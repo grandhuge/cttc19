@@ -106,35 +106,41 @@
             </div>
         </div>
 
-        <div id="reportResults" class="fade-in">
-            <div class="bg-white rounded-lg p-6 shadow-md mb-6">
-                <h2 id="reportTitle" class="text-xl font-semibold text-gray-800 mb-4">รายงานการปฏิบัติงานทั้งหมด</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full border-collapse">
-                        <thead>
-                            <tr>
-                                <th class="px-4 py-3 text-left" data-sort="employee">พนักงาน</th>
-                                <th class="px-4 py-3 text-left" data-sort="date">วันที่ปฏิบัติงาน</th>
-                                <th class="px-4 py-3 text-left" data-sort="work">งานที่ปฏิบัติ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportData">
-                            <tr>
-                                <td colspan="3" class="px-4 py-3 text-center text-gray-500">กำลังโหลดข้อมูล...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="text-center">
-                <button id="printReport" class="btn-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 mr-3">
-                    พิมพ์รายงาน
-                </button>
-                <button id="exportCSV" class="btn-tertiary text-white font-medium py-2 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
-                    ส่งออก CSV
-                </button>
-            </div>
+        <!-- แก้ไขส่วน reportResults ใน HTML -->
+<div id="reportResults" class="fade-in">
+    <div class="bg-white rounded-lg p-6 shadow-md mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 id="reportTitle" class="text-xl font-semibold text-gray-800">รายงานการปฏิบัติงานทั้งหมด</h2>
+            <div id="rowCountDisplay" class="text-sm text-gray-500">กำลังโหลดข้อมูล...</div>
         </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full border-collapse">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-3 text-left" data-sort="employee">พนักงาน</th>
+                        <th class="px-4 py-3 text-left" data-sort="date">วันที่ปฏิบัติงาน</th>
+                        <th class="px-4 py-3 text-left" data-sort="work">งานที่ปฏิบัติ</th>
+                    </tr>
+                </thead>
+                <tbody id="reportData">
+                    <tr>
+                        <td colspan="3" class="px-4 py-3 text-center text-gray-500">กำลังโหลดข้อมูล...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- เพิ่ม pagination container -->
+        <div id="pagination" class="flex justify-center mt-4"></div>
+    </div>
+    <div class="text-center">
+        <button id="printReport" class="btn-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 mr-3">
+            พิมพ์รายงาน
+        </button>
+        <button id="exportCSV" class="btn-tertiary text-white font-medium py-2 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
+            ส่งออก CSV
+        </button>
+    </div>
+</div>
     </div>
 
     <script>
@@ -146,6 +152,9 @@
         let currentSortDirection = 'desc';
         let currentEmployee = '';
         let currentMonth = '';
+		// เพิ่มตัวแปรเหล่านี้ที่ส่วนบนของ script
+let currentPage = 1;
+const rowsPerPage = 31;
 
         // Function to fetch data using JSONP
         function fetchData() {
@@ -295,6 +304,9 @@
         function displayAllData() {
             const reportTitle = document.getElementById('reportTitle');
             
+			// รีเซ็ตไปที่หน้าแรกเมื่อแสดงทั้งหมด
+    currentPage = 1;
+			
             // Reset current filters
             currentEmployee = '';
             currentMonth = '';
@@ -313,53 +325,176 @@
         }
 
         // Render data to table
-        function renderData() {
-            const reportData = document.getElementById('reportData');
+        // แก้ไขฟังก์ชัน renderData() ให้แสดงเฉพาะข้อมูลในหน้าที่เลือก
+function renderData() {
+    const reportData = document.getElementById('reportData');
+    
+    // Clear previous data
+    reportData.innerHTML = '';
+    
+    // Calculate pagination
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = Math.min(startIndex + rowsPerPage, displayData.length);
+    const paginatedData = displayData.slice(startIndex, endIndex);
+    
+    // Add data rows
+    if (paginatedData.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="3" class="px-4 py-3 text-center text-gray-500">ไม่พบข้อมูลการปฏิบัติงาน</td>`;
+        reportData.appendChild(row);
+    } else {
+        paginatedData.forEach(rowData => {
+            if (!rowData[1] || !rowData[2]) return; // Skip rows with missing employee or date
             
-            // Clear previous data
-            reportData.innerHTML = '';
+            const row = document.createElement('tr');
             
-            // Add data rows
-            if (displayData.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="3" class="px-4 py-3 text-center text-gray-500">ไม่พบข้อมูลการปฏิบัติงาน</td>`;
-                reportData.appendChild(row);
-            } else {
-                displayData.forEach(rowData => {
-                    if (!rowData[1] || !rowData[2]) return; // Skip rows with missing employee or date
-                    
-                    const row = document.createElement('tr');
-                    
-                    // Format date
-                    let dateDisplay = rowData[2];
-                    try {
-                        const date = new Date(rowData[2]);
-                        if (!isNaN(date.getTime())) {
-                            dateDisplay = date.toLocaleDateString('th-TH', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            });
-                        }
-                    } catch (e) {
-                        console.error("Error formatting date:", e);
-                    }
-                    
-                    row.innerHTML = `
-                        <td class="border px-4 py-3">${rowData[1] || '-'}</td>
-                        <td class="border px-4 py-3">${dateDisplay}</td>
-                        <td class="border px-4 py-3">${rowData[3] || '-'}</td>
-                    `;
-                    reportData.appendChild(row);
-                });
+            // Format date
+            let dateDisplay = rowData[2];
+            try {
+                const date = new Date(rowData[2]);
+                if (!isNaN(date.getTime())) {
+                    dateDisplay = date.toLocaleDateString('th-TH', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                }
+            } catch (e) {
+                console.error("Error formatting date:", e);
             }
+            
+            row.innerHTML = `
+                <td class="border px-4 py-3">${rowData[1] || '-'}</td>
+                <td class="border px-4 py-3">${dateDisplay}</td>
+                <td class="border px-4 py-3">${rowData[3] || '-'}</td>
+            `;
+            reportData.appendChild(row);
+        });
+    }
+    
+    // Render pagination
+    renderPagination();
+    
+    // Update row count display
+    updateRowCountDisplay(startIndex + 1, endIndex, displayData.length);
+}
+
+// เพิ่มฟังก์ชันแสดงจำนวนแถว
+function updateRowCountDisplay(start, end, total) {
+    const rowCountDisplay = document.getElementById('rowCountDisplay');
+    if (rowCountDisplay) {
+        rowCountDisplay.textContent = `แสดง ${start} ถึง ${end} จาก ${total} แถว`;
+    }
+}
+		
+		// เพิ่มฟังก์ชันนี้หลังฟังก์ชัน renderData()
+function renderPagination() {
+    const paginationContainer = document.getElementById('pagination');
+    if (!paginationContainer) return;
+    
+    const totalPages = Math.ceil(displayData.length / rowsPerPage);
+    
+    // Clear previous pagination
+    paginationContainer.innerHTML = '';
+    
+    if (totalPages <= 1) return;
+    
+    // Previous button
+    const prevButton = document.createElement('button');
+    prevButton.textContent = '← ก่อนหน้า';
+    prevButton.className = 'px-3 py-1 mx-1 rounded-lg border border-gray-300 hover:bg-gray-100';
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderData();
+            renderPagination();
         }
+    });
+    paginationContainer.appendChild(prevButton);
+    
+    // Page numbers
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    if (startPage > 1) {
+        const firstPageButton = document.createElement('button');
+        firstPageButton.textContent = '1';
+        firstPageButton.className = 'px-3 py-1 mx-1 rounded-lg border border-gray-300 hover:bg-gray-100';
+        firstPageButton.addEventListener('click', () => {
+            currentPage = 1;
+            renderData();
+            renderPagination();
+        });
+        paginationContainer.appendChild(firstPageButton);
+        
+        if (startPage > 2) {
+            const ellipsis = document.createElement('span');
+            ellipsis.textContent = '...';
+            ellipsis.className = 'px-3 py-1 mx-1';
+            paginationContainer.appendChild(ellipsis);
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        pageButton.className = `px-3 py-1 mx-1 rounded-lg border ${i === currentPage ? 'bg-green-500 text-white' : 'border-gray-300 hover:bg-gray-100'}`;
+        pageButton.addEventListener('click', () => {
+            currentPage = i;
+            renderData();
+            renderPagination();
+        });
+        paginationContainer.appendChild(pageButton);
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            const ellipsis = document.createElement('span');
+            ellipsis.textContent = '...';
+            ellipsis.className = 'px-3 py-1 mx-1';
+            paginationContainer.appendChild(ellipsis);
+        }
+        
+        const lastPageButton = document.createElement('button');
+        lastPageButton.textContent = totalPages;
+        lastPageButton.className = 'px-3 py-1 mx-1 rounded-lg border border-gray-300 hover:bg-gray-100';
+        lastPageButton.addEventListener('click', () => {
+            currentPage = totalPages;
+            renderData();
+            renderPagination();
+        });
+        paginationContainer.appendChild(lastPageButton);
+    }
+    
+    // Next button
+    const nextButton = document.createElement('button');
+    nextButton.textContent = 'ถัดไป →';
+    nextButton.className = 'px-3 py-1 mx-1 rounded-lg border border-gray-300 hover:bg-gray-100';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderData();
+            renderPagination();
+        }
+    });
+    paginationContainer.appendChild(nextButton);
+}
 
         // Generate filtered report based on selections
         function generateReport() {
             const employee = document.getElementById('employeeSelect').value;
             const month = document.getElementById('monthSelect').value;
             
+			// รีเซ็ตไปที่หน้าแรกเมื่อมีการกรองใหม่
+    currentPage = 1;
+			
             // Store current filters
             currentEmployee = employee;
             currentMonth = month;
