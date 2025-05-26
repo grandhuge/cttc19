@@ -823,9 +823,9 @@
           const scoreNum = parseFloat(score);
           let colorClass = 'bg-gray-100';
           
-          if (scoreNum >= 4.5) colorClass = 'bg-green-100 text-green-800';
+          if (scoreNum >= 4) colorClass = 'bg-green-100 text-green-800';
           else if (scoreNum >= 3.5) colorClass = 'bg-blue-100 text-blue-800';
-          else if (scoreNum >= 2.5) colorClass = 'bg-yellow-100 text-yellow-800';
+          else if (scoreNum >= 3) colorClass = 'bg-yellow-100 text-yellow-800';
           else colorClass = 'bg-red-100 text-red-800';
           
           return `<td class="px-4 py-3 text-center ${colorClass} font-medium">${score}</td>`;
@@ -835,9 +835,9 @@
         const totalScoreNum = parseFloat(formattedTotalScore);
         let totalScoreClass = 'bg-gray-100';
         
-        if (totalScoreNum >= 4.5) totalScoreClass = 'bg-green-100 text-green-800';
+        if (totalScoreNum >= 4) totalScoreClass = 'bg-green-100 text-green-800';
         else if (totalScoreNum >= 3.5) totalScoreClass = 'bg-blue-100 text-blue-800';
-        else if (totalScoreNum >= 2.5) totalScoreClass = 'bg-yellow-100 text-yellow-800';
+        else if (totalScoreNum >= 3) totalScoreClass = 'bg-yellow-100 text-yellow-800';
         else totalScoreClass = 'bg-red-100 text-red-800';
         
         row.innerHTML = `
