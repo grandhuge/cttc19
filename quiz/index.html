@@ -1,0 +1,959 @@
+<html lang="th"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมตอบคำถามมหาสนุก by cttc19</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&amp;family=Itim&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-image: url('img/bg.png');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+        }
+        
+        .game-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            overflow: hidden;
+        }
+        
+        .title-font {
+            font-family: 'Itim', cursive;
+        }
+        
+        .timer-animation {
+            transition: width 1s linear;
+        }
+        
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            animation: bounceIn 0.5s;
+        }
+        
+        .answer-btn {
+            transition: all 0.3s;
+            border-radius: 16px;
+            border-width: 3px;
+            box-shadow: 0 4px 0 #6366f1;
+        }
+        
+        .answer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 0 #6366f1;
+        }
+        
+        .answer-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 0 #6366f1;
+        }
+        
+        .disabled-btn {
+            box-shadow: none;
+            transform: none;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            70% { transform: translate(-50%, -50%) scale(0.9); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .footer {
+            background-color: rgba(99, 102, 241, 0.9);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.relative{position:relative}.my-12{margin-top:3rem;margin-bottom:3rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mr-2{margin-right:0.5rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-24{height:6rem}.h-4{height:1rem}.min-h-screen{min-height:100vh}.w-64{width:16rem}.w-full{width:100%}.max-w-4xl{max-width:56rem}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-4{gap:1rem}.overflow-hidden{overflow:hidden}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-xl{border-radius:0.75rem}.border-2{border-width:2px}.border-4{border-width:4px}.border-blue-300{--tw-border-opacity:1;border-color:rgb(147 197 253 / var(--tw-border-opacity, 1))}.border-green-300{--tw-border-opacity:1;border-color:rgb(134 239 172 / var(--tw-border-opacity, 1))}.border-green-500{--tw-border-opacity:1;border-color:rgb(34 197 94 / var(--tw-border-opacity, 1))}.border-red-500{--tw-border-opacity:1;border-color:rgb(239 68 68 / var(--tw-border-opacity, 1))}.border-yellow-300{--tw-border-opacity:1;border-color:rgb(253 224 71 / var(--tw-border-opacity, 1))}.bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-indigo-100{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.bg-indigo-300{--tw-bg-opacity:1;background-color:rgb(165 180 252 / var(--tw-bg-opacity, 1))}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-red-100{--tw-bg-opacity:1;background-color:rgb(254 226 226 / var(--tw-bg-opacity, 1))}.bg-yellow-100{--tw-bg-opacity:1;background-color:rgb(254 249 195 / var(--tw-bg-opacity, 1))}.bg-yellow-300{--tw-bg-opacity:1;background-color:rgb(253 224 71 / var(--tw-bg-opacity, 1))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-indigo-500{--tw-gradient-from:#6366f1 var(--tw-gradient-from-position);--tw-gradient-to:rgb(99 102 241 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-purple-600{--tw-gradient-to:#9333ea var(--tw-gradient-to-position)}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-10{padding-left:2.5rem;padding-right:2.5rem}.py-4{padding-top:1rem;padding-bottom:1rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.text-6xl{font-size:3.75rem;line-height:1}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-semibold{font-weight:600}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-green-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-indigo-500{--tw-text-opacity:1;color:rgb(99 102 241 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.text-indigo-800{--tw-text-opacity:1;color:rgb(55 48 163 / var(--tw-text-opacity, 1))}.text-red-600{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.text-red-700{--tw-text-opacity:1;color:rgb(185 28 28 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-yellow-300{--tw-text-opacity:1;color:rgb(253 224 71 / var(--tw-text-opacity, 1))}.text-yellow-600{--tw-text-opacity:1;color:rgb(202 138 4 / var(--tw-text-opacity, 1))}.text-yellow-700{--tw-text-opacity:1;color:rgb(161 98 7 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}</style></head>
+<body class="flex items-center justify-center p-4 relative min-h-screen">
+    <div class="game-container max-w-4xl w-full my-12">
+        <!-- หน้าเริ่มต้น -->
+        <div id="start-screen" class="p-8 text-center">
+            <!-- Logo placeholder -->
+            <div class="flex justify-center mb-4">
+                <img src="img/logo.png" alt="Game Logo" class="h-24 floating">
+            </div>
+            
+            <h1 class="text-5xl font-bold text-indigo-600 mb-6 title-font">เกมกดให้ไว..ตอบให้ทัน!!</h1>
+            <p class="text-xl text-indigo-500 mb-8">ตอบคำถาม 10 ข้อ ข้อละ 1 นาที</p>
+            
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <div class="bg-yellow-100 p-4 rounded-xl border-2 border-yellow-300 w-64">
+                    <div class="text-yellow-600 text-4xl mb-2">🎮</div>
+                    <h3 class="font-bold text-yellow-700">วิธีเล่น</h3>
+                    <p class="text-yellow-600">ตอบคำถามให้ถูกต้องเพื่อไปข้อถัดไป</p>
+                </div>
+                <div class="bg-green-100 p-4 rounded-xl border-2 border-green-300 w-64">
+                    <div class="text-green-600 text-4xl mb-2">⏱️</div>
+                    <h3 class="font-bold text-green-700">เวลา</h3>
+                    <p class="text-green-600">มีเวลา 60 วินาทีในแต่ละข้อ</p>
+                </div>
+                <div class="bg-blue-100 p-4 rounded-xl border-2 border-blue-300 w-64">
+                    <div class="text-blue-600 text-4xl mb-2">🏆</div>
+                    <h3 class="font-bold text-blue-700">คะแนน</h3>
+                    <p class="text-blue-600">ตอบถูกได้ 1 คะแนน</p>
+                </div>
+            </div>
+            
+            <button id="start-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-2xl text-2xl transition-all transform hover:scale-105 shadow-lg">
+                เริ่มเกม 🚀
+            </button>
+        </div>
+
+        <!-- หน้าคำถาม -->
+        <div id="quiz-screen" class="hidden">
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-semibold">คำถามที่ <span id="question-number" class="text-yellow-300 font-bold">1</span>/10</h2>
+                    <div class="text-2xl font-semibold flex items-center">
+                        <span class="mr-2">⏱️</span> <span id="timer" class="text-yellow-300 font-bold">60</span> วินาที
+                    </div>
+                </div>
+                <div class="w-full bg-indigo-300 h-4 mt-3 rounded-full overflow-hidden">
+                    <div id="timer-bar" class="bg-yellow-300 h-4 rounded-full timer-animation" style="width: 100%;"></div>
+                </div>
+            </div>
+            
+            <div class="p-8">
+                <div class="bg-indigo-100 p-6 rounded-2xl mb-6 shadow-md">
+                    <h3 id="question-text" class="text-2xl font-semibold text-indigo-800"></h3>
+                </div>
+                
+                <div id="answers" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- ตัวเลือกคำตอบจะถูกเพิ่มที่นี่ด้วย JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าสรุปผล -->
+        <div id="result-screen" class="hidden p-8 text-center">
+<!--            <h2 class="text-4xl font-bold text-indigo-600 mb-4 title-font">ผลคะแนน</h2>
+            
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-8 rounded-2xl mb-6">
+                <p class="text-6xl font-bold text-white mb-2"><span id="score">0</span> / 10</p>
+                <p class="text-xl text-yellow-300">คุณตอบถูก <span id="correct-count">0</span> ข้อ จาก 10 ข้อ</p>
+            </div>
+ -->           
+//            <div id="result-message" class="mb-8 text-xl text-indigo-700">
+                <!-- ข้อความจะถูกเพิ่มโดย JavaScript -->
+//            </div>
+           
+            <button id="restart-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-2xl text-2xl transition-all transform hover:scale-105 shadow-lg">
+                เล่นอีกครั้ง 🔄
+            </button>
+        </div>
+    </div>
+
+    <!-- ส่วนแสดงผลตอบถูก/ผิด -->
+    <div id="feedback" class="hidden feedback">
+        <div id="correct-feedback" class="hidden">
+            <div class="bg-green-100 p-8 rounded-2xl border-4 border-green-500 shadow-xl">
+                <div class="text-6xl mb-4">🎉</div>
+                <p class="text-3xl font-bold text-green-700">ถูกต้อง!</p>
+            </div>
+        </div>
+        <div id="incorrect-feedback" class="hidden">
+            <div class="bg-red-100 p-8 rounded-2xl border-4 border-red-500 shadow-xl">
+                <div class="text-6xl mb-4">😢</div>
+                <p class="text-3xl font-bold text-red-700">ไม่ถูกต้อง!</p>
+                <p class="text-xl text-red-600 mt-2">ลองตอบใหม่อีกครั้ง</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        © 2025 developed by Tle Narongphisit | ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี
+    </div>
+
+    <script>
+        // ข้อมูลคำถาม  ข้อ
+        const allQuestions = [
+            {
+                question: "สหกรณ์คืออะไร?",
+                answers: ["ร้านขายของ", "กลุ่มคนที่ช่วยกันทำงานและแบ่งปันผลประโยชน์", "ที่ฝากเงิน", "การประชุมใหญ่"],
+                correct: 1
+            },
+            {
+                question: "ข้อใดคือประโยชน์ของการเป็นสมาชิกสหกรณ์?",
+                answers: ["ได้ของฟรีทุกวัน", "ได้รู้จักการช่วยเหลือกันและการออมเงิน", "ได้เที่ยวต่างประเทศ", "ไม่ต้องเรียนหนังสือ"],
+                correct: 1
+            },
+            {
+                question: "ข้อใดคือสิ่งที่ควรทำเมื่อเป็นสมาชิกสหกรณ์?",
+                answers: ["ใช้ของในร้านโดยไม่จ่ายเงิน", "ช่วยกันดูแลและทำงานร่วมกัน", "ขโมยของเพราะเป็นของส่วนรวม", "แกล้งเพื่อนให้ถูกหักเงิน"],
+                correct: 1
+            },
+            {
+                question: "ร้านสหกรณ์ในโรงเรียนส่วนใหญ่ขายอะไร?",
+                answers: ["เสื้อผ้าแฟชั่น", "ขนมและของใช้จำเป็นในการเรียน", "โทรศัพท์มือถือ", "ของตกแต่งบ้าน"],
+                correct: 1
+            },
+            {
+                question: "สหกรณ์นักเรียนสอนให้นักเรียนรู้จักอะไร?",
+                answers: ["การแกล้งเพื่อน", "การออมเงิน การทำงานเป็นทีม", "การเล่นเกมเก่ง", "การใช้เงินฟุ่มเฟือย"],
+                correct: 1
+            },
+            {
+                question: "ใครคือผู้ได้รับยกย่องว่าเป็นพระบิดาแห่งการสหกรณ์ไทย”?",
+                answers: ["พระบาทสมเด็จพระจุลจอมเกล้าเจ้าอยู่หัว", "พระราชวรวงศ์เธอ กรมหมื่นพิทยาลงกรณ์", "รัชกาลที่ 1", "สมเด็จพระเทพรัตนราชสุดาฯ"],
+                correct: 1
+            },
+            {
+                question: "วันที่ 7 มิถุนายน ของทุกปี คือวันอะไร?",
+                answers: ["วันเด็ก", "วันออมสิน", "วันสหกรณ์นักเรียน", "วันครู"],
+                correct: 2
+            },
+            {
+                question: "ถ้าเพื่อนซื้อของในร้านสหกรณ์แล้วลืมจ่ายเงิน เราควรทำอย่างไร?",
+                answers: ["เงียบไว้", "แอบหยิบเพิ่ม", "บอกให้เพื่อนจ่ายให้ครบ", "ยืมของเพื่อนแทน"],
+                correct: 2
+            },
+            {
+                question: "ถ้ามีเงินเหลือจากการซื้อของในร้านสหกรณ์ ควรทำอย่างไร?",
+                answers: ["เอาไปซื้อขนมหมด", "เอาไปให้เพื่อนใช้", "เก็บไว้ในบัญชีออมทรัพย์ของสหกรณ์", "ซื้อของเล่น"],
+                correct: 2
+            },
+            {
+                question: "สหกรณ์แห่งแรกในประเทศไทยคือที่ใด?",
+                answers: ["สหกรณ์หนองโพ", "สหกรณ์วัดจันทร์ จังหวัดพิษณุโลก", "สหกรณ์เครดิตยูเนี่ยนหิรัญญาวาส", "สหกรณ์นิคมท่ายาง"],
+                correct: 1
+            },
+            {
+                question: "วันสหกรณ์แห่งชาติ ตรงกับวันที่ใด?",
+                answers: ["7 มิถุนายน", "12 สิงหาคม", "26 กุมภาพันธ์", "5 ธันวาคม"],
+                correct: 2
+            },
+            {
+                question: "ใครเป็นผู้ริเริ่มแนวคิดสหกรณ์ในโลก?",
+                answers: ["วิลเลี่ยม คิง", "โรเบิร์ต โอเวน", "อดัม สมิธ", "คาร์ล มาร์กซ์"],
+                correct: 1
+            },
+            {
+                question: "หลักการสหกรณ์สากลมีทั้งหมดกี่ข้อ?",
+                answers: ["5 ข้อ", "6 ข้อ", "7 ข้อ", "10 ข้อ"],
+                correct: 2
+            },
+            {
+                question: "สหกรณ์รอชเดลอยู่ในประเทศใด?",
+                answers: ["ฝรั่งเศส", "เยอรมนี", "สหรัฐอเมริกา", "อังกฤษ"],
+                correct: 3
+            },
+            {
+                question: "วันสหกรณ์นักเรียนตรงกับวันที่ใด?",
+                answers: ["7 มิถุนายน", "26 มิถุนายน", "26 กุมภาพันธ์", "7 กุมภาพันธ์"],
+                correct: 0
+            },
+			{
+                question: "ข้อใดคือหลักการสหกรณ์ข้อหนึ่ง?",
+                answers: ["เปิดรับสมาชิกโดยสมัครใจ", "มีการควบคุมแบบประชาธิปไตย", "สมาชิกต้องจ่ายภาษีสูง", "ไม่รับสมาชิกใหม่"],
+                correct: 0
+            },
+			{
+                question: "ข้อใดไม่ใช่ประเภทของสหกรณ์ในประเทศไทย?",
+                answers: ["สหกรณ์บริการ", "สหกรณ์นิคม", "สหกรณ์ชาวนา", "สหกรณ์เครดิตยูเนี่ยน"],
+                correct: 2
+            },
+	{
+        question: "การช่วยตนเองและช่วยเหลือกัน เป็นแนวคิดของอะไร?",
+        answers: ["ระบบทุนนิยม", "ระบบสหกรณ์", "ระบบศักดินา", "ระบบเผด็จการ"],
+        correct: 1
+    },
+    {
+        question: "พระราชดำรัสที่อธิบายความหมายของคำว่า “สหกรณ์” คือของใคร?",
+        answers: ["รัชกาลที่ 5", "รัชกาลที่ 9", "รัชกาลที่ 10", "สมเด็จพระเทพรัตนราชสุดาฯ"],
+        correct: 1
+    },
+    {
+        question: "อุดมการณ์ของสหกรณ์คือข้อใด?",
+        answers: ["แข่งขันกันอย่างสุดกำลัง", "เอากำไรสูงสุด", "ช่วยตนเองและช่วยเหลือซึ่งกันและกัน", "ใช้แรงงานเด็ก"],
+        correct: 2
+    },
+    {
+        question: "การปันผลของสหกรณ์คืออะไร?",
+        answers: ["เงินที่ให้ฟรีๆ", "เงินแบ่งกำไรให้สมาชิก", "เงินเดือน", "เงินฝาก"],
+        correct: 1
+    },
+    {
+        question: "ประโยชน์ของสหกรณ์คือข้อใด?",
+        answers: ["ช่วยให้คนแข่งขันกัน", "ช่วยให้คนเป็นหนี้", "ช่วยให้คนได้ช่วยเหลือกัน", "ช่วยให้เศรษฐกิจตกต่ำ"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์ต้องดำเนินงานแบบใด?",
+        answers: ["แบบผูกขาด", "แบบราชการ", "แบบประชาธิปไตย", "แบบบริษัทเอกชน"],
+        correct: 2
+    },
+	{
+question: "“การรวมกลุ่มของคนที่มีเป้าหมายเดียวกัน” หมายถึงอะไร?",
+answers: ["ชุมนุม", "พรรคการเมือง", "สหกรณ์", "โรงเรียน"],
+correct: 2
+},
+{
+question: "สหกรณ์ออมทรัพย์มีเป้าหมายหลักคืออะไร?",
+answers: ["ซื้อขาย", "เก็บเงิน", "ส่งเสริมการออมและให้กู้ยืม", "ผลิตสินค้า"],
+correct: 2
+},
+{
+question: "การดำเนินงานสหกรณ์ต้องยึดอะไรเป็นหลัก?",
+answers: ["ผลประโยชน์ส่วนตน", "ความมั่นคงของรัฐ", "ผลประโยชน์ร่วมกัน", "ความสะดวกของผู้นำ"],
+correct: 2
+},
+{
+question: "ผู้ก่อตั้งสหกรณ์แห่งแรกของไทยคือใคร?",
+answers: ["สมเด็จพระเทพฯ", "พระราชวรวงศ์เธอ กรมหมื่นพิทยาลงกรณ์", "รัชกาลที่ 9", "นายเบอร์นาร์ด ฮันเตอร์"],
+correct: 1
+},
+{
+        question: "สหกรณ์เกิดขึ้นเพื่อแก้ปัญหาใดในสังคมเป็นหลัก?",
+        answers: ["การไม่มีเวลาพักผ่อน", "การคมนาคมไม่สะดวก", "ความยากจนและการถูกเอารัดเอาเปรียบ", "การมีเทคโนโลยีมากเกินไป"],
+        correct: 2
+    },
+    {
+        question: "วันสหกรณ์สากลตรงกับวันใดของทุกปี?",
+        answers: ["เสาร์แรกของเดือนมิถุนายน", "เสาร์แรกของเดือนกรกฎาคม", "วันที่ 26 กุมภาพันธ์", "วันที่ 7 มิถุนายน"],
+        correct: 1
+    },
+    {
+        question: "ข้อใดคือลักษณะของ 'อุดมการณ์สหกรณ์'?",
+        answers: ["เอาเปรียบเพื่อความอยู่รอด", "เน้นผลกำไรสูงสุด", "การช่วยเหลือตนเองและกันและกัน", "แข่งขันให้ชนะผู้อื่น"],
+        correct: 2
+    },
+    {
+        question: "หลักการสหกรณ์ข้อที่ 5 คืออะไร?",
+        answers: ["การใช้แรงงานเด็ก", "การศึกษา ฝึกอบรม และสารสนเทศ", "การควบคุมกำไร", "การใช้ทรัพยากรร่วม"],
+        correct: 1
+    },
+    {
+        question: "ข้อใดคือสหกรณ์ประเภทหนึ่งในประเทศไทย?",
+        answers: ["สหกรณ์แรงงาน", "สหกรณ์เยาวชน", "สหกรณ์ร้านค้า", "สหกรณ์บริษัท"],
+        correct: 2
+    },
+    {
+        question: "โรเบิร์ต โอเวน พยายามก่อตั้งสหกรณ์ที่ใดในอเมริกา?",
+        answers: ["ลอสแองเจลิส", "นิวฮาโมนี่", "บรู๊คลิน", "วอชิงตัน"],
+        correct: 1
+    },
+    {
+        question: "สมาชิกสหกรณ์มีสิทธิ์อะไรในการประชุมใหญ่?",
+        answers: ["พูดคุยอย่างเดียว", "ช่วยกันทำความสะอาด", "ออกเสียงลงคะแนนได้ 1 เสียง", "ไม่มีสิทธิ์ทำอะไร"],
+        correct: 2
+    },
+    {
+        question: "หลักการข้อใดกล่าวถึง 'การร่วมมือระหว่างสหกรณ์'?",
+        answers: ["ข้อ 1", "ข้อ 4", "ข้อ 6", "ข้อ 7"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์มีความแตกต่างจากบริษัทเอกชนในเรื่องใดมากที่สุด?",
+        answers: ["ความหรูหรา", "การแข่งขัน", "การมีส่วนร่วมของสมาชิก", "การใช้เทคโนโลยี"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์ส่งเสริมการพึ่งพาตนเองด้วยวิธีใด?",
+        answers: ["ยืมเงินจากธนาคารต่างประเทศ", "ทำธุรกิจตามใจผู้นำ", "รวมเงินและแรงกันทำกิจกรรม", "ซื้อของจากต่างชาติ"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์ใดเน้นเรื่องการเลี้ยงสัตว์และปลูกพืช?",
+        answers: ["สหกรณ์เครดิตยูเนี่ยน", "สหกรณ์บริการ", "สหกรณ์การเกษตร", "สหกรณ์ร้านค้า"],
+        correct: 2
+    },
+    {
+        question: "หลักการข้อที่ 7 เน้นเรื่องใด?",
+        answers: ["การซื้อขาย", "การแข่งขันในตลาด", "การเอื้ออาทรต่อชุมชน", "การควบคุมโดยรัฐบาล"],
+        correct: 2
+    },
+    {
+        question: "ข้อใดเป็นคุณธรรมที่สมาชิกสหกรณ์ควรมี?",
+        answers: ["ความลับ", "ความขยัน", "ความซื่อสัตย์", "ความเฉยเมย"],
+        correct: 2
+    },
+    {
+        question: "หลักการใดกล่าวถึงการรับสมาชิกทั่วไปโดยสมัครใจ?",
+        answers: ["ข้อ 1", "ข้อ 3", "ข้อ 5", "ข้อ 7"],
+        correct: 0
+    },
+    {
+        question: "จุดเด่นของสหกรณ์คืออะไร?",
+        answers: ["การใช้แรงงานเด็ก", "เน้นผลกำไรสูงสุด", "การเป็นเจ้าของร่วมกัน", "ความเป็นเอกชน"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์เครดิตยูเนี่ยนให้บริการใดเป็นหลัก?",
+        answers: ["การเดินทาง", "การศึกษา", "การออมและกู้ยืม", "การรักษาพยาบาล"],
+        correct: 2
+    },
+    {
+        question: "วิธีการหนึ่งของสหกรณ์คืออะไร?",
+        answers: ["ขายของราคาสูง", "ประชุมร่วมกัน", "ห้ามสมาชิกพูด", "แบ่งกลุ่มแข่งขันกัน"],
+        correct: 1
+    },
+    {
+        question: "'ผลตอบแทนจากการถือหุ้นในสหกรณ์' เรียกว่าอะไร?",
+        answers: ["เงินฝาก", "เงินกู้", "เงินปันผล", "เงินเดือน"],
+        correct: 2
+    },
+    {
+        question: "สมเด็จพระเทพฯ มีบทบาทในการส่งเสริมสหกรณ์ผ่านโรงเรียนใด?",
+        answers: ["โรงเรียนในวัด", "โรงเรียนเอกชน", "โรงเรียนตำรวจตระเวนชายแดน", "โรงเรียนประถมทั่วไป"],
+        correct: 2
+    },
+	{
+        question: "ใครเป็นผู้เสนอแนะให้จัดการเรียนรู้เรื่องสหกรณ์ในโรงเรียนตำรวจตระเวนชายแดน?",
+        answers: ["รัชกาลที่ 9", "สมเด็จพระเทพรัตนราชสุดาฯ", "นายกรัฐมนตรี", "รัฐมนตรีว่าการศึกษาธิการ"],
+        correct: 1
+    },
+    {
+        question: "การถือหุ้นในสหกรณ์เรียกอีกอย่างว่าอะไร?",
+        answers: ["เงินบริจาค", "เงินสะสม", "เงินทุนเรือนหุ้น", "เงินปันผล"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์เน้นการตัดสินใจแบบใด?",
+        answers: ["ผู้นำสั่ง", "สมาชิกโหวตเสียง", "หัวหน้าเลือก", "ตัดสินใจลับ"],
+        correct: 1
+    },
+    {
+        question: "สมาชิกในสหกรณ์สามารถ...",
+        answers: ["ขายหุ้นให้คนภายนอก", "ลาออกได้โดยสมัครใจ", "บริหารงานเองโดยลำพัง", "ไม่ต้องร่วมกิจกรรม"],
+        correct: 1
+    },
+    {
+        question: "องค์กรสากลที่เกี่ยวข้องกับสหกรณ์คืออะไร?",
+        answers: ["WTO", "WHO", "ICA", "APEC"],
+        correct: 2
+    },
+    {
+        question: "หลักการสหกรณ์ข้อ 2 คือเรื่องใด?",
+        answers: ["การเป็นสมาชิกโดยสมัครใจ", "การควบคุมโดยสมาชิกตามแนวประชาธิปไตย", "การมีส่วนร่วมทางเศรษฐกิจ", "การปกครองตนเอง"],
+        correct: 1
+    },
+    {
+        question: "จุดเริ่มต้นของสหกรณ์ในประเทศไทยมาจากปัญหาใดของเกษตรกร?",
+        answers: ["การใช้แรงงานเด็ก", "การขาดแคลนน้ำ", "การขาดแคลนเงินทุน", "การศึกษาต่ำ"],
+        correct: 2
+    },
+    {
+        question: "การปันผลของสหกรณ์เกิดจากอะไร?",
+        answers: ["เงินบริจาค", "กำไรสุทธิจากกิจกรรม", "การกู้เงิน", "การประกันภัย"],
+        correct: 1
+    },
+    {
+        question: "สหกรณ์ใดที่ส่งเสริมการจับปลาและการเพาะเลี้ยงสัตว์น้ำ?",
+        answers: ["สหกรณ์บริการ", "สหกรณ์เครดิตยูเนี่ยน", "สหกรณ์ประมง", "สหกรณ์ออมทรัพย์"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์แห่งใดที่สมเด็จพระเทพฯ เสด็จพระราชดำเนินไปเยี่ยมชมบ่อยครั้ง?",
+        answers: ["สหกรณ์โคนมหนองโพ", "สหกรณ์หุบกะพง", "สหกรณ์นิคมท่ายาง", "สหกรณ์นักเรียน ตชด."],
+        correct: 3
+    },
+    {
+        question: "การเป็นเจ้าของร่วมกันของสมาชิกในสหกรณ์แสดงถึงหลักใด?",
+        answers: ["ประชาธิปไตย", "เศรษฐกิจพอเพียง", "ความเท่าเทียมกัน", "ความรับผิดชอบร่วม"],
+        correct: 3
+    },
+    {
+        question: "สหกรณ์เครดิตยูเนี่ยนเน้นการบริการแบบใด?",
+        answers: ["ประมง", "สินเชื่อและออมทรัพย์", "ร้านค้า", "เกษตรกรรม"],
+        correct: 1
+    },
+    {
+        question: "ประโยชน์ที่ชัดเจนของการเรียนรู้สหกรณ์สำหรับนักเรียนคืออะไร?",
+        answers: ["ได้เกรดดี", "ได้เงินเดือน", "เรียนรู้การทำงานร่วมกัน", "ได้ทุนเรียนต่อ"],
+        correct: 2
+    },
+    {
+        question: "คำว่า 'ปันผล' หมายถึงอะไร?",
+        answers: ["เงินที่สหกรณ์จ่ายให้สมาชิกจากกำไร", "เงินเดือนกรรมการ", "เงินฝากประจำ", "ค่าลงทะเบียน"],
+        correct: 0
+    },
+    {
+        question: "ข้อใดไม่ใช่หลักของสหกรณ์?",
+        answers: ["รับสมาชิกโดยสมัครใจ", "ปิดกั้นข้อมูลจากสมาชิก", "การควบคุมแบบประชาธิปไตย", "การศึกษาอบรม"],
+        correct: 1
+    },
+    {
+        question: "'ความเสมอภาค' หมายถึงอะไรในการดำเนินงานของสหกรณ์?",
+        answers: ["มีกรรมการเท่าๆ กัน", "สมาชิกออกเสียงเท่าเทียม", "รายได้ต้องเท่ากัน", "ทุกคนต้องทำงานหนักเท่ากัน"],
+        correct: 1
+    },
+    {
+        question: "สหกรณ์ใดเกี่ยวข้องกับการค้าขายสินค้า?",
+        answers: ["สหกรณ์เครดิตยูเนี่ยน", "สหกรณ์บริการ", "สหกรณ์ร้านค้า", "สหกรณ์ออมทรัพย์"],
+        correct: 2
+    },
+    {
+        question: "กำไรสุทธิของสหกรณ์จะถูกนำไปทำอะไร?",
+        answers: ["มอบให้รัฐบาล", "หารเฉลี่ยให้ทุกคนในชุมชน", "ใช้จ่ายทั่วไป", "จัดสรรเป็นทุนสำรองและปันผล"],
+        correct: 3
+    },
+    {
+        question: "หน่วยงานใดที่เริ่มส่งเสริมสหกรณ์ในโรงเรียนทั่วประเทศ?",
+        answers: ["กระทรวงพาณิชย์", "กรมส่งเสริมสหกรณ์", "กระทรวงศึกษาธิการ", "สำนักงานเศรษฐกิจการเกษตร"],
+        correct: 1
+    },
+    {
+        question: "สมาชิกสามารถทำอะไรในสหกรณ์ได้?",
+        answers: ["กำหนดราคาสินค้าเอง", "ปลอมแปลงรายงานการเงิน", "เสนอความคิดเห็นในที่ประชุม", "หลีกเลี่ยงหน้าที่"],
+        correct: 2
+    },
+    {
+        question: "การที่สมาชิกสหกรณ์ได้ใช้บริการและรับผลประโยชน์ร่วมกัน เรียกว่าอะไร?",
+        answers: ["การปกครอง", "การดำเนินกิจการ", "การมีส่วนร่วมทางเศรษฐกิจ", "การประเมินผล"],
+        correct: 2
+    },
+    {
+        question: "ข้อใดเป็นการแสดงออกถึงความเป็น 'น้ำหนึ่งใจเดียวกัน'?",
+        answers: ["ต่างคนต่างอยู่", "ไม่แบ่งปันข้อมูล", "ช่วยกันทำงานและตัดสินใจร่วม", "แข่งขันกันทุกเรื่อง"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์กับ 'เศรษฐกิจพอเพียง' มีจุดร่วมตรงไหน?",
+        answers: ["ใช้เงินลงทุนเยอะ", "เน้นกำไรสูงสุด", "ช่วยเหลือกัน พอประมาณ มีเหตุผล", "ผลิตมากที่สุดเพื่อส่งออก"],
+        correct: 2
+    },
+    {
+        question: "ผลประโยชน์จากสหกรณ์ควรตกเป็นของใคร?",
+        answers: ["สมาชิก", "รัฐบาล", "ผู้นำเท่านั้น", "บริษัทเอกชน"],
+        correct: 0
+    },
+    {
+        question: "หากนักเรียนอยากให้สหกรณ์โรงเรียนดีขึ้นควรทำอย่างไร?",
+        answers: ["ใช้บริการแล้วไม่จ่ายเงิน", "ไม่เข้าร่วมกิจกรรม", "เสนอแนวคิดและร่วมมือ", "วิจารณ์แต่ไม่ช่วยอะไร"],
+        correct: 2
+    },
+    {
+        question: "การเป็นสมาชิกสหกรณ์ต้องมีคุณสมบัติใด?",
+        answers: ["รวยมาก", "เชื่อในแนวคิดสหกรณ์", "เป็นนักธุรกิจ", "มีบัตรประชาชนเท่านั้น"],
+        correct: 1
+    },
+	{
+        question: "จุดประสงค์หลักของการจัดตั้งสหกรณ์คืออะไร?",
+        answers: ["เพื่อแข่งกับบริษัทเอกชน", "เพื่อสร้างความร่ำรวย", "เพื่อช่วยเหลือกันทางเศรษฐกิจและสังคม", "เพื่อสะสมทรัพย์สิน"],
+        correct: 2
+    },
+    {
+        question: "หลักการสหกรณ์ข้อที่ 3 เน้นเรื่องใด?",
+        answers: ["สมาชิกใหม่", "การเลือกตั้ง", "การมีส่วนร่วมทางเศรษฐกิจ", "การแสดงสินค้า"],
+        correct: 2
+    },
+    {
+        question: "ข้อใด “ไม่ใช่” ประเภทของสหกรณ์ในประเทศไทย?",
+        answers: ["สหกรณ์บริการ", "สหกรณ์โรงพยาบาล", "สหกรณ์เครดิตยูเนี่ยน", "สหกรณ์ออมทรัพย์"],
+        correct: 1
+    },
+    {
+        question: "หลักการข้อใดกล่าวถึง “การปกครองตนเอง”?",
+        answers: ["ข้อ 1", "ข้อ 2", "ข้อ 4", "ข้อ 7"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์ร้านค้าทำหน้าที่อะไร?",
+        answers: ["รับซื้อสินค้าเกษตร", "ให้เงินกู้", "จำหน่ายสินค้าอุปโภคบริโภค", "ผลิตเครื่องจักร"],
+        correct: 2
+    },
+    {
+        question: "คำว่า 'หุบกะพง' เกี่ยวข้องกับเรื่องใด?",
+        answers: ["การทำเหมืองแร่", "โครงการตามพระราชดำริด้านสหกรณ์", "การสร้างถนน", "โรงงานผลิตสินค้า"],
+        correct: 1
+    },
+    {
+        question: "“สันนิบาตสหกรณ์แห่งประเทศไทย” มีหน้าที่หลักใด?",
+        answers: ["ตรวจสอบภาษี", "ทำหน้าที่ให้ความรู้และประสานงาน", "เก็บเงินภาษี", "ลงทุนในต่างประเทศ"],
+        correct: 1
+    },
+    {
+        question: "สหกรณ์ควรดำเนินกิจการแบบใด?",
+        answers: ["เพื่อกำไรสูงสุด", "เพื่อประโยชน์สมาชิก", "ตามคำสั่งรัฐบาล", "เพื่อส่งออกสินค้า"],
+        correct: 1
+    },
+    {
+        question: "สหกรณ์ใดที่มุ่งให้บริการทั่วไป เช่น ขนส่ง ซ่อมแซม?",
+        answers: ["สหกรณ์การเกษตร", "สหกรณ์ร้านค้า", "สหกรณ์บริการ", "สหกรณ์ออมทรัพย์"],
+        correct: 2
+    },
+    {
+        question: "หลักการสหกรณ์ใดเกี่ยวข้องกับการศึกษาของสมาชิก?",
+        answers: ["ข้อ 2", "ข้อ 4", "ข้อ 5", "ข้อ 6"],
+        correct: 2
+    },
+    {
+        question: "หลักการสหกรณ์เน้น “การตัดสินใจร่วมกัน” หมายถึงหลักใด?",
+        answers: ["การตลาด", "การประชาธิปไตย", "การบริหารทุน", "การแข่งขัน"],
+        correct: 1
+    },
+    {
+        question: "การที่สมาชิกได้กำไรคืนตามการใช้บริการ เรียกว่าอะไร?",
+        answers: ["เงินเดือน", "เงินคืน", "เฉลี่ยคืน", "ทุนเรือนหุ้น"],
+        correct: 2
+    },
+    {
+        question: "สมาชิกสามารถลาออกจากสหกรณ์ได้หรือไม่?",
+        answers: ["ไม่ได้เลย", "ต้องรอครบ 10 ปี", "ได้ตามสิทธิ์โดยสมัครใจ", "ต้องรอรัฐบาลอนุมัติ"],
+        correct: 2
+    },
+    {
+        question: "การจัดประชุมใหญ่ของสหกรณ์ควรจัดเมื่อใด?",
+        answers: ["ทุกวัน", "ทุกเดือน", "ทุกปี", "ทุก 5 ปี"],
+        correct: 2
+    },
+    {
+        question: "“สมาชิก 1 คน 1 เสียง” เป็นหลักของอะไร?",
+        answers: ["ความเท่าเทียมทางเศรษฐกิจ", "ความรับผิดชอบทางการเงิน", "ความเป็นธรรมในการตัดสินใจ", "ความเฉลียวฉลาด"],
+        correct: 2
+    },
+    {
+        question: "การดำเนินงานของสหกรณ์ควรยึดอะไรเป็นสำคัญ?",
+        answers: ["คำสั่งผู้จัดการ", "ความพึงพอใจของนักธุรกิจ", "ความต้องการของสมาชิก", "เป้าหมายขององค์กรเอกชน"],
+        correct: 2
+    },
+    {
+        question: "หากนักเรียนซื้อของที่ร้านสหกรณ์แล้วมีเงินเหลือ ควรทำอย่างไร?",
+        answers: ["ซื้อของเล่น", "เอาไปให้เพื่อน", "ฝากเข้าบัญชีออมทรัพย์", "เก็บไว้ใช้ส่วนตัว"],
+        correct: 2
+    },
+    {
+        question: "ข้อใดคือความหมายของ “ทุนเรือนหุ้น”?",
+        answers: ["เงินบริจาคจากสมาชิก", "เงินเดือนจากรัฐบาล", "เงินที่สมาชิกจ่ายเข้าเพื่อเป็นเจ้าของร่วม", "เงินกู้จากธนาคาร"],
+        correct: 2
+    },
+    {
+        question: "ในระบบสหกรณ์ “ผลกำไร” เรียกว่าอะไร?",
+        answers: ["รายรับ", "รายจ่าย", "ส่วนเกิน", "ทุนเรือนหุ้น"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์ช่วยแก้ปัญหาอะไรของเกษตรกร?",
+        answers: ["การเล่นพนัน", "การขาดแคลนแรงงาน", "การถูกกดราคา", "การเข้าไม่ถึงอินเทอร์เน็ต"],
+        correct: 2
+    },
+    {
+        question: "สหกรณ์รอชเดลอยู่ในเมืองใด?",
+        answers: ["แมนเชสเตอร์", "รอชเดล", "ลิเวอร์พูล", "เบอร์มิงแฮม"],
+        correct: 1
+    },
+    {
+        question: "การที่สมาชิกได้ร่วมกันลงทุน ร่วมใช้บริการ และร่วมรับผลประโยชน์ เรียกว่า?",
+        answers: ["อุดมการณ์สหกรณ์", "วิธีการสหกรณ์", "หลักสหกรณ์", "ประโยชน์ของสหกรณ์"],
+        correct: 1
+    },
+    {
+        question: "จุดเน้นของ “ปรัชญาเศรษฐกิจพอเพียง” ที่สัมพันธ์กับสหกรณ์คืออะไร?",
+        answers: ["รวยแล้วช่วยกัน", "พอประมาณ มีเหตุผล และมีภูมิคุ้มกัน", "ใช้จ่ายเต็มที่", "ไม่ทำอะไรเลย"],
+        correct: 1
+    },
+    {
+        question: "สหกรณ์นักเรียนช่วยฝึกอะไรให้กับนักเรียน?",
+        answers: ["การเป็นเจ้าของบริษัท", "การเก็บเงินให้เพื่อน", "ความรับผิดชอบ การออม และการทำงานร่วมกัน", "การเป็นหัวหน้าทีม"],
+        correct: 2
+    },
+    {
+        question: "การเอื้ออาทรต่อชุมชน เป็นหลักสหกรณ์ข้อใด?",
+        answers: ["ข้อ 4", "ข้อ 5", "ข้อ 6", "ข้อ 7"],
+        correct: 3
+    }
+        ];
+
+        // ตัวแปรสำหรับเกม
+        let currentQuestionIndex = 0;
+        let shuffledQuestions = [];
+        let score = 0;
+        let timer;
+        let timeLeft = 60;
+        let disabledAnswers = []; // เก็บตัวเลือกที่ถูกตัดออกไปแล้ว
+
+        // องค์ประกอบ DOM
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const questionNumber = document.getElementById('question-number');
+        const questionText = document.getElementById('question-text');
+        const answersContainer = document.getElementById('answers');
+        const timerDisplay = document.getElementById('timer');
+        const timerBar = document.getElementById('timer-bar');
+        const scoreDisplay = document.getElementById('score');
+        const correctCountDisplay = document.getElementById('correct-count');
+        const feedback = document.getElementById('feedback');
+        const correctFeedback = document.getElementById('correct-feedback');
+        const incorrectFeedback = document.getElementById('incorrect-feedback');
+        const resultMessage = document.getElementById('result-message');
+
+        // สุ่มคำถาม 10 ข้อจาก 15 ข้อ
+        function selectRandomQuestions() {
+            // สร้างสำเนาของคำถามทั้งหมด
+            const questionsCopy = [...allQuestions];
+            // สลับตำแหน่งคำถาม
+            for (let i = questionsCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questionsCopy[i], questionsCopy[j]] = [questionsCopy[j], questionsCopy[i]];
+            }
+            // เลือก 10 ข้อแรก
+            return questionsCopy.slice(0, 10);
+        }
+
+        // แสดงคำถามปัจจุบัน
+        function displayQuestion() {
+            const question = shuffledQuestions[currentQuestionIndex];
+            questionNumber.textContent = currentQuestionIndex + 1;
+            questionText.textContent = question.question;
+            
+            // ล้างตัวเลือกคำตอบเดิม
+            answersContainer.innerHTML = '';
+            disabledAnswers = []; // รีเซ็ตตัวเลือกที่ถูกตัดออก
+            
+            // สร้างปุ่มตัวเลือกคำตอบ
+            question.answers.forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.className = 'answer-btn bg-white border-3 border-indigo-200 hover:border-indigo-500 text-gray-800 font-semibold py-4 px-6 text-lg text-left transition-all w-full';
+                
+                // เพิ่มไอคอนตามตัวเลือก
+                const icons = ['🅰️', '🅱️', '🅾️', '🆎'];
+                button.innerHTML = `<span class="mr-3 text-xl">${icons[index]}</span> ${answer}`;
+                
+                button.dataset.index = index;
+                button.addEventListener('click', () => selectAnswer(index));
+                answersContainer.appendChild(button);
+            });
+            
+            // เริ่มจับเวลาใหม่
+            resetTimer();
+        }
+
+        // เลือกคำตอบ
+        function selectAnswer(answerIndex) {
+            const question = shuffledQuestions[currentQuestionIndex];
+            
+            if (answerIndex === question.correct) {
+                // ตอบถูก
+                showFeedback(true);
+                createConfetti();
+                
+                setTimeout(() => {
+                    score++;
+                    currentQuestionIndex++;
+                    
+                    if (currentQuestionIndex < shuffledQuestions.length) {
+                        displayQuestion();
+                    } else {
+                        showResults();
+                    }
+                }, 1500);
+            } else {
+                // ตอบผิด
+                showFeedback(false);
+                
+                // เพิ่มตัวเลือกที่ผิดเข้าไปในรายการที่ถูกตัด
+                disabledAnswers.push(answerIndex);
+                
+                // ปิดปุ่มที่ตอบผิด
+                const buttons = answersContainer.querySelectorAll('button');
+                buttons[answerIndex].classList.remove('bg-white', 'hover:border-indigo-500');
+                buttons[answerIndex].classList.add('bg-red-100', 'border-red-300', 'text-red-400', 'cursor-not-allowed', 'disabled-btn');
+                buttons[answerIndex].disabled = true;
+            }
+        }
+
+        // สร้างคอนเฟ็ตติเมื่อตอบถูก
+        function createConfetti() {
+            const confettiCount = 100;
+            const colors = ['#FFC700', '#FF0058', '#2BD1FC', '#F19CBB', '#C3FF00'];
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.opacity = 1;
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                document.body.appendChild(confetti);
+                
+                const size = Math.random() * 10 + 5;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                
+                const destinationX = confetti.offsetLeft + (Math.random() - 0.5) * 600;
+                const destinationY = -100;
+                
+                const animation = confetti.animate([
+                    { transform: `translate(0, 0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translate(${destinationX}px, ${destinationY}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 2000 + 1000,
+                    easing: 'cubic-bezier(0, .9, .57, 1)',
+                    delay: Math.random() * 200
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+
+        // แสดงผลลัพธ์ถูก/ผิด
+        function showFeedback(isCorrect) {
+            feedback.classList.remove('hidden');
+            
+            if (isCorrect) {
+                correctFeedback.classList.remove('hidden');
+                incorrectFeedback.classList.add('hidden');
+            } else {
+                correctFeedback.classList.add('hidden');
+                incorrectFeedback.classList.remove('hidden');
+            }
+            
+            setTimeout(() => {
+                feedback.classList.add('hidden');
+            }, 1500);
+        }
+
+        // เริ่มจับเวลาใหม่
+        function resetTimer() {
+            clearInterval(timer);
+            timeLeft = 60;
+            timerDisplay.textContent = timeLeft;
+            timerBar.style.width = '100%';
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                timerBar.style.width = `${(timeLeft / 60) * 100}%`;
+                
+                if (timeLeft <= 10) {
+                    timerBar.classList.add('bg-red-400');
+                    timerBar.classList.remove('bg-yellow-300');
+                } else {
+                    timerBar.classList.add('bg-yellow-300');
+                    timerBar.classList.remove('bg-red-400');
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    // เมื่อหมดเวลา ให้ตัดตัวเลือกที่ไม่ใช่คำตอบที่ถูกต้องออกไป 1 ตัวเลือก
+                    autoEliminateOneWrongAnswer();
+                }
+            }, 1000);
+        }
+
+        // ตัดตัวเลือกที่ผิดออกไป 1 ตัวเลือกเมื่อหมดเวลา
+        function autoEliminateOneWrongAnswer() {
+            const question = shuffledQuestions[currentQuestionIndex];
+            const correctIndex = question.correct;
+            
+            // หาตัวเลือกที่ผิดที่ยังไม่ถูกตัดออก
+            const availableWrongAnswers = [];
+            for (let i = 0; i < question.answers.length; i++) {
+                if (i !== correctIndex && !disabledAnswers.includes(i)) {
+                    availableWrongAnswers.push(i);
+                }
+            }
+            
+            if (availableWrongAnswers.length > 0) {
+                // สุ่มตัวเลือกที่ผิดมา 1 ตัว
+                const randomIndex = Math.floor(Math.random() * availableWrongAnswers.length);
+                const wrongAnswerIndex = availableWrongAnswers[randomIndex];
+                
+                // ตัดตัวเลือกนั้นออก
+                disabledAnswers.push(wrongAnswerIndex);
+                
+                const buttons = answersContainer.querySelectorAll('button');
+                buttons[wrongAnswerIndex].classList.remove('bg-white', 'hover:border-indigo-500');
+                buttons[wrongAnswerIndex].classList.add('bg-gray-100', 'border-gray-300', 'text-gray-400', 'cursor-not-allowed', 'disabled-btn');
+                buttons[wrongAnswerIndex].disabled = true;
+                
+                // เริ่มจับเวลาใหม่
+                resetTimer();
+            }
+        }
+
+        // แสดงผลลัพธ์
+        function showResults() {
+            clearInterval(timer);
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            scoreDisplay.textContent = score;
+            correctCountDisplay.textContent = score;
+            
+            // แสดงข้อความตามคะแนน
+            let message = '';
+            const emoji = ['🌟', '🎓', '🏆', '🎯', '🚀'];
+            const randomEmoji = emoji[Math.floor(Math.random() * emoji.length)];
+            
+            if (score >= 9) {
+                message = `${randomEmoji} ยอดเยี่ยมมาก! คุณเก่งมาก!`;
+            } else if (score >= 7) {
+                message = `${randomEmoji} ดีมาก! คุณทำได้ดี!`;
+            } else if (score >= 5) {
+                message = `${randomEmoji} ดี! พยายามต่อไปนะ!`;
+            } else {
+                message = `${randomEmoji} ไม่เป็นไร ลองใหม่อีกครั้งนะ!`;
+            }
+            
+            resultMessage.textContent = message;
+            
+            if (score >= 7) {
+                createConfetti();
+            }
+        }
+
+        // เริ่มเกม
+        function startGame() {
+            score = 0;
+            currentQuestionIndex = 0;
+            shuffledQuestions = selectRandomQuestions();
+            
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            displayQuestion();
+        }
+
+        // เริ่มต้นเกมใหม่
+        function restartGame() {
+            startGame();
+        }
+
+        // เพิ่ม Event Listeners
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', restartGame);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'946a23b4358d731d',t:'MTc0ODM5NzQyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>
