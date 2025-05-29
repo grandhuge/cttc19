@@ -217,11 +217,11 @@
             
             // แสดงข้อความผลลัพธ์
             let message = '';
-            if (score >= 9) {
+            if (score >= 18.4) {
                 message = 'ยอดเยี่ยมมาก! คุณเก่งมากเลย 🎉';
-            } else if (score >= 7) {
+            } else if (score >= 16.4) {
                 message = 'ทำได้ดีมาก! เกือบจะเต็มแล้ว 😊';
-            } else if (score >= 5) {
+            } else if (score >= 12.3) {
                 message = 'ดีแล้ว! ลองเล่นอีกครั้งเพื่อทำคะแนนให้ดีขึ้นนะ 👍';
             } else {
                 message = 'ยังมีที่สำหรับการพัฒนาอีกนะ ลองเล่นอีกครั้งดู! 💪';
@@ -515,7 +515,7 @@ saveScoreButton.addEventListener('click', async () => {
                 button.className = 'answer-btn bg-white border-3 border-indigo-200 hover:border-indigo-500 text-gray-800 font-semibold py-4 px-6 text-lg text-left transition-all w-full';
                 
                 // เพิ่มไอคอนตามตัวเลือก
-                const icons = ['🅰️', '🅱️', '🅲️', '🅳️'];
+                const icons = ['1️⃣ ', '2️⃣ ', '3️⃣ ', '4️⃣ '];
                 button.innerHTML = `<span class="mr-3 text-xl">${icons[index]}</span> ${answer}`;
                 
                 button.dataset.index = index;
