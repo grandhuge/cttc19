@@ -1,0 +1,763 @@
+/* Styles specific to lesson pages */
+.lesson-page-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.lesson-header-title {
+    text-align: center;
+    color: var(--primary-color); /* From main style.css */
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid var(--secondary-color); /* From main style.css */
+}
+.lesson-header-title h1 {
+    font-size: 2.5em;
+}
+
+.lesson-slide {
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin-bottom: 20px; /* For when all are visible for dev */
+    background-color: #f9f9f9; /* Light bg for slide content */
+}
+
+.slide-content {
+    text-align: center;
+}
+.slide-content h2 {
+    color: var(--accent-color); /* From main style.css */
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+.slide-image-large {
+    max-width: 70%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+.slide-image-medium {
+    max-width: 50%;
+    height: auto;
+    border-radius: 8px;
+    margin: 15px auto;
+}
+
+.mascot-dialogue {
+    display: flex;
+    align-items: center;
+    margin: 20px auto;
+    padding: 10px 15px;
+    background-color: #eef; /* Light blue/purple tint */
+    border-radius: 20px;
+    max-width: 80%;
+    border: 2px solid var(--accent-color);
+}
+.mascot-dialogue.left { justify-content: flex-start; }
+.mascot-dialogue.right { justify-content: flex-end; }
+.mascot-dialogue.center { justify-content: center; }
+
+.mascot-dialogue img {
+    width: 80px; /* Adjust as needed */
+    height: auto;
+    margin-right: 15px;
+}
+.mascot-dialogue.right img {
+    margin-left: 15px;
+    margin-right: 0;
+}
+.mascot-dialogue p {
+    margin: 0;
+    font-size: 1.1em;
+    line-height: 1.5;
+    text-align: left;
+}
+.flip-mascot { /* To flip mascot image if needed */
+    transform: scaleX(-1);
+}
+
+
+.problem-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    max-width: 400px;
+    margin: 15px auto;
+}
+.problem-list li {
+    background-color: #fff8e1; /* Light yellow */
+    border: 1px dashed var(--secondary-color);
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    font-size: 1.05em;
+}
+.problem-list .emoji { margin-right: 10px; }
+
+.example-box {
+    background-color: #E3F2FD; /* Light blue */
+    border: 1px solid var(--accent-color);
+    padding: 15px;
+    margin: 15px auto;
+    border-radius: 8px;
+    max-width: 70%;
+}
+.example-box img {
+    max-width: 80%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.definition-box {
+    background-color: #FCE4EC; /* Light pink */
+    border: 2px solid #EC407A; /* Pinkish accent */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: left;
+    margin: 20px auto;
+    max-width: 80%;
+}
+.definition-box .keyword {
+    background-color: var(--secondary-color);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #333;
+}
+.definition-box ul { margin-top: 10px; padding-left: 20px; }
+.definition-box li { margin-bottom: 8px; }
+
+.importance-columns {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    margin-top: 20px;
+}
+.importance-columns .column {
+    flex-basis: 45%;
+    background-color: #F1F8E9; /* Light green for importance */
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--primary-color);
+}
+.importance-columns .column h3 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-top: 0;
+}
+.importance-columns .column img {
+    display: block;
+    max-width: 150px;
+    height: auto;
+    margin: 10px auto;
+    border-radius: 5px;
+}
+.importance-columns .column ul {
+    list-style: disc;
+    padding-left: 25px;
+    text-align: left;
+}
+
+.key-features-list {
+    list-style: none;
+    padding: 0;
+    max-width: 600px;
+    margin: 20px auto;
+}
+.key-features-list li {
+    display: flex;
+    align-items: center;
+    background-color: #FFF9C4; /* Light yellow */
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid var(--secondary-color);
+}
+.key-features-list img {
+    width: 60px; /* Adjust icon size */
+    height: auto;
+    margin-right: 15px;
+}
+
+.quiz-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: 20px auto;
+    text-align: left;
+    border: 2px solid var(--accent-color);
+}
+.quiz-question { margin-bottom: 20px; }
+.quiz-question p { font-weight: bold; margin-bottom: 10px; }
+.quiz-question label { display: block; margin-bottom: 8px; cursor: pointer; }
+
+
+.lesson-nav-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1em;
+    margin: 20px 5px 0 5px;
+    transition: background-color 0.3s;
+}
+.lesson-nav-btn:hover {
+    background-color: #1976D2; /* Darker blue */
+}
+.lesson-nav-btn.prev {
+    background-color: #78909C; /* Grey */
+}
+.lesson-nav-btn.prev:hover {
+    background-color: #546E7A;
+}
+
+/* ... (CSS ด้านบนเป็นโค้ดเดิมสำหรับหน้าบทเรียน) ... */
+
+/* Read Aloud Buttons */
+/* .read-aloud-btn {
+    background-color: var(--secondary-color);
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-left: 10px;
+    vertical-align: middle;
+    transition: background-color 0.2s;
+}
+.read-aloud-btn:hover {
+    background-color: #ffd54f; 
+}
+.read-aloud-btn.inline-read-btn { 
+    width: 24px;
+    height: 24px;
+    font-size: 1em;
+} */
+}
+/* ลบส่วนนี้ออกได้ */
+/* .mascot-dialogue .read-aloud-btn { 
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+.definition-box .read-aloud-btn {
+    float: right; 
+} */
+
+/* Interactive Poll */
+.interactive-poll {
+    background-color: #E3F2FD;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px auto;
+    max-width: 70%;
+    border: 1px solid var(--accent-color);
+}
+.interactive-poll p { margin-bottom: 10px; }
+.poll-btn {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+.poll-btn:hover { background-color: #1976D2; }
+.poll-results { margin-top: 10px; font-size: 0.9em; }
+
+/* Drag and Drop Activity */
+.drag-drop-activity {
+    background-color: #FFF9C4;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 80%;
+    border: 1px dashed #FFB300;
+}
+.drag-drop-activity h3 { text-align: center; color: #F57F17; margin-top: 0;}
+.problem-zone {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+}
+.problem-item {
+    padding: 10px 15px;
+    background-color: #FFCDD2; /* Light red for problems */
+    border: 1px solid #E57373;
+    border-radius: 5px;
+    min-width: 120px; text-align: center;
+}
+.problem-item.solved {
+    background-color: #C8E6C9; /* Light green when solved */
+    border-color: #81C784;
+}
+.solution-options {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+}
+.solution-item {
+    padding: 10px 15px;
+    background-color: #C5CAE9; /* Light indigo for solutions */
+    border: 1px solid #9FA8DA;
+    border-radius: 5px;
+    cursor: grab;
+    min-width: 120px; text-align: center;
+}
+#dragDropFeedback { text-align: center; font-weight: bold; margin-top: 10px; }
+
+/* Benefits Sort Activity */
+.benefits-sort-activity {
+    background-color: #F1F8E9;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 90%;
+    border: 1px solid var(--primary-color);
+}
+.benefits-sort-activity h3 { text-align: center; color: var(--primary-color); margin-top: 0; }
+.benefit-items-pool {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+}
+.benefit-card {
+    padding: 8px 12px;
+    background-color: #BBDEFB; /* Light blue for cards */
+    border: 1px solid #90CAF9;
+    border-radius: 5px;
+    cursor: grab;
+    text-align: center;
+}
+.benefit-dropzones {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+}
+.dropzone {
+    flex-basis: 45%;
+    min-height: 150px;
+    padding: 10px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    text-align: center;
+    background-color: #fafafa;
+}
+.dropzone h4 { margin-top: 0; }
+.dropzone img { max-width: 80px; margin: 10px auto; display: block; opacity: 0.5; }
+.dropzone.self-zone { border-color: var(--secondary-color); }
+.dropzone.community-zone { border-color: var(--accent-color); }
+.dropzone .benefit-card { background-color: #E1BEE7; border-color: #CE93D8; } /* Dropped card color */
+#benefitSortFeedback { text-align: center; font-weight: bold; margin-top: 15px; }
+
+
+/* Fun Quiz Container */
+.fun-quiz-container {
+    background-color: #E0F7FA; /* Light cyan */
+    padding: 20px;
+    border-radius: 15px;
+    max-width: 700px;
+    margin: 20px auto;
+    border: 3px solid #4DD0E1; /* Cyan border */
+}
+.quiz-question-card {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: relative; /* For feedback icon */
+}
+.question-text {
+    font-weight: bold;
+    margin-bottom: 12px;
+    font-size: 1.1em;
+    color: #00796B; /* Dark teal */
+}
+.highlight-text {
+    color: #D32F2F; /* Red for emphasis */
+    font-weight: bold;
+}
+.answer-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+.answer-btn {
+    background-color: #80CBC4; /* Tealish buttons */
+    color: white;
+    border: none;
+    padding: 12px 10px;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    text-align: left;
+}
+.answer-btn:hover {
+    background-color: #4DB6AC;
+    transform: translateY(-2px);
+}
+.answer-btn.selected {
+    background-color: #00796B; /* Darker when selected */
+    box-shadow: 0 0 0 3px #4DD0E1;
+}
+.answer-btn.correct {
+    background-color: #66BB6A !important; /* Green for correct */
+    color: white !important;
+}
+.answer-btn.incorrect {
+    background-color: #EF5350 !important; /* Red for incorrect */
+    color: white !important;
+    opacity: 0.7;
+}
+.feedback-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5em;
+}
+#checkQuizAnswersBtn {
+    display: block;
+    margin: 20px auto 10px auto;
+    background-color: var(--primary-color);
+    padding: 12px 30px;
+    font-size: 1.1em;
+}
+#checkQuizAnswersBtn:hover {
+    background-color: #388E3C;
+}
+.final-quiz-result-display {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+}
+.final-quiz-result-display.all-correct { background-color: #C8E6C9; color: #2E7D32; }
+.final-quiz-result-display.some-correct { background-color: #FFF9C4; color: #F57F17; }
+.final-quiz-result-display.none-correct { background-color: #FFCDD2; color: #C62828; }
+
+/* ... (CSS ด้านบนเป็นโค้ดเดิมสำหรับหน้าบทเรียน และ interactive elements อื่นๆ) ... */
+/* ... (CSS ด้านล่างเพิ่มเติมของบทที่ 2) ... */
+
+/* Slide Header for Title and Narration Button */
+.slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed var(--secondary-color); /* Or your preferred style */
+}
+.slide-header h2 {
+    margin: 0; /* Remove default margin from h2 */
+    color: var(--accent-color);
+    font-size: 1.8em;
+    flex-grow: 1; /* Allow title to take up space */
+}
+
+/* Slide Narration Button */
+.slide-narration-btn {
+    background-color: var(--secondary-color);
+    color: #333;
+    border: none;
+    border-radius: 8px; /* Rounded rectangle */
+    padding: 8px 12px;
+    font-size: 0.9em;
+    cursor: pointer;
+    margin-left: 15px; /* Space from title */
+    transition: background-color 0.2s, transform 0.1s;
+    white-space: nowrap; /* Prevent button text from wrapping */
+}
+.slide-narration-btn:hover {
+    background-color: #ffd54f; /* Lighter yellow */
+    transform: scale(1.05);
+}
+.slide-narration-btn.playing { /* Style when audio is playing */
+    background-color: #FF9800; /* Orange to indicate playing */
+    color: white;
+}
+
+/* Adjustments for slide 1 narration button if placed with dialogue */
+#slide1 .slide-content .slide-narration-btn {
+    display: block; /* Make it a block to position it */
+    margin: 15px auto 0 auto; /* Center it below dialogues */
+}
+
+/* Ensure problem items and solution items are distinct for drag-drop */
+.problem-zone .problem-item[data-dropzone="true"] { /* Updated to target only actual dropzones */
+    border: 2px dashed #E57373; /* Make dropzone clear */
+    background-color: #ffebee; /* Lighter red for problem dropzone */
+    min-height: 50px; /* Ensure it has some height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* Ensure benefit dropzones are clearly marked */
+.benefit-dropzones .dropzone[data-dropzone="true"] {
+    border: 2px dashed var(--accent-color); /* Make dropzone clear */
+}
+
+/* Readable text class removed as narration button is now per slide */
+/* .readable-text .inline-read-btn removed */
+/* Mascot dialogue button removed */
+/* .mascot-dialogue .read-aloud-btn removed */
+/* .definition-box .read-aloud-btn removed */
+/* .key-features-list .read-aloud-btn removed */
+
+/* ... (CSS เดิม และ CSS สำหรับ .slide-header, .slide-narration-btn จากครั้งที่แล้ว) ... */
+
+.principle-explanation {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin: 15px auto;
+    max-width: 85%;
+    padding: 10px;
+    background-color: #fff; /* White background for text block */
+    border-left: 5px solid var(--primary-color); /* Accent border */
+    text-align: left;
+}
+
+/* Interactive TF (True/False) */
+.interactive-tf {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #E3F2FD; /* Light blue */
+    border-radius: 8px;
+}
+.interactive-tf p { font-weight: bold; margin-bottom: 10px; }
+.tf-btn {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 10px 15px;
+    margin: 0 5px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+.tf-btn:hover { background-color: #1976D2; }
+.tf-feedback { margin-top: 10px; font-weight: bold; }
+
+/* Interactive Vote */
+.interactive-vote { margin-top: 20px; padding: 15px; background-color: #FFF9C4; border-radius: 8px; }
+.interactive-vote p { font-weight: bold; margin-bottom: 10px; }
+.vote-option-btn { /* Similar to tf-btn or game-btn */
+    background-color: var(--secondary-color); color: #333; padding: 10px 15px;
+    margin: 5px; border-radius: 5px; border: none; cursor: pointer;
+}
+.vote-option-btn:hover { background-color: #FFD54F; }
+.vote-feedback { margin-top: 10px; font-weight: bold; }
+
+/* Interactive Collect Shares */
+.interactive-collect-shares { margin-top: 20px; padding: 15px; background-color: #C8E6C9; border-radius: 8px; }
+.interactive-collect-shares p { font-weight: bold; margin-bottom: 10px; }
+.collect-coin-btn {
+    width: 60px; height: 60px; cursor: pointer; transition: transform 0.1s;
+    display: block; margin: 10px auto;
+}
+.collect-coin-btn:active { transform: scale(0.9); }
+#coopFundAmount { font-size: 1.2em; color: var(--primary-color); }
+
+/* Interactive Click Reveal */
+.interactive-click-reveal { margin-top: 20px; padding: 15px; background-color: #F3E5F5; border-radius: 8px; }
+.interactive-click-reveal p { font-weight: bold; margin-bottom: 10px; }
+.reveal-option-btn { /* Similar to tf-btn */
+    background-color: #BA68C8; color: white; padding: 10px 15px;
+    margin: 5px; border-radius: 5px; border: none; cursor: pointer;
+}
+.reveal-option-btn:hover { background-color: #AB47BC; }
+.reveal-feedback { margin-top: 10px; font-weight: bold; }
+
+/* Interactive Match Activity (Education) */
+.interactive-match-activity { margin-top: 20px; padding: 15px; background-color: #E0F2F1; border-radius: 8px; }
+.interactive-match-activity p { font-weight: bold; margin-bottom: 10px; }
+.match-option-btn { /* Similar to tf-btn */
+    background-color: #4DB6AC; color: white; padding: 10px 15px;
+    margin: 5px; border-radius: 5px; border: none; cursor: pointer;
+}
+.match-option-btn:hover { background-color: #26A69A; }
+.match-feedback { margin-top: 10px; font-weight: bold; }
+
+/* Interactive Connect Coops */
+.interactive-connect-coops { margin-top: 20px; padding: 15px; background-color: #FFE0B2; border-radius: 8px; text-align: center;}
+.interactive-connect-coops p { font-weight: bold; margin-bottom: 10px; }
+.connect-area { display: flex; justify-content: space-around; margin-bottom: 10px; }
+.coop-node {
+    padding: 10px; background-color: var(--secondary-color); color: #333;
+    border-radius: 5px; cursor: pointer; border: 2px solid transparent;
+    font-size: 0.9em;
+}
+.coop-node.selected-node { border-color: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
+#connectCanvas { border: 1px solid #ccc; margin-bottom: 10px; }
+.connect-feedback { margin-top: 0px; font-weight: bold; height: 1.2em; /* Reserve space */}
+.small-btn { padding: 6px 10px; font-size: 0.8em;}
+
+
+/* Interactive Choose Project */
+.interactive-choose-project { margin-top: 20px; padding: 15px; background-color: #D1C4E9; border-radius: 8px; }
+.interactive-choose-project p { font-weight: bold; margin-bottom: 10px; }
+.project-choice-btn { /* Similar to tf-btn */
+    display: block; width: 80%; margin: 8px auto;
+    background-color: #7E57C2; color: white; padding: 10px 15px;
+    border-radius: 5px; border: none; cursor: pointer;
+}
+.project-choice-btn:hover { background-color: #673AB7; }
+.project-choice-feedback { margin-top: 10px; font-weight: bold; text-align: center;}
+
+.summary-text {
+    font-size: 1.1em;
+    line-height: 1.7;
+    padding: 15px;
+    background-color: #E8F5E9; /* Light green */
+    border-left: 5px solid var(--primary-color);
+    margin: 20px 0;
+    text-align: left;
+}
+
+/* Quiz styling should already be in lesson_page_style.css from previous update */
+
+/* ... (CSS เพิ่มเติมของบทที่ 2) ... */
+
+/* Explanation Text for Quiz */
+.explanation-text {
+    font-size: 0.9em;
+    margin-top: 10px;
+    padding: 8px;
+    background-color: #f8f9fa; /* Light grey background */
+    border-radius: 4px;
+    line-height: 1.4;
+    min-height: 2.8em; /* Reserve some space even if empty initially */
+}
+.explanation-text:empty { /* Hide if empty before results */
+    /* display: none; */ /* Or just keep min-height */
+     border: 1px dashed #eee; /* Show placeholder when empty */
+}
+
+/* ... (CSS ด้านบนบท 2) ... */
+/* ... (CSS ด้านล่างเพิ่มบท 3) ... */
+
+/* Interactive Store Items (Slide 1) */
+.interactive-store-items {
+    margin-top: 20px; padding: 15px; background-color: #E0F2F1; /* Light teal */
+    border-radius: 8px; text-align: center;
+}
+.interactive-store-items p { font-weight: bold; margin-bottom: 10px; }
+.item-choice-btn {
+    background-color: #4DB6AC; color: white; padding: 8px 12px;
+    margin: 5px; border-radius: 20px; border: none; cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+.item-choice-btn:hover { background-color: #26A69A; transform: scale(1.05); }
+.item-choice-btn.selected-correct { background-color: #66BB6A; border: 2px solid #388E3C;}
+.item-choice-btn.selected-incorrect { background-color: #EF5350; border: 2px solid #C62828; opacity: 0.7;}
+.store-items-feedback { margin-top: 10px; font-weight: bold; }
+
+/* Interactive Savings Drag (Slide 2) */
+.interactive-savings-drag {
+    margin-top: 20px; padding: 15px; background-color: #FFF9C4; /* Light yellow */
+    border-radius: 8px; text-align: center;
+}
+.interactive-savings-drag p { font-weight: bold; margin-bottom: 10px; }
+.coin-pool { margin-bottom: 15px; }
+.draggable-coin {
+    width: 50px; height: 50px; cursor: grab; display: inline-block; margin: 0 5px;
+    transition: transform 0.1s;
+}
+.draggable-coin:active { transform: scale(1.1); cursor: grabbing; }
+.piggy-bank-dropzone {
+    width: 150px; height: 150px; margin: 10px auto;
+    border: 3px dashed var(--secondary-color); border-radius: 15px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background-color: #fff;
+}
+.piggy-bank-dropzone img { max-width: 80%; max-height: 100px; margin-bottom: 5px;}
+#savingsAmount { font-size: 1.2em; color: var(--primary-color); }
+.savings-feedback { margin-top: 10px; font-weight: bold; }
+
+/* Interactive Agricultural Match (Slide 3) */
+.interactive-agri-match {
+    margin-top: 20px; padding: 15px; background-color: #F1F8E9; /* Light green */
+    border-radius: 8px;
+}
+.interactive-agri-match p { font-weight: bold; margin-bottom: 10px; text-align: center; }
+.agri-match-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Align items at the top of their containers */
+    gap: 20px;
+}
+.agri-problems, .agri-solutions {
+    flex-basis: 45%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.agri-card {
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 0.95em;
+    min-height: 40px; /* Ensure cards have some height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.agri-card.problem {
+    background-color: #FFCDD2; /* Light red for problems */
+    border: 1px solid #E57373;
+    /* For drop target styling */
+    border-style: dashed;
+}
+.agri-card.problem.solved { /* When a solution is correctly dropped */
+    background-color: #C8E6C9; /* Light green */
+    border-color: #81C784;
+    border-style: solid;
+}
+.agri-card.solution {
+    background-color: #C5CAE9; /* Light indigo for solutions */
+    border: 1px solid #9FA8DA;
+    cursor: grab;
+}
+.agri-card.solution.used { /* When solution has been used */
+    opacity: 0.5;
+    cursor: default;
+}
+.agri-match-feedback { margin-top: 15px; font-weight: bold; text-align: center; }
+
+/* Other Types List (Slide 4) */
+.other-types-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px auto;
+    max-width: 80%;
+    text-align: left;
+}
+.other-types-list li {
+    background-color: #E1F5FE; /* Light blue */
+    border: 1px dashed #4FC3F7;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+}
+.other-types-list strong { color: var(--accent-color); }

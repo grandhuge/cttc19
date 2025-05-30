@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 1: สหกรณ์คืออะไรนะ? - Co-op Kids Club</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/lesson_page_style.css"> <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="../assets/images/mascots/mascot.png" alt="Mascots" class="logo-mascot-small">
+            <h1>Co-op Kids Club</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../index.html">หน้าหลัก</a></li>
+                <li><a href="../index.html#lessons" class="active">บทเรียน</a></li>
+                <li><a href="../activities.html">กิจกรรม</a></li>
+                <li><a href="#">เกม</a></li>
+                <li><a href="#">นิทาน</a></li>
+                <li><a href="#">แบบทดสอบ</a></li>
+                <li><a href="../about.html">เกี่ยวกับเรา</a></li>
+            </ul>
+        </nav>
+        <button id="music-toggle" class="music-button">🎵 เปิดเพลง</button>
+    </header>
+
+    <main class="lesson-page-container">
+        <div class="lesson-header-title">
+            <h1>บทที่ 1: สหกรณ์คืออะไรนะ?</h1>
+        </div>
+
+        <section class="lesson-slide" id="slide1">
+            <div class="slide-header">
+                </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter1/lesson01_intro.png" alt="พี่ออมตังค์และน้องปันผลชวนเรียน" class="slide-image-large">
+                <div class="mascot-dialogue left">
+                    <img src="../assets/images/mascots/mascot.png" alt="พี่ออมตังค์">
+                    <p>สวัสดีครับน้องๆ! วันนี้พี่ออมตังค์กับน้องปันผลจะพาทุกคนไปรู้จักกับคำว่า "สหกรณ์" กันครับ!</p>
+                </div>
+                <div class="mascot-dialogue right">
+                    <img src="../assets/images/mascots/mascot.png" alt="น้องปันผล" class="flip-mascot">
+                    <p>ใช่แล้วค่ะ! "สหกรณ์" เนี่ย ไม่ใช่เรื่องไกลตัวเลยนะ สนุกแล้วก็ได้ประโยชน์ด้วย พร้อมกันรึยังคะ?</p>
+                </div>
+                 <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson01/slide1.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <button class="lesson-nav-btn next" data-target="slide2">ไปกันเลย!</button>
+        </section>
+
+        <section class="lesson-slide" id="slide2" style="display:none;">
+            <div class="slide-header">
+                <h2>เอ๊ะ...ปัญหาแบบนี้ เคยเจอกันไหมนะ?</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson01/slide2.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter1/problem_kids.png" alt="เด็กๆ เจอปัญหา" class="slide-image-medium">
+                <ul class="problem-list">
+                    <li>✏️ ดินสอหายบ่อย ไม่มีสำรองใช้เลย</li>
+                    <li>⚽ อยากเล่นฟุตบอลกับเพื่อนๆ แต่ไม่มีใครมีลูกบอล</li>
+                    <li>🧹 ห้องเรียนไม่ค่อยสะอาด เพราะไม้กวาดเก่าแล้ว</li>
+                </ul>
+                <div class="interactive-poll">
+                    <p>น้องๆ เคยเจอปัญหาไหนบ้าง ลองคลิกเลือกดูสิ:</p>
+                    <button class="poll-btn" data-problem-id="pencil">ดินสอหาย</button>
+                    <button class="poll-btn" data-problem-id="ball">ไม่มีลูกบอล</button>
+                    <button class="poll-btn" data-problem-id="broom">ไม้กวาดเก่า</button>
+                    <div class="poll-results">
+                        <p>ดินสอหาย: <span id="poll-pencil-count">0</span> คน</p>
+                        <p>ไม่มีลูกบอล: <span id="poll-ball-count">0</span> คน</p>
+                        <p>ไม้กวาดเก่า: <span id="poll-broom-count">0</span> คน</p>
+                    </div>
+                </div>
+                <div class="mascot-dialogue center">
+                    <img src="../assets/images/mascots/mascot.png" alt="น้องปันผล">
+                    <p>ถ้าเจอปัญหา เราจะทำยังไงกันดีนะ?</p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide1">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide3">แล้วจะแก้ยังไงดี?</button>
+        </section>
+
+        <section class="lesson-slide" id="slide3" style="display:none;">
+            <div class="slide-header">
+                <h2>"รวมพลัง" แก้ปัญหาดีกว่า!</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson01/slide3.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <div class="example-box">
+                    <img src="../assets/images/lessons/chapter1/buying_ball_together.png" alt="รวมเงินซื้อลูกบอล">
+                    <p><strong>ตัวอย่างที่ 1:</strong> ถ้าทุกคนในกลุ่มช่วยกันออกเงินคนละนิด ก็ซื้อลูกบอลมาเล่นด้วยกันได้นะ!</p>
+                </div>
+                <div class="example-box">
+                    <img src="../assets/images/lessons/chapter1/cleaning_together.png" alt="ช่วยกันทำความสะอาด">
+                    <p><strong>ตัวอย่างที่ 2:</strong> แบ่งเวรกันทำความสะอาดห้องเรียน คนละไม้คนละมือ ห้องก็สะอาดน่าอยู่!</p>
+                </div>
+                <div class="drag-drop-activity">
+                    <h3>จับคู่ปัญหา กับ วิธีแก้ปัญหา!</h3>
+                    <div class="problem-zone">
+                        <div class="problem-item" id="dd-problem1" data-dropzone="true">ไม่มีลูกบอลเล่น</div>
+                        <div class="problem-item" id="dd-problem2" data-dropzone="true">ห้องเรียนสกปรก</div>
+                    </div>
+                    <div class="solution-options">
+                        <div class="solution-item draggable" draggable="true" id="dd-solution1" data-matches="dd-problem1">รวมเงินกันซื้อ</div>
+                        <div class="solution-item draggable" draggable="true" id="dd-solution2" data-matches="dd-problem2">แบ่งเวรกันทำ</div>
+                    </div>
+                    <div id="dragDropFeedback"></div>
+                </div>
+                <div class="mascot-dialogue center">
+                    <img src="../assets/images/mascots/mascot.png" alt="พี่ออมตังค์">
+                    <p>เห็นไหมครับ? การ "ทำงานร่วมกัน" และ "ช่วยเหลือกัน" เนี่ย ช่วยให้เราแก้ปัญหาได้เยอะเลย!</p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide2">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide4">แล้วมันคือสหกรณ์ยังไงนะ?</button>
+        </section>
+
+        <section class="lesson-slide" id="slide4" style="display:none;">
+            <div class="slide-header">
+                <h2>สหกรณ์ก็คือ... แบบนี้นี่เอง!</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson01/slide4.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter1/coop_group_hug.png" alt="กลุ่มคนร่วมมือกันเป็นสหกรณ์" class="slide-image-medium">
+                <div class="definition-box">
+                    <p><strong>"สหกรณ์"</strong> คือ การที่คนหลายๆ คน (ตั้งแต่ 10 คนขึ้นไปสำหรับสหกรณ์จริงๆ) ที่มีปัญหาหรือความต้องการคล้ายๆ กัน...</p>
+                    <ul>
+                        <li><span class="keyword">สมัครใจ</span> มารวมกลุ่มกัน</li>
+                        <li><span class="keyword">ทำงานร่วมกัน</span> และ <span class="keyword">ช่วยเหลือซึ่งกันและกัน</span></li>
+                        <li>เพื่อแก้ไขปัญหานั้นๆ หรือทำให้ชีวิตดีขึ้น โดยเน้นประโยชน์ของทุกคนในกลุ่ม</li>
+                    </ul>
+                </div>
+                <div class="mascot-dialogue right">
+                     <img src="../assets/images/mascots/mascot.png" alt="น้องปันผล" class="flip-mascot">
+                    <p>พอจะเข้าใจแล้วใช่ไหมคะว่าสหกรณ์คืออะไร? ง่ายนิดเดียวเอง!</p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide3">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide5">สหกรณ์สำคัญยังไง?</button>
+        </section>
+
+        <section class="lesson-slide" id="slide5" style="display:none;">
+            <div class="slide-header">
+                <h2>แล้ว "สหกรณ์" สำคัญกับเรายังไงนะ?</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson01/slide5.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <div class="benefits-sort-activity">
+                    <h3>ลองลากประโยชน์ไปใส่ในกลุ่มที่ถูกต้องดูสิ!</h3>
+                    <div class="benefit-items-pool">
+                        <div class="benefit-card draggable" draggable="true" data-category="self">ฝึกความรับผิดชอบ</div>
+                        <div class="benefit-card draggable" draggable="true" data-category="community">สร้างความสามัคคี</div>
+                        <div class="benefit-card draggable" draggable="true" data-category="self">ฝึกการประหยัด</div>
+                        <div class="benefit-card draggable" draggable="true" data-category="community">โรงเรียน/ชุมชนเข้มแข็ง</div>
+                        <div class="benefit-card draggable" draggable="true" data-category="self">รู้จักช่วยเหลือผู้อื่น</div>
+                    </div>
+                    <div class="benefit-dropzones">
+                        <div class="dropzone self-zone" data-category="self" data-dropzone="true">
+                            <h4>ประโยชน์ต่อตนเอง 🙋‍♂️🙋‍♀️</h4>
+                            <img src="../assets/images/lessons/chapter1/benefit_self.png" alt="ประโยชน์ต่อตนเอง">
+                        </div>
+                        <div class="dropzone community-zone" data-category="community" data-dropzone="true">
+                            <h4>ประโยชน์ต่อส่วนรวม 👨‍👩‍👧‍👦🏫</h4>
+                            <img src="../assets/images/lessons/chapter1/benefit_community.png" alt="ประโยชน์ต่อส่วนรวม">
+                        </div>
+                    </div>
+                    <div id="benefitSortFeedback"></div>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide4">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide6">มีอะไรอีกนะ?</button>
+        </section>
+
+        <section class="lesson-slide" id="slide6" style="display:none;">
+            <div class="slide-header">
+                <h2>ลักษณะสำคัญของสหกรณ์ (แบบง่ายๆ)</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson01/slide6.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <ul class="key-features-list">
+                    <li><img src="../assets/images/lessons/chapter1/feature_people.png" alt="รวมคน"> <strong>รวมคน ไม่ใช่แค่รวมเงิน:</strong> หัวใจสำคัญคือ "คน" ที่มาร่วมมือกัน</li>
+                    <li><img src="../assets/images/lessons/chapter1/feature_owner.png" alt="เป็นเจ้าของ"> <strong>ทุกคนเป็นเจ้าของร่วมกัน:</strong> ทุกคนในสหกรณ์มีสิทธิมีเสียงเท่าเทียมกัน</li>
+                    <li><img src="../assets/images/lessons/chapter1/feature_benefit.png" alt="ได้ประโยชน์"> <strong>ทุกคนได้รับประโยชน์:</strong> สหกรณ์ทำเพื่อประโยชน์ของสมาชิกทุกคน</li>
+                </ul>
+                 <div class="mascot-dialogue center">
+                    <img src="../assets/images/mascots/mascot.png" alt="พี่ออมตังค์">
+                    <p>นี่เป็นแค่ส่วนหนึ่งของความเป็นสหกรณ์นะครับ ยังมีเรื่องน่ารู้อีกเยอะเลย!</p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide5">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide7">มาทดสอบกัน!</button>
+        </section>
+
+        <section class="lesson-slide" id="slide7" style="display:none;">
+            <div class="slide-header">
+                <h2>มาทบทวนความเข้าใจกันหน่อย!</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson01/slide7.mp3">🔊 ฟังคำถาม</button>
+            </div>
+            <div class="slide-content">
+                <div class="fun-quiz-container">
+                    <div class="quiz-question-card" data-question="1">
+                        <p class="question-text">1. "สหกรณ์" คืออะไรเป็นหลัก?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-correct="false">ก) การทำงานคนเดียวเก่งๆ</button>
+                            <button class="answer-btn" data-correct="true">ข) การรวมกลุ่มทำงานร่วมกัน</button>
+                            <button class="answer-btn" data-correct="false">ค) การแข่งขันกันเองในกลุ่ม</button>
+                        </div>
+                        <div class="feedback-icon"></div>
+                    </div>
+
+                    <div class="quiz-question-card" data-question="2">
+                        <p class="question-text">2. ถ้าเพื่อนๆ ในห้องไม่มีลูกบอลเล่น แล้วช่วยกันเก็บเงินซื้อ แบบนี้เรียกว่าเป็นวิธีการแบบสหกรณ์ได้ไหม?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-correct="true">ใช่เลย!</button>
+                            <button class="answer-btn" data-correct="false">ไม่ใช่หรอก</button>
+                        </div>
+                        <div class="feedback-icon"></div>
+                    </div>
+
+                    <div class="quiz-question-card" data-question="3">
+                        <p class="question-text">3. ข้อใด <span class="highlight-text">ไม่ใช่</span> ประโยชน์ของสหกรณ์ต่อตนเอง?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-correct="false">ก) ฝึกความรับผิดชอบ</button>
+                            <button class="answer-btn" data-correct="true">ข) ทำให้เราวิ่งเร็วขึ้น</button>
+                            <button class="answer-btn" data-correct="false">ค) ฝึกการประหยัดอดออม</button>
+                        </div>
+                        <div class="feedback-icon"></div>
+                    </div>
+
+                    <div class="quiz-question-card" data-question="4">
+                        <p class="question-text">4. สหกรณ์เน้นการรวมอะไรเป็นสำคัญที่สุด?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-correct="true">ก) รวมคนที่มีปัญหาคล้ายกัน</button>
+                            <button class="answer-btn" data-correct="false">ข) รวมเงินให้ได้เยอะที่สุด</button>
+                            <button class="answer-btn" data-correct="false">ค) รวมของเล่นหายาก</button>
+                        </div>
+                        <div class="feedback-icon"></div>
+                    </div>
+
+                     <div class="quiz-question-card" data-question="5">
+                        <p class="question-text">5. เมื่อเข้าร่วมสหกรณ์ ทุกคนเป็นอะไรในสหกรณ์นั้น?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-correct="false">ก) เป็นแค่ผู้ใช้บริการ</button>
+                            <button class="answer-btn" data-correct="true">ข) เป็นเจ้าของร่วมกัน</button>
+                            <button class="answer-btn" data-correct="false">ค) เป็นลูกจ้าง</button>
+                        </div>
+                        <div class="feedback-icon"></div>
+                    </div>
+                    <button id="checkQuizAnswersBtn" class="game-btn">ตรวจคำตอบ!</button>
+                    <div id="finalQuizResult" class="final-quiz-result-display"></div>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide6">ย้อนกลับ</button>
+            <a href="../index.html#lessons" class="lesson-nav-btn">กลับหน้าหลักบทเรียน</a>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; <span id="current-year"></span> Developed by Tle Narongphisit | ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี</p>
+    </footer>
+
+    <audio id="background-music" loop>
+        <source src="../assets/audio/background_music/music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <audio id="slideNarrationPlayer"></audio>
+
+    <script src="../js/script.js"></script>
+    <script src="js/lesson01_script.js"></script>
+</body>
+</html>
