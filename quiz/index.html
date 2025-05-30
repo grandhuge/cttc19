@@ -64,7 +64,8 @@
                         <h3 class="font-bold text-blue-700">คะแนน</h3>
                         <p class="text-blue-600">ตอบถูกครั้งแรกได้ 1 คะแนน</p>
                         <p class="text-blue-600 text-sm">ตอบผิดลด 0.3 คะแนน/ครั้ง</p>
-                        <p class="text-blue-600 text-sm">โบนัสความเร็วสูงสุด 0.6 คะแนน</p>
+						<p class="text-blue-600 text-sm">ไม่ตอบลด 0.2 คะแนน/60 วินาที</p>
+                        <p class="text-blue-600 text-sm">โบนัสตอบเร็วสูงสุด 0.6 คะแนน</p>
                     </div>
                 </div>
                 
@@ -262,13 +263,13 @@
             
             <!-- บันทึกคะแนน -->
             <div class="bg-indigo-50 p-6 rounded-2xl mb-6">
-                <h3 class="text-2xl font-bold text-indigo-600 mb-4">บันทึกคะแนนของคุณ</h3>
+                <h3 class="text-2xl font-bold text-indigo-600 mb-4">บันทึกคะแนนของคุณ (ยังไม่เปิดใช้งานฟังก์ชั่นนี้)</h3>
                 <div class="mb-4">
                     <label for="player-name" class="block text-left text-indigo-700 mb-2">ชื่อผู้เล่น:</label>
                     <input type="text" id="player-name" class="w-full px-4 py-2 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="กรุณาใส่ชื่อของคุณ">
                 </div>
                 <button id="save-score" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl text-lg transition-all">
-                    บันทึกคะแนน 💾 (ยังไม่เปิดใช้งานฟังก์ชั่นนี้)
+                    บันทึกคะแนน 💾
                 </button>
                 <p id="save-status" class="mt-2 text-sm"></p>
             </div>
@@ -278,7 +279,7 @@
                     เล่นอีกครั้ง 🔄
                 </button>
                 <button id="view-leaderboard-button" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-2xl text-xl transition-all transform hover:scale-105 shadow-lg">
-					ดูสถิติผู้เล่น 🏆 & กลับหน้าแรก 🏠
+					ดูสถิติผู้เล่น 🏆
                 </button>
             </div>
         </div>
@@ -312,7 +313,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        © 2025 developed by SomO ToTle | ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี
+        © 2025 developed by Som-O & To-Tle | ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี
     </div>
 
     <script src="js/script.js"></script>

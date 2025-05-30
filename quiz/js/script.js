@@ -240,6 +240,8 @@
 saveScoreButton.addEventListener('click', async () => {
     const playerName = playerNameInput.value.trim();
     
+	document.getElementById("save-score").disabled = true; //ปิดการใช้งานปุ่มบันทึกคะแนน
+	
     if (!playerName) {
         saveStatusMessage.textContent = 'กรุณากรอกชื่อผู้เล่น';
         saveStatusMessage.className = 'mt-2 text-sm text-red-500';
@@ -781,39 +783,55 @@ saveScoreButton.addEventListener('click', async () => {
 
         // ตัดตัวเลือกที่ผิดออกไป 1 ตัวเลือกเมื่อหมดเวลา
         function autoEliminateOneWrongAnswer() {
-            // ถ้าตอบถูกแล้ว ไม่ต้องตัดตัวเลือก
-            if (hasAnsweredCorrectly) {
-                return;
-            }
-            
-            const question = shuffledQuestions[currentQuestionIndex];
-            const correctIndex = question.correct;
-            
-            // หาตัวเลือกที่ผิดที่ยังไม่ถูกตัดออก
-            const availableWrongAnswers = [];
-            for (let i = 0; i < question.answers.length; i++) {
-                if (i !== correctIndex && !disabledAnswers.includes(i)) {
-                    availableWrongAnswers.push(i);
-                }
-            }
-            
-            if (availableWrongAnswers.length > 0) {
-                // สุ่มตัวเลือกที่ผิดมา 1 ตัว
-                const randomIndex = Math.floor(Math.random() * availableWrongAnswers.length);
-                const wrongAnswerIndex = availableWrongAnswers[randomIndex];
-                
-                // ตัดตัวเลือกนั้นออก
-                disabledAnswers.push(wrongAnswerIndex);
-                
-                const buttons = answersContainer.querySelectorAll('button');
-                buttons[wrongAnswerIndex].classList.remove('bg-white', 'hover:border-indigo-500');
-                buttons[wrongAnswerIndex].classList.add('bg-gray-100', 'border-gray-300', 'text-gray-400', 'cursor-not-allowed', 'disabled-btn');
-                buttons[wrongAnswerIndex].disabled = true;
-                
-                // เริ่มจับเวลาใหม่
-                resetTimer();
-            }
+    // ถ้าตอบถูกแล้ว ไม่ต้องตัดตัวเลือก
+    if (hasAnsweredCorrectly) {
+        return;
+    }
+    
+    const question = shuffledQuestions[currentQuestionIndex];
+    const correctIndex = question.correct;
+    
+    // หาตัวเลือกที่ผิดที่ยังไม่ถูกตัดออก
+    const availableWrongAnswers = [];
+    for (let i = 0; i < question.answers.length; i++) {
+        if (i !== correctIndex && !disabledAnswers.includes(i)) {
+            availableWrongAnswers.push(i);
         }
+    }
+    
+    if (availableWrongAnswers.length > 0) {
+        // หักคะแนน 0.2 คะแนนเมื่อหมดเวลา
+        currentQuestionScore -= 0.2;
+        if (currentQuestionScore < 0.1) currentQuestionScore = 0.1; // ไม่ให้น้อยกว่า 0.1
+        questionScoreDisplay.textContent = currentQuestionScore.toFixed(1); // อัพเดทคะแนนที่แสดง
+        
+        // สุ่มตัวเลือกที่ผิดมา 1 ตัว
+        const randomIndex = Math.floor(Math.random() * availableWrongAnswers.length);
+        const wrongAnswerIndex = availableWrongAnswers[randomIndex];
+        
+        // ตัดตัวเลือกนั้นออก
+        disabledAnswers.push(wrongAnswerIndex);
+        
+        const buttons = answersContainer.querySelectorAll('button');
+        buttons[wrongAnswerIndex].classList.remove('bg-white', 'hover:border-indigo-500');
+        buttons[wrongAnswerIndex].classList.add('bg-gray-100', 'border-gray-300', 'text-gray-400', 'cursor-not-allowed', 'disabled-btn');
+        buttons[wrongAnswerIndex].disabled = true;
+        
+        // แสดงข้อความแจ้งเตือน
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-red-100 text-red-800 px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce';
+        notification.textContent = '⏰ หมดเวลา! ตัดตัวเลือกออก 1 ข้อ (-0.2 คะแนน)';
+        document.body.appendChild(notification);
+        
+        // ลบข้อความแจ้งเตือนหลังจาก 3 วินาที
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+        
+        // เริ่มจับเวลาใหม่
+        resetTimer();
+    }
+}
 
         // ฟังก์ชันตัวช่วย: หยุดเวลา
         function pauseTime() {
