@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-op Kids Club: สหกรณ์ของหนู</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="assets/images/mascots/mascot.png" alt="Mascots" class="logo-mascot-small">
+            <h1>Co-op Kids Club</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">หน้าหลัก</a></li>
+                <li><a href="index.html#lessons">บทเรียน</a></li>
+                <li><a href="activities.html">กิจกรรม</a></li>
+                <li><a href="#">เกม</a></li>
+                <li><a href="#">นิทาน</a></li>
+                <li><a href="#">แบบทดสอบ</a></li>
+                <li><a href="about.html">เกี่ยวกับเรา</a></li>
+            </ul>
+        </nav>
+        <button id="music-toggle" class="music-button">🎵 เปิดเพลง</button>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-text">
+                <h2>สวัสดี! น้องๆ ทุกคน</h2>
+                <p>ยินดีต้อนรับสู่ "สหกรณ์ของหนู"! มาสนุกกับการเรียนรู้เรื่องสหกรณ์<br>กับพี่ออมตังค์และน้องปันผลกันเถอะ!</p>
+            </div>
+            <div class="mascot-display">
+                <img src="assets/images/mascots/mascot.png" alt="พี่ออมตังค์และน้องปันผล" class="main-mascot">
+            </div>
+            <div class="intro-video">
+                <h3>ชมวิดีโอแนะนำกันก่อนนะ!</h3>
+                <a href="https://youtu.be/KI7NCLVkoA0" target="_blank" class="video-placeholder" title="คลิกเพื่อชมวิดีโอแนะนำ (ลิงก์ตัวอย่าง)">
+                    <img src="https://via.placeholder.com/480x270.png?text=วิดีโอแนะนำสหกรณ์" alt="วิดีโอแนะนำสหกรณ์">
+                    <div class="play-button-overlay">▶</div>
+                </a>
+
+            </div>
+        </section>
+
+        <section id="lessons" class="lesson-gateway">
+            <h2>เลือกบทเรียนที่สนใจได้เลย!</h2>
+            <div class="lesson-buttons">
+                <a href="lessons_html/lesson01_what_is_coop.html" class="lesson-btn">
+                    <div class="lesson-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M20 22H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1zm-1-2V4H5v16h14zM17 6H7v2h10V6zm0 4H7v2h10v-2zm-5 4H7v2h5v-2z"/></svg>
+                    </div>
+                    <span>สหกรณ์คืออะไรนะ?</span>
+                </a>
+                <a href="lessons_html/lesson02_principles.html" class="lesson-btn">
+                    <div class="lesson-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M16 13h-3V9.998A.999.999 0 0 0 12 9H8a1 1 0 0 0-1 .998V13H4a1 1 0 0 0-.998 1A.999.999 0 0 0 4 15h3v3.002A.999.999 0 0 0 8 19h4a1 1 0 0 0 .998-1V15h3a1 1 0 0 0 1-1c0-.551-.447-.998-1-.998zM5 5h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>
+                    </div>
+                    <span>หลักการสหกรณ์ 7 ข้อ</span>
+                </a>
+                <a href="lessons_html/lesson03_types.html" class="lesson-btn">
+                    <div class="lesson-icon">
+                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-13h2v2h-2v-2zm0 4h2v6h-2v-6z"/></svg>
+                    </div>
+                    <span>สหกรณ์มีกี่ประเภท?</span>
+                </a>
+                <a href="#" class="lesson-btn">
+                    <div class="lesson-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M12 3L4 9v12h16V9l-8-6zm6 16H6v-8.586l6-4.5 6 4.586V19zM10 12h4v2h-4v-2z"/></svg>
+                    </div>
+                    <span>สหกรณ์โรงเรียนของเรา</span>
+                </a>
+                <a href="#" class="lesson-btn">
+                    <div class="lesson-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M12 17.27l-5.293 3.198a1 1 0 0 1-1.451-1.054l1.302-6.033-4.726-4.11a1 1 0 0 1 .555-1.705l6.168-.533L11.27.655a1 1 0 0 1 1.86 0l2.718 5.378 6.168.533a1 1 0 0 1 .555 1.705l-4.726 4.11 1.302 6.033a1 1 0 0 1-1.451 1.054L12 17.27z"/></svg>
+                    </div>
+                    <span>ประโยชน์ของสหกรณ์</span>
+                </a>
+                <a href="#" class="lesson-btn">
+                    <div class="lesson-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M17.653 10.625A6.002 6.002 0 0 0 12 3C8.686 3 6 5.686 6 9c0 2.148 1.134 4.027 2.847 5.084A6.002 6.002 0 0 0 6 21h12c0-3.053-1.486-5.715-3.653-7.377A5.968 5.968 0 0 0 18 9c0-2.829-1.864-5.206-4.347-5.802L13 4.76V3.5h2V2h-4v1.5h2v1.26C10.864 3.794 9 6.171 9 9c0 .742.17 1.445.47 2.084A5.993 5.993 0 0 0 6.347 13.623 7.98 7.98 0 0 1 4 9c0-3.859 3.14-7 7-7 .136 0 .27.006.405.011A7.984 7.984 0 0 1 20 9c0 3.054-1.487 5.716-3.653 7.377A5.968 5.968 0 0 0 20 9c0-3.469-2.431-6.338-5.653-6.875zM12 5c-2.206 0-4 1.794-4 4s1.794 4 4 4 4-1.794 4-4-1.794-4-4-4z"/></svg>
+                    </div>
+                    <span>เศรษฐกิจพอเพียงกับสหกรณ์</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="current-year"></span> Developed by Tle Narongphisit | ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี</p>
+    </footer>
+
+    <audio id="background-music" loop>
+        <source src="assets/audio/background_music/music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

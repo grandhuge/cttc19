@@ -1,0 +1,399 @@
+:root {
+    --primary-color: #4CAF50; /* Green for Co-op */
+    --secondary-color: #FFC107; /* Yellow for fun */
+    --accent-color: #2196F3; /* Blue for trust */
+    --text-color: #333;
+    --bg-color: #f4f9f4; /* Light green tint */
+    --light-bg: #ffffff;
+    --font-family: 'Kanit', sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-mascot-small {
+    width: 50px; /* Adjust as needed */
+    height: auto;
+    margin-right: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--secondary-color);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+nav ul li a:hover, nav ul li a.active {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+.music-button {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    transition: transform 0.2s ease;
+}
+.music-button:hover {
+    transform: scale(1.05);
+}
+
+
+main {
+    padding: 2rem;
+}
+
+.hero {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: var(--light-bg);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.hero-text {
+    grid-column: 1 / -1; /* Span full width */
+    text-align: center;
+}
+
+
+.hero h2 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+.mascot-display {
+    grid-row: 2;
+    grid-column: 1 / 2;
+    text-align: center; /* Or right for the boy */
+}
+
+.main-mascot {
+    max-width: 80%;
+    height: auto;
+    max-height: 300px; /* Control size */
+    border-radius: 10px;
+    animation: bounceMascot 2s infinite ease-in-out alternate;
+}
+
+@keyframes bounceMascot {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-10px); }
+}
+
+.intro-video {
+    grid-row: 2;
+    grid-column: 2 / 3;
+    text-align: center; /* Or left for the girl or center for video */
+}
+
+.intro-video h3 {
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+}
+
+.video-placeholder {
+    display: inline-block;
+    position: relative;
+    border: 3px solid var(--accent-color);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.video-placeholder img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.play-button-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(0,0,0,0.3);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.video-placeholder:hover .play-button-overlay {
+    background-color: rgba(0,0,0,0.5);
+}
+
+
+.lesson-gateway {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--accent-color); /* Light blue background for this section */
+    color: white;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.lesson-gateway h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.lesson-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem; /* Increased gap */
+}
+
+.lesson-btn {
+    background-color: var(--light-bg);
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 1.5rem; /* Increased padding */
+    border-radius: 10px;
+    width: 180px; /* Fixed width */
+    min-height: 180px; /* Fixed min height */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.lesson-btn:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    background-color: var(--secondary-color);
+}
+
+.lesson-icon {
+    margin-bottom: 1rem; /* Increased margin */
+}
+
+.lesson-icon svg {
+    width: 50px; /* Slightly larger icon */
+    height: 50px;
+    fill: var(--primary-color); /* Icon color */
+}
+.lesson-btn:hover .lesson-icon svg {
+    fill: white;
+}
+
+
+.lesson-btn span {
+    font-size: 1rem;
+    font-weight: 500;
+}
+.lesson-btn:hover span {
+    color: white;
+}
+
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: #333;
+    color: #f4f4f4;
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+    nav ul {
+        flex-direction: column;
+        margin-top: 1rem;
+    }
+    nav ul li {
+        margin: 5px 0;
+    }
+    .hero {
+        grid-template-columns: 1fr; /* Stack mascot and video on smaller screens */
+    }
+    .mascot-display, .intro-video {
+        grid-column: 1 / -1; /* Full width for both */
+    }
+    .main-mascot {
+        max-height: 200px;
+    }
+    .lesson-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .lesson-btn {
+        width: 80%;
+        max-width: 300px;
+    }
+}
+
+/* Styles for About Page (about.html) */
+
+.about-page-main {
+    max-width: 900px; /* Limit width for readability on about page */
+    margin: 2rem auto; /* Center the main content */
+    padding: 1rem;
+    background-color: var(--light-bg);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.about-hero {
+    text-align: center;
+    padding: 2rem 1rem;
+    border-bottom: 2px solid var(--primary-color-light, #e0f2f1); /* Light separator */
+    margin-bottom: 2rem;
+}
+
+.about-mascot-hero {
+    max-width: 250px; /* Adjust as needed */
+    height: auto;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    border: 4px solid var(--secondary-color);
+}
+
+.about-hero h2 {
+    color: var(--primary-color);
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.about-hero p {
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.about-content {
+    padding: 0 1rem;
+}
+
+.about-section {
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background-color: #fff; /* White cards for sections */
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.about-section h3 {
+    color: var(--accent-color);
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--secondary-color);
+    display: inline-block; /* To make border only as wide as text */
+}
+
+.about-section p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+}
+
+.about-section p strong {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.contact-info p {
+    margin-bottom: 0.5rem; /* Tighter spacing for contact details */
+}
+
+.thank-you-message {
+    text-align: center;
+    background-color: var(--primary-color-xlight, #e8f5e9); /* Very light green for thank you */
+    border-left: 5px solid var(--primary-color);
+}
+
+.thank-you-message p {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.thank-you-mascot {
+    max-width: 150px;
+    height: auto;
+    margin-top: 1rem;
+    animation: bounceMascot 2s infinite ease-in-out alternate; /* Reusing animation from index */
+}
+
+/* Ensure consistent main padding with index.html if not using about-page-main for centering */
+/* If you had general 'main' padding in style.css, it will apply. If not: */
+/*
+main {
+    padding: 2rem; // This might already exist in your style.css
+}
+*/

@@ -1,0 +1,122 @@
+/* Styles for Activities Page (activities.html) */
+
+.activities-land {
+    padding-bottom: 2rem; /* Add some space at the bottom */
+}
+
+.activities-hero {
+    text-align: center;
+    padding: 2rem 1rem 3rem 1rem; /* More padding at bottom */
+    background: linear-gradient(to bottom, var(--secondary-color), #FFD54F); /* Cheerful gradient */
+    color: var(--text-color); /* Or white if contrast is better */
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.activities-mascot-hero {
+    max-width: 200px; /* Adjust as needed */
+    height: auto;
+    margin-bottom: 1rem;
+    /* Optional: Add a fun animation like floating slightly */
+    animation: floatMascot 3s infinite ease-in-out alternate;
+}
+
+@keyframes floatMascot {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.activities-hero h1 {
+    color: var(--primary-color); /* Dark green for title */
+    font-size: 2.8rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.activities-hero p {
+    font-size: 1.2rem;
+    color: #444; /* Darker text for readability on yellow */
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+    gap: 2rem; /* Space between game cards */
+    padding: 0 2rem; /* Padding for the grid container */
+    max-width: 1200px;
+    margin: 0 auto; /* Center the grid */
+}
+
+.game-card {
+    background-color: var(--light-bg);
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    overflow: hidden; /* To make sure border-radius applies to image */
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.game-thumbnail {
+    width: 100%;
+    height: 200px; /* Fixed height for thumbnails */
+    object-fit: cover; /* Crop image to fit without distortion */
+    border-bottom: 3px solid var(--secondary-color);
+}
+
+.game-card h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin: 1rem 1rem 0.5rem 1rem;
+    font-weight: 700;
+}
+
+.game-description {
+    font-size: 0.95rem;
+    color: #555;
+    padding: 0 1rem;
+    flex-grow: 1; /* Allows description to take available space */
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.play-button {
+    display: block;
+    background-color: var(--accent-color);
+    color: white;
+    text-align: center;
+    padding: 0.8rem 1rem;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 1rem; /* Margin around the button inside the card */
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.play-button:hover {
+    background-color: #1e88e5; /* Darker blue */
+    transform: scale(1.05);
+}
+
+/* Responsive adjustments for smaller screens if needed */
+@media (max-width: 768px) {
+    .activities-hero h1 {
+        font-size: 2.2rem;
+    }
+    .games-grid {
+        grid-template-columns: 1fr; /* Stack cards on very small screens */
+        padding: 0 1rem;
+    }
+}
