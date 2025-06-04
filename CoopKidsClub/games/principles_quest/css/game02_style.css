@@ -1,0 +1,135 @@
+.game02-container {
+    background-color: #E0F7FA; /* Light cyan background for the game page */
+    padding: 20px;
+    min-height: calc(100vh - 120px); /* Full height minus header/footer */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-screen {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 800px; /* Max width for game content */
+    text-align: center;
+    position: relative; /* For absolute positioned elements like bg */
+    overflow: hidden; /* If using full-screen bg images per screen */
+}
+.game-screen .game-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    opacity: 0.3; /* Example for background image */
+}
+.game-content { position: relative; z-index: 1;} /* Ensure content is above bg */
+
+.game-mascot-intro, .game-mascot-outro {
+    max-width: 150px;
+    margin-bottom: 15px;
+}
+.mascot-intro-box, .mascot-outro-box {
+    background-color: rgba(255,255,255,0.8);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 70%;
+}
+
+/* Game Play Screen */
+.game-header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--secondary-color);
+}
+.game-header-info h2 { margin: 0; color: var(--primary-color); font-size: 1.5em;}
+
+.badge-display-area { display: flex; gap: 5px; }
+.badge-icon { width: 30px; height: 30px; }
+
+.mission-content-area {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start; /* Align items to the top */
+    text-align: left;
+    margin-bottom: 20px;
+}
+.mission-image-holder { flex-basis: 40%; text-align: center;}
+#missionImage {
+    max-width: 100%;
+    height: auto;
+    max-height: 250px; /* Limit image height */
+    border-radius: 10px;
+    border: 3px solid var(--accent-color);
+}
+.mission-scenario { flex-basis: 60%; }
+#missionDescription { font-size: 1.05em; line-height: 1.6; margin-bottom: 15px; }
+.mission-question-text { font-weight: bold; margin-bottom: 10px; color: var(--accent-color); }
+
+.mission-options-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Single column for options */
+    gap: 10px;
+}
+.option-btn { /* Reuse .game-btn or style specifically */
+    background-color: var(--secondary-color);
+    color: #333;
+    padding: 12px 15px;
+    border-radius: 8px;
+    text-align: left;
+    border: 2px solid transparent;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.option-btn:hover { background-color: #FFD54F; border-color: #FFB300; }
+.option-btn.correct-answer { background-color: #A5D6A7 !important; border-color: #66BB6A !important; color: #2E7D32 !important;}
+.option-btn.wrong-answer { background-color: #FFCDD2 !important; border-color: #EF5350 !important; color: #C62828 !important; opacity: 0.7;}
+.option-btn:disabled { cursor: not-allowed; }
+
+
+.feedback-area {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center items */
+    padding: 10px;
+    background-color: #E0F2F1; /* Light teal feedback area */
+    border-radius: 8px;
+    min-height: 60px; /* Ensure space for feedback */
+    margin-bottom: 15px;
+}
+.feedback-mascot-img {
+    width: 50px; /* Adjust size */
+    height: auto;
+    margin-right: 10px;
+}
+.feedback-text-bubble {
+    background-color: white;
+    padding: 8px 12px;
+    border-radius: 15px;
+    border-top-left-radius: 0; /* Speech bubble shape */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-size: 0.95em;
+    flex-grow: 1;
+    text-align: left;
+}
+.feedback-text-bubble.correct { border: 2px solid green; }
+.feedback-text-bubble.incorrect { border: 2px solid red; }
+
+
+#nextMissionBtn { margin-top: 10px; }
+
+/* Game End Screen */
+.final-badges-collected {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+}
+.final-badges-collected .badge-icon { width: 50px; height: 50px; }
+.game-end-buttons { display: flex; justify-content: center; gap: 15px; }

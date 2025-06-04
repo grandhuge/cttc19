@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกม: สร้างสหกรณ์โรงเรียนของเรา - Co-op Kids Club</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/lesson_page_style.css"> <link rel="stylesheet" href="css/game03_style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="../../assets/images/mascots/mascot.png" alt="Mascots" class="logo-mascot-small">
+            <h1>Co-op Kids Club</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../../index.html">หน้าหลัก</a></li>
+                <li><a href="../../index.html#lessons">บทเรียน</a></li>
+                <li><a href="../../activities.html" class="active">กิจกรรม</a></li>
+                <li><a href="#">เกม</a></li>
+                <li><a href="#">นิทาน</a></li>
+                <li><a href="#">แบบทดสอบ</a></li>
+                <li><a href="../../about.html">เกี่ยวกับเรา</a></li>
+            </ul>
+        </nav>
+        <button id="music-toggle" class="music-button">🎵 เปิดเพลง</button>
+    </header>
+
+    <main class="game-container game03-container">
+        <div id="gameStartScreen_G3" class="game-screen-g3">
+            <img src="images/game_intro_bg.png" alt="สร้างสหกรณ์โรงเรียน" class="game-bg-g3">
+            <div class="game-content-g3">
+                <h1>เกม: สร้างสหกรณ์โรงเรียนของเรา!</h1>
+                <div class="mascot-dialogue-g3">
+                    <img src="../../assets/images/mascots/mascot.png" alt="พี่ออมตังค์และน้องปันผล">
+                    <p>เพื่อนๆ พร้อมไหม? เราจะมาช่วยกันสร้างสหกรณ์ในโรงเรียนของเราให้น่าอยู่และเป็นประโยชน์กับทุกคนกัน! มาดูกันว่าเราจะทำได้สำเร็จไหม!</p>
+                </div>
+                <button id="startGameBtn_G3" class="game-btn large-btn">เริ่มสร้างเลย!</button>
+            </div>
+        </div>
+
+        <div id="gamePlayScreen_G3" class="game-screen-g3" style="display:none;">
+            <div class="game-status-bar">
+                <div class="status-item"><strong>สัปดาห์ที่:</strong> <span id="currentWeek">1</span> / <span id="totalWeeks">10</span></div>
+                <div class="status-item">💰 <strong>เงินทุน:</strong> <span id="fundsDisplay">500</span> บาท</div>
+                <div class="status-item">😊 <strong>ความสุขสมาชิก:</strong> <span id="happinessDisplay">50</span>%</div>
+                <div class="status-item">📦 <strong>สินค้าในร้าน:</strong> <span id="stockDisplay">พอใช้</span></div>
+            </div>
+
+            <div class="game-main-area">
+                <div class="coop-visual-area">
+                    <img id="coopImage" src="images/coop_store_empty.png" alt="ร้านสหกรณ์โรงเรียน">
+                    <p id="coopImageCaption">ร้านค้ายังว่างเปล่า...</p>
+                </div>
+
+                <div class="decision-event-area">
+                    <h3 id="eventTitle">เหตุการณ์/การตัดสินใจ</h3>
+                    <p id="eventDescription">รายละเอียดของเหตุการณ์...</p>
+                    <div id="decisionOptions" class="decision-options-g3">
+                        </div>
+                </div>
+            </div>
+
+            <div class="advisor-feedback-area">
+                <img id="advisorMascot" src="images/mascot_advisor_aomtung.png" alt="ที่ปรึกษา" class="advisor-mascot-img">
+                <p id="advisorText" class="advisor-text-bubble">เราจะเริ่มยังไงกันดีนะ?</p>
+            </div>
+        </div>
+
+        <div id="gameEndScreen_G3" class="game-screen-g3" style="display:none;">
+            <img id="gameEndBg" src="images/game_win_bg.png" alt="จบเกม" class="game-bg-g3">
+            <div class="game-content-g3">
+                <h1 id="gameEndTitle">ภารกิจสำเร็จ! / ลองใหม่อีกครั้งนะ!</h1>
+                <div class="mascot-dialogue-g3">
+                    <img id="endGameMascot" src="../../assets/images/mascots/mascot.png" alt="พี่ออมตังค์และน้องปันผล">
+                    <p id="gameEndMessage">ผลลัพธ์การสร้างสหกรณ์...</p>
+                </div>
+                <div class="final-stats">
+                    <p><strong>สรุปผลการดำเนินงาน:</strong></p>
+                    <p>💰 เงินทุนคงเหลือ: <span id="finalFunds">0</span> บาท</p>
+                    <p>😊 ความสุขสมาชิก: <span id="finalHappiness">0</span>%</p>
+                </div>
+                <div class="game-end-buttons-g3">
+                    <button id="playAgainBtn_G3" class="game-btn">เล่นอีกครั้ง</button>
+                    <a href="../../activities.html" class="game-btn">กลับไปหน้ากิจกรรม</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="current-year"></span> Developed by Tle Narongphisit | ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี</p>
+    </footer>
+
+    <audio id="background-music" loop>
+        <source src="../../audio/background_music/music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="positiveSound_G3" src="audio/positive_choice.mp3"></audio>
+    <audio id="negativeSound_G3" src="audio/negative_choice.mp3"></audio>
+    <audio id="cashSound_G3" src="audio/money_up.mp3"></audio>
+
+    <script src="../../js/script.js"></script>
+    <script src="js/game03_script.js"></script>
+</body>
+</html>
