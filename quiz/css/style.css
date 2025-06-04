@@ -3,6 +3,7 @@ body {
             background-image: url('../img/bg.png');
             background-size: cover;
             background-position: center;
+			background-attachment: fixed;
             min-height: 100vh;
         }
         
@@ -112,7 +113,7 @@ body {
             color: white;
             text-align: center;
             padding: 10px;
-            position: absolute;
+            position: fixed;
             bottom: 0;
             width: 100%;
             font-size: 14px;
