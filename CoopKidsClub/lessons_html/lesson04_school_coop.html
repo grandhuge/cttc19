@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 4: สหกรณ์ในโรงเรียน - Co-op Kids Club</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/lesson_page_style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="../assets/images/mascots/mascot.png" alt="Mascots" class="logo-mascot-small">
+            <h1>Co-op Kids Club</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../index.html">หน้าหลัก</a></li>
+                <li><a href="../index.html#lessons" class="active">บทเรียน</a></li>
+                <li><a href="../activities.html">กิจกรรม</a></li>
+                <li><a href="#">เกม</a></li>
+                <li><a href="#">นิทาน</a></li>
+                <li><a href="#">แบบทดสอบ</a></li>
+                <li><a href="../about.html">เกี่ยวกับเรา</a></li>
+            </ul>
+        </nav>
+        <button id="music-toggle" class="music-button">🎵 เปิดเพลง</button>
+    </header>
+
+    <main class="lesson-page-container">
+        <div class="lesson-header-title">
+            <h1>บทที่ 4: สหกรณ์ในโรงเรียน</h1>
+        </div>
+
+        <section class="lesson-slide" id="slide0">
+            <div class="slide-header">
+                <h2>สหกรณ์ใกล้ตัวเราที่สุด... ก็ที่โรงเรียนนี่เอง!</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson04/slide0.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter4/school_coop_intro.png" alt="สหกรณ์ในโรงเรียน" class="slide-image-large">
+                <div class="mascot-dialogue center">
+                    <img src="../assets/images/mascots/mascot.png" alt="พี่ออมตังค์และน้องปันผล">
+                    <p>น้องๆ รู้ไหมว่าที่โรงเรียนของเราก็มี "สหกรณ์" ได้ด้วยนะ! วันนี้เราจะไปดูกันว่าสหกรณ์ในโรงเรียนเป็นยังไง สนุกและได้ประโยชน์แค่ไหน!</p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn next" data-target="slide1">สหกรณ์โรงเรียนคืออะไร?</button>
+        </section>
+
+        <section class="lesson-slide" id="slide1" style="display:none;">
+            <div class="slide-header">
+                <h2>1. สหกรณ์โรงเรียน คืออะไรนะ?</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson04/slide1.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter4/school_coop_meaning.png" alt="ความหมายสหกรณ์โรงเรียน" class="slide-image-medium">
+                <p class="principle-explanation">สหกรณ์ในโรงเรียน คือ การที่ <span class="highlight-text">นักเรียน</span> รวมกลุ่มกันจัดตั้งขึ้น <span class="highlight-text">ในโรงเรียน</span> โดยมีคุณครูเป็นที่ปรึกษา เพื่อฝึกการทำงานร่วมกัน เรียนรู้หลักการสหกรณ์ผ่านการปฏิบัติจริง และจัดกิจกรรมที่เป็นประโยชน์ต่อนักเรียนเอง</p>
+                <div class="interactive-keywords">
+                    <p><strong>คำสำคัญของสหกรณ์โรงเรียนคืออะไรบ้าง? (คลิกเลือกคำที่ใช่)</strong></p>
+                    <button class="keyword-btn" data-correct="true">นักเรียนจัดตั้ง</button>
+                    <button class="keyword-btn" data-correct="true">คุณครูช่วยเหลือ</button>
+                    <button class="keyword-btn" data-correct="false">ขายของแพงๆ</button>
+                    <button class="keyword-btn" data-correct="true">อยู่ในโรงเรียน</button>
+                    <button class="keyword-btn" data-correct="false">ผู้ใหญ่บ้านดูแล</button>
+                    <p class="keywords-feedback"></p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide0">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide2">แล้วตั้งขึ้นมาทำไม?</button>
+        </section>
+
+        <section class="lesson-slide" id="slide2" style="display:none;">
+            <div class="slide-header">
+                <h2>2. เป้าหมายของสหกรณ์โรงเรียน</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson04/slide2.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter4/school_coop_objectives.png" alt="เป้าหมายสหกรณ์โรงเรียน" class="slide-image-medium">
+                <p class="principle-explanation">สหกรณ์โรงเรียนมีเป้าหมายหลายอย่างเลยนะ เช่น:</p>
+                <ul class="bullet-list checkmark">
+                    <li>ฝึกให้นักเรียนรู้จักการทำงานร่วมกันเป็นหมู่คณะ</li>
+                    <li>ส่งเสริมให้นักเรียนรู้จักการประหยัดและการออมทรัพย์</li>
+                    <li>สอนให้นักเรียนเข้าใจและปฏิบัติตามหลักประชาธิปไตย</li>
+                    <li>ฝึกให้นักเรียนรู้จักพึ่งพาตนเองและช่วยเหลือซึ่งกันและกัน</li>
+                    <li>จัดหาสิ่งของจำเป็นให้นักเรียนได้ซื้อในราคายุติธรรม</li>
+                </ul>
+                <div class="interactive-match-objective">
+                     <p><strong>ลองจับคู่เป้าหมายกับคำอธิบายสั้นๆ ดูสิ!</strong></p>
+                    <div class="objective-match-area">
+                        <span class="obj-draggable" draggable="true" data-matchkey="obj1">ฝึกทำงานร่วมกัน</span>
+                        <span class="obj-draggable" draggable="true" data-matchkey="obj2">ส่งเสริมการออม</span>
+                        <span class="obj-draggable" draggable="true" data-matchkey="obj3">เรียนรู้ประชาธิปไตย</span>
+                    </div>
+                    <div class="objective-dropzones">
+                        <div class="obj-dropzone" data-dropkey="obj2" data-dropzone="true">รู้จักเก็บเงินค่าขนม</div>
+                        <div class="obj-dropzone" data-dropkey="obj3" data-dropzone="true">ทุกคนมีสิทธิออกเสียง</div>
+                        <div class="obj-dropzone" data-dropkey="obj1" data-dropzone="true">ช่วยกันคิด ช่วยกันทำ</div>
+                    </div>
+                    <p class="objective-match-feedback"></p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide1">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide3">แล้วได้ประโยชน์อะไรบ้าง?</button>
+        </section>
+
+        <section class="lesson-slide" id="slide3" style="display:none;">
+            <div class="slide-header">
+                <h2>3. ประโยชน์ของสหกรณ์โรงเรียน</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson04/slide3.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter4/school_coop_benefits.png" alt="ประโยชน์สหกรณ์โรงเรียน" class="slide-image-medium">
+                <div class="benefits-columns">
+                    <div class="column">
+                        <h3>ต่อนักเรียน (สมาชิก) 🙋</h3>
+                        <ul>
+                            <li>ได้ซื้อของจำเป็นในราคาถูก</li>
+                            <li>ฝึกการประหยัด รู้จักออมเงิน</li>
+                            <li>ฝึกความรับผิดชอบ ซื่อสัตย์</li>
+                            <li>ได้ประสบการณ์ทำงานจริง</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>ต่อโรงเรียน 🏫</h3>
+                        <ul>
+                            <li>เป็นแหล่งเรียนรู้นอกห้องเรียน</li>
+                            <li>ฝึกนักเรียนให้มีคุณลักษณะที่ดี</li>
+                            <li>อาจมีเงินทุนสนับสนุนกิจกรรมโรงเรียน</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="interactive-benefit-sort">
+                    <p><strong>อันไหนเป็นประโยชน์ต่อนักเรียน อันไหนต่อโรงเรียน? (ลากไปใส่กลุ่ม)</strong></p>
+                    <div class="benefit-card-pool">
+                        <span class="benefit-item draggable" draggable="true" data-group="student">ซื้อดินสอได้ถูกลง</span>
+                        <span class="benefit-item draggable" draggable="true" data-group="school">มีที่ให้นักเรียนฝึกงาน</span>
+                        <span class="benefit-item draggable" draggable="true" data-group="student">มีเงินออมมากขึ้น</span>
+                    </div>
+                    <div class="benefit-group-dropzones">
+                        <div class="benefit-group student-group" data-group="student" data-dropzone="true">กลุ่ม: นักเรียน</div>
+                        <div class="benefit-group school-group" data-group="school" data-dropzone="true">กลุ่ม: โรงเรียน</div>
+                    </div>
+                    <p class="benefit-sort-feedback"></p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide2">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide4">เขาทำงานกันยังไงนะ?</button>
+        </section>
+
+        <section class="lesson-slide" id="slide4" style="display:none;">
+            <div class="slide-header">
+                <h2>4. สหกรณ์โรงเรียนทำงานกันยังไงนะ? (แบบง่ายๆ)</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson04/slide4.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter4/school_coop_operations.png" alt="การดำเนินงานสหกรณ์โรงเรียน" class="slide-image-medium">
+                <ul class="bullet-list arrow">
+                    <li><strong>สมาชิก:</strong> ก็คือนักเรียนทุกคนในโรงเรียนที่สมัครใจเข้ามาเป็นสมาชิก</li>
+                    <li><strong>คณะกรรมการ:</strong> นักเรียนที่ได้รับการเลือกตั้งจากสมาชิก ให้มาช่วยดูแลการทำงานของสหกรณ์ (เช่น พี่ออมตังค์เป็นเหรัญญิก น้องปันผลเป็นเลขานุการ) โดยมีคุณครูเป็นที่ปรึกษา</li>
+                    <li><strong>กิจกรรมหลัก:</strong>
+                        <ul>
+                            <li><strong>ร้านค้าสหกรณ์:</strong> ขายของจำเป็นให้นักเรียน</li>
+                            <li><strong>กิจกรรมออมทรัพย์:</strong> รับฝากเงินจากนักเรียน (ถ้ามี)</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="interactive-role-match">
+                    <p><strong>ใครทำหน้าที่อะไรในสหกรณ์โรงเรียน? (จับคู่)</strong></p>
+                    <div class="role-match-container">
+                        <div class="role-item draggable" draggable="true" data-match="roleA">นักเรียนทั่วไป</div>
+                        <div class="role-item draggable" draggable="true" data-match="roleB">กรรมการนักเรียน</div>
+                        <div class="role-item draggable" draggable="true" data-match="roleC">คุณครู</div>
+                    </div>
+                    <div class="role-dropzones">
+                        <div class="role-desc-dropzone" data-dropzone="true" data-match="roleA">เป็นสมาชิก, ซื้อของ, ฝากเงิน</div>
+                        <div class="role-desc-dropzone" data-dropzone="true" data-match="roleB">ช่วยบริหารงานร้านค้า, จัดประชุม</div>
+                        <div class="role-desc-dropzone" data-dropzone="true" data-match="roleC">ให้คำแนะนำ, สนับสนุน</div>
+                    </div>
+                    <p class="role-match-feedback"></p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide3">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide5">มีกิจกรรมอะไรบ้าง?</button>
+        </section>
+
+        <section class="lesson-slide" id="slide5" style="display:none;">
+            <div class="slide-header">
+                <h2>5. ตัวอย่างกิจกรรมสนุกๆ ของสหกรณ์ในโรงเรียน</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson04/slide5.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter4/school_coop_activities.png" alt="กิจกรรมสหกรณ์โรงเรียน" class="slide-image-large">
+                <div class="activities-gallery">
+                    <div class="activity-card">
+                        <img src="../assets/images/lessons/chapter4/activity_store.png" alt="ร้านค้าสหกรณ์">
+                        <p>ร้านค้าสหกรณ์ ขายของให้นักเรียน</p>
+                    </div>
+                    <div class="activity-card">
+                        <img src="../assets/images/lessons/chapter4/activity_savings.png" alt="กิจกรรมออมทรัพย์">
+                        <p>กิจกรรมออมทรัพย์ ส่งเสริมการออม</p>
+                    </div>
+                    <div class="activity-card">
+                        <img src="../assets/images/lessons/chapter4/activity_garden.png" alt="แปลงผักสหกรณ์">
+                        <p>แปลงผักสหกรณ์ (ถ้ามี) ขายผลผลิต</p>
+                    </div>
+                     <div class="activity-card">
+                        <img src="../assets/images/lessons/chapter4/activity_recycling.png" alt="กิจกรรมรีไซเคิล">
+                        <p>กิจกรรมรีไซเคิล เพื่อสิ่งแวดล้อม</p>
+                    </div>
+                </div>
+                <div class="mascot-dialogue center">
+                    <img src="../assets/images/mascots/mascot.png" alt="น้องปันผล">
+                    <p>โรงเรียนของน้องๆ มีกิจกรรมสหกรณ์แบบไหนบ้างเอ่ย? สนุกใช่ไหมล่ะ!</p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide4">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide6">สรุปและทดสอบ</button>
+        </section>
+
+        <section class="lesson-slide" id="slide6" style="display:none;">
+            <div class="slide-header">
+                <h2>สรุปเรื่องสหกรณ์ในโรงเรียน และมาทดสอบกัน!</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson04/slide6.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <p class="summary-text">สหกรณ์ในโรงเรียนเป็นที่ที่เราจะได้เรียนรู้และฝึกฝนการทำงานร่วมกัน การเป็นผู้นำผู้ตามที่ดี และยังได้ประโยชน์จากการซื้อของราคาถูกและฝึกการออมด้วยนะ!</p>
+                <div class="fun-quiz-container">
+                    <div class="quiz-question-card" data-question-id="q1">
+                        <p class="question-text">1. ใครคือสมาชิกหลักของสหกรณ์ในโรงเรียน?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-answer-value="a">ก) คุณครู</button>
+                            <button class="answer-btn" data-answer-value="b" data-correct="true">ข) นักเรียน</button>
+                            <button class="answer-btn" data-answer-value="c">ค) ผู้ปกครอง</button>
+                        </div>
+                        <div class="feedback-icon"></div><div class="explanation-text"></div>
+                    </div>
+                    <div class="quiz-question-card" data-question-id="q2">
+                        <p class="question-text">2. ข้อใดคือเป้าหมายสำคัญของสหกรณ์โรงเรียน?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-answer-value="a">ก) เพื่อให้โรงเรียนมีกำไรเยอะๆ</button>
+                            <button class="answer-btn" data-answer-value="b" data-correct="true">ข) เพื่อฝึกให้นักเรียนรู้จักการทำงานร่วมกันและประชาธิปไตย</button>
+                            <button class="answer-btn" data-answer-value="c">ค) เพื่อแข่งขันกับร้านค้าข้างนอก</button>
+                        </div>
+                        <div class="feedback-icon"></div><div class="explanation-text"></div>
+                    </div>
+                     <div class="quiz-question-card" data-question-id="q3">
+                        <p class="question-text">3. การซื้อสมุดจากร้านค้าสหกรณ์โรงเรียน เป็นประโยชน์ต่อใครโดยตรง?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-answer-value="a" data-correct="true">ก) นักเรียนที่เป็นสมาชิก</button>
+                            <button class="answer-btn" data-answer-value="b">ข) คุณครูใหญ่เท่านั้น</button>
+                            <button class="answer-btn" data-answer-value="c">ค) ชุมชนรอบโรงเรียน</button>
+                        </div>
+                        <div class="feedback-icon"></div><div class="explanation-text"></div>
+                    </div>
+                     <div class="quiz-question-card" data-question-id="q4">
+                        <p class="question-text">4. ใครทำหน้าที่ดูแลและบริหารงานสหกรณ์ในโรงเรียนเป็นหลัก?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-answer-value="a">ก) ภารโรง</button>
+                            <button class="answer-btn" data-answer-value="b" data-correct="true">ข) คณะกรรมการนักเรียน (ที่ได้รับเลือกตั้ง)</button>
+                            <button class="answer-btn" data-answer-value="c">ค) สมาคมผู้ปกครอง</button>
+                        </div>
+                        <div class="feedback-icon"></div><div class="explanation-text"></div>
+                    </div>
+                    <div class="quiz-question-card" data-question-id="q5">
+                        <p class="question-text">5. กิจกรรมใดต่อไปนี้ <span class="highlight-text">ไม่ใช่</span> กิจกรรมหลักที่มักพบในสหกรณ์โรงเรียนทั่วไป?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-answer-value="a">ก) ร้านค้าขายอุปกรณ์การเรียน</button>
+                            <button class="answer-btn" data-answer-value="b">ข) กิจกรรมออมทรัพย์</button>
+                            <button class="answer-btn" data-answer-value="c" data-correct="true">ค) การให้กู้ยืมเงินซื้อบ้าน</button>
+                        </div>
+                        <div class="feedback-icon"></div><div class="explanation-text"></div>
+                    </div>
+                    <button id="checkQuizAnswersBtn" class="game-btn">ตรวจคำตอบ!</button>
+                    <div id="finalQuizResult" class="final-quiz-result-display"></div>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide5">ย้อนกลับ</button>
+            <a href="../index.html#lessons" class="lesson-nav-btn">กลับหน้าหลักบทเรียน</a>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; <span id="current-year"></span> Developed by Tle Narongphisit | ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี</p>
+    </footer>
+
+    <audio id="background-music" loop>
+        <source src="../assets/audio/background_music/music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="slideNarrationPlayer"></audio>
+
+    <script src="../js/script.js"></script>
+    <script src="js/lesson04_script.js"></script>
+</body>
+</html>

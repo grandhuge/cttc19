@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทที่ 5: คุณธรรมที่ได้จากสหกรณ์ - Co-op Kids Club</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/lesson_page_style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="../assets/images/mascots/mascot.png" alt="Mascots" class="logo-mascot-small">
+            <h1>Co-op Kids Club</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../index.html">หน้าหลัก</a></li>
+                <li><a href="../index.html#lessons" class="active">บทเรียน</a></li>
+                <li><a href="../activities.html">กิจกรรม</a></li>
+                <li><a href="#">เกม</a></li>
+                <li><a href="#">นิทาน</a></li>
+                <li><a href="#">แบบทดสอบ</a></li>
+                <li><a href="../about.html">เกี่ยวกับเรา</a></li>
+            </ul>
+        </nav>
+        <button id="music-toggle" class="music-button">🎵 เปิดเพลง</button>
+    </header>
+
+    <main class="lesson-page-container">
+        <div class="lesson-header-title">
+            <h1>บทที่ 5: คุณธรรมที่ได้จากสหกรณ์</h1>
+        </div>
+
+        <section class="lesson-slide" id="slide0">
+            <div class="slide-header">
+                <h2>สหกรณ์สอนอะไรดีๆ ให้เราบ้างนะ?</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson05/slide0.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter5/virtues_intro.png" alt="คุณธรรมจากสหกรณ์" class="slide-image-large">
+                <div class="mascot-dialogue center">
+                    <img src="../assets/images/mascots/mascot.png" alt="พี่ออมตังค์และน้องปันผล">
+                    <p>น้องๆ รู้ไหมว่าการทำกิจกรรมสหกรณ์ในโรงเรียน ไม่เพียงแต่ให้เราได้เรียนรู้เรื่องการทำงานร่วมกัน แต่ยังช่วยปลูกฝังคุณธรรมดีๆ หลายอย่างให้เราด้วยนะ!</p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn next" data-target="slide1">มีอะไรบ้าง ไปดูกัน!</button>
+        </section>
+
+        <section class="lesson-slide" id="slide1" style="display:none;">
+            <div class="slide-header">
+                <h2>1. ความซื่อสัตย์สุจริต</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson05/slide1.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter5/virtue_honesty.png" alt="ความซื่อสัตย์" class="slide-image-medium">
+                <p class="principle-explanation">คือ การเป็นคนตรงไปตรงมา ไม่โกหก ไม่คดโกง ไม่เอาของคนอื่นมาเป็นของตัวเอง เช่น ถ้าเราเป็นคนขายของในร้านสหกรณ์ ก็ต้องทอนเงินให้ถูกต้อง ไม่แอบหยิบของไปโดยไม่จ่ายเงิน</p>
+                <div class="interactive-scenario">
+                    <p><strong>สถานการณ์ชวนคิด:</strong> "น้องปันผลซื้อขนมที่ร้านสหกรณ์โรงเรียน พี่ออมตังค์ (คนขาย) ทอนเงินเกินมา 5 บาท น้องปันผลควรทำอย่างไร?"</p>
+                    <button class="scenario-option-btn" data-action="keep">A) เก็บเงินไว้เลย โชคดีจัง!</button>
+                    <button class="scenario-option-btn correct-action" data-action="return">B) รีบบอกพี่ออมตังค์แล้วคืนเงินส่วนที่เกินไป</button>
+                    <p class="scenario-feedback"></p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide0">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide2">คุณธรรมต่อไป</button>
+        </section>
+
+        <section class="lesson-slide" id="slide2" style="display:none;">
+            <div class="slide-header">
+                <h2>2. ความรับผิดชอบ</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson05/slide2.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter5/virtue_responsibility.png" alt="ความรับผิดชอบ" class="slide-image-medium">
+                <p class="principle-explanation">คือ การตั้งใจทำหน้าที่ที่ได้รับมอบหมายให้ดีที่สุด และยอมรับผลที่ตามมาจากการกระทำของเรา เช่น ถ้าได้รับเลือกเป็นกรรมการสหกรณ์ ก็ต้องมาประชุมและช่วยงานอย่างสม่ำเสมอ หรือช่วยดูแลร้านค้าให้สะอาดเรียบร้อย</p>
+                <div class="interactive-role-play">
+                    <p><strong>ถ้าเราเป็นกรรมการสหกรณ์ เรามีหน้าที่อะไรบ้าง? (เลือกสิ่งที่ใช่)</strong></p>
+                    <button class="role-task-btn" data-correct="true">ช่วยจัดของในร้านค้า</button>
+                    <button class="role-task-btn" data-correct="false">มาโรงเรียนสายทุกวัน</button>
+                    <button class="role-task-btn" data-correct="true">เข้าประชุมกรรมการ</button>
+                    <button class="role-task-btn" data-correct="false">ไม่สนใจดูแลความสะอาด</button>
+                    <p class="role-play-feedback"></p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide1">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide3">คุณธรรมต่อไป</button>
+        </section>
+
+        <section class="lesson-slide" id="slide3" style="display:none;">
+            <div class="slide-header">
+                <h2>3. การประหยัดและอดออม</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson05/slide3.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter5/virtue_saving.png" alt="การประหยัด" class="slide-image-medium">
+                <p class="principle-explanation">คือ การใช้จ่ายเงินและสิ่งของอย่างรู้คุณค่า ไม่ฟุ่มเฟือย รู้จักเก็บออมเงินไว้ใช้ในยามจำเป็น การซื้อของจากสหกรณ์ที่ราคาถูกก็เป็นการประหยัดอย่างหนึ่ง และการฝากเงินกับสหกรณ์ออมทรัพย์ก็คือการอดออม</p>
+                <div class="interactive-saving-tips">
+                    <p><strong>ช่วยพี่ออมตังค์เลือกวิธีประหยัดในร้านสหกรณ์หน่อยสิ! (คลิกที่รูปวิธีที่ถูกต้อง)</strong></p>
+                    <div class="saving-options-grid">
+                        <div class="saving-tip-card" data-correct="true">
+                            <img src="../assets/images/lessons/chapter5/tip_reusable_bag.png" alt="ใช้ถุงผ้า">
+                            <p>ใช้ถุงผ้าแทนถุงพลาสติก</p>
+                        </div>
+                        <div class="saving-tip-card" data-correct="false">
+                            <img src="../assets/images/lessons/chapter5/tip_buy_unneeded.png" alt="ซื้อของไม่จำเป็น">
+                            <p>ซื้อขนมทุกอย่างที่อยากกิน</p>
+                        </div>
+                        <div class="saving-tip-card" data-correct="true">
+                            <img src="../assets/images/lessons/chapter5/tip_turn_off_light.png" alt="ปิดไฟเมื่อไม่ใช้">
+                            <p>ปิดไฟเมื่อไม่มีคนอยู่</p>
+                        </div>
+                    </div>
+                    <p class="saving-tips-feedback"></p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide2">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide4">คุณธรรมต่อไป</button>
+        </section>
+
+        <section class="lesson-slide" id="slide4" style="display:none;">
+            <div class="slide-header">
+                <h2>4. ความสามัคคีและการทำงานเป็นทีม</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson05/slide4.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter5/virtue_teamwork.png" alt="ความสามัคคี" class="slide-image-medium">
+                <p class="principle-explanation">คือ การร่วมมือร่วมใจกันทำงานเป็นกลุ่ม รับฟังความคิดเห็นของคนอื่น ช่วยเหลือกันเพื่อให้งานสำเร็จ สหกรณ์จะเข้มแข็งได้ก็เพราะสมาชิกทุกคนสามัคคีกัน</p>
+                <div class="interactive-puzzle">
+                    <p><strong>มาช่วยกันต่อภาพให้สมบูรณ์! (คลิกเพื่อหมุนชิ้นส่วน แล้วลากไปวาง)</strong></p>
+                    <div class="puzzle-area-l5">
+                        <div class="puzzle-piece-l5" draggable="true" data-piece="1" style="background-image: url('../assets/images/lessons/chapter5/puzzle_team_1.png');"></div>
+                        <div class="puzzle-piece-l5" draggable="true" data-piece="2" style="background-image: url('../assets/images/lessons/chapter5/puzzle_team_2.png');"></div>
+                        <div class="puzzle-piece-l5" draggable="true" data-piece="3" style="background-image: url('../assets/images/lessons/chapter5/puzzle_team_3.png');"></div>
+                        <div class="puzzle-piece-l5" draggable="true" data-piece="4" style="background-image: url('../assets/images/lessons/chapter5/puzzle_team_4.png');"></div>
+                    </div>
+                    <div class="puzzle-board-l5">
+                        <div class="puzzle-slot-l5" data-dropzone="true" data-accept="1"></div>
+                        <div class="puzzle-slot-l5" data-dropzone="true" data-accept="2"></div>
+                        <div class="puzzle-slot-l5" data-dropzone="true" data-accept="3"></div>
+                        <div class="puzzle-slot-l5" data-dropzone="true" data-accept="4"></div>
+                    </div>
+                    <p class="puzzle-feedback-l5"></p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide3">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide5">คุณธรรมสุดท้าย</button>
+        </section>
+
+        <section class="lesson-slide" id="slide5" style="display:none;">
+            <div class="slide-header">
+                <h2>5. การช่วยเหลือแบ่งปัน (เสียสละ เห็นอกเห็นใจ)</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson05/slide5.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <img src="../assets/images/lessons/chapter5/virtue_sharing.png" alt="การช่วยเหลือแบ่งปัน" class="slide-image-medium">
+                <p class="principle-explanation">คือ การมีน้ำใจ ช่วยเหลือเพื่อนสมาชิกที่เดือดร้อน หรือแบ่งปันสิ่งที่เรามีให้กับผู้อื่น รวมถึงการที่สหกรณ์นำผลกำไรส่วนหนึ่งไปทำประโยชน์เพื่อส่วนรวม เช่น ช่วยเหลือโรงเรียนหรือชุมชน</p>
+                <div class="interactive-sharing-choice">
+                    <p><strong>ถ้าสหกรณ์โรงเรียนมีกำไรเล็กน้อยจากการขายของ ควรนำไปทำอะไรดีนะ? (เลือกกิจกรรมที่แสดงการช่วยเหลือแบ่งปัน)</strong></p>
+                    <button class="sharing-option-btn" data-correct="true">A) ซื้อหนังสือใหม่เข้าห้องสมุดโรงเรียน</button>
+                    <button class="sharing-option-btn" data-correct="false">B) กรรมการนักเรียนนำเงินไปซื้อขนมกินกันเอง</button>
+                    <button class="sharing-option-btn" data-correct="true">C) บริจาคอุปกรณ์กีฬาให้น้องๆ ที่ขาดแคลน</button>
+                    <p class="sharing-feedback"></p>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide4">ย้อนกลับ</button>
+            <button class="lesson-nav-btn next" data-target="slide6">สรุปและทดสอบ</button>
+        </section>
+
+        <section class="lesson-slide" id="slide6" style="display:none;">
+            <div class="slide-header">
+                <h2>สรุปคุณธรรมจากสหกรณ์ และมาทดสอบกัน!</h2>
+                <button class="slide-narration-btn" data-audio-src="../assets/audio/narrations/lesson05/slide6.mp3">🔊 ฟังเสียงบรรยายสไลด์นี้</button>
+            </div>
+            <div class="slide-content">
+                <p class="summary-text">การเข้าร่วมกิจกรรมสหกรณ์ช่วยให้เราเป็นคนดีขึ้นในหลายๆ ด้านเลยนะ ทั้งซื่อสัตย์ รับผิดชอบ ประหยัด สามัคคี และรู้จักช่วยเหลือแบ่งปัน ซึ่งเป็นสิ่งสำคัญในการอยู่ร่วมกันในสังคมอย่างมีความสุข!</p>
+                <div class="fun-quiz-container">
+                    <div class="quiz-question-card" data-question-id="q1">
+                        <p class="question-text">1. การทอนเงินให้ลูกค้าถูกต้อง เป็นการแสดงออกถึงคุณธรรมข้อใด?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-answer-value="a" data-correct="true">ก) ความซื่อสัตย์</button>
+                            <button class="answer-btn" data-answer-value="b">ข) การประหยัด</button>
+                            <button class="answer-btn" data-answer-value="c">ค) ความสามัคคี</button>
+                        </div>
+                        <div class="feedback-icon"></div><div class="explanation-text"></div>
+                    </div>
+                    <div class="quiz-question-card" data-question-id="q2">
+                        <p class="question-text">2. เมื่อได้รับมอบหมายให้ดูแลร้านค้าสหกรณ์ แล้วเราทำความสะอาดร้านค้าอย่างดี แสดงว่าเรามีคุณธรรมข้อใด?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-answer-value="a">ก) การแบ่งปัน</button>
+                            <button class="answer-btn" data-answer-value="b" data-correct="true">ข) ความรับผิดชอบ</button>
+                            <button class="answer-btn" data-answer-value="c">ค) ความซื่อสัตย์</button>
+                        </div>
+                        <div class="feedback-icon"></div><div class="explanation-text"></div>
+                    </div>
+                     <div class="quiz-question-card" data-question-id="q3">
+                        <p class="question-text">3. การนำเงินค่าขนมที่เหลือไปฝากสหกรณ์ออมทรัพย์ เป็นการฝึกฝนคุณธรรมข้อใด?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-answer-value="a" data-correct="true">ก) การประหยัดและอดออม</button>
+                            <button class="answer-btn" data-answer-value="b">ข) ความสามัคคี</button>
+                            <button class="answer-btn" data-answer-value="c">ค) ความรับผิดชอบ</button>
+                        </div>
+                        <div class="feedback-icon"></div><div class="explanation-text"></div>
+                    </div>
+                     <div class="quiz-question-card" data-question-id="q4">
+                        <p class="question-text">4. เมื่อเพื่อนในกลุ่มสหกรณ์มีความเห็นไม่ตรงกัน เราควรทำอย่างไรเพื่อแสดงความสามัคคี?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-answer-value="a">ก) ไม่คุยกับเพื่อนคนนั้นอีก</button>
+                            <button class="answer-btn" data-answer-value="b" data-correct="true">ข) รับฟังความคิดเห็นของทุกคนแล้วหาข้อสรุปร่วมกัน</button>
+                            <button class="answer-btn" data-answer-value="c">ค) ให้หัวหน้ากลุ่มตัดสินใจคนเดียว</button>
+                        </div>
+                        <div class="feedback-icon"></div><div class="explanation-text"></div>
+                    </div>
+                    <div class="quiz-question-card" data-question-id="q5">
+                        <p class="question-text">5. สหกรณ์โรงเรียนบริจาคสมุดที่ขายไม่หมดให้โรงเรียนที่ขาดแคลน เป็นการแสดงออกถึงคุณธรรมข้อใด?</p>
+                        <div class="answer-options">
+                            <button class="answer-btn" data-answer-value="a">ก) ความซื่อสัตย์</button>
+                            <button class="answer-btn" data-answer-value="b" data-correct="true">ข) การช่วยเหลือแบ่งปัน</button>
+                            <button class="answer-btn" data-answer-value="c">ค) การประหยัด</button>
+                        </div>
+                        <div class="feedback-icon"></div><div class="explanation-text"></div>
+                    </div>
+                    <button id="checkQuizAnswersBtn" class="game-btn">ตรวจคำตอบ!</button>
+                    <div id="finalQuizResult" class="final-quiz-result-display"></div>
+                </div>
+            </div>
+            <button class="lesson-nav-btn prev" data-target="slide5">ย้อนกลับ</button>
+            <a href="../index.html#lessons" class="lesson-nav-btn">บทเรียนทั้งหมด</a>
+            </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; <span id="current-year"></span> Developed by Tle Narongphisit | ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี</p>
+    </footer>
+
+    <audio id="background-music" loop>
+        <source src="../assets/audio/background_music/music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="slideNarrationPlayer"></audio>
+
+    <script src="../js/script.js"></script>
+    <script src="js/lesson05_script.js"></script>
+</body>
+</html>
