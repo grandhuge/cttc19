@@ -526,7 +526,8 @@
                     <td class="px-6 py-4 whitespace-nowrap">${person.cooperative}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${person.province}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${person.preScore !== null ? person.preScore : '-'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${person.postScore !== null ? person.postScore : '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap ${person.postScore !== null ? (person.postScore >= 12 ? 'text-green-600' : 'text-red-600') : ''}">
+        ${person.postScore !== null ? `${person.postScore} (${person.postScore >= 12 ? 'ผ่าน' : 'ไม่ผ่าน'})` : '-'}</td>
                     <td class="px-6 py-4 whitespace-nowrap ${evaluationColor}">${person.evaluation}</td>
                 `;
                 
