@@ -163,7 +163,7 @@ body {
         .sound-btn {
             position: fixed;
             top: 20px;
-            right: 20px;
+            left: 20px;
             z-index: 50;
             width: 50px;
             height: 50px;
@@ -178,6 +178,24 @@ body {
             transition: all 0.3s;
         }
         
+		.close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 50;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+		
         .sound-btn:hover {
             transform: scale(1.1);
         }
