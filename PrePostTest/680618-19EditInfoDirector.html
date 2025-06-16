@@ -1,0 +1,565 @@
+<html lang="th"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบตรวจสอบและแก้ไขข้อมูลผู้เข้าอบรม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f9ff;
+        }
+        .loader {
+            border-top-color: #3498db;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        @-webkit-keyframes spinner {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+        }
+        thead {
+            background-color: #1e40af;
+            color: white;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #e5edff;
+        }
+        tbody tr:hover {
+            background-color: #dbeafe;
+        }
+        .tab-active {
+            background-color: #2563eb;
+            color: white;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.inset-y-0{top:0px;bottom:0px}.left-0{left:0px}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.block{display:block}.flex{display:flex}.hidden{display:none}.h-12{height:3rem}.h-5{height:1.25rem}.min-h-screen{min-height:100vh}.w-1\/12{width:8.333333%}.w-1\/3{width:33.333333%}.w-1\/4{width:25%}.w-1\/6{width:16.666667%}.w-12{width:3rem}.w-5{width:1.25rem}.w-full{width:100%}.min-w-full{min-width:100%}.max-w-3xl{max-width:48rem}.flex-1{flex:1 1 0%}.flex-grow{flex-grow:1}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.rounded{border-radius:0.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-t-lg{border-top-left-radius:0.5rem;border-top-right-radius:0.5rem}.border{border-width:1px}.border-4{border-width:4px}.border-l-4{border-left-width:4px}.border-t-4{border-top-width:4px}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-green-500{--tw-border-opacity:1;border-color:rgb(34 197 94 / var(--tw-border-opacity, 1))}.border-red-500{--tw-border-opacity:1;border-color:rgb(239 68 68 / var(--tw-border-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-500{--tw-bg-opacity:1;background-color:rgb(107 114 128 / var(--tw-bg-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-gray-900{--tw-bg-opacity:1;background-color:rgb(17 24 39 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-green-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.bg-red-100{--tw-bg-opacity:1;background-color:rgb(254 226 226 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-opacity-50{--tw-bg-opacity:0.5}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-blue-600{--tw-gradient-from:#2563eb var(--tw-gradient-from-position);--tw-gradient-to:rgb(37 99 235 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-blue-800{--tw-gradient-to:#1e40af var(--tw-gradient-to-position)}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.py-8{padding-top:2rem;padding-bottom:2rem}.pl-10{padding-left:2.5rem}.pl-3{padding-left:0.75rem}.pt-4{padding-top:1rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-green-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-red-700{--tw-text-opacity:1;color:rgb(185 28 28 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.ease-linear{transition-timing-function:linear}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-600:hover{--tw-bg-opacity:1;background-color:rgb(75 85 99 / var(--tw-bg-opacity, 1))}.hover\:bg-green-700:hover{--tw-bg-opacity:1;background-color:rgb(21 128 61 / var(--tw-bg-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-blue-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(59 130 246 / var(--tw-ring-opacity, 1))}.disabled\:opacity-50:disabled{opacity:0.5}@media (min-width: 768px){.md\:text-3xl{font-size:1.875rem;line-height:2.25rem}.md\:text-xl{font-size:1.25rem;line-height:1.75rem}}</style></head>
+<body>
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-6 shadow-lg">
+            <div class="container mx-auto px-4">
+                <h1 class="text-2xl md:text-3xl font-bold text-center">ระบบตรวจสอบและแก้ไขข้อมูลผู้เข้าอบรม</h1>
+                <h3 class="text-lg md:text-xl text-center mt-2">โครงการพัฒนาศักยภาพกรรมการดำเนินการออนไลน์ 18-19 มิถุนายน 2568</h3>
+		<h2 class="text-lg md:text-xl text-center mt-2">** โปรดตรวจสอบข้อมูลให้ถูกต้องเพื่อประโยชน์ในการออกประกาศนียบัตรต่อไป</h2>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-8">
+            <!-- Loading Indicator -->
+            <div id="loading" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex mb-6">
+                <button id="viewTab" class="flex-1 py-3 px-4 rounded-t-lg font-medium text-center transition-colors duration-200 tab-active">
+                    ตรวจสอบรายชื่อผู้ผ่านเกณฑ์แบบทดสอบ
+                </button>
+                <button id="editTab" class="flex-1 py-3 px-4 rounded-t-lg font-medium text-center transition-colors duration-200 bg-gray-200">
+                    แก้ไขข้อมูลส่วนตัว
+                </button>
+            </div>
+
+            <!-- View All Participants Section -->
+            <div id="viewSection" class="bg-white rounded-lg shadow-lg p-6 mx-auto">
+                <h3 class="text-xl font-semibold text-blue-800 mb-4">รายชื่อผู้มีสิทธิรับประกาศนียบัตร (รอตรวจสอบคุณสมบัติจากศูนย์ฯในพื้นที่เพื่อออกประกาศนียบัตรต่อไป)</h3>
+                <h4 class="text-xl font-semibold text-blue-800 mb-4">** หากข้อมูลของท่านไม่ถูกต้อง โปรดกดที่แท๊บแก้ไขข้อมูลส่วนตัว เพื่อแก้ไขข้อมูลของท่านให้ถูกต้อง</h4>
+                <div class="mb-4">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="ค้นหาชื่อ สหกรณ์ หรือจังหวัด..." class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr>
+                                <th class="w-1/12">ลำดับ</th>
+                                <th class="w-1/8">คำนำหน้า</th>
+                                <th class="w-1/4">ชื่อ - นามสกุล</th>
+                                <th class="w-1/3">สังกัดสหกรณ์</th>
+                                <th class="w-1/6">จังหวัด</th>
+                            </tr>
+                        </thead>
+                        <tbody id="participantTableBody"><tr>
+                        <td>1</td>
+                        <td></td>
+                        <td>รอรายชื่อผู้ผ่านเกณฑ์แบบทดสอบ</td>
+                        <td></td>
+                        <td></td>
+                    </tr></tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4 flex justify-between items-center">
+                    <div>
+                        <span id="totalParticipants">1</span> รายการ
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="prevPage" class="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50" disabled="">
+                            « ก่อนหน้า
+                        </button>
+                        <span id="pageInfo" class="px-3 py-1">หน้า 1 จาก 1</span>
+                        <button id="nextPage" class="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50" disabled="">
+                            ถัดไป »
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Information Section -->
+            <div id="editSection" class="bg-white rounded-lg shadow-lg p-6 max-w-3xl mx-auto hidden">
+                <!-- Step 1: Select Participant -->
+                <div id="step1" class="mb-6 hidden">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-4">เลือกรายชื่อที่ต้องการแก้ไขข้อมูล</h3>
+                    <div class="mb-4">
+                        <label for="participantSelect" class="block text-gray-700 mb-2">ชื่อ - นามสกุล:</label>
+                        <select id="participantSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="">-- กรุณาเลือกรายชื่อ --</option><option value="0">รอรายชื่อผู้ผ่านเกณฑ์แบบทดสอบ</option></select>
+                    </div>
+                </div>
+
+                <!-- Step 2: Edit Information -->
+                <div id="step2" class="hidden">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-4">แก้ไขข้อมูลผู้เข้าอบรม</h3>
+                    <form id="editForm" class="space-y-4">
+                        <div>
+                            <label for="prefix" class="block text-gray-700 mb-2">คำนำหน้า:</label>
+                            <input type="text" id="prefix" name="prefix" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="fullName" class="block text-gray-700 mb-2">ชื่อ - นามสกุล:</label>
+                            <input type="text" id="fullName" name="fullName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="cooperative" class="block text-gray-700 mb-2">สังกัดสหกรณ์:</label>
+                            <input type="text" id="cooperative" name="cooperative" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="province" class="block text-gray-700 mb-2">จังหวัด:</label>
+                            <input type="text" id="province" name="province" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <input type="hidden" id="rowIndex" name="rowIndex" value="0">
+                        <div class="flex justify-between pt-4">
+                            <button type="button" id="backButton" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-200">
+                                ย้อนกลับ
+                            </button>
+                            <button type="button" id="saveButton" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200">
+                                บันทึกข้อมูล
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 3: Verify ID -->
+                <div id="step3" class="">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-4">ยืนยันตัวตน</h3>
+                    <p class="mb-4 text-gray-700">กรุณากรอกเลขบัตรประชาชนเพื่อยืนยันการแก้ไขข้อมูล</p>
+                    <div class="mb-4">
+                        <label for="idVerification" class="block text-gray-700 mb-2">เลขบัตรประชาชน:</label>
+                        <input type="password" id="idVerification" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex justify-between">
+                        <button type="button" id="cancelVerification" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-200">
+                            ยกเลิก
+                        </button>
+                        <button type="button" id="confirmVerification" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                            ยืนยัน
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status Messages -->
+                <div id="statusMessage" class="mt-6 hidden">
+                    <div id="successMessage" class="hidden bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded">
+                        <p class="font-bold">สำเร็จ!</p>
+                        <p>แก้ไขข้อมูลเรียบร้อยแล้ว</p>
+                    </div>
+                    <div id="errorMessage" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded hidden">
+                        <p class="font-bold">ผิดพลาด!</p>
+                        <p id="errorText">เลขบัตรประชาชนไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-4 mt-8">
+            <div class="container mx-auto px-4 text-center">
+                <p>© developed by Tle Narongphisit CPD019 Suratthani</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Global variables
+        let participantsData = [];
+        const apiUrl = 'https://script.google.com/macros/s/AKfycbw3Qqp234sq88yfWcsnZ5JMNhX3R49qQDxtaOVQEFZk4aFduyp-5zMaNNXtESNSw54/exec';
+        let selectedParticipant = null;
+        
+        // Pagination variables
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let filteredData = [];
+
+        // DOM Elements - Tabs
+        const viewTab = document.getElementById('viewTab');
+        const editTab = document.getElementById('editTab');
+        const viewSection = document.getElementById('viewSection');
+        const editSection = document.getElementById('editSection');
+
+        // DOM Elements - Loading
+        const loadingElement = document.getElementById('loading');
+
+        // DOM Elements - Edit Form
+        const step1Element = document.getElementById('step1');
+        const step2Element = document.getElementById('step2');
+        const step3Element = document.getElementById('step3');
+        const participantSelect = document.getElementById('participantSelect');
+        const backButton = document.getElementById('backButton');
+        const saveButton = document.getElementById('saveButton');
+        const cancelVerification = document.getElementById('cancelVerification');
+        const confirmVerification = document.getElementById('confirmVerification');
+        const statusMessage = document.getElementById('statusMessage');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        
+        // DOM Elements - Table
+        const participantTableBody = document.getElementById('participantTableBody');
+        const totalParticipants = document.getElementById('totalParticipants');
+        const prevPageButton = document.getElementById('prevPage');
+        const nextPageButton = document.getElementById('nextPage');
+        const pageInfo = document.getElementById('pageInfo');
+        const searchInput = document.getElementById('searchInput');
+
+        // Form fields
+        const prefixInput = document.getElementById('prefix');
+        const fullNameInput = document.getElementById('fullName');
+        const cooperativeInput = document.getElementById('cooperative');
+        const provinceInput = document.getElementById('province');
+        const rowIndexInput = document.getElementById('rowIndex');
+        const idVerificationInput = document.getElementById('idVerification');
+
+        // Show loading indicator
+        function showLoading() {
+            loadingElement.classList.remove('hidden');
+        }
+
+        // Hide loading indicator
+        function hideLoading() {
+            loadingElement.classList.add('hidden');
+        }
+
+        // Switch tabs
+        function switchToViewTab() {
+            viewTab.classList.add('tab-active');
+            viewTab.classList.remove('bg-gray-200');
+            editTab.classList.remove('tab-active');
+            editTab.classList.add('bg-gray-200');
+            
+            viewSection.classList.remove('hidden');
+            editSection.classList.add('hidden');
+        }
+        
+        function switchToEditTab() {
+            editTab.classList.add('tab-active');
+            editTab.classList.remove('bg-gray-200');
+            viewTab.classList.remove('tab-active');
+            viewTab.classList.add('bg-gray-200');
+            
+            editSection.classList.remove('hidden');
+            viewSection.classList.add('hidden');
+            
+            // Reset edit form to step 1
+            step1Element.classList.remove('hidden');
+            step2Element.classList.add('hidden');
+            step3Element.classList.add('hidden');
+            statusMessage.classList.add('hidden');
+        }
+
+        // Fetch data using JSONP
+        function fetchData() {
+            showLoading();
+            
+            // Create a unique callback name
+            const callbackName = 'jsonpCallback_' + Math.round(Math.random() * 10000000);
+            
+            // Create script element
+            const script = document.createElement('script');
+            script.src = `${apiUrl}?action=getAll&callback=${callbackName}`;
+            
+            // Define the callback function
+            window[callbackName] = function(data) {
+                participantsData = data;
+                filteredData = [...participantsData];
+                populateParticipantSelect();
+                renderParticipantTable();
+                hideLoading();
+                
+                // Clean up
+                document.body.removeChild(script);
+                delete window[callbackName];
+            };
+            
+            // Add script to document
+            document.body.appendChild(script);
+        }
+
+        // Populate participant select dropdown
+        function populateParticipantSelect() {
+            participantSelect.innerHTML = '<option value="">-- กรุณาเลือกรายชื่อ --</option>';
+            
+            participantsData.forEach((participant, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = participant.fullName;
+                participantSelect.appendChild(option);
+            });
+        }
+
+        // Show participant details for editing
+        function showParticipantDetails(index) {
+            const participant = participantsData[index];
+            
+            prefixInput.value = participant.prefix;
+            fullNameInput.value = participant.fullName;
+            cooperativeInput.value = participant.cooperative;
+            provinceInput.value = participant.province;
+            rowIndexInput.value = index;
+            
+            selectedParticipant = participant;
+            
+            step1Element.classList.add('hidden');
+            step2Element.classList.remove('hidden');
+        }
+
+        // Update participant data
+        function updateParticipant(rowIndex, idNumber) {
+            showLoading();
+            
+            const updatedData = {
+                prefix: prefixInput.value,
+                fullName: fullNameInput.value,
+                cooperative: cooperativeInput.value,
+                province: provinceInput.value,
+                rowIndex: parseInt(rowIndex) + 2, // +2 because of header row and 0-based index
+                idNumber: idNumber
+            };
+            
+            // Create a unique callback name
+            const callbackName = 'jsonpCallback_' + Math.round(Math.random() * 10000000);
+            
+            // Create script element
+            const script = document.createElement('script');
+            const queryParams = Object.entries(updatedData)
+                .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+                .join('&');
+                
+            script.src = `${apiUrl}?action=update&${queryParams}&callback=${callbackName}`;
+            
+            // Define the callback function
+            window[callbackName] = function(response) {
+                hideLoading();
+                
+                if (response.success) {
+                    showSuccessMessage();
+                    // Update local data
+                    participantsData[rowIndex] = {
+                        ...participantsData[rowIndex],
+                        prefix: updatedData.prefix,
+                        fullName: updatedData.fullName,
+                        cooperative: updatedData.cooperative,
+                        province: updatedData.province
+                    };
+                    
+                    // Refresh dropdown and table
+                    populateParticipantSelect();
+                    filterParticipants();
+                    renderParticipantTable();
+                } else {
+                    showErrorMessage(response.message || 'เกิดข้อผิดพลาดในการอัปเดตข้อมูล');
+                }
+                
+                // Clean up
+                document.body.removeChild(script);
+                delete window[callbackName];
+            };
+            
+            // Add script to document
+            document.body.appendChild(script);
+        }
+
+        // Show success message
+        function showSuccessMessage() {
+            statusMessage.classList.remove('hidden');
+            successMessage.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            
+            step3Element.classList.add('hidden');
+            step1Element.classList.remove('hidden');
+            
+            // Hide message after 3 seconds
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+                successMessage.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Show error message
+        function showErrorMessage(message) {
+            statusMessage.classList.remove('hidden');
+            errorMessage.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+            
+            errorText.textContent = message;
+            
+            // Hide message after 3 seconds
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+            }, 3000);
+        }
+        
+        // Filter participants based on search input
+        function filterParticipants() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            if (!searchTerm) {
+                filteredData = [...participantsData];
+            } else {
+                filteredData = participantsData.filter(participant => 
+                    participant.fullName.toLowerCase().includes(searchTerm) || 
+                    participant.cooperative.toLowerCase().includes(searchTerm) ||
+                    participant.province.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            currentPage = 1;
+            renderParticipantTable();
+        }
+        
+        // Render participant table with pagination
+        function renderParticipantTable() {
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            participantTableBody.innerHTML = '';
+            
+            if (pageData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="5" class="text-center py-4">ไม่พบข้อมูล</td>`;
+                participantTableBody.appendChild(row);
+            } else {
+                pageData.forEach((participant, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${startIndex + index + 1}</td>
+                        <td>${participant.prefix}</td>
+                        <td>${participant.fullName}</td>
+                        <td>${participant.cooperative}</td>
+                        <td>${participant.province}</td>
+                    `;
+                    participantTableBody.appendChild(row);
+                });
+            }
+            
+            // Update pagination info
+            totalParticipants.textContent = filteredData.length;
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            pageInfo.textContent = `หน้า ${currentPage} จาก ${totalPages || 1}`;
+            
+            // Update pagination buttons
+            prevPageButton.disabled = currentPage <= 1;
+            nextPageButton.disabled = currentPage >= totalPages;
+        }
+        
+        // Navigate to previous page
+        function goToPrevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderParticipantTable();
+            }
+        }
+        
+        // Navigate to next page
+        function goToNextPage() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderParticipantTable();
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', fetchData);
+        
+        // Tab navigation
+        viewTab.addEventListener('click', switchToViewTab);
+        editTab.addEventListener('click', switchToEditTab);
+
+        // Edit form events
+        participantSelect.addEventListener('change', function() {
+            if (this.value) {
+                showParticipantDetails(this.value);
+            }
+        });
+
+        backButton.addEventListener('click', function() {
+            step2Element.classList.add('hidden');
+            step1Element.classList.remove('hidden');
+        });
+
+        saveButton.addEventListener('click', function() {
+            step2Element.classList.add('hidden');
+            step3Element.classList.remove('hidden');
+            idVerificationInput.value = '';
+        });
+
+        cancelVerification.addEventListener('click', function() {
+            step3Element.classList.add('hidden');
+            step2Element.classList.remove('hidden');
+        });
+
+        confirmVerification.addEventListener('click', function() {
+            const rowIndex = rowIndexInput.value;
+            const idNumber = idVerificationInput.value;
+            
+            if (!idNumber) {
+                showErrorMessage('กรุณากรอกเลขบัตรประชาชน');
+                return;
+            }
+            
+            updateParticipant(rowIndex, idNumber);
+        });
+        
+        // Table pagination and search events
+        prevPageButton.addEventListener('click', goToPrevPage);
+        nextPageButton.addEventListener('click', goToNextPage);
+        searchInput.addEventListener('input', filterParticipants);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'94fa4bb1223d45bd',t:'MTc0OTkwOTAxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>
