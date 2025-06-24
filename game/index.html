@@ -112,6 +112,45 @@
             </div>
         </div>
 
+		<!-- Game Goal Progress -->
+        <div class="bg-white rounded-xl shadow-md p-5 mb-8">
+            <h2 class="text-xl font-bold text-blue-800 mb-3">เป้าหมายเกม</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <h3 class="font-medium mb-2 flex items-center"><span class="text-xl mr-2">💰</span> เงินสะสมส่วนตัว</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                        <div id="personal-money-progress" class="bg-blue-600 h-4 rounded-full progress-bar" style="width: 10%"></div>
+                    </div>
+                    <div class="text-sm text-gray-600 flex justify-between">
+                        <span>ปัจจุบัน: <span id="personal-money-current">1,000</span> บาท</span>
+                        <span>เป้าหมาย: 10,000 บาท</span>
+                    </div>
+                </div>
+                
+                <div class="bg-amber-50 p-3 rounded-lg">
+                    <h3 class="font-medium mb-2 flex items-center"><span class="text-xl mr-2">🏪</span> เงินทุนร้านค้า</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                        <div id="store-capital-progress" class="bg-amber-600 h-4 rounded-full progress-bar" style="width: 50%"></div>
+                    </div>
+                    <div class="text-sm text-gray-600 flex justify-between">
+                        <span>ปัจจุบัน: <span id="store-capital-current">5,000</span> บาท</span>
+                        <span>เป้าหมาย: 10,000 บาท</span>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 p-3 rounded-lg">
+                    <h3 class="font-medium mb-2 flex items-center"><span class="text-xl mr-2">📈</span> ความพึงพอใจลูกค้า</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                        <div id="satisfaction-progress" class="bg-green-600 h-4 rounded-full progress-bar" style="width: 80%"></div>
+                    </div>
+                    <div class="text-sm text-gray-600 flex justify-between">
+                        <span>ปัจจุบัน: <span id="satisfaction-current">80</span>%</span>
+                        <span>เป้าหมาย: 100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <!-- กิจกรรมส่งเสริมการผลิตและอาชีพ -->
             <div id="production-activity" class="activity-card bg-white rounded-xl shadow-md overflow-hidden">
@@ -342,44 +381,7 @@
             </div>
         </div>
         
-        <!-- Game Goal Progress -->
-        <div class="bg-white rounded-xl shadow-md p-5 mb-8">
-            <h2 class="text-xl font-bold text-blue-800 mb-3">เป้าหมายเกม</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-blue-50 p-3 rounded-lg">
-                    <h3 class="font-medium mb-2 flex items-center"><span class="text-xl mr-2">💰</span> เงินสะสมส่วนตัว</h3>
-                    <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
-                        <div id="personal-money-progress" class="bg-blue-600 h-4 rounded-full progress-bar" style="width: 10%"></div>
-                    </div>
-                    <div class="text-sm text-gray-600 flex justify-between">
-                        <span>ปัจจุบัน: <span id="personal-money-current">1,000</span> บาท</span>
-                        <span>เป้าหมาย: 10,000 บาท</span>
-                    </div>
-                </div>
-                
-                <div class="bg-amber-50 p-3 rounded-lg">
-                    <h3 class="font-medium mb-2 flex items-center"><span class="text-xl mr-2">🏪</span> เงินทุนร้านค้า</h3>
-                    <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
-                        <div id="store-capital-progress" class="bg-amber-600 h-4 rounded-full progress-bar" style="width: 50%"></div>
-                    </div>
-                    <div class="text-sm text-gray-600 flex justify-between">
-                        <span>ปัจจุบัน: <span id="store-capital-current">5,000</span> บาท</span>
-                        <span>เป้าหมาย: 10,000 บาท</span>
-                    </div>
-                </div>
-                
-                <div class="bg-green-50 p-3 rounded-lg">
-                    <h3 class="font-medium mb-2 flex items-center"><span class="text-xl mr-2">📈</span> ความพึงพอใจลูกค้า</h3>
-                    <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
-                        <div id="satisfaction-progress" class="bg-green-600 h-4 rounded-full progress-bar" style="width: 80%"></div>
-                    </div>
-                    <div class="text-sm text-gray-600 flex justify-between">
-                        <span>ปัจจุบัน: <span id="satisfaction-current">80</span>%</span>
-                        <span>เป้าหมาย: 100%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
         
         <footer class="text-center text-gray-500 text-sm py-4 border-t border-gray-200">
             developed by Tle Narongphisit | CPD019
