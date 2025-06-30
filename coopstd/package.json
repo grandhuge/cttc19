@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
-    "start": "node postcss.config.js"
+    "start": "node eslint.config.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
