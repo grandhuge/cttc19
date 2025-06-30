@@ -1,7 +1,3 @@
-"scripts": {
-  "start": "node your-main-file.js"
-}
-
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
@@ -13,6 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
+    "start": "node postcss.config.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
