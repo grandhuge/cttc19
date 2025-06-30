@@ -1,3 +1,7 @@
+"scripts": {
+  "start": "node your-main-file.js"
+}
+
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
