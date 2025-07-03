@@ -11,7 +11,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Prompt', sans-serif;
-            background-image: url('https://cttc19.onrender.com/game/img/background.png');
+            background-image: url('./img/background.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -32,6 +32,7 @@
             max-width: 800px;
             width: 90%;
             border: 3px solid #d9b3ff;
+            position: relative;
         }
         
         .logo {
@@ -98,12 +99,27 @@
             margin: 0 5px;
         }
         
-        .sparkles {
+        .music-control {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .music-control:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
         }
         
         @media (max-width: 600px) {
@@ -124,12 +140,19 @@
                 padding: 12px 30px;
                 font-size: 1.2rem;
             }
+            
+            .music-control {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="https://cttc19.onrender.com/game/img/logo.png" alt="โลโก้สหกรณ์นักเรียน" class="logo">
+        <button class="music-control" id="musicToggle">🔊</button>
+        <img src="./img/logo.png" alt="โลโก้สหกรณ์นักเรียน" class="logo">
         <h1>เกมจำลองกิจกรรมสหกรณ์นักเรียน <span class="emoji">🏫</span></h1>
         
         <p class="description">
@@ -138,18 +161,60 @@
         </p>
         
         <div class="mascot-container">
-            <img src="https://cttc19.onrender.com/game/img/mascot.gif" alt="มาสคอตเชิญชวน" class="mascot">
-            <a href="https://coopstd.onrender.com/" class="play-button">
+            <img src="./img/mascot.gif" alt="มาสคอตเชิญชวน" class="mascot">
+            <a href="https://coopstd.onrender.com/" class="play-button" id="playButton">
                 เริ่มเล่นเกมเลย! <span class="emoji">🚀</span>
             </a>
         </div>
     </div>
     
+    <!-- Audio elements -->
+    <audio id="hoverSound" src="./sound/hover.mp3" preload="auto"></audio>
+    <audio id="bgMusic" loop>
+        <source src="./sound/Clickety Clack.mp3" type="audio/mpeg">
+    </audio>
+    
     <script>
-        // เพิ่มลูกเล่นให้กับปุ่ม
-        const playButton = document.querySelector('.play-button');
+        // ตัวแปรสำหรับเสียง
+        const hoverSound = document.getElementById('hoverSound');
+        const bgMusic = document.getElementById('bgMusic');
+        const musicToggle = document.getElementById('musicToggle');
+        const playButton = document.getElementById('playButton');
         
+        // เริ่มเล่นเพลงพื้นหลังโดยอัตโนมัติ (แต่จะถูก pause โดย browser ถ้าไม่มีการโต้ตอบก่อน)
+        let musicPlaying = false;
+        
+        // ฟังก์ชันสำหรับเล่นเพลง (ต้องมีการโต้ตอบก่อน)
+        function playBackgroundMusic() {
+            if (!musicPlaying) {
+                bgMusic.play()
+                    .then(() => {
+                        musicPlaying = true;
+                        musicToggle.textContent = "🔊";
+                    })
+                    .catch(error => {
+                        console.log("Auto-play was prevented:", error);
+                    });
+            }
+        }
+        
+        // ปุ่มควบคุมเสียง
+        musicToggle.addEventListener('click', () => {
+            if (musicPlaying) {
+                bgMusic.pause();
+                musicPlaying = false;
+                musicToggle.textContent = "🔇";
+            } else {
+                bgMusic.play();
+                musicPlaying = true;
+                musicToggle.textContent = "🔊";
+            }
+        });
+        
+        // เพิ่มเสียงเมื่อเมาส์อยู่บนปุ่ม
         playButton.addEventListener('mouseover', () => {
+            hoverSound.currentTime = 0;
+            hoverSound.play();
             playButton.innerHTML = 'เริ่มเล่นเกมเลย! <span class="emoji">🎯</span>';
         });
         
@@ -158,10 +223,19 @@
         });
         
         // เพิ่มลูกเล่นเมื่อคลิกปุ่ม
-        playButton.addEventListener('click', () => {
+        playButton.addEventListener('click', (e) => {
+            e.preventDefault();
             playButton.innerHTML = 'กำลังไป... <span class="emoji">⏳</span>';
             playButton.style.transform = 'scale(0.95)';
+            
+            // เล่นเสียงก่อนเปลี่ยนหน้า
+            setTimeout(() => {
+                window.location.href = playButton.href;
+            }, 1000);
         });
+        
+        // เริ่มเล่นเพลงเมื่อผู้ใช้คลิกที่ใดก็ได้บนหน้า
+        document.body.addEventListener('click', playBackgroundMusic, { once: true });
     </script>
 </body>
 </html>
