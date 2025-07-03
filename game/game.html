@@ -1,0 +1,1238 @@
+<html lang="th"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมเรียนรู้กิจกรรมสหกรณ์นักเรียน by cttc19</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f9ff;
+        }
+        
+        .activity-card {
+            transition: all 0.3s ease;
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn {
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+        
+        .notification {
+            animation: slideIn 0.5s ease forwards, fadeOut 0.5s ease 3.5s forwards;
+            transform: translateX(100%);
+        }
+        
+        @keyframes slideIn {
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+        
+        .plant-item, .shop-item {
+            transition: all 0.2s ease;
+        }
+        
+        .plant-item:hover, .shop-item:hover {
+            transform: scale(1.03);
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 3s ease-in infinite;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.sticky{position:sticky}.inset-0{inset:0px}.bottom-4{bottom:1rem}.right-4{right:1rem}.top-0{top:0px}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-1{margin-left:0.25rem}.ml-2{margin-left:0.5rem}.ml-auto{margin-left:auto}.mr-2{margin-right:0.5rem}.mr-4{margin-right:1rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.mt-2{margin-top:0.5rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-4{height:1rem}.h-6{height:1.5rem}.max-h-40{max-height:10rem}.max-h-\[90vh\]{max-height:90vh}.min-h-screen{min-height:100vh}.w-6{width:1.5rem}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-6xl{max-width:72rem}.max-w-md{max-width:28rem}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-6 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1.5rem * var(--tw-space-x-reverse));margin-left:calc(1.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-t{border-top-width:1px}.border-amber-200{--tw-border-opacity:1;border-color:rgb(253 230 138 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-transparent{border-color:transparent}.border-amber-400{--tw-border-opacity:1;border-color:rgb(251 191 36 / var(--tw-border-opacity, 1))}.bg-amber-50{--tw-bg-opacity:1;background-color:rgb(255 251 235 / var(--tw-bg-opacity, 1))}.bg-amber-600{--tw-bg-opacity:1;background-color:rgb(217 119 6 / var(--tw-bg-opacity, 1))}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-300{--tw-bg-opacity:1;background-color:rgb(209 213 219 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-green-50{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-green-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.bg-purple-50{--tw-bg-opacity:1;background-color:rgb(250 245 255 / var(--tw-bg-opacity, 1))}.bg-purple-600{--tw-bg-opacity:1;background-color:rgb(147 51 234 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-opacity-50{--tw-bg-opacity:0.5}.bg-opacity-70{--tw-bg-opacity:0.7}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-8{padding-top:2rem;padding-bottom:2rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.text-amber-500{--tw-text-opacity:1;color:rgb(245 158 11 / var(--tw-text-opacity, 1))}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-amber-700{--tw-text-opacity:1;color:rgb(180 83 9 / var(--tw-text-opacity, 1))}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:border-green-400:hover{--tw-border-opacity:1;border-color:rgb(74 222 128 / var(--tw-border-opacity, 1))}.hover\:bg-amber-700:hover{--tw-bg-opacity:1;background-color:rgb(180 83 9 / var(--tw-bg-opacity, 1))}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-400:hover{--tw-bg-opacity:1;background-color:rgb(156 163 175 / var(--tw-bg-opacity, 1))}.hover\:bg-green-700:hover{--tw-bg-opacity:1;background-color:rgb(21 128 61 / var(--tw-bg-opacity, 1))}.hover\:bg-purple-700:hover{--tw-bg-opacity:1;background-color:rgb(126 34 206 / var(--tw-bg-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-blue-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(59 130 246 / var(--tw-ring-opacity, 1))}.focus\:ring-green-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(34 197 94 / var(--tw-ring-opacity, 1))}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}</style></head>
+<body class="min-h-screen">
+    <div id="app" class="container mx-auto px-4 py-8 max-w-6xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-blue-800 mb-2">เกมเรียนรู้กิจกรรมสหกรณ์นักเรียน</h1>
+            <p class="text-lg text-gray-600">เรียนรู้หลักการสหกรณ์ผ่านกิจกรรมที่สนุกและน่าสนใจ</p>
+        </header>
+
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <div class="stats bg-white rounded-xl shadow-md p-4 flex items-center space-x-6 w-full max-w-3xl">
+                <div class="stat text-center">
+                    <div class="text-sm text-gray-500">รอบเกม</div>
+                    <div id="round" class="text-2xl font-bold text-blue-700">1</div>
+                </div>
+                <div class="stat text-center">
+                    <div class="text-sm text-gray-500">เงินสะสมส่วนตัว</div>
+                    <div id="personal-money" class="text-2xl font-bold text-green-600">1,000</div>
+                </div>
+                <div class="stat text-center">
+                    <div class="text-sm text-gray-500">ความพึงพอใจของลูกค้า</div>
+                    <div class="flex items-center">
+                        <div id="satisfaction" class="text-2xl font-bold text-amber-500">80</div>
+                        <div class="text-amber-500 ml-1">%</div>
+                    </div>
+                </div>
+                <div class="stat text-center">
+                    <div class="text-sm text-gray-500">จำนวนลูกค้า/วัน</div>
+                    <div id="customers" class="text-2xl font-bold text-purple-600">20</div>
+                </div>
+                <button id="next-round-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg ml-auto btn">
+                    รอบถัดไป
+                </button>
+            </div>
+        </div>
+
+		<!-- Game Goal Progress -->
+        <div class="bg-white rounded-xl shadow-md p-5 mb-8">
+            <h2 class="text-xl font-bold text-blue-800 mb-3">เป้าหมายเกม</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <h3 class="font-medium mb-2 flex items-center"><span class="text-xl mr-2">💰</span> เงินสะสมส่วนตัว</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                        <div id="personal-money-progress" class="bg-blue-600 h-4 rounded-full progress-bar" style="width: 10%"></div>
+                    </div>
+                    <div class="text-sm text-gray-600 flex justify-between">
+                        <span>ปัจจุบัน: <span id="personal-money-current">1,000</span> บาท</span>
+                        <span>เป้าหมาย: 10,000 บาท</span>
+                    </div>
+                </div>
+                
+                <div class="bg-amber-50 p-3 rounded-lg">
+                    <h3 class="font-medium mb-2 flex items-center"><span class="text-xl mr-2">🏪</span> เงินทุนร้านค้า</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                        <div id="store-capital-progress" class="bg-amber-600 h-4 rounded-full progress-bar" style="width: 50%"></div>
+                    </div>
+                    <div class="text-sm text-gray-600 flex justify-between">
+                        <span>ปัจจุบัน: <span id="store-capital-current">5,000</span> บาท</span>
+                        <span>เป้าหมาย: 10,000 บาท</span>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 p-3 rounded-lg">
+                    <h3 class="font-medium mb-2 flex items-center"><span class="text-xl mr-2">📈</span> ความพึงพอใจลูกค้า</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                        <div id="satisfaction-progress" class="bg-green-600 h-4 rounded-full progress-bar" style="width: 80%"></div>
+                    </div>
+                    <div class="text-sm text-gray-600 flex justify-between">
+                        <span>ปัจจุบัน: <span id="satisfaction-current">80</span>%</span>
+                        <span>เป้าหมาย: 100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- กิจกรรมส่งเสริมการผลิตและอาชีพ -->
+            <div id="production-activity" class="activity-card bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-green-600 text-white p-4">
+                    <h2 class="text-xl font-bold">กิจกรรมส่งเสริมการผลิตและอาชีพ</h2>
+                </div>
+                <div class="p-5">
+                    <p class="mb-4">เลือกกิจกรรมการผลิตเพื่อสร้างรายได้</p>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="plant-item bg-green-50 p-3 rounded-lg cursor-pointer border-2 border-transparent hover:border-green-400" data-type="vegetable">
+                            <div class="flex items-center mb-2">
+                                <span class="text-2xl mr-2">🥬</span>
+                                <h3 class="font-medium">ปลูกผัก</h3>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <p>ลงทุน: 100 บาท</p>
+                                <p>ผลตอบแทน: 130-180 บาท</p>
+                                <p>ระยะเวลา: 1 รอบ</p>
+                            </div>
+                        </div>
+                        
+                        <div class="plant-item bg-green-50 p-3 rounded-lg cursor-pointer border-2 border-transparent hover:border-green-400" data-type="chicken">
+                            <div class="flex items-center mb-2">
+                                <span class="text-2xl mr-2">🐔</span>
+                                <h3 class="font-medium">เลี้ยงไก่</h3>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <p>ลงทุน: 200 บาท</p>
+                                <p>ผลตอบแทน: 280-350 บาท</p>
+                                <p>ระยะเวลา: 2 รอบ</p>
+                            </div>
+                        </div>
+                        
+                        <div class="plant-item bg-green-50 p-3 rounded-lg cursor-pointer border-2 border-transparent hover:border-green-400" data-type="mushroom">
+                            <div class="flex items-center mb-2">
+                                <span class="text-2xl mr-2">🍄</span>
+                                <h3 class="font-medium">เพาะเห็ด</h3>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <p>ลงทุน: 150 บาท</p>
+                                <p>ผลตอบแทน: 200-280 บาท</p>
+                                <p>ระยะเวลา: 1 รอบ</p>
+                            </div>
+                        </div>
+                        
+                        <div class="plant-item bg-green-50 p-3 rounded-lg cursor-pointer border-2 border-transparent hover:border-green-400" data-type="fish">
+                            <div class="flex items-center mb-2">
+                                <span class="text-2xl mr-2">🐟</span>
+                                <h3 class="font-medium">เลี้ยงปลา</h3>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <p>ลงทุน: 250 บาท</p>
+                                <p>ผลตอบแทน: 350-450 บาท</p>
+                                <p>ระยะเวลา: 3 รอบ</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="active-productions" class="space-y-3"><div class="text-gray-500 text-center">ไม่มีกิจกรรมการผลิตที่กำลังดำเนินการ</div></div>
+                </div>
+            </div>
+
+            <!-- กิจกรรมออมทรัพย์ -->
+            <div id="savings-activity" class="activity-card bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-blue-600 text-white p-4">
+                    <h2 class="text-xl font-bold">กิจกรรมออมทรัพย์</h2>
+                </div>
+                <div class="p-5">
+                    <div class="mb-4">
+                        <p class="mb-2">ฝากเงินออมทรัพย์ (ดอกเบี้ย 1% ต่อรอบ)</p>
+                        <div class="flex items-center mb-4">
+                            <div class="text-lg font-medium mr-4">เงินฝากปัจจุบัน: <span id="savings-amount" class="text-blue-600">0</span> บาท</div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <input type="number" id="deposit-amount" placeholder="จำนวนเงิน" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button id="deposit-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg btn">ฝาก</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="mb-2">ถอนเงินออมทรัพย์</p>
+                        <div class="flex space-x-2">
+                            <input type="number" id="withdraw-amount" placeholder="จำนวนเงิน" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button id="withdraw-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg btn">ถอน</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="font-medium mb-2">ประวัติการทำรายการ</h3>
+                        <div id="savings-history" class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto text-sm">
+                            <div class="text-gray-500 text-center">ยังไม่มีประวัติการทำรายการ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- กิจกรรมร้านค้าสหกรณ์ -->
+            <div id="store-activity" class="activity-card bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-amber-600 text-white p-4">
+                    <h2 class="text-xl font-bold">กิจกรรมร้านค้าสหกรณ์</h2>
+                </div>
+                <div class="p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <p class="font-medium">เงินทุนร้านค้า: <span id="store-capital" class="text-amber-600 font-bold">5,000</span> บาท</p>
+                            <p class="text-sm text-gray-600">ปันผล 2% และเฉลี่ยคืน 3% ต่อรอบ</p>
+                        </div>
+                        <div>
+                            <p class="font-medium">ยอดขาย: <span id="store-sales" class="text-green-600 font-bold">0</span> บาท/รอบ</p>
+                            <p class="text-sm text-gray-600">กำไร: <span id="store-profit" class="text-green-600 font-bold">0</span> บาท/รอบ</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h3 class="font-medium mb-2">เหตุการณ์ปัจจุบัน</h3>
+                        <div id="current-event" class="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                    <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">📢</span>
+                        <h3 class="font-medium">วันกีฬาสี</h3>
+                    </div>
+                    <p>นักเรียนต้องการน้ำดื่มและขนม</p>
+                    <p class="text-sm text-amber-700 mt-2">* สินค้าที่เกี่ยวข้องกับเหตุการณ์นี้จะขายดีเป็นพิเศษ</p>
+                </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h3 class="font-medium mb-2">สินค้าที่มีจำหน่าย</h3>
+                        <div id="store-inventory" class="grid grid-cols-2 gap-2"><div class="shop-item bg-amber-50 p-3 rounded-lg ">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">📓</span>
+                            <h3 class="font-medium">สมุด</h3>
+                            
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p>ราคาขาย: 25 บาท</p>
+                            <p>คงเหลือ: 20 ชิ้น</p>
+                        </div>
+                    </div><div class="shop-item bg-amber-50 p-3 rounded-lg ">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">✏️</span>
+                            <h3 class="font-medium">ดินสอ</h3>
+                            
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p>ราคาขาย: 10 บาท</p>
+                            <p>คงเหลือ: 30 ชิ้น</p>
+                        </div>
+                    </div><div class="shop-item bg-amber-50 p-3 rounded-lg ">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">🖊️</span>
+                            <h3 class="font-medium">ปากกา</h3>
+                            
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p>ราคาขาย: 15 บาท</p>
+                            <p>คงเหลือ: 25 ชิ้น</p>
+                        </div>
+                    </div><div class="shop-item bg-amber-50 p-3 rounded-lg border-2 border-amber-400">
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">💧</span>
+                            <h3 class="font-medium">น้ำดื่ม</h3>
+                            <span class="ml-auto text-amber-600 text-sm font-medium">🔥 ขายดี</span>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p>ราคาขาย: 10 บาท</p>
+                            <p>คงเหลือ: 40 ชิ้น</p>
+                        </div>
+                    </div></div>
+                    </div>
+                    
+                    <div class="mt-4 grid grid-cols-2 gap-2">
+                        <button id="manage-inventory-btn" class="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-lg btn">จัดการสินค้า</button>
+                        <button id="invest-store-btn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg btn">เพิ่มเงินทุนร้านค้า</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- กิจกรรมการศึกษาและสวัสดิการ -->
+            <div id="welfare-activity" class="activity-card bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-purple-600 text-white p-4">
+                    <h2 class="text-xl font-bold">กิจกรรมการศึกษาและสวัสดิการ</h2>
+                </div>
+                <div class="p-5">
+                    <p class="mb-4">บริจาคเพื่อสนับสนุนด้านต่างๆ เพื่อเพิ่มความพึงพอใจของลูกค้า</p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-purple-50 p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium flex items-center"><span class="text-xl mr-2">📚</span> สนับสนุนการศึกษา</h3>
+                                <button class="donate-btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-1 px-3 rounded-lg btn text-sm" data-type="education" data-amount="200">บริจาค 200 บาท</button>
+                            </div>
+                            <p class="text-sm text-gray-600">เพิ่มความพึงพอใจ 5% และจำนวนลูกค้า 2 คน/วัน</p>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium flex items-center"><span class="text-xl mr-2">🏥</span> สนับสนุนสุขภาพ</h3>
+                                <button class="donate-btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-1 px-3 rounded-lg btn text-sm" data-type="health" data-amount="300">บริจาค 300 บาท</button>
+                            </div>
+                            <p class="text-sm text-gray-600">เพิ่มความพึงพอใจ 8% และจำนวนลูกค้า 3 คน/วัน</p>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium flex items-center"><span class="text-xl mr-2">🌳</span> สนับสนุนสิ่งแวดล้อม</h3>
+                                <button class="donate-btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-1 px-3 rounded-lg btn text-sm" data-type="environment" data-amount="250">บริจาค 250 บาท</button>
+                            </div>
+                            <p class="text-sm text-gray-600">เพิ่มความพึงพอใจ 7% และจำนวนลูกค้า 2 คน/วัน</p>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium flex items-center"><span class="text-xl mr-2">🎭</span> สนับสนุนศิลปวัฒนธรรม</h3>
+                                <button class="donate-btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-1 px-3 rounded-lg btn text-sm" data-type="culture" data-amount="150">บริจาค 150 บาท</button>
+                            </div>
+                            <p class="text-sm text-gray-600">เพิ่มความพึงพอใจ 4% และจำนวนลูกค้า 1 คน/วัน</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="font-medium mb-2">ประวัติการบริจาค</h3>
+                        <div id="donation-history" class="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto text-sm">
+                            <div class="text-gray-500 text-center">ยังไม่มีประวัติการบริจาค</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <footer class="text-center text-gray-500 text-sm py-4 border-t border-gray-200">
+            developed by Tle Narongphisit | CPD019
+        </footer>
+    </div>
+
+    <!-- Modal for inventory management -->
+    <div id="inventory-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal">
+        <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="bg-amber-600 text-white p-4 sticky top-0">
+                <h2 class="text-xl font-bold">จัดการสินค้าในร้าน</h2>
+            </div>
+            <div class="p-5">
+                <div class="mb-4">
+                    <h3 class="font-medium mb-2">สินค้าที่มีอยู่ในร้าน</h3>
+                    <div id="current-inventory" class="grid grid-cols-2 gap-3 mb-4">
+                        <!-- Current inventory items will be displayed here -->
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h3 class="font-medium mb-2">สินค้าที่สามารถเลือกได้</h3>
+                    <div id="available-products" class="grid grid-cols-2 gap-3">
+                        <!-- Available products will be displayed here -->
+                    </div>
+                </div>
+                
+                <div class="flex justify-end mt-6 space-x-3">
+                    <button id="close-inventory-modal" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg btn">ยกเลิก</button>
+                    <button id="save-inventory" class="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-lg btn">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for store investment -->
+    <div id="invest-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal">
+        <div class="bg-white rounded-xl max-w-md w-full">
+            <div class="bg-green-600 text-white p-4">
+                <h2 class="text-xl font-bold">เพิ่มเงินทุนร้านค้า</h2>
+            </div>
+            <div class="p-5">
+                <p class="mb-4">นำเงินสะสมส่วนตัวมาเพิ่มเป็นเงินทุนร้านค้า</p>
+                
+                <div class="mb-4">
+                    <label for="invest-amount" class="block text-sm font-medium text-gray-700 mb-1">จำนวนเงิน</label>
+                    <input type="number" id="invest-amount" placeholder="ระบุจำนวนเงิน" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button id="close-invest-modal" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg btn">ยกเลิก</button>
+                    <button id="confirm-invest" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg btn">ยืนยัน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden modal">
+        <div class="bg-white rounded-xl max-w-md w-full text-center p-6">
+            <div class="text-5xl mb-4">🎉</div>
+            <h2 class="text-2xl font-bold text-green-600 mb-3">ยินดีด้วย! คุณประสบความสำเร็จ</h2>
+            <p class="mb-4">คุณได้บรรลุเป้าหมายทั้งหมดของเกมสหกรณ์การเรียนรู้</p>
+            <div class="mb-6">
+                <div class="text-left mb-2">
+                    <span class="inline-block w-6 h-6 bg-green-500 rounded-full text-white text-center">✓</span>
+                    <span class="ml-2">เงินสะสมส่วนตัว: 10,000+ บาท</span>
+                </div>
+                <div class="text-left mb-2">
+                    <span class="inline-block w-6 h-6 bg-green-500 rounded-full text-white text-center">✓</span>
+                    <span class="ml-2">เงินทุนร้านค้า: 10,000+ บาท</span>
+                </div>
+                <div class="text-left">
+                    <span class="inline-block w-6 h-6 bg-green-500 rounded-full text-white text-center">✓</span>
+                    <span class="ml-2">ความพึงพอใจลูกค้า: 100%</span>
+                </div>
+            </div>
+            <p class="text-sm text-gray-600 mb-4">จำนวนรอบที่ใช้: <span id="success-rounds">0</span> รอบ</p>
+            <button id="continue-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg btn">เล่นต่อ</button>
+        </div>
+    </div>
+
+    <!-- Notification system -->
+    <div id="notification-container" class="fixed bottom-4 right-4 z-50 space-y-2">
+        <!-- Notifications will appear here -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Game state
+            const gameState = {
+                round: 1,
+                personalMoney: 1000,
+                satisfaction: 80,
+                customers: 20,
+                savings: 0,
+                storeCapital: 5000,
+                storeSales: 0,
+                storeProfit: 0,
+                activeProductions: [],
+                storeInventory: [],
+                availableProducts: [
+                    { id: 1, name: 'สมุด', icon: '📓', cost: 15, price: 25, popularity: 8 },
+                    { id: 2, name: 'ดินสอ', icon: '✏️', cost: 5, price: 10, popularity: 9 },
+                    { id: 3, name: 'ปากกา', icon: '🖊️', cost: 8, price: 15, popularity: 10 },
+                    { id: 4, name: 'ยางลบ', icon: '🧽', cost: 3, price: 7, popularity: 7 },
+                    { id: 5, name: 'ไม้บรรทัด', icon: '📏', cost: 10, price: 18, popularity: 6 },
+                    { id: 6, name: 'กระเป๋า', icon: '🎒', cost: 150, price: 250, popularity: 5 },
+                    { id: 7, name: 'น้ำดื่ม', icon: '💧', cost: 5, price: 10, popularity: 10 },
+                    { id: 8, name: 'ขนม', icon: '🍪', cost: 8, price: 15, popularity: 9 },
+                    { id: 9, name: 'ผลไม้', icon: '🍎', cost: 12, price: 20, popularity: 7 },
+                    { id: 10, name: 'อาหารกลางวัน', icon: '🍱', cost: 35, price: 50, popularity: 8 },
+                    { id: 11, name: 'เครื่องคิดเลข', icon: '🧮', cost: 80, price: 120, popularity: 6 },
+                    { id: 12, name: 'หนังสือ', icon: '📚', cost: 100, price: 150, popularity: 5 }
+                ],
+                events: [
+                    { id: 1, name: 'เปิดเทอมใหม่', description: 'นักเรียนต้องการอุปกรณ์การเรียน', popularItems: [1, 2, 3, 4, 5, 11] },
+                    { id: 2, name: 'ช่วงสอบ', description: 'นักเรียนต้องการอุปกรณ์การเรียนและขนม', popularItems: [2, 3, 7, 8, 11] },
+                    { id: 3, name: 'วันกีฬาสี', description: 'นักเรียนต้องการน้ำดื่มและขนม', popularItems: [7, 8, 9] },
+                    { id: 4, name: 'ทัศนศึกษา', description: 'นักเรียนต้องการกระเป๋าและอาหาร', popularItems: [6, 7, 9, 10] },
+                    { id: 5, name: 'วันปกติ', description: 'นักเรียนต้องการสินค้าทั่วไป', popularItems: [3, 7, 8, 10] }
+                ],
+                currentEvent: null,
+                donationHistory: [],
+                gameCompleted: false
+            };
+
+            // Game goals
+            const gameGoals = {
+                personalMoney: 10000,
+                storeCapital: 10000,
+                satisfaction: 100
+            };
+
+            // Initialize store inventory with some default items
+            gameState.storeInventory = [
+                { ...gameState.availableProducts[0], stock: 20 },
+                { ...gameState.availableProducts[1], stock: 30 },
+                { ...gameState.availableProducts[2], stock: 25 },
+                { ...gameState.availableProducts[6], stock: 40 }
+            ];
+
+            // DOM elements
+            const elements = {
+                round: document.getElementById('round'),
+                personalMoney: document.getElementById('personal-money'),
+                satisfaction: document.getElementById('satisfaction'),
+                customers: document.getElementById('customers'),
+                savingsAmount: document.getElementById('savings-amount'),
+                depositAmount: document.getElementById('deposit-amount'),
+                withdrawAmount: document.getElementById('withdraw-amount'),
+                depositBtn: document.getElementById('deposit-btn'),
+                withdrawBtn: document.getElementById('withdraw-btn'),
+                savingsHistory: document.getElementById('savings-history'),
+                storeCapital: document.getElementById('store-capital'),
+                storeSales: document.getElementById('store-sales'),
+                storeProfit: document.getElementById('store-profit'),
+                currentEvent: document.getElementById('current-event'),
+                storeInventory: document.getElementById('store-inventory'),
+                activeProductions: document.getElementById('active-productions'),
+                donationHistory: document.getElementById('donation-history'),
+                nextRoundBtn: document.getElementById('next-round-btn'),
+                manageInventoryBtn: document.getElementById('manage-inventory-btn'),
+                investStoreBtn: document.getElementById('invest-store-btn'),
+                inventoryModal: document.getElementById('inventory-modal'),
+                closeInventoryModal: document.getElementById('close-inventory-modal'),
+                saveInventory: document.getElementById('save-inventory'),
+                currentInventory: document.getElementById('current-inventory'),
+                availableProducts: document.getElementById('available-products'),
+                notificationContainer: document.getElementById('notification-container'),
+                investModal: document.getElementById('invest-modal'),
+                closeInvestModal: document.getElementById('close-invest-modal'),
+                confirmInvest: document.getElementById('confirm-invest'),
+                investAmount: document.getElementById('invest-amount'),
+                personalMoneyProgress: document.getElementById('personal-money-progress'),
+                personalMoneyCurrent: document.getElementById('personal-money-current'),
+                storeCapitalProgress: document.getElementById('store-capital-progress'),
+                storeCapitalCurrent: document.getElementById('store-capital-current'),
+                satisfactionProgress: document.getElementById('satisfaction-progress'),
+                satisfactionCurrent: document.getElementById('satisfaction-current'),
+                successModal: document.getElementById('success-modal'),
+                successRounds: document.getElementById('success-rounds'),
+                continueBtn: document.getElementById('continue-btn')
+            };
+
+            // Initialize UI
+            updateUI();
+            generateRandomEvent();
+            renderStoreInventory();
+            updateGoalProgress();
+
+            // Event listeners
+            elements.nextRoundBtn.addEventListener('click', nextRound);
+            elements.depositBtn.addEventListener('click', depositSavings);
+            elements.withdrawBtn.addEventListener('click', withdrawSavings);
+            elements.manageInventoryBtn.addEventListener('click', openInventoryModal);
+            elements.closeInventoryModal.addEventListener('click', closeInventoryModal);
+            elements.saveInventory.addEventListener('click', saveInventory);
+            elements.investStoreBtn.addEventListener('click', openInvestModal);
+            elements.closeInvestModal.addEventListener('click', closeInvestModal);
+            elements.confirmInvest.addEventListener('click', investInStore);
+            elements.continueBtn.addEventListener('click', closeSuccessModal);
+
+            // Add event listeners for production items
+            document.querySelectorAll('.plant-item').forEach(item => {
+                item.addEventListener('click', () => startProduction(item.dataset.type));
+            });
+
+            // Add event listeners for donation buttons
+            document.querySelectorAll('.donate-btn').forEach(btn => {
+                btn.addEventListener('click', () => makeDonation(btn.dataset.type, parseInt(btn.dataset.amount)));
+            });
+
+            // Functions
+            function updateUI() {
+                elements.round.textContent = gameState.round;
+                elements.personalMoney.textContent = formatNumber(gameState.personalMoney);
+                elements.satisfaction.textContent = gameState.satisfaction;
+                elements.customers.textContent = gameState.customers;
+                elements.savingsAmount.textContent = formatNumber(gameState.savings);
+                elements.storeCapital.textContent = formatNumber(gameState.storeCapital);
+                elements.storeSales.textContent = formatNumber(gameState.storeSales);
+                elements.storeProfit.textContent = formatNumber(gameState.storeProfit);
+                
+                renderActiveProductions();
+            }
+
+            function formatNumber(num) {
+                return num.toLocaleString('th-TH');
+            }
+
+            function updateGoalProgress() {
+                // Update personal money progress
+                const personalMoneyPercentage = Math.min(100, (gameState.personalMoney / gameGoals.personalMoney) * 100);
+                elements.personalMoneyProgress.style.width = `${personalMoneyPercentage}%`;
+                elements.personalMoneyCurrent.textContent = formatNumber(gameState.personalMoney);
+                
+                // Update store capital progress
+                const storeCapitalPercentage = Math.min(100, (gameState.storeCapital / gameGoals.storeCapital) * 100);
+                elements.storeCapitalProgress.style.width = `${storeCapitalPercentage}%`;
+                elements.storeCapitalCurrent.textContent = formatNumber(gameState.storeCapital);
+                
+                // Update satisfaction progress
+                const satisfactionPercentage = Math.min(100, (gameState.satisfaction / gameGoals.satisfaction) * 100);
+                elements.satisfactionProgress.style.width = `${satisfactionPercentage}%`;
+                elements.satisfactionCurrent.textContent = gameState.satisfaction;
+                
+                // Check if all goals are met
+                if (!gameState.gameCompleted && 
+                    gameState.personalMoney >= gameGoals.personalMoney && 
+                    gameState.storeCapital >= gameGoals.storeCapital && 
+                    gameState.satisfaction >= gameGoals.satisfaction) {
+                    gameState.gameCompleted = true;
+                    showSuccessModal();
+                }
+            }
+
+            function showSuccessModal() {
+                elements.successRounds.textContent = gameState.round;
+                elements.successModal.classList.remove('hidden');
+                createConfetti();
+            }
+
+            function closeSuccessModal() {
+                elements.successModal.classList.add('hidden');
+            }
+
+            function createConfetti() {
+                const confettiContainer = document.createElement('div');
+                confettiContainer.style.position = 'fixed';
+                confettiContainer.style.top = '0';
+                confettiContainer.style.left = '0';
+                confettiContainer.style.width = '100%';
+                confettiContainer.style.height = '100%';
+                confettiContainer.style.pointerEvents = 'none';
+                confettiContainer.style.zIndex = '9999';
+                document.body.appendChild(confettiContainer);
+                
+                const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f', '#ff5722', '#4caf50', '#2196f3'];
+                
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${Math.random() * 100}%`;
+                    confetti.style.top = `-10px`;
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = `${Math.random() * 10 + 5}px`;
+                    confetti.style.height = `${Math.random() * 10 + 5}px`;
+                    confetti.style.opacity = Math.random() + 0.5;
+                    confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+                    confetti.style.animationDelay = `${Math.random() * 2}s`;
+                    confettiContainer.appendChild(confetti);
+                }
+                
+                setTimeout(() => {
+                    confettiContainer.remove();
+                }, 5000);
+            }
+
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification p-3 rounded-lg shadow-lg max-w-xs ${
+                    type === 'success' ? 'bg-green-500' : 
+                    type === 'error' ? 'bg-red-500' : 
+                    type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'
+                } text-white`;
+                notification.textContent = message;
+                
+                elements.notificationContainer.appendChild(notification);
+                
+                // Remove notification after 4 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 4000);
+            }
+
+            function nextRound() {
+                // Process savings interest
+                if (gameState.savings > 0) {
+                    const interest = Math.floor(gameState.savings * 0.01); // 1% interest
+                    gameState.savings += interest;
+                    addSavingsHistory(`รับดอกเบี้ย +${formatNumber(interest)} บาท`);
+                }
+                
+                // Process store profits
+                processSales();
+                
+                // Process active productions
+                processProductions();
+                
+                // Process store dividends and returns
+                if (gameState.storeCapital > 0) {
+                    const dividend = Math.floor(gameState.storeCapital * 0.02); // 2% dividend
+                    const returns = Math.floor(gameState.storeSales * 0.03); // 3% returns
+                    
+                    gameState.personalMoney += dividend + returns;
+                    
+                    showNotification(`ได้รับปันผลจากร้านค้า ${formatNumber(dividend)} บาท และเฉลี่ยคืน ${formatNumber(returns)} บาท`, 'success');
+                }
+                
+                // Generate new random event
+                generateRandomEvent();
+                
+                // Increment round
+                gameState.round++;
+                
+                // Update UI
+                updateUI();
+                renderStoreInventory();
+                updateGoalProgress();
+            }
+
+            function depositSavings() {
+                const amount = parseInt(elements.depositAmount.value);
+                
+                if (isNaN(amount) || amount <= 0) {
+                    showNotification('กรุณาระบุจำนวนเงินที่ถูกต้อง', 'error');
+                    return;
+                }
+                
+                if (amount > gameState.personalMoney) {
+                    showNotification('เงินสะสมส่วนตัวไม่เพียงพอ', 'error');
+                    return;
+                }
+                
+                gameState.personalMoney -= amount;
+                gameState.savings += amount;
+                
+                addSavingsHistory(`ฝากเงิน +${formatNumber(amount)} บาท`);
+                showNotification(`ฝากเงินสำเร็จ ${formatNumber(amount)} บาท`, 'success');
+                
+                elements.depositAmount.value = '';
+                updateUI();
+                updateGoalProgress();
+            }
+
+            function withdrawSavings() {
+                const amount = parseInt(elements.withdrawAmount.value);
+                
+                if (isNaN(amount) || amount <= 0) {
+                    showNotification('กรุณาระบุจำนวนเงินที่ถูกต้อง', 'error');
+                    return;
+                }
+                
+                if (amount > gameState.savings) {
+                    showNotification('เงินฝากไม่เพียงพอ', 'error');
+                    return;
+                }
+                
+                gameState.personalMoney += amount;
+                gameState.savings -= amount;
+                
+                addSavingsHistory(`ถอนเงิน -${formatNumber(amount)} บาท`);
+                showNotification(`ถอนเงินสำเร็จ ${formatNumber(amount)} บาท`, 'success');
+                
+                elements.withdrawAmount.value = '';
+                updateUI();
+                updateGoalProgress();
+            }
+
+            function addSavingsHistory(text) {
+                if (elements.savingsHistory.querySelector('.text-gray-500')) {
+                    elements.savingsHistory.innerHTML = '';
+                }
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'mb-1 pb-1 border-b border-gray-200';
+                historyItem.innerHTML = `<span class="text-gray-600">รอบที่ ${gameState.round}:</span> ${text}`;
+                
+                elements.savingsHistory.prepend(historyItem);
+            }
+
+            function startProduction(type) {
+                let productionData;
+                
+                switch (type) {
+                    case 'vegetable':
+                        productionData = {
+                            type: 'vegetable',
+                            name: 'ปลูกผัก',
+                            icon: '🥬',
+                            cost: 100,
+                            duration: 1,
+                            remainingRounds: 1,
+                            minReturn: 130,
+                            maxReturn: 180
+                        };
+                        break;
+                    case 'chicken':
+                        productionData = {
+                            type: 'chicken',
+                            name: 'เลี้ยงไก่',
+                            icon: '🐔',
+                            cost: 200,
+                            duration: 2,
+                            remainingRounds: 2,
+                            minReturn: 280,
+                            maxReturn: 350
+                        };
+                        break;
+                    case 'mushroom':
+                        productionData = {
+                            type: 'mushroom',
+                            name: 'เพาะเห็ด',
+                            icon: '🍄',
+                            cost: 150,
+                            duration: 1,
+                            remainingRounds: 1,
+                            minReturn: 200,
+                            maxReturn: 280
+                        };
+                        break;
+                    case 'fish':
+                        productionData = {
+                            type: 'fish',
+                            name: 'เลี้ยงปลา',
+                            icon: '🐟',
+                            cost: 250,
+                            duration: 3,
+                            remainingRounds: 3,
+                            minReturn: 350,
+                            maxReturn: 450
+                        };
+                        break;
+                }
+                
+                if (gameState.personalMoney < productionData.cost) {
+                    showNotification('เงินสะสมส่วนตัวไม่เพียงพอ', 'error');
+                    return;
+                }
+                
+                gameState.personalMoney -= productionData.cost;
+                gameState.activeProductions.push(productionData);
+                
+                showNotification(`เริ่มกิจกรรม${productionData.name}สำเร็จ`, 'success');
+                updateUI();
+                updateGoalProgress();
+            }
+
+            function processProductions() {
+                const completedProductions = [];
+                const remainingProductions = [];
+                
+                gameState.activeProductions.forEach(production => {
+                    production.remainingRounds--;
+                    
+                    if (production.remainingRounds <= 0) {
+                        completedProductions.push(production);
+                    } else {
+                        remainingProductions.push(production);
+                    }
+                });
+                
+                gameState.activeProductions = remainingProductions;
+                
+                completedProductions.forEach(production => {
+                    const returnAmount = Math.floor(Math.random() * (production.maxReturn - production.minReturn + 1)) + production.minReturn;
+                    gameState.personalMoney += returnAmount;
+                    
+                    showNotification(`กิจกรรม${production.name}สำเร็จ ได้รับ ${formatNumber(returnAmount)} บาท`, 'success');
+                });
+            }
+
+            function renderActiveProductions() {
+                elements.activeProductions.innerHTML = '';
+                
+                if (gameState.activeProductions.length === 0) {
+                    elements.activeProductions.innerHTML = '<div class="text-gray-500 text-center">ไม่มีกิจกรรมการผลิตที่กำลังดำเนินการ</div>';
+                    return;
+                }
+                
+                gameState.activeProductions.forEach(production => {
+                    const productionEl = document.createElement('div');
+                    productionEl.className = 'bg-green-100 p-3 rounded-lg';
+                    
+                    productionEl.innerHTML = `
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">${production.icon}</span>
+                            <h3 class="font-medium">${production.name}</h3>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-sm text-gray-600">
+                                <p>ลงทุน: ${formatNumber(production.cost)} บาท</p>
+                                <p>คาดการณ์ผลตอบแทน: ${formatNumber(production.minReturn)}-${formatNumber(production.maxReturn)} บาท</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium">เหลืออีก</p>
+                                <p class="text-xl font-bold text-green-600">${production.remainingRounds} รอบ</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    elements.activeProductions.appendChild(productionEl);
+                });
+            }
+
+            function generateRandomEvent() {
+                const randomEvent = gameState.events[Math.floor(Math.random() * gameState.events.length)];
+                gameState.currentEvent = randomEvent;
+                
+                elements.currentEvent.innerHTML = `
+                    <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">📢</span>
+                        <h3 class="font-medium">${randomEvent.name}</h3>
+                    </div>
+                    <p>${randomEvent.description}</p>
+                    <p class="text-sm text-amber-700 mt-2">* สินค้าที่เกี่ยวข้องกับเหตุการณ์นี้จะขายดีเป็นพิเศษ</p>
+                `;
+            }
+
+            function renderStoreInventory() {
+                elements.storeInventory.innerHTML = '';
+                
+                if (gameState.storeInventory.length === 0) {
+                    elements.storeInventory.innerHTML = '<div class="text-gray-500 text-center">ไม่มีสินค้าในร้าน</div>';
+                    return;
+                }
+                
+                gameState.storeInventory.forEach(item => {
+                    const isPopular = gameState.currentEvent && gameState.currentEvent.popularItems.includes(item.id);
+                    
+                    const itemEl = document.createElement('div');
+                    itemEl.className = `shop-item bg-amber-50 p-3 rounded-lg ${isPopular ? 'border-2 border-amber-400' : ''}`;
+                    
+                    itemEl.innerHTML = `
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">${item.icon}</span>
+                            <h3 class="font-medium">${item.name}</h3>
+                            ${isPopular ? '<span class="ml-auto text-amber-600 text-sm font-medium">🔥 ขายดี</span>' : ''}
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p>ราคาขาย: ${formatNumber(item.price)} บาท</p>
+                            <p>คงเหลือ: ${item.stock} ชิ้น</p>
+                        </div>
+                    `;
+                    
+                    elements.storeInventory.appendChild(itemEl);
+                });
+            }
+
+            function processSales() {
+                let totalSales = 0;
+                let totalCost = 0;
+                
+                // Calculate base sales based on customers and satisfaction
+                const baseSales = gameState.customers * (gameState.satisfaction / 100);
+                
+                gameState.storeInventory.forEach(item => {
+                    // Calculate sales for this item
+                    let itemSales = Math.floor(baseSales * (item.popularity / 10));
+                    
+                    // Boost sales for popular items based on current event
+                    if (gameState.currentEvent && gameState.currentEvent.popularItems.includes(item.id)) {
+                        itemSales = Math.floor(itemSales * 1.5);
+                    }
+                    
+                    // Limit sales by available stock
+                    const actualSales = Math.min(itemSales, item.stock);
+                    
+                    // Update stock
+                    item.stock -= actualSales;
+                    
+                    // Calculate revenue and cost
+                    const revenue = actualSales * item.price;
+                    const cost = actualSales * item.cost;
+                    
+                    totalSales += revenue;
+                    totalCost += cost;
+                });
+                
+                // Calculate profit
+                const profit = totalSales - totalCost;
+                
+                // Update store capital with sales revenue
+                gameState.storeCapital += totalSales;
+                
+                // Update personal money with profit
+                gameState.personalMoney += profit;
+                
+                // Update store sales and profit for display
+                gameState.storeSales = totalSales;
+                gameState.storeProfit = profit;
+                
+                showNotification(`ยอดขายรอบนี้: ${formatNumber(totalSales)} บาท (กำไร ${formatNumber(profit)} บาท)`, 'info');
+                
+                // Restock items that are low
+                gameState.storeInventory.forEach(item => {
+                    if (item.stock < 5) {
+                        const restockAmount = 20;
+                        const restockCost = restockAmount * item.cost;
+                        
+                        if (gameState.storeCapital >= restockCost) {
+                            item.stock += restockAmount;
+                            gameState.storeCapital -= restockCost;
+                        }
+                    }
+                });
+            }
+
+            function openInventoryModal() {
+                renderCurrentInventory();
+                renderAvailableProducts();
+                elements.inventoryModal.classList.remove('hidden');
+            }
+
+            function closeInventoryModal() {
+                elements.inventoryModal.classList.add('hidden');
+            }
+
+            function openInvestModal() {
+                elements.investModal.classList.remove('hidden');
+            }
+
+            function closeInvestModal() {
+                elements.investModal.classList.add('hidden');
+                elements.investAmount.value = '';
+            }
+
+            function investInStore() {
+                const amount = parseInt(elements.investAmount.value);
+                
+                if (isNaN(amount) || amount <= 0) {
+                    showNotification('กรุณาระบุจำนวนเงินที่ถูกต้อง', 'error');
+                    return;
+                }
+                
+                if (amount > gameState.personalMoney) {
+                    showNotification('เงินสะสมส่วนตัวไม่เพียงพอ', 'error');
+                    return;
+                }
+                
+                gameState.personalMoney -= amount;
+                gameState.storeCapital += amount;
+                
+                showNotification(`เพิ่มเงินทุนร้านค้าสำเร็จ ${formatNumber(amount)} บาท`, 'success');
+                
+                closeInvestModal();
+                updateUI();
+                updateGoalProgress();
+            }
+
+            function renderCurrentInventory() {
+                elements.currentInventory.innerHTML = '';
+                
+                if (gameState.storeInventory.length === 0) {
+                    elements.currentInventory.innerHTML = '<div class="text-gray-500 text-center col-span-2">ไม่มีสินค้าในร้าน</div>';
+                    return;
+                }
+                
+                gameState.storeInventory.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'bg-amber-50 p-3 rounded-lg border border-amber-200';
+                    itemEl.dataset.id = item.id;
+                    
+                    itemEl.innerHTML = `
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">${item.icon}</span>
+                            <h3 class="font-medium">${item.name}</h3>
+                            <button class="remove-item-btn ml-auto text-red-500 hover:text-red-700" data-id="${item.id}">❌</button>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p>ต้นทุน: ${formatNumber(item.cost)} บาท</p>
+                            <p>ราคาขาย: ${formatNumber(item.price)} บาท</p>
+                            <p>คงเหลือ: ${item.stock} ชิ้น</p>
+                        </div>
+                    `;
+                    
+                    elements.currentInventory.appendChild(itemEl);
+                });
+                
+                // Add event listeners for remove buttons
+                document.querySelectorAll('.remove-item-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        removeInventoryItem(parseInt(btn.dataset.id));
+                    });
+                });
+            }
+
+            function renderAvailableProducts() {
+                elements.availableProducts.innerHTML = '';
+                
+                // Filter out products that are already in inventory
+                const availableProducts = gameState.availableProducts.filter(product => 
+                    !gameState.storeInventory.some(item => item.id === product.id)
+                );
+                
+                if (availableProducts.length === 0) {
+                    elements.availableProducts.innerHTML = '<div class="text-gray-500 text-center col-span-2">ไม่มีสินค้าเพิ่มเติมที่สามารถเลือกได้</div>';
+                    return;
+                }
+                
+                availableProducts.forEach(product => {
+                    const productEl = document.createElement('div');
+                    productEl.className = 'bg-gray-50 p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100';
+                    productEl.dataset.id = product.id;
+                    
+                    productEl.innerHTML = `
+                        <div class="flex items-center mb-2">
+                            <span class="text-2xl mr-2">${product.icon}</span>
+                            <h3 class="font-medium">${product.name}</h3>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p>ต้นทุน: ${formatNumber(product.cost)} บาท</p>
+                            <p>ราคาขาย: ${formatNumber(product.price)} บาท</p>
+                            <p>ความนิยม: ${product.popularity}/10</p>
+                        </div>
+                        <button class="add-product-btn mt-2 bg-amber-500 hover:bg-amber-600 text-white font-medium py-1 px-3 rounded-lg btn text-sm w-full">เพิ่มสินค้า</button>
+                    `;
+                    
+                    elements.availableProducts.appendChild(productEl);
+                });
+                
+                // Add event listeners for add buttons
+                document.querySelectorAll('.add-product-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const productId = parseInt(e.target.closest('[data-id]').dataset.id);
+                        addInventoryItem(productId);
+                    });
+                });
+            }
+
+            function removeInventoryItem(itemId) {
+                gameState.storeInventory = gameState.storeInventory.filter(item => item.id !== itemId);
+                renderCurrentInventory();
+                renderAvailableProducts();
+            }
+
+            function addInventoryItem(productId) {
+                const product = gameState.availableProducts.find(p => p.id === productId);
+                
+                if (product) {
+                    const initialStock = 20;
+                    const initialCost = initialStock * product.cost;
+                    
+                    if (gameState.storeCapital < initialCost) {
+                        showNotification(`เงินทุนร้านค้าไม่เพียงพอ ต้องใช้ ${formatNumber(initialCost)} บาท`, 'error');
+                        return;
+                    }
+                    
+                    gameState.storeCapital -= initialCost;
+                    gameState.storeInventory.push({...product, stock: initialStock});
+                    
+                    renderCurrentInventory();
+                    renderAvailableProducts();
+                }
+            }
+
+            function saveInventory() {
+                closeInventoryModal();
+                renderStoreInventory();
+                updateUI();
+                showNotification('บันทึกการเปลี่ยนแปลงสินค้าเรียบร้อย', 'success');
+            }
+
+            function makeDonation(type, amount) {
+                if (gameState.personalMoney < amount) {
+                    showNotification('เงินสะสมส่วนตัวไม่เพียงพอ', 'error');
+                    return;
+                }
+                
+                gameState.personalMoney -= amount;
+                
+                let satisfactionIncrease = 0;
+                let customerIncrease = 0;
+                let donationName = '';
+                
+                switch (type) {
+                    case 'education':
+                        satisfactionIncrease = 5;
+                        customerIncrease = 2;
+                        donationName = 'การศึกษา';
+                        break;
+                    case 'health':
+                        satisfactionIncrease = 8;
+                        customerIncrease = 3;
+                        donationName = 'สุขภาพ';
+                        break;
+                    case 'environment':
+                        satisfactionIncrease = 7;
+                        customerIncrease = 2;
+                        donationName = 'สิ่งแวดล้อม';
+                        break;
+                    case 'culture':
+                        satisfactionIncrease = 4;
+                        customerIncrease = 1;
+                        donationName = 'ศิลปวัฒนธรรม';
+                        break;
+                }
+                
+                gameState.satisfaction = Math.min(100, gameState.satisfaction + satisfactionIncrease);
+                gameState.customers += customerIncrease;
+                
+                // Add to donation history
+                if (elements.donationHistory.querySelector('.text-gray-500')) {
+                    elements.donationHistory.innerHTML = '';
+                }
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'mb-1 pb-1 border-b border-gray-200';
+                historyItem.innerHTML = `<span class="text-gray-600">รอบที่ ${gameState.round}:</span> บริจาคสนับสนุน${donationName} ${formatNumber(amount)} บาท`;
+                
+                elements.donationHistory.prepend(historyItem);
+                
+                showNotification(`บริจาคสนับสนุน${donationName}สำเร็จ เพิ่มความพึงพอใจ ${satisfactionIncrease}% และลูกค้า ${customerIncrease} คน/วัน`, 'success');
+                updateUI();
+                updateGoalProgress();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'954ada10618a731d',t:'MTc1MDc1MzcwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>
