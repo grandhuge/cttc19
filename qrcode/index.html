@@ -1,1 +1,276 @@
+<html lang="th"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator - CPD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-shadow { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .pulse-animation { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.absolute{position:absolute}.relative{position:relative}.inset-y-0{top:0px;bottom:0px}.right-0{right:0px}.mx-8{margin-left:2rem;margin-right:2rem}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mr-2{margin-right:0.5rem}.mr-3{margin-right:0.75rem}.mt-0\.5{margin-top:0.125rem}.mt-12{margin-top:3rem}.mt-4{margin-top:1rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-20{height:5rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.min-h-screen{min-height:100vh}.w-4{width:1rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-auto{width:auto}.w-full{width:100%}.max-w-4xl{max-width:56rem}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.list-inside{list-style-position:inside}.list-decimal{list-style-type:decimal}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.gap-4{gap:1rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-blue-200{--tw-border-opacity:1;border-color:rgb(191 219 254 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-red-200{--tw-border-opacity:1;border-color:rgb(254 202 202 / var(--tw-border-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-500{--tw-bg-opacity:1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-red-50{--tw-bg-opacity:1;background-color:rgb(254 242 242 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-blue-50{--tw-gradient-from:#eff6ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(239 246 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-blue-500{--tw-gradient-from:#3b82f6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(59 130 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-indigo-50{--tw-gradient-to:#eef2ff var(--tw-gradient-to-position)}.to-indigo-600{--tw-gradient-to:#4f46e5 var(--tw-gradient-to-position)}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-8{padding-top:2rem;padding-bottom:2rem}.pr-3{padding-right:0.75rem}.pt-0{padding-top:0px}.text-center{text-align:center}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-red-700{--tw-text-opacity:1;color:rgb(185 28 28 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-white\/80{color:rgb(255 255 255 / 0.8)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-green-600:hover{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.hover\:from-blue-600:hover{--tw-gradient-from:#2563eb var(--tw-gradient-from-position);--tw-gradient-to:rgb(37 99 235 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-indigo-700:hover{--tw-gradient-to:#4338ca var(--tw-gradient-to-position)}.focus\:border-blue-500:focus{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-blue-200:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(191 219 254 / var(--tw-ring-opacity, 1))}@media (min-width: 768px){.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}</style></head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <img src="https://cpd.go.th/images/logo_cpd_big.png" alt="CPD Logo" class="mx-auto mb-4 h-20 w-auto">
+            <h1 class="text-4xl font-bold text-white mb-2">QR Code Generator</h1>
+            <p class="text-white/80 text-lg">สร้าง QR Code จากลิงก์ของคุณได้อย่างง่ายดาย ไม่มีปัญหาเรื่องโฆษณา ได้ลิ้งก์จริงลิ้งก์เดิม ไม่แปลงลิ้งก์ สแกนแล้วเข้าถึงหน้าเว็บเลยไม่ผ่านตัวกลาง</p>
+        </div>
 
+        <!-- Main Card -->
+        <div class="max-w-4xl mx-auto bg-white rounded-2xl card-shadow overflow-hidden">
+            <!-- Instructions Section -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b">
+                <h2 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                    <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3">i</span>
+                    วิธีการใช้งาน
+                </h2>
+                <div class="grid md:grid-cols-3 gap-4 text-sm text-gray-600">
+                    <div class="flex items-start space-x-2">
+                        <span class="bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">1</span>
+                        <span>วางลิงก์ที่ต้องการในช่องด้านล่าง</span>
+                    </div>
+                    <div class="flex items-start space-x-2">
+                        <span class="bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">2</span>
+                        <span>กดปุ่ม "สร้าง QR Code" เพื่อสร้างรหัส</span>
+                    </div>
+                    <div class="flex items-start space-x-2">
+                        <span class="bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mt-0.5">3</span>
+                        <span>กดปุ่ม "ดาวน์โหลด" เพื่อบันทึกไฟล์</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Section -->
+            <div class="p-8">
+                <div class="mb-6">
+                    <label for="urlInput" class="block text-lg font-medium text-gray-700 mb-3">
+                        ใส่ลิงก์ที่ต้องการสร้าง QR Code
+                    </label>
+                    <div class="relative">
+                        <input type="url" id="urlInput" placeholder="https://example.com" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 text-lg">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="generateBtn" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-blue-600 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                    <span class="flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        สร้าง QR Code
+                    </span>
+                </button>
+            </div>
+
+            <!-- QR Code Display Section -->
+            <div id="qrSection" class="p-8 pt-0">
+                <div class="bg-gray-50 rounded-xl p-8 text-center">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">QR Code ของคุณ</h3>
+                    <div class="flex justify-center mb-6">
+                        <div class="bg-white p-4 rounded-xl shadow-md">
+                            <div id="qrCanvas" class="mx-auto flex justify-center" title="https://google.com"><canvas width="256" height="256" style="display: none;"></canvas><img src="data:image/png;base64,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" style="display: block;"></div>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <p class="text-gray-600 text-sm">สแกน QR Code นี้เพื่อเข้าถึงลิงก์</p>
+                        <button id="downloadBtn" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200 shadow-md">
+                    <span class="flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                        </svg>
+                        ซ่อนคำแนะนำ
+                    </span>
+                </button>
+                        <div id="saveInstructions" class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+                            <p class="font-medium mb-2">วิธีบันทึก QR Code:</p>
+                            <ol class="list-decimal list-inside space-y-1">
+                                <li>คลิกขวาที่รูป QR Code ด้านบน</li>
+                                <li>เลือก "บันทึกรูปภาพ" หรือ "Save image as"</li>
+                                <li>ตั้งชื่อไฟล์และเลือกตำแหน่งที่ต้องการบันทึก</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="hidden mx-8 mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-red-700 font-medium">กรุณาใส่ลิงก์ที่ถูกต้อง (เช่น https://example.com)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-12 text-white/80">
+            <p class="text-sm">© developed by Tle Narongphisit | CTTC19 @ CPD</p>
+        </footer>
+    </div>
+
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const qrSection = document.getElementById('qrSection');
+        const qrCanvas = document.getElementById('qrCanvas');
+        const errorMessage = document.getElementById('errorMessage');
+
+        let currentQRDataURL = '';
+
+        // Validate URL function
+        function isValidURL(string) {
+            // Check if string starts with http:// or https://
+            if (!string.startsWith('http://') && !string.startsWith('https://')) {
+                return false;
+            }
+            
+            try {
+                const url = new URL(string);
+                return url.protocol === 'http:' || url.protocol === 'https:';
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Generate QR Code
+        generateBtn.addEventListener('click', async function() {
+            let url = urlInput.value.trim();
+            
+            // Auto-add https:// if no protocol is specified
+            if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+                urlInput.value = url;
+            }
+            
+            // Hide previous error
+            errorMessage.classList.add('hidden');
+            
+            if (!url) {
+                showError();
+                return;
+            }
+
+            if (!isValidURL(url)) {
+                showError();
+                return;
+            }
+
+            // Show loading state
+            generateBtn.innerHTML = `
+                <span class="flex items-center justify-center">
+                    <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    กำลังสร้าง...
+                </span>
+            `;
+
+            try {
+                // Clear previous QR code
+                qrCanvas.innerHTML = '';
+                
+                // Generate QR code using QRCode.js
+                const qr = new QRCode(qrCanvas, {
+                    text: url,
+                    width: 256,
+                    height: 256,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // Wait a bit for QR code to render, then get the image
+                setTimeout(() => {
+                    const img = qrCanvas.querySelector('img');
+                    if (img) {
+                        currentQRDataURL = img.src;
+                    }
+                }, 100);
+                
+                // Show QR section
+                qrSection.classList.remove('hidden');
+                
+                // Scroll to QR section
+                qrSection.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Error generating QR code:', error);
+                showError();
+            } finally {
+                // Reset button
+                generateBtn.innerHTML = `
+                    <span class="flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        สร้าง QR Code
+                    </span>
+                `;
+            }
+        });
+
+        // Show save instructions
+        downloadBtn.addEventListener('click', function() {
+            const saveInstructions = document.getElementById('saveInstructions');
+            if (saveInstructions.classList.contains('hidden')) {
+                saveInstructions.classList.remove('hidden');
+                downloadBtn.innerHTML = `
+                    <span class="flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                        </svg>
+                        ซ่อนคำแนะนำ
+                    </span>
+                `;
+            } else {
+                saveInstructions.classList.add('hidden');
+                downloadBtn.innerHTML = `
+                    <span class="flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        บันทึก QR Code
+                    </span>
+                `;
+            }
+        });
+
+        // Show error message
+        function showError() {
+            errorMessage.classList.remove('hidden');
+            errorMessage.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Allow Enter key to generate QR code
+        urlInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateBtn.click();
+            }
+        });
+
+        // Clear QR section when input changes
+        urlInput.addEventListener('input', function() {
+            qrSection.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95af5620e2aa45c3',t:'MTc1MTgwNzM2NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>
