@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกม: หมู่บ้าน (ไม่) ลับแล - Co-op Kids Club</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="css/game01_style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="../../assets/images/mascots/mascot.png" alt="Mascots" class="logo-mascot-small">
+            <h1>Co-op Kids Club</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../../index.html">หน้าหลัก</a></li>
+                <li><a href="../../index.html#lessons">บทเรียน</a></li>
+                <li><a href="../../activities.html" class="active">กิจกรรม</a></li>
+                <li><a href="#">เกม</a></li>
+                <li><a href="#">นิทาน</a></li>
+                <li><a href="#">แบบทดสอบ</a></li>
+                <li><a href="../../about.html">เกี่ยวกับเรา</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="game-container game01-container">
+        <div id="startScreen" class="game-screen active-screen">
+            <div class="intro-content">
+                <h1>หมู่บ้าน (ไม่) ลับแล</h1>
+                <p class="subtitle">พลังของ "การรวมกลุ่ม" จะเปลี่ยนแปลงหมู่บ้านนี้ไปตลอดกาล!</p>
+                <div class="mascot-dialogue intro">
+                    <img src="images/characters/mascot_aomtung_guide.png" alt="พี่ออมตังค์">
+                    <p>หมู่บ้านแห่งนี้กำลังเดือดร้อน เพราะทุกคนต่างคนต่างอยู่ เรามาช่วยพวกเขากันเถอะ!</p>
+                </div>
+                <button id="startGameBtn" class="game-btn">เริ่มภารกิจ!</button>
+            </div>
+        </div>
+
+        <div id="gamePlayScreen" class="game-screen">
+            <div class="resource-dashboard">
+                <div class="resource-item" id="trustMeter"><img src="images/ui/icon_trust.png"><span>0</span></div>
+                <div class="resource-item" id="resourceMeter"><img src="images/ui/icon_resource.png"><span>0</span></div>
+                <div class="resource-item" id="knowledgeMeter"><img src="images/ui/icon_knowledge.png"><span>0</span></div>
+            </div>
+
+            <div id="villageMap" class="village-map">
+                </div>
+
+            <div id="dialogueBox" class="dialogue-box">
+                <img id="dialogueMascot" src="images/characters/mascot_panpol_helper.png" alt="น้องปันผล">
+                <p id="dialogueText">คลิกที่ชาวบ้านที่มีปัญหา (❗️) เพื่อช่วยเหลือพวกเขา!</p>
+            </div>
+        </div>
+
+        <div id="interactionModal" class="modal">
+            <div class="modal-content">
+                <h3 id="modalTitle"></h3>
+                <p id="modalDescription"></p>
+                <div id="modalInteractionArea"></div>
+                <div id="modalOptions"></div>
+            </div>
+        </div>
+
+        <div id="winScreen" class="game-screen">
+            <div class="win-content">
+                <h1>หมู่บ้านสหกรณ์สำเร็จแล้ว!</h1>
+                <img src="images/backgrounds/village_map_phase3.png" class="win-village-img" alt="หมู่บ้านสหกรณ์">
+                <p class="win-message">ยอดเยี่ยม! ด้วยพลังแห่งการร่วมมือ หมู่บ้าน (ไม่) ลับแล ได้กลายเป็นชุมชนที่เข้มแข็งและมีความสุข!</p>
+                <div class="mascot-dialogue win">
+                    <img src="images/mascots/mascot.png" alt="มาสคอต">
+                    <p>"นี่แหละคือหัวใจของสหกรณ์... การทำงานร่วมกันเพื่อชีวิตที่ดีขึ้นของทุกคน!"</p>
+                </div>
+                <button id="playAgainBtn" class="game-btn">เล่นอีกครั้ง</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; <span id="current-year"></span> Developed by Tle Narongphisit | ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี</p>
+    </footer>
+
+    <audio id="problemAppearSound" src="audio/problem_appear.mp3"></audio>
+    <audio id="trustGainSound" src="audio/trust_gain.mp3"></audio>
+    <audio id="resourceGainSound" src="audio/resource_gain.mp3"></audio>
+    <audio id="knowledgeGainSound" src="audio/knowledge_gain.mp3"></audio>
+    <audio id="taskCompleteSound" src="audio/task_complete.mp3"></audio>
+    <audio id="villageCelebrateSound" src="audio/village_celebrate.mp3"></audio>
+    
+    <script src="js/game01_script.js"></script>
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+:root {
+    --trust-color: #FF6B6B;
+    --resource-color: #4ECDC4;
+    --knowledge-color: #FED766;
+    --dark-text: #2F4858;
+}
+
+body { font-family: 'Kanit', sans-serif; }
+
+.game-container {
+    padding: 20px;
+    background: linear-gradient(180deg, #87CEEB, #E0FFFF);
+    overflow: hidden;
+}
+
+.game-screen {
+    display: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 24px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 1000px;
+    margin: 20px auto;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+.game-screen.active-screen { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* --- Start Screen --- */
+.intro-content h1 { font-size: 3em; color: var(--dark-text); }
+.intro-content .subtitle { font-size: 1.3em; color: #555; margin-top: -15px; }
+.mascot-dialogue { display: flex; align-items: center; gap: 15px; max-width: 600px; margin: 20px auto; background: #fff; padding: 15px; border-radius: 16px; }
+.mascot-dialogue.intro img { width: 100px; }
+.game-btn { /* Shared style */
+    padding: 12px 30px; border-radius: 50px; border: none;
+    color: white; background: linear-gradient(45deg, #FF6B6B, #FF9A8B);
+    font-size: 1.2em; font-weight: 500; cursor: pointer;
+    margin-top: 20px; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.5);
+    transition: all 0.2s ease;
+}
+.game-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6); }
+
+/* --- Game Play Screen --- */
+.resource-dashboard {
+    display: flex; justify-content: center; gap: 20px;
+    padding: 10px; background: rgba(255,255,255,0.7); border-radius: 50px;
+    position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 10;
+}
+.resource-item { display: flex; align-items: center; gap: 8px; font-size: 1.2em; font-weight: bold; }
+.resource-item img { width: 30px; }
+#trustMeter span { color: var(--trust-color); }
+#resourceMeter span { color: var(--resource-color); }
+#knowledgeMeter span { color: var(--knowledge-color); }
+
+.village-map {
+    width: 100%;
+    height: 500px;
+    background-image: url('../images/backgrounds/village_map_phase1.png');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: background-image 1s ease-in-out;
+}
+.villager {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.villager:hover { transform: scale(1.1); }
+.problem-indicator {
+    position: absolute; top: -15px; right: 0;
+    width: 30px; height: 30px;
+    background-image: url('../images/ui/problem_icon.png');
+    background-size: contain;
+    animation: bounce 1.5s infinite;
+}
+@keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);}}
+
+.dialogue-box {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 16px;
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.dialogue-box img { width: 70px; }
+.dialogue-box p { margin: 0; color: var(--dark-text); font-size: 1.1em; text-align: left;}
+
+/* --- Modal & Win Screen --- */
+.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+.modal.active { display: flex; }
+.modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 500px; animation: popIn 0.3s ease; }
+#modalInteractionArea { min-height: 150px; background: #f4f4f4; border-radius: 10px; margin: 15px 0; padding: 10px; }
+.draggable-item { cursor: grab; }
+.drop-zone { border: 2px dashed #ccc; padding: 20px; }
+.drop-zone.hover { background-color: #e0e0e0; }
+
+.win-content h1 { font-size: 2.5em; }
+.win-village-img { width: 80%; max-width: 600px; border-radius: 16px; margin: 15px 0; }
+.win-message { font-size: 1.3em; max-width: 70%; margin-left: auto; margin-right: auto;}

@@ -1,0 +1,169 @@
+body {
+    font-family: 'Kanit', sans-serif;
+}
+
+.game-container {
+    padding: 20px;
+    background: linear-gradient(135deg, #F9FBE7, #E8F5E9); /* Light yellow to light green gradient */
+}
+
+.game-screen-g3 {
+    display: none;
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 950px;
+    margin: 20px auto;
+    text-align: center;
+}
+.game-screen-g3.active-screen { display: block; }
+
+.game-content-g3 h1 { color: var(--primary-color); font-size: 2.2em; }
+.game-content-g3 h2 { color: var(--accent-color); margin-top: -10px; }
+
+.mascot-dialogue-g3.intro {
+    max-width: 70%;
+    margin: 20px auto;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.mascot-dialogue-g3.intro img { max-width: 130px; }
+
+.game-btn { /* Assuming some base style exists */
+    cursor: pointer;
+    padding: 12px 25px;
+    border-radius: 8px;
+    border: none;
+    color: white;
+    background-color: var(--accent-color);
+    font-size: 1.1em;
+    margin: 10px;
+}
+.game-btn.large-btn { font-size: 1.3em; padding: 15px 35px; }
+.game-btn:hover { background-color: #00796B; }
+
+/* --- Game Play Screen --- */
+.game-status-bar-g3 {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #A5D6A7;
+    color: #1B5E20;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+.status-item { display: flex; align-items: center; gap: 5px; }
+
+.happiness-bar {
+    width: 100px;
+    height: 15px;
+    background-color: #FFCDD2;
+    border: 1px solid #E57373;
+    border-radius: 10px;
+    overflow: hidden;
+}
+#happinessFill {
+    height: 100%;
+    background: linear-gradient(90deg, #81C784, #4CAF50);
+    width: 50%;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+}
+
+.game-main-area-g3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+.store-visual-area-g3 {
+    background-color: #E0F2F1;
+    padding: 15px;
+    border-radius: 10px;
+    min-height: 350px;
+}
+.store-shelf-display {
+    background-image: url('../images/shelf.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: bottom center;
+    height: 300px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+    align-content: flex-start;
+    justify-content: center;
+}
+.product-icon-on-shelf {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 5px;
+    border-radius: 8px;
+    transition: transform 0.3s;
+}
+.product-icon-on-shelf:hover { transform: scale(1.1); }
+.empty-shelf-text { color: #757575; font-style: italic; align-self: center; width: 100%; }
+
+.event-card-g3 {
+    background-color: #FFF9C4;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px dashed var(--accent-color);
+    min-height: 350px;
+    text-align: left;
+}
+#eventTitle { color: var(--primary-color); margin-top: 0; }
+#eventDescription { margin-bottom: 20px; line-height: 1.6; min-height: 80px; }
+.decision-options-g3 { display: flex; flex-direction: column; gap: 10px; }
+.decision-btn-g3 {
+    background-color: var(--secondary-color);
+    padding: 12px 15px; border-radius: 8px;
+    cursor: pointer; font-size: 1em;
+    border: none; text-align: left;
+    transition: background-color 0.2s;
+}
+.decision-btn-g3:hover { background-color: #FFD54F; }
+.decision-btn-g3:disabled { background-color: #E0E0E0; cursor: not-allowed; }
+
+.advisor-area-g3 {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    background-color: #F1F8E9;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+.advisor-area-g3 img { width: 70px; height: 70px; object-fit: contain; }
+.advisor-text-bubble { font-style: italic; color: #555; }
+
+/* --- Game End Screen --- */
+.end-game-summary-img { max-width: 250px; margin: 20px 0; }
+.end-game-message {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    max-width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.final-stats-g3 {
+    font-size: 1.1em;
+    font-weight: bold;
+    background-color: #E8EAF6;
+    padding: 15px;
+    border-radius: 10px;
+    display: inline-block;
+}
+.game-end-buttons-g3 { margin-top: 20px; }

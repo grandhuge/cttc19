@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกม: Co-op Kids Mart - Co-op Kids Club</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="css/game03_style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="../../assets/images/mascots/mascot.png" alt="Mascots" class="logo-mascot-small">
+            <h1>Co-op Kids Club</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../../index.html">หน้าหลัก</a></li>
+                <li><a href="../../index.html#lessons">บทเรียน</a></li>
+                <li><a href="../../activities.html" class="active">กิจกรรม</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="game-container game03-container">
+        <div id="gameStartScreen_G3" class="game-screen-g3 active-screen">
+            <div class="game-content-g3">
+                <h1>เกม: Co-op Kids Mart</h1>
+                <h2>มาเป็นผู้จัดการร้านสหกรณ์กัน!</h2>
+                <div class="mascot-dialogue-g3 intro">
+                    <img src="images/mascot_intro.png" alt="พี่ออมตังค์และน้องปันผล">
+                    <p>สวัสดีผู้จัดการ! โรงเรียนของเรากำลังจะเปิดร้านค้าสหกรณ์ "Co-op Kids Mart" เรามาช่วยกันบริหารร้านให้ประสบความสำเร็จใน 8 สัปดาห์กันเถอะ! ภารกิจของเราคือทำให้เพื่อนๆ มีความสุขและร้านค้ามีกำไรพอที่จะพัฒนาต่อไปได้!</p>
+                </div>
+                <button id="startGameBtn_G3" class="game-btn large-btn">เปิดร้านเลย!</button>
+            </div>
+        </div>
+
+        <div id="gamePlayScreen_G3" class="game-screen-g3">
+            <div class="game-status-bar-g3">
+                <div class="status-item">🗓️ <strong>สัปดาห์ที่:</strong> <span id="currentWeek">1</span> / 8</div>
+                <div class="status-item">💰 <strong>เงินทุน:</strong> <span id="fundsDisplay">1000</span> บาท</div>
+                <div class="status-item">😊 <strong>ความสุขสมาชิก:</strong> 
+                    <div class="happiness-bar"><div id="happinessFill"></div></div>
+                    <span id="happinessValue">50%</span>
+                </div>
+            </div>
+
+            <div class="game-main-area-g3">
+                <div class="store-visual-area-g3">
+                    <h3>มุมมองร้าน Co-op Kids Mart</h3>
+                    <div id="storeShelf" class="store-shelf-display">
+                        </div>
+                </div>
+
+                <div class="decision-making-area-g3">
+                    <div id="eventCard" class="event-card-g3">
+                        <h4 id="eventTitle">ได้เวลาตัดสินใจ!</h4>
+                        <p id="eventDescription">รายละเอียดของเหตุการณ์...</p>
+                        <div id="decisionOptions" class="decision-options-g3">
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="advisor-area-g3">
+                <img id="advisorMascot" src="images/mascot_advisor_neutral.png" alt="ที่ปรึกษา">
+                <p id="advisorText" class="advisor-text-bubble">การตัดสินใจครั้งแรกสำคัญมากนะ!</p>
+            </div>
+        </div>
+
+        <div id="gameEndScreen_G3" class="game-screen-g3">
+            <div class="game-content-g3">
+                <h1 id="gameEndTitle">สรุปผลการบริหารร้าน</h1>
+                <img id="endGameImage" src="images/game_summary_win.png" alt="ผลลัพธ์" class="end-game-summary-img">
+                <p id="gameEndMessage" class="end-game-message">ผลลัพธ์การบริหารร้าน...</p>
+                <div class="final-stats-g3">
+                    <p>💰 เงินทุนสุดท้าย: <span id="finalFunds">0</span> บาท</p>
+                    <p>😊 ระดับความสุขสุดท้าย: <span id="finalHappiness">0</span>%</p>
+                </div>
+                <div class="game-end-buttons-g3">
+                    <button id="playAgainBtn_G3" class="game-btn">บริหารร้านอีกครั้ง</button>
+                    <a href="../../activities.html" class="game-btn">กลับไปหน้ากิจกรรม</a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <audio id="cashRegisterSound" src="audio/cash_register.mp3"></audio>
+    <audio id="happyCustomerSound" src="audio/happy_customer.mp3"></audio>
+    <audio id="sadCustomerSound" src="audio/sad_customer.mp3"></audio>
+    <audio id="decisionPopupSound" src="audio/decision_popup.mp3"></audio>
+
+    <script src="js/game03_script.js"></script>
+</body>
+</html>
