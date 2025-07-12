@@ -1,0 +1,936 @@
+<html lang="th"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันไดงูสหกรณ์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(135deg, #a5f3fc, #67e8f9, #22d3ee);
+            min-height: 100vh;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .cell {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .player-token {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .dice {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dice:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .dice:active {
+            transform: scale(0.95);
+        }
+        .snake, .ladder {
+            position: absolute;
+            font-size: 24px;
+        }
+        .special-green {
+            background-color: #86efac;
+        }
+        .special-red {
+            background-color: #fca5a5;
+        }
+        .podium {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 200px;
+        }
+        .podium-step {
+            width: 100px;
+            margin: 0 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .trophy {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .player-name {
+            font-weight: bold;
+            padding: 5px;
+            text-align: center;
+            width: 100%;
+            color: white;
+        }
+        .question-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .question-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .btn {
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .dice-animation {
+            animation: diceRoll 0.5s ease-in-out;
+        }
+        @keyframes diceRoll {
+            0% { transform: rotate(0deg); }
+            20% { transform: rotate(72deg); }
+            40% { transform: rotate(144deg); }
+            60% { transform: rotate(216deg); }
+            80% { transform: rotate(288deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .player-move {
+            transition: all 0.5s ease-out;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: confetti-fall 3s ease-in-out infinite;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mr-2{margin-right:0.5rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.hidden{display:none}.h-4{height:1rem}.h-8{height:2rem}.w-4{width:1rem}.w-8{width:2rem}.w-full{width:100%}.max-w-3xl{max-width:48rem}.max-w-6xl{max-width:72rem}.flex-shrink-0{flex-shrink:0}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.list-disc{list-style-type:disc}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.rounded{border-radius:0.25rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.bg-amber-700{--tw-bg-opacity:1;background-color:rgb(180 83 9 / var(--tw-bg-opacity, 1))}.bg-amber-800{--tw-bg-opacity:1;background-color:rgb(146 64 14 / var(--tw-bg-opacity, 1))}.bg-blue-100{--tw-bg-opacity:1;background-color:rgb(219 234 254 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-500{--tw-bg-opacity:1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-300{--tw-bg-opacity:1;background-color:rgb(209 213 219 / var(--tw-bg-opacity, 1))}.bg-gray-400{--tw-bg-opacity:1;background-color:rgb(156 163 175 / var(--tw-bg-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-green-300{--tw-bg-opacity:1;background-color:rgb(134 239 172 / var(--tw-bg-opacity, 1))}.bg-red-300{--tw-bg-opacity:1;background-color:rgb(252 165 165 / var(--tw-bg-opacity, 1))}.bg-red-500{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-300{--tw-bg-opacity:1;background-color:rgb(253 224 71 / var(--tw-bg-opacity, 1))}.bg-yellow-500{--tw-bg-opacity:1;background-color:rgb(234 179 8 / var(--tw-bg-opacity, 1))}.bg-opacity-70{--tw-bg-opacity:0.7}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-green-500{--tw-gradient-from:#22c55e var(--tw-gradient-from-position);--tw-gradient-to:rgb(34 197 94 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-indigo-500{--tw-gradient-from:#6366f1 var(--tw-gradient-from-position);--tw-gradient-to:rgb(99 102 241 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-purple-100{--tw-gradient-from:#f3e8ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(243 232 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-purple-500{--tw-gradient-from:#a855f7 var(--tw-gradient-from-position);--tw-gradient-to:rgb(168 85 247 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-yellow-100{--tw-gradient-from:#fef9c3 var(--tw-gradient-from-position);--tw-gradient-to:rgb(254 249 195 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-blue-100{--tw-gradient-to:#dbeafe var(--tw-gradient-to-position)}.to-emerald-600{--tw-gradient-to:#059669 var(--tw-gradient-to-position)}.to-orange-100{--tw-gradient-to:#ffedd5 var(--tw-gradient-to-position)}.to-pink-500{--tw-gradient-to:#ec4899 var(--tw-gradient-to-position)}.to-purple-600{--tw-gradient-to:#9333ea var(--tw-gradient-to-position)}.p-2{padding:0.5rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.pl-6{padding-left:1.5rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow{--tw-shadow:0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-blue-200:hover{--tw-bg-opacity:1;background-color:rgb(191 219 254 / var(--tw-bg-opacity, 1))}.hover\:bg-blue-600:hover{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.hover\:from-green-600:hover{--tw-gradient-from:#16a34a var(--tw-gradient-from-position);--tw-gradient-to:rgb(22 163 74 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:from-indigo-600:hover{--tw-gradient-from:#4f46e5 var(--tw-gradient-from-position);--tw-gradient-to:rgb(79 70 229 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-emerald-700:hover{--tw-gradient-to:#047857 var(--tw-gradient-to-position)}.hover\:to-purple-700:hover{--tw-gradient-to:#7e22ce var(--tw-gradient-to-position)}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-blue-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(59 130 246 / var(--tw-ring-opacity, 1))}@media (min-width: 768px){.md\:text-3xl{font-size:1.875rem;line-height:2.25rem}}@media (min-width: 1024px){.lg\:mb-0{margin-bottom:0px}.lg\:w-4\/12{width:33.333333%}.lg\:w-8\/12{width:66.666667%}.lg\:pr-4{padding-right:1rem}}</style></head>
+<body class="p-4">
+    <!-- Start Screen -->
+    <div id="start-screen" class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h1 class="text-4xl font-bold text-center text-blue-600 mb-6">🎲 บันไดงูสหกรณ์ 🐍</h1>
+        
+        <div class="bg-gradient-to-r from-purple-100 to-blue-100 p-4 rounded-lg mb-6">
+            <h2 class="text-xl font-bold mb-2">📜 กติกาการเล่น</h2>
+            <ul class="list-disc pl-6 space-y-2">
+                <li>ผู้เล่นจะผลัดกันทอยลูกเต๋าและเดินตามจำนวนแต้มที่ทอยได้</li>
+                <li>หากตกที่ช่องสีเขียว ต้องตอบคำถามเกี่ยวกับสหกรณ์ ตอบถูกได้เดินหน้า ตอบผิดอยู่ที่เดิม</li>
+                <li>หากตกที่ช่องสีแดง ต้องตอบคำถามเกี่ยวกับสหกรณ์ ตอบถูกอยู่ที่เดิม ตอบผิดต้องถอยหลัง</li>
+                <li>ผู้เล่นที่ถึงช่องที่ 100 ก่อนเป็นผู้ชนะ</li>
+                <li>ต้องทอยได้แต้มพอดีกับช่องที่เหลือจึงจะชนะได้</li>
+            </ul>
+        </div>
+        
+        <div class="mb-6">
+            <label class="block text-gray-700 font-medium mb-2">จำนวนผู้เล่น</label>
+            <div class="flex space-x-4">
+                <button class="player-count-btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition" data-count="2">2 คน</button>
+                <button class="player-count-btn bg-blue-100 text-blue-800 px-4 py-2 rounded-lg hover:bg-blue-200 transition" data-count="3">3 คน</button>
+                <button class="player-count-btn bg-blue-100 text-blue-800 px-4 py-2 rounded-lg hover:bg-blue-200 transition" data-count="4">4 คน</button>
+            </div>
+        </div>
+        
+        <div id="player-inputs" class="space-y-4 mb-6">
+            <div class="player-input flex items-center space-x-4">
+                <div class="w-8 h-8 rounded-full bg-red-500 flex-shrink-0"></div>
+                <input type="text" placeholder="ชื่อผู้เล่น 1" class="player-name-input border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="player-input flex items-center space-x-4">
+                <div class="w-8 h-8 rounded-full bg-blue-500 flex-shrink-0"></div>
+                <input type="text" placeholder="ชื่อผู้เล่น 2" class="player-name-input border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+        
+        <button id="start-game" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-lg text-xl font-bold hover:from-green-600 hover:to-emerald-700 transition transform hover:scale-105 flex items-center justify-center">
+            <span class="mr-2">🎮</span> เริ่มเกม
+        </button>
+    </div>
+    
+    <!-- Game Screen (Hidden initially) -->
+    <div id="game-screen" class="max-w-6xl mx-auto hidden">
+        <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
+            <div class="flex flex-wrap justify-between items-center mb-4">
+                <h1 class="text-2xl md:text-3xl font-bold text-blue-600">🎲 บันไดงูสหกรณ์ 🐍</h1>
+                <div id="current-player" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-bold"></div>
+            </div>
+            
+            <div class="flex flex-wrap">
+                <div class="w-full lg:w-8/12 mb-4 lg:mb-0 lg:pr-4">
+                    <div class="game-board bg-blue-50 p-2 rounded-lg"><div class="cell" id="cell-100" style="background-color: rgb(253, 230, 138);"><span>100</span><div style="font-size: 14px; position: absolute; top: 2px; right: 2px;">🏁</div></div><div class="cell" id="cell-99" style="background-color: rgb(191, 219, 254);"><span>99</span></div><div class="cell" id="cell-98" style="background-color: rgb(224, 242, 254);"><span>98</span></div><div class="cell special-red" id="cell-97"><span>97</span><div class="snake" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🐍</div></div><div class="cell" id="cell-96" style="background-color: rgb(224, 242, 254);"><span>96</span></div><div class="cell" id="cell-95" style="background-color: rgb(191, 219, 254);"><span>95</span></div><div class="cell" id="cell-94" style="background-color: rgb(224, 242, 254);"><span>94</span></div><div class="cell special-green" id="cell-93"><span>93</span><div class="ladder" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🪜</div></div><div class="cell" id="cell-92" style="background-color: rgb(224, 242, 254);"><span>92</span></div><div class="cell" id="cell-91" style="background-color: rgb(191, 219, 254);"><span>91</span></div><div class="cell" id="cell-81" style="background-color: rgb(191, 219, 254);"><span>81</span></div><div class="cell" id="cell-82" style="background-color: rgb(224, 242, 254);"><span>82</span></div><div class="cell" id="cell-83" style="background-color: rgb(191, 219, 254);"><span>83</span></div><div class="cell" id="cell-84" style="background-color: rgb(224, 242, 254);"><span>84</span></div><div class="cell special-green" id="cell-85"><span>85</span><div class="ladder" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🪜</div></div><div class="cell" id="cell-86" style="background-color: rgb(224, 242, 254);"><span>86</span></div><div class="cell" id="cell-87" style="background-color: rgb(191, 219, 254);"><span>87</span></div><div class="cell" id="cell-88" style="background-color: rgb(224, 242, 254);"><span>88</span></div><div class="cell special-red" id="cell-89"><span>89</span><div class="snake" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🐍</div></div><div class="cell" id="cell-90" style="background-color: rgb(224, 242, 254);"><span>90</span></div><div class="cell" id="cell-80" style="background-color: rgb(224, 242, 254);"><span>80</span></div><div class="cell special-red" id="cell-79"><span>79</span><div class="snake" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🐍</div></div><div class="cell" id="cell-78" style="background-color: rgb(224, 242, 254);"><span>78</span></div><div class="cell" id="cell-77" style="background-color: rgb(191, 219, 254);"><span>77</span></div><div class="cell" id="cell-76" style="background-color: rgb(224, 242, 254);"><span>76</span></div><div class="cell" id="cell-75" style="background-color: rgb(191, 219, 254);"><span>75</span></div><div class="cell" id="cell-74" style="background-color: rgb(224, 242, 254);"><span>74</span></div><div class="cell special-green" id="cell-73"><span>73</span><div class="ladder" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🪜</div></div><div class="cell" id="cell-72" style="background-color: rgb(224, 242, 254);"><span>72</span></div><div class="cell" id="cell-71" style="background-color: rgb(191, 219, 254);"><span>71</span></div><div class="cell" id="cell-61" style="background-color: rgb(191, 219, 254);"><span>61</span></div><div class="cell" id="cell-62" style="background-color: rgb(224, 242, 254);"><span>62</span></div><div class="cell special-red" id="cell-63"><span>63</span><div class="snake" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🐍</div></div><div class="cell" id="cell-64" style="background-color: rgb(224, 242, 254);"><span>64</span></div><div class="cell" id="cell-65" style="background-color: rgb(191, 219, 254);"><span>65</span></div><div class="cell" id="cell-66" style="background-color: rgb(224, 242, 254);"><span>66</span></div><div class="cell special-green" id="cell-67"><span>67</span><div class="ladder" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🪜</div></div><div class="cell" id="cell-68" style="background-color: rgb(224, 242, 254);"><span>68</span></div><div class="cell" id="cell-69" style="background-color: rgb(191, 219, 254);"><span>69</span></div><div class="cell" id="cell-70" style="background-color: rgb(224, 242, 254);"><span>70</span></div><div class="cell" id="cell-60" style="background-color: rgb(224, 242, 254);"><span>60</span></div><div class="cell" id="cell-59" style="background-color: rgb(191, 219, 254);"><span>59</span></div><div class="cell" id="cell-58" style="background-color: rgb(224, 242, 254);"><span>58</span></div><div class="cell special-red" id="cell-57"><span>57</span><div class="snake" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🐍</div></div><div class="cell" id="cell-56" style="background-color: rgb(224, 242, 254);"><span>56</span></div><div class="cell" id="cell-55" style="background-color: rgb(191, 219, 254);"><span>55</span></div><div class="cell special-green" id="cell-54"><span>54</span><div class="ladder" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🪜</div></div><div class="cell" id="cell-53" style="background-color: rgb(191, 219, 254);"><span>53</span></div><div class="cell" id="cell-52" style="background-color: rgb(224, 242, 254);"><span>52</span></div><div class="cell" id="cell-51" style="background-color: rgb(191, 219, 254);"><span>51</span></div><div class="cell special-green" id="cell-41"><span>41</span><div class="ladder" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🪜</div></div><div class="cell" id="cell-42" style="background-color: rgb(224, 242, 254);"><span>42</span></div><div class="cell" id="cell-43" style="background-color: rgb(191, 219, 254);"><span>43</span></div><div class="cell" id="cell-44" style="background-color: rgb(224, 242, 254);"><span>44</span></div><div class="cell" id="cell-45" style="background-color: rgb(191, 219, 254);"><span>45</span></div><div class="cell" id="cell-46" style="background-color: rgb(224, 242, 254);"><span>46</span></div><div class="cell special-red" id="cell-47"><span>47</span><div class="snake" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🐍</div></div><div class="cell" id="cell-48" style="background-color: rgb(224, 242, 254);"><span>48</span></div><div class="cell" id="cell-49" style="background-color: rgb(191, 219, 254);"><span>49</span></div><div class="cell" id="cell-50" style="background-color: rgb(224, 242, 254);"><span>50</span></div><div class="cell" id="cell-40" style="background-color: rgb(224, 242, 254);"><span>40</span></div><div class="cell" id="cell-39" style="background-color: rgb(191, 219, 254);"><span>39</span></div><div class="cell" id="cell-38" style="background-color: rgb(224, 242, 254);"><span>38</span></div><div class="cell special-red" id="cell-37"><span>37</span><div class="snake" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🐍</div></div><div class="cell" id="cell-36" style="background-color: rgb(224, 242, 254);"><span>36</span></div><div class="cell" id="cell-35" style="background-color: rgb(191, 219, 254);"><span>35</span></div><div class="cell" id="cell-34" style="background-color: rgb(224, 242, 254);"><span>34</span></div><div class="cell special-green" id="cell-33"><span>33</span><div class="ladder" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🪜</div></div><div class="cell" id="cell-32" style="background-color: rgb(224, 242, 254);"><span>32</span></div><div class="cell" id="cell-31" style="background-color: rgb(191, 219, 254);"><span>31</span></div><div class="cell special-green" id="cell-21"><span>21</span><div class="ladder" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🪜</div></div><div class="cell" id="cell-22" style="background-color: rgb(224, 242, 254);"><span>22</span></div><div class="cell" id="cell-23" style="background-color: rgb(191, 219, 254);"><span>23</span></div><div class="cell" id="cell-24" style="background-color: rgb(224, 242, 254);"><span>24</span></div><div class="cell" id="cell-25" style="background-color: rgb(191, 219, 254);"><span>25</span></div><div class="cell" id="cell-26" style="background-color: rgb(224, 242, 254);"><span>26</span></div><div class="cell special-red" id="cell-27"><span>27</span><div class="snake" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🐍</div></div><div class="cell" id="cell-28" style="background-color: rgb(224, 242, 254);"><span>28</span></div><div class="cell" id="cell-29" style="background-color: rgb(191, 219, 254);"><span>29</span></div><div class="cell" id="cell-30" style="background-color: rgb(224, 242, 254);"><span>30</span></div><div class="cell" id="cell-20" style="background-color: rgb(224, 242, 254);"><span>20</span></div><div class="cell special-red" id="cell-19"><span>19</span><div class="snake" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🐍</div></div><div class="cell" id="cell-18" style="background-color: rgb(224, 242, 254);"><span>18</span></div><div class="cell" id="cell-17" style="background-color: rgb(191, 219, 254);"><span>17</span></div><div class="cell" id="cell-16" style="background-color: rgb(224, 242, 254);"><span>16</span></div><div class="cell" id="cell-15" style="background-color: rgb(191, 219, 254);"><span>15</span></div><div class="cell" id="cell-14" style="background-color: rgb(224, 242, 254);"><span>14</span></div><div class="cell special-green" id="cell-13"><span>13</span><div class="ladder" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🪜</div></div><div class="cell" id="cell-12" style="background-color: rgb(224, 242, 254);"><span>12</span></div><div class="cell" id="cell-11" style="background-color: rgb(191, 219, 254);"><span>11</span></div><div class="cell" id="cell-1" style="background-color: rgb(191, 219, 254);"><span>1</span></div><div class="cell" id="cell-2" style="background-color: rgb(224, 242, 254);"><span>2</span></div><div class="cell" id="cell-3" style="background-color: rgb(191, 219, 254);"><span>3</span></div><div class="cell" id="cell-4" style="background-color: rgb(224, 242, 254);"><span>4</span></div><div class="cell" id="cell-5" style="background-color: rgb(191, 219, 254);"><span>5</span></div><div class="cell" id="cell-6" style="background-color: rgb(224, 242, 254);"><span>6</span></div><div class="cell special-green" id="cell-7"><span>7</span><div class="ladder" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🪜</div></div><div class="cell" id="cell-8" style="background-color: rgb(224, 242, 254);"><span>8</span></div><div class="cell special-red" id="cell-9"><span>9</span><div class="snake" style="font-size: 12px; position: absolute; top: 2px; right: 2px;">🐍</div></div><div class="cell" id="cell-10" style="background-color: rgb(224, 242, 254);"><span>10</span></div></div>
+                </div>
+                
+                <div class="w-full lg:w-4/12">
+                    <div class="bg-white rounded-lg shadow p-4 mb-4">
+                        <h2 class="text-xl font-bold mb-3">ผู้เล่น</h2>
+                        <div id="players-status" class="space-y-3"></div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-4 mb-4 flex flex-col items-center">
+                        <h2 class="text-xl font-bold mb-3">ทอยลูกเต๋า</h2>
+                        <div id="dice" class="dice mb-4">?</div>
+                        <button id="roll-button" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-2 rounded-lg font-bold hover:from-indigo-600 hover:to-purple-700 transition btn">ทอยลูกเต๋า</button>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-lg p-4">
+                        <h3 class="font-bold mb-2">ช่องพิเศษ:</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="w-4 h-4 bg-green-300 rounded mr-2"></div>
+                            <span>ตอบถูก: เดินหน้า / ตอบผิด: อยู่ที่เดิม</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 bg-red-300 rounded mr-2"></div>
+                            <span>ตอบถูก: อยู่ที่เดิม / ตอบผิด: ถอยหลัง</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="text-center text-white py-3 bg-gray-800 bg-opacity-70 rounded-lg">
+            developed by Tle Narongphisit | CTTC19 @ CPD
+        </footer>
+    </div>
+    
+    <!-- Question Modal (Hidden initially) -->
+    <div id="question-modal" class="question-modal hidden">
+        <div class="question-container">
+            <h2 id="question-type" class="text-xl font-bold mb-4 text-center"></h2>
+            <p id="question-text" class="text-lg mb-6"></p>
+            
+            <div id="question-options" class="space-y-3 mb-6">
+                <!-- Options will be inserted here -->
+            </div>
+            
+            <div id="question-result" class="p-4 rounded-lg mb-4 text-center hidden"></div>
+            
+            <div class="flex justify-center">
+                <button id="question-continue" class="bg-blue-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-600 transition hidden">ดำเนินการต่อ</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Winner Modal (Hidden initially) -->
+    <div id="winner-modal" class="question-modal hidden">
+        <div class="question-container">
+            <h2 class="text-2xl font-bold mb-4 text-center text-purple-600">🏆 ผลการแข่งขัน 🏆</h2>
+            
+            <div class="podium mb-6">
+                <div id="second-place" class="podium-step bg-gray-300" style="height: 120px;">
+                    <div class="trophy">🥈</div>
+                    <div class="player-name bg-gray-400">-</div>
+                </div>
+                <div id="first-place" class="podium-step bg-yellow-300" style="height: 160px;">
+                    <div class="trophy">🏆</div>
+                    <div class="player-name bg-yellow-500">-</div>
+                </div>
+                <div id="third-place" class="podium-step bg-amber-700" style="height: 80px;">
+                    <div class="trophy">🥉</div>
+                    <div class="player-name bg-amber-800">-</div>
+                </div>
+            </div>
+            
+            <div id="fourth-place" class="mb-6 text-center hidden">
+                <div class="inline-block">
+                    <div class="text-2xl mb-1">🎖️</div>
+                    <div class="bg-gray-200 px-4 py-1 rounded font-bold">-</div>
+                </div>
+            </div>
+            
+            <div class="flex justify-center">
+                <button id="play-again" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-lg font-bold hover:from-green-600 hover:to-emerald-700 transition">เล่นอีกครั้ง</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let playerCount = 2;
+        let players = [];
+        let currentPlayerIndex = 0;
+        let gameStarted = false;
+        let specialCells = {
+            green: [7, 13, 21, 33, 41, 54, 67, 73, 85, 93],
+            red: [9, 19, 27, 37, 47, 57, 63, 79, 89, 97]
+        };
+        
+        // Special cell effects (move forward or backward)
+        let specialEffects = {
+            green: [3, 4, 5, 6, 4, 5, 3, 4, 5, 6],
+            red: [3, 4, 5, 6, 4, 5, 3, 4, 5, 6]
+        };
+        
+        // Questions for special cells
+        const questions = [
+            {
+                question: "สหกรณ์แห่งแรกของโลกก่อตั้งขึ้นที่ประเทศใด?",
+                options: ["อังกฤษ", "ฝรั่งเศส", "เยอรมนี", "สวีเดน"],
+                answer: 0
+            },
+            {
+                question: "สหกรณ์แห่งแรกของไทยคือสหกรณ์ประเภทใด?",
+                options: ["สหกรณ์ออมทรัพย์", "สหกรณ์การเกษตร", "สหกรณ์ร้านค้า", "สหกรณ์บริการ"],
+                answer: 1
+            },
+            {
+                question: "หลักการสหกรณ์สากลมีกี่ข้อ?",
+                options: ["5 ข้อ", "6 ข้อ", "7 ข้อ", "8 ข้อ"],
+                answer: 2
+            },
+            {
+                question: "วันสหกรณ์แห่งชาติของไทยตรงกับวันที่เท่าไร?",
+                options: ["26 กุมภาพันธ์", "26 มีนาคม", "26 เมษายน", "26 พฤษภาคม"],
+                answer: 0
+            },
+            {
+                question: "สหกรณ์ในประเทศไทยแบ่งออกเป็นกี่ประเภท?",
+                options: ["5 ประเภท", "6 ประเภท", "7 ประเภท", "8 ประเภท"],
+                answer: 2
+            },
+            {
+                question: "ข้อใดไม่ใช่อุดมการณ์สหกรณ์?",
+                options: ["ความเสมอภาค", "ความเที่ยงธรรม", "การแสวงหากำไรสูงสุด", "การช่วยตนเอง"],
+                answer: 2
+            },
+            {
+                question: "สัญลักษณ์สากลของขบวนการสหกรณ์คือข้อใด?",
+                options: ["ต้นสน 2 ต้น", "รวงข้าวในวงกลม", "มือจับมือในวงกลม", "ดอกบัวในวงกลม"],
+                answer: 0
+            },
+            {
+                question: "หน่วยงานใดมีหน้าที่กำกับดูแลสหกรณ์ในประเทศไทย?",
+                options: ["กรมส่งเสริมสหกรณ์", "กระทรวงพาณิชย์", "กระทรวงการคลัง", "ธนาคารแห่งประเทศไทย"],
+                answer: 0
+            },
+            {
+                question: "ข้อใดไม่ใช่หลักการสหกรณ์?",
+                options: ["การเปิดรับสมาชิกทั่วไป", "การควบคุมโดยสมาชิก", "การจัดสรรกำไรตามส่วนการถือหุ้น", "การให้การศึกษาแก่สมาชิก"],
+                answer: 2
+            },
+            {
+                question: "ผู้ริเริ่มจัดตั้งสหกรณ์ในประเทศไทยคือใคร?",
+                options: ["พระบาทสมเด็จพระปกเกล้าเจ้าอยู่หัว", "พระบาทสมเด็จพระมงกุฎเกล้าเจ้าอยู่หัว", "พระราชวรวงศ์เธอ กรมหมื่นพิทยาลงกรณ์", "พระยาสุริยานุวัตร"],
+                answer: 2
+            },
+            {
+                question: "สหกรณ์แห่งแรกของไทยก่อตั้งขึ้นในปี พ.ศ. ใด?",
+                options: ["พ.ศ. 2459", "พ.ศ. 2469", "พ.ศ. 2479", "พ.ศ. 2489"],
+                answer: 0
+            },
+            {
+                question: "ข้อใดไม่ใช่ประเภทของสหกรณ์ในประเทศไทย?",
+                options: ["สหกรณ์การเกษตร", "สหกรณ์ประมง", "สหกรณ์อุตสาหกรรม", "สหกรณ์นิคม"],
+                answer: 2
+            },
+            {
+                question: "สหกรณ์ที่มีจำนวนมากที่สุดในประเทศไทยคือประเภทใด?",
+                options: ["สหกรณ์ออมทรัพย์", "สหกรณ์การเกษตร", "สหกรณ์ร้านค้า", "สหกรณ์บริการ"],
+                answer: 1
+            },
+            {
+                question: "ข้อใดไม่ใช่คุณค่าของสหกรณ์?",
+                options: ["การพึ่งพาตนเอง", "ความรับผิดชอบต่อตนเอง", "การแข่งขันเสรี", "ความเสมอภาค"],
+                answer: 2
+            },
+            {
+                question: "สีใดเป็นสีสากลของขบวนการสหกรณ์?",
+                options: ["สีเขียว", "สีฟ้า", "สีแดง", "สีเหลือง"],
+                answer: 0
+            }
+        ];
+        
+        // Sound effects
+        const sounds = {
+            dice: new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAAwAAAbAAkJCQkJCQkJCQkJCQkJCQwMDAwMDAwMDAwMDAwMDA4ODg4ODg4ODg4ODg4ODg4P//////////////////AAAAOkxhdmM1OC4xMzQAAAAAAAAAAAAASW5mbwAAAA8AAAADAAABsABVVVVVVVVVVVVVVVVVVVWAgICAgICAgICAgICAgICA1dXV1dXV1dXV1dXV1dXV1f//////////////////AAAA"),
+            move: new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAABAAAAVAAQEBAQEBAQEBAQECAgICAgICAgICAgIDAwMDAwMDAwMDAwMDg4ODg4ODg4ODg4OD///////////////8AAAAPQ0xBTSAxLjAuMC5iZXRhMgAAADRMYXZmNTguNDIuMTAxAAAAAAAAAAAAAP/jOMAAAAAAAAAAAABJbmZvAAAADwAAAAQAAAFQAEFBQUFBQUFBQUFBQYGBgYGBgYGBgYGBgcHBwcHBwcHBwcHBwfHx8fHx8fHx8fHx///////////////AAAAA"),
+            correct: new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAABAAAAVAAICAgICAgICAgIEBAQEBAQEBAQEBAgICAgICAgICAgIDA"),
+            wrong: new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAAAwAAAUAAQEBAQEBAQEBAQECAgICAgICAgICAgIDAwMDAwMDAwMDAwMDg4ODg4ODg4ODg4OD///////////////8AAAAA"),
+            win: new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+M4wAAAAAAAAAAAAEluZm8AAAAPAAAABwAAAZAAFBQUFBQUFBQgICAgICAgICAsLCwsLCwsLCw4ODg4ODg4OEREREREREREUFBQUFBQUFBQXFxcXFxcXFxoaGhoaGhoaHR0dHR0dHR0gICAgICAgICMjIyMjIyMjJiYmJiYmJiYpKSkpKSkpKS0tLS0tLS0tMDAwMDAwMDAwP//////////AAAAA")
+        };
+        
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const playerCountBtns = document.querySelectorAll('.player-count-btn');
+        const playerInputs = document.getElementById('player-inputs');
+        const startGameBtn = document.getElementById('start-game');
+        const gameBoard = document.querySelector('.game-board');
+        const currentPlayerDisplay = document.getElementById('current-player');
+        const playersStatus = document.getElementById('players-status');
+        const diceElement = document.getElementById('dice');
+        const rollButton = document.getElementById('roll-button');
+        const questionModal = document.getElementById('question-modal');
+        const questionType = document.getElementById('question-type');
+        const questionText = document.getElementById('question-text');
+        const questionOptions = document.getElementById('question-options');
+        const questionResult = document.getElementById('question-result');
+        const questionContinue = document.getElementById('question-continue');
+        const winnerModal = document.getElementById('winner-modal');
+        const firstPlace = document.getElementById('first-place');
+        const secondPlace = document.getElementById('second-place');
+        const thirdPlace = document.getElementById('third-place');
+        const fourthPlace = document.getElementById('fourth-place');
+        const playAgainBtn = document.getElementById('play-again');
+        
+        // Player colors
+        const playerColors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
+        
+        // Initialize the game
+        function init() {
+            // Player count selection
+            playerCountBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    playerCountBtns.forEach(b => b.classList.replace('bg-blue-500', 'bg-blue-100'));
+                    playerCountBtns.forEach(b => b.classList.replace('text-white', 'text-blue-800'));
+                    btn.classList.replace('bg-blue-100', 'bg-blue-500');
+                    btn.classList.replace('text-blue-800', 'text-white');
+                    playerCount = parseInt(btn.dataset.count);
+                    updatePlayerInputs();
+                });
+            });
+            
+            // Start game button
+            startGameBtn.addEventListener('click', startGame);
+            
+            // Roll dice button
+            rollButton.addEventListener('click', rollDice);
+            
+            // Question continue button
+            questionContinue.addEventListener('click', () => {
+                questionModal.classList.add('hidden');
+                checkWinCondition();
+            });
+            
+            // Play again button
+            playAgainBtn.addEventListener('click', () => {
+                winnerModal.classList.add('hidden');
+                resetGame();
+            });
+            
+            // Create game board
+            createGameBoard();
+        }
+        
+        // Update player inputs based on selected player count
+        function updatePlayerInputs() {
+            playerInputs.innerHTML = '';
+            
+            for (let i = 0; i < playerCount; i++) {
+                const playerInput = document.createElement('div');
+                playerInput.className = 'player-input flex items-center space-x-4';
+                playerInput.innerHTML = `
+                    <div class="w-8 h-8 rounded-full" style="background-color: ${playerColors[i]}"></div>
+                    <input type="text" placeholder="ชื่อผู้เล่น ${i + 1}" class="player-name-input border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                `;
+                playerInputs.appendChild(playerInput);
+            }
+        }
+        
+        // Create the game board
+        function createGameBoard() {
+            gameBoard.innerHTML = '';
+            
+            // Create cells in reverse order for rows 1, 3, 5, 7, 9 (bottom to top)
+            for (let row = 9; row >= 0; row--) {
+                for (let col = 0; col < 10; col++) {
+                    const cellNumber = row % 2 === 0 
+                        ? row * 10 + col + 1 
+                        : row * 10 + (10 - col);
+                    
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.id = `cell-${cellNumber}`;
+                    
+                    // Set background color based on cell type
+                    if (specialCells.green.includes(cellNumber)) {
+                        cell.classList.add('special-green');
+                    } else if (specialCells.red.includes(cellNumber)) {
+                        cell.classList.add('special-red');
+                    } else {
+                        cell.style.backgroundColor = cellNumber % 2 === 0 ? '#e0f2fe' : '#bfdbfe';
+                    }
+                    
+                    // Add cell number
+                    cell.innerHTML = `<span>${cellNumber}</span>`;
+                    
+                    // Add snake or ladder icon
+                    if (specialCells.green.includes(cellNumber)) {
+                        const ladder = document.createElement('div');
+                        ladder.className = 'ladder';
+                        ladder.innerHTML = '🪜';
+                        ladder.style.fontSize = '12px';
+                        ladder.style.position = 'absolute';
+                        ladder.style.top = '2px';
+                        ladder.style.right = '2px';
+                        cell.appendChild(ladder);
+                    } else if (specialCells.red.includes(cellNumber)) {
+                        const snake = document.createElement('div');
+                        snake.className = 'snake';
+                        snake.innerHTML = '🐍';
+                        snake.style.fontSize = '12px';
+                        snake.style.position = 'absolute';
+                        snake.style.top = '2px';
+                        snake.style.right = '2px';
+                        cell.appendChild(snake);
+                    }
+                    
+                    gameBoard.appendChild(cell);
+                }
+            }
+            
+            // Add finish flag to cell 100
+            const finishCell = document.getElementById('cell-100');
+            if (finishCell) {
+                const flag = document.createElement('div');
+                flag.innerHTML = '🏁';
+                flag.style.fontSize = '14px';
+                flag.style.position = 'absolute';
+                flag.style.top = '2px';
+                flag.style.right = '2px';
+                finishCell.appendChild(flag);
+                finishCell.style.backgroundColor = '#fde68a';
+            }
+        }
+        
+        // Start the game
+        function startGame() {
+            // Get player names
+            const playerNameInputs = document.querySelectorAll('.player-name-input');
+            players = [];
+            
+            for (let i = 0; i < playerCount; i++) {
+                const name = playerNameInputs[i].value.trim() || `ผู้เล่น ${i + 1}`;
+                players.push({
+                    name: name,
+                    position: 0,
+                    color: playerColors[i],
+                    finished: false,
+                    rank: 0
+                });
+            }
+            
+            // Switch to game screen
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            
+            // Initialize game
+            currentPlayerIndex = 0;
+            gameStarted = true;
+            
+            // Update UI
+            updatePlayersStatus();
+            updateCurrentPlayerDisplay();
+            renderPlayerTokens();
+        }
+        
+        // Update players status display
+        function updatePlayersStatus() {
+            playersStatus.innerHTML = '';
+            
+            players.forEach((player, index) => {
+                const playerElement = document.createElement('div');
+                playerElement.className = 'flex items-center justify-between';
+                playerElement.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 rounded-full mr-2" style="background-color: ${player.color}"></div>
+                        <span class="font-medium">${player.name}</span>
+                    </div>
+                    <div class="bg-gray-100 px-2 py-1 rounded">
+                        ช่อง ${player.position}
+                    </div>
+                `;
+                
+                if (index === currentPlayerIndex && !player.finished) {
+                    playerElement.classList.add('bg-yellow-100', 'p-2', 'rounded');
+                }
+                
+                playersStatus.appendChild(playerElement);
+            });
+        }
+        
+        // Update current player display
+        function updateCurrentPlayerDisplay() {
+            const player = players[currentPlayerIndex];
+            currentPlayerDisplay.innerHTML = `
+                <div class="flex items-center">
+                    <div class="w-4 h-4 rounded-full mr-2" style="background-color: ${player.color}"></div>
+                    <span>ตาของ ${player.name}</span>
+                </div>
+            `;
+        }
+        
+        // Render player tokens on the board
+        function renderPlayerTokens() {
+            // Remove existing tokens
+            document.querySelectorAll('.player-token').forEach(token => token.remove());
+            
+            // Add tokens for each player
+            players.forEach((player, index) => {
+                if (player.position > 0) {
+                    const cell = document.getElementById(`cell-${player.position}`);
+                    if (cell) {
+                        const token = document.createElement('div');
+                        token.className = 'player-token';
+                        token.style.backgroundColor = player.color;
+                        
+                        // Position tokens in different corners of the cell based on player index
+                        const positions = [
+                            { top: '25%', left: '25%' },
+                            { top: '25%', left: '75%' },
+                            { top: '75%', left: '25%' },
+                            { top: '75%', left: '75%' }
+                        ];
+                        
+                        token.style.top = positions[index].top;
+                        token.style.left = positions[index].left;
+                        
+                        cell.appendChild(token);
+                    }
+                }
+            });
+        }
+        
+        // Roll the dice
+        function rollDice() {
+            // Disable roll button during animation
+            rollButton.disabled = true;
+            
+            // Play dice sound
+            sounds.dice.play();
+            
+            // Animate dice
+            diceElement.classList.add('dice-animation');
+            diceElement.textContent = '?';
+            
+            // Get current player
+            const player = players[currentPlayerIndex];
+            
+            // If player has already finished, move to next player
+            if (player.finished) {
+                nextPlayer();
+                rollButton.disabled = false;
+                return;
+            }
+            
+            // Generate random dice value after a delay
+            setTimeout(() => {
+                const diceValue = Math.floor(Math.random() * 6) + 1;
+                diceElement.textContent = diceValue;
+                diceElement.classList.remove('dice-animation');
+                
+                // Move player
+                movePlayer(diceValue);
+            }, 600);
+        }
+        
+        // Move player based on dice value
+        function movePlayer(diceValue) {
+            const player = players[currentPlayerIndex];
+            const oldPosition = player.position;
+            let newPosition = oldPosition + diceValue;
+            
+            // Check if player would go beyond 100
+            if (newPosition > 100) {
+                newPosition = 100 - (newPosition - 100);
+            }
+            
+            // Update player position
+            player.position = newPosition;
+            
+            // Play move sound
+            sounds.move.play();
+            
+            // Update UI
+            updatePlayersStatus();
+            renderPlayerTokens();
+            
+            // Check if player landed on a special cell
+            setTimeout(() => {
+                checkSpecialCell();
+            }, 500);
+        }
+        
+        // Check if player landed on a special cell
+        function checkSpecialCell() {
+            const player = players[currentPlayerIndex];
+            const position = player.position;
+            
+            // Check green cells (forward)
+            if (specialCells.green.includes(position)) {
+                const index = specialCells.green.indexOf(position);
+                showQuestion('green', index);
+                return;
+            }
+            
+            // Check red cells (backward)
+            if (specialCells.red.includes(position)) {
+                const index = specialCells.red.indexOf(position);
+                showQuestion('red', index);
+                return;
+            }
+            
+            // No special cell, check win condition
+            checkWinCondition();
+        }
+        
+        // Show question for special cell
+        function showQuestion(cellType, index) {
+            // Get random question
+            const questionIndex = Math.floor(Math.random() * questions.length);
+            const question = questions[questionIndex];
+            
+            // Set question type
+            if (cellType === 'green') {
+                questionType.textContent = '🪜 คำถามช่องสีเขียว';
+                questionType.className = 'text-xl font-bold mb-4 text-center text-green-600';
+            } else {
+                questionType.textContent = '🐍 คำถามช่องสีแดง';
+                questionType.className = 'text-xl font-bold mb-4 text-center text-red-600';
+            }
+            
+            // Set question text
+            questionText.textContent = question.question;
+            
+            // Set question options
+            questionOptions.innerHTML = '';
+            question.options.forEach((option, i) => {
+                const button = document.createElement('button');
+                button.className = 'w-full text-left p-3 rounded-lg border border-gray-300 hover:bg-gray-100 transition';
+                button.textContent = option;
+                button.addEventListener('click', () => handleAnswer(i === question.answer, cellType, index));
+                questionOptions.appendChild(button);
+            });
+            
+            // Reset question result
+            questionResult.className = 'p-4 rounded-lg mb-4 text-center hidden';
+            questionResult.textContent = '';
+            
+            // Hide continue button
+            questionContinue.classList.add('hidden');
+            
+            // Show question modal
+            questionModal.classList.remove('hidden');
+        }
+        
+        // Handle answer to question
+        function handleAnswer(isCorrect, cellType, index) {
+            const player = players[currentPlayerIndex];
+            
+            // Disable option buttons
+            const optionButtons = questionOptions.querySelectorAll('button');
+            optionButtons.forEach(button => {
+                button.disabled = true;
+                button.classList.add('opacity-50');
+            });
+            
+            // Show result
+            questionResult.classList.remove('hidden');
+            
+            if (isCorrect) {
+                // Play correct sound
+                sounds.correct.play();
+                
+                questionResult.textContent = '✅ ถูกต้อง!';
+                questionResult.className = 'p-4 rounded-lg mb-4 text-center bg-green-100 text-green-800';
+                
+                if (cellType === 'green') {
+                    // Move forward
+                    const moveForward = specialEffects.green[index];
+                    questionResult.textContent += ` เดินหน้า ${moveForward} ช่อง`;
+                    player.position += moveForward;
+                } else {
+                    // Stay in place for red cell
+                    questionResult.textContent += ' คุณอยู่ที่เดิม';
+                }
+            } else {
+                // Play wrong sound
+                sounds.wrong.play();
+                
+                questionResult.textContent = '❌ ไม่ถูกต้อง!';
+                questionResult.className = 'p-4 rounded-lg mb-4 text-center bg-red-100 text-red-800';
+                
+                if (cellType === 'green') {
+                    // Stay in place
+                    questionResult.textContent += ' คุณอยู่ที่เดิม';
+                } else {
+                    // Move backward
+                    const moveBackward = specialEffects.red[index];
+                    questionResult.textContent += ` ถอยหลัง ${moveBackward} ช่อง`;
+                    player.position = Math.max(1, player.position - moveBackward);
+                }
+            }
+            
+            // Update UI
+            updatePlayersStatus();
+            
+            // Show continue button
+            questionContinue.classList.remove('hidden');
+        }
+        
+        // Check if player has won
+        function checkWinCondition() {
+            const player = players[currentPlayerIndex];
+            
+            // Check if player reached position 100
+            if (player.position === 100) {
+                // Mark player as finished
+                player.finished = true;
+                
+                // Assign rank
+                player.rank = players.filter(p => p.finished).length;
+                
+                // Play win sound
+                sounds.win.play();
+                
+                // Create confetti effect
+                createConfetti();
+                
+                // Check if all players have finished
+                const allFinished = players.every(p => p.finished);
+                
+                if (allFinished) {
+                    // Show winner modal
+                    showWinnerModal();
+                } else {
+                    // Move to next player
+                    nextPlayer();
+                }
+            } else {
+                // Move to next player
+                nextPlayer();
+            }
+            
+            // Enable roll button
+            rollButton.disabled = false;
+        }
+        
+        // Move to next player
+        function nextPlayer() {
+            do {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            } while (players[currentPlayerIndex].finished);
+            
+            updateCurrentPlayerDisplay();
+            updatePlayersStatus();
+        }
+        
+        // Show winner modal
+        function showWinnerModal() {
+            // Sort players by rank
+            const sortedPlayers = [...players].sort((a, b) => a.rank - b.rank);
+            
+            // Set first place
+            firstPlace.querySelector('.player-name').textContent = sortedPlayers[0].name;
+            firstPlace.querySelector('.player-name').style.backgroundColor = sortedPlayers[0].color;
+            
+            // Set second place
+            if (sortedPlayers.length > 1) {
+                secondPlace.querySelector('.player-name').textContent = sortedPlayers[1].name;
+                secondPlace.querySelector('.player-name').style.backgroundColor = sortedPlayers[1].color;
+            }
+            
+            // Set third place
+            if (sortedPlayers.length > 2) {
+                thirdPlace.querySelector('.player-name').textContent = sortedPlayers[2].name;
+                thirdPlace.querySelector('.player-name').style.backgroundColor = sortedPlayers[2].color;
+            }
+            
+            // Set fourth place
+            if (sortedPlayers.length > 3) {
+                fourthPlace.classList.remove('hidden');
+                fourthPlace.querySelector('div:last-child').textContent = sortedPlayers[3].name;
+                fourthPlace.querySelector('div:last-child').style.backgroundColor = sortedPlayers[3].color;
+            } else {
+                fourthPlace.classList.add('hidden');
+            }
+            
+            // Show winner modal
+            winnerModal.classList.remove('hidden');
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const confettiCount = 100;
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+        
+        // Reset game
+        function resetGame() {
+            // Reset game state
+            players = [];
+            currentPlayerIndex = 0;
+            gameStarted = false;
+            
+            // Switch to start screen
+            gameScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            
+            // Reset player inputs
+            updatePlayerInputs();
+        }
+        
+        // Initialize the game
+        init();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95dd830457f57331',t:'MTc1MjI5MTU0OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>
