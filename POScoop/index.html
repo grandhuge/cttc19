@@ -1,1 +1,875 @@
+<html lang="th"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ร้านสหกรณ์นักเรียน - เกมจำลอง POS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Prompt', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f9ff;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239ee6ff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .product-card {
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-bounce {
+            transition: all 0.2s ease;
+        }
+        
+        .btn-bounce:active {
+            transform: scale(0.95);
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .animate-pop {
+            animation: pop 0.3s ease;
+        }
+        
+        .character {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 120px;
+            height: 120px;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+        
+        .character:hover {
+            transform: scale(1.1);
+        }
+        
+        .speech-bubble {
+            position: absolute;
+            top: -80px;
+            right: 60px;
+            background: white;
+            border-radius: 20px;
+            padding: 10px 15px;
+            max-width: 200px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border: 15px solid transparent;
+            border-top-color: white;
+            border-bottom: 0;
+            margin-bottom: -15px;
+        }
+        
+        .character:hover .speech-bubble {
+            opacity: 1;
+        }
+        
+        .coin {
+            transition: all 0.2s ease;
+        }
+        
+        .coin:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #60a5fa;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .character {
+                width: 80px;
+                height: 80px;
+                bottom: 10px;
+                right: 10px;
+            }
+            
+            .speech-bubble {
+                top: -60px;
+                right: 40px;
+                max-width: 150px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.inset-0{inset:0px}.z-50{z-index:50}.mx-4{margin-left:1rem;margin-right:1rem}.mx-auto{margin-left:auto;margin-right:auto}.mx-2{margin-left:0.5rem;margin-right:0.5rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.ml-2{margin-left:0.5rem}.mr-2{margin-right:0.5rem}.mr-3{margin-right:0.75rem}.mt-1{margin-top:0.25rem}.mt-12{margin-top:3rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-12{height:3rem}.h-6{height:1.5rem}.h-7{height:1.75rem}.h-full{height:100%}.max-h-64{max-height:16rem}.min-h-screen{min-height:100vh}.w-10{width:2.5rem}.w-12{width:3rem}.w-16{width:4rem}.w-6{width:1.5rem}.w-7{width:1.75rem}.w-full{width:100%}.max-w-md{max-width:28rem}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.overflow-y-auto{overflow-y:auto}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-2{border-width:2px}.border-t{border-top-width:1px}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-yellow-200{--tw-border-opacity:1;border-color:rgb(254 240 138 / var(--tw-border-opacity, 1))}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-green-50{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.bg-purple-600{--tw-bg-opacity:1;background-color:rgb(147 51 234 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-50{--tw-bg-opacity:1;background-color:rgb(254 252 232 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-opacity-20{--tw-bg-opacity:0.2}.bg-opacity-50{--tw-bg-opacity:0.5}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-blue-500{--tw-gradient-from:#3b82f6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(59 130 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-purple-500{--tw-gradient-to:#a855f7 var(--tw-gradient-to-position)}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-2{padding:0.5rem}.px-4{padding-left:1rem;padding-right:1rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.pt-4{padding-top:1rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-xs{font-size:0.75rem;line-height:1rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.text-blue-500{--tw-text-opacity:1;color:rgb(59 130 246 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-red-600{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-yellow-800{--tw-text-opacity:1;color:rgb(133 77 14 / var(--tw-text-opacity, 1))}.opacity-50{opacity:0.5}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:border-blue-500:hover{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-300:hover{--tw-bg-opacity:1;background-color:rgb(209 213 219 / var(--tw-bg-opacity, 1))}.hover\:bg-purple-700:hover{--tw-bg-opacity:1;background-color:rgb(126 34 206 / var(--tw-bg-opacity, 1))}@media (min-width: 640px){.sm\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}@media (min-width: 768px){.md\:mb-0{margin-bottom:0px}.md\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:text-3xl{font-size:1.875rem;line-height:2.25rem}}@media (min-width: 1024px){.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}</style></head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center mb-4 md:mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path>
+                    <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                <h1 class="text-2xl md:text-3xl font-bold">ร้านสหกรณ์นักเรียน</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="font-medium">คะแนน: <span id="score" class="font-bold">20</span></span>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-lg px-4 py-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    <span class="font-medium">ระดับ: <span id="level" class="font-bold">1</span></span>
+                </div>
+            </div>
+        </div>
+    </header>
 
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 mt-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Products Section -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-2 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path>
+                    </svg>
+                    สินค้าในร้าน
+                </h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="products-container"><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">📓</div>
+                    <h3 class="font-medium text-gray-800 text-center">สมุดปกอ่อน</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿5.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">📔</div>
+                    <h3 class="font-medium text-gray-800 text-center">สมุดปกแข็ง</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿15.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">✏️</div>
+                    <h3 class="font-medium text-gray-800 text-center">ดินสอ</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿3.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">🧽</div>
+                    <h3 class="font-medium text-gray-800 text-center">ยางลบ</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿5.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">📏</div>
+                    <h3 class="font-medium text-gray-800 text-center">ไม้บรรทัด</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿10.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">🔄</div>
+                    <h3 class="font-medium text-gray-800 text-center">กบเหลา</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿7.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">🖊️</div>
+                    <h3 class="font-medium text-gray-800 text-center">ปากกาลูกลื่น</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿8.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">🖌️</div>
+                    <h3 class="font-medium text-gray-800 text-center">น้ำยาลบคำผิด</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿20.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">✂️</div>
+                    <h3 class="font-medium text-gray-800 text-center">กรรไกร</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿15.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">📎</div>
+                    <h3 class="font-medium text-gray-800 text-center">เทปกาว</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿12.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">🍞</div>
+                    <h3 class="font-medium text-gray-800 text-center">ขนมปัง</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿10.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">🥛</div>
+                    <h3 class="font-medium text-gray-800 text-center">นม</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿8.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">🧃</div>
+                    <h3 class="font-medium text-gray-800 text-center">น้ำผลไม้</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿12.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">🍪</div>
+                    <h3 class="font-medium text-gray-800 text-center">ขนมขบเคี้ยว</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿5.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">🍫</div>
+                    <h3 class="font-medium text-gray-800 text-center">ช็อกโกแลต</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿15.00</p>
+                </div><div class="product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500">
+                    <div class="text-4xl mb-2">🍦</div>
+                    <h3 class="font-medium text-gray-800 text-center">ไอศกรีม</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿10.00</p>
+                </div></div>
+            </div>
+
+            <!-- Cart & Checkout Section -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mr-2 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path>
+                    </svg>
+                    รายการสินค้า
+                </h2>
+                <div class="bg-blue-50 rounded-lg p-4 mb-4 max-h-64 overflow-y-auto" id="cart-container"><p class="text-gray-500 text-center py-4">ยังไม่มีสินค้าในรายการ</p></div>
+                
+                <div class="border-t border-gray-200 pt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-medium text-gray-700">ราคารวม:</span>
+                        <span class="font-bold text-xl text-blue-600" id="total-price">฿0.00</span>
+                    </div>
+                    
+                    <div class="bg-yellow-50 rounded-lg p-4 mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">ลูกค้าจ่ายเงินมา:</label>
+                        <div class="flex flex-wrap gap-2 mb-3 justify-center">
+                            <div class="coin cursor-pointer" data-value="1">
+                                <svg class="w-12 h-12" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" fill="#B87333" stroke="#8B4513" stroke-width="2"></circle>
+                                    <circle cx="50" cy="50" r="35" fill="#CD7F32" stroke="#8B4513" stroke-width="1"></circle>
+                                    <text x="50" y="55" font-size="24" text-anchor="middle" fill="white">฿1</text>
+                                </svg>
+                            </div>
+                            <div class="coin cursor-pointer" data-value="2">
+                                <svg class="w-12 h-12" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" fill="#B87333" stroke="#8B4513" stroke-width="2"></circle>
+                                    <circle cx="50" cy="50" r="35" fill="#CD7F32" stroke="#8B4513" stroke-width="1"></circle>
+                                    <text x="50" y="55" font-size="24" text-anchor="middle" fill="white">฿2</text>
+                                </svg>
+                            </div>
+                            <div class="coin cursor-pointer" data-value="5">
+                                <svg class="w-12 h-12" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" fill="#C0C0C0" stroke="#A9A9A9" stroke-width="2"></circle>
+                                    <circle cx="50" cy="50" r="35" fill="#D3D3D3" stroke="#A9A9A9" stroke-width="1"></circle>
+                                    <text x="50" y="55" font-size="24" text-anchor="middle" fill="#333">฿5</text>
+                                </svg>
+                            </div>
+                            <div class="coin cursor-pointer" data-value="10">
+                                <svg class="w-12 h-12" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" fill="#C0C0C0" stroke="#A9A9A9" stroke-width="2"></circle>
+                                    <circle cx="50" cy="50" r="35" fill="#D3D3D3" stroke="#A9A9A9" stroke-width="1"></circle>
+                                    <text x="50" y="55" font-size="22" text-anchor="middle" fill="#333">฿10</text>
+                                </svg>
+                            </div>
+                            <div class="coin cursor-pointer" data-value="20">
+                                <svg class="w-16 h-12" viewBox="0 0 120 80">
+                                    <rect x="5" y="5" width="110" height="70" rx="5" fill="#FFC107" stroke="#FF8F00" stroke-width="2"></rect>
+                                    <text x="60" y="45" font-size="24" text-anchor="middle" fill="#7B5800">฿20</text>
+                                </svg>
+                            </div>
+                            <div class="coin cursor-pointer" data-value="50">
+                                <svg class="w-16 h-12" viewBox="0 0 120 80">
+                                    <rect x="5" y="5" width="110" height="70" rx="5" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"></rect>
+                                    <text x="60" y="45" font-size="24" text-anchor="middle" fill="white">฿50</text>
+                                </svg>
+                            </div>
+                            <div class="coin cursor-pointer" data-value="100">
+                                <svg class="w-16 h-12" viewBox="0 0 120 80">
+                                    <rect x="5" y="5" width="110" height="70" rx="5" fill="#F44336" stroke="#C62828" stroke-width="2"></rect>
+                                    <text x="60" y="45" font-size="22" text-anchor="middle" fill="white">฿100</text>
+                                </svg>
+                            </div>
+                            <div class="coin cursor-pointer" data-value="500">
+                                <svg class="w-16 h-12" viewBox="0 0 120 80">
+                                    <rect x="5" y="5" width="110" height="70" rx="5" fill="#9C27B0" stroke="#6A1B9A" stroke-width="2"></rect>
+                                    <text x="60" y="45" font-size="22" text-anchor="middle" fill="white">฿500</text>
+                                </svg>
+                            </div>
+                            <div class="coin cursor-pointer" data-value="1000">
+                                <svg class="w-16 h-12" viewBox="0 0 120 80">
+                                    <rect x="5" y="5" width="110" height="70" rx="5" fill="#795548" stroke="#4E342E" stroke-width="2"></rect>
+                                    <text x="60" y="45" font-size="20" text-anchor="middle" fill="white">฿1000</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="number" id="customer-payment" class="w-full p-3 border border-gray-300 rounded-lg text-lg font-bold text-blue-700" placeholder="0.00" min="0" step="1">
+                            <button id="clear-payment" class="ml-2 bg-gray-200 hover:bg-gray-300 text-gray-700 p-3 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-50 rounded-lg p-4 mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">เงินทอน (คุณต้องคำนวณเอง):</label>
+                        <input type="number" id="change-amount" class="w-full p-3 border border-gray-300 rounded-lg text-lg font-bold text-green-700" placeholder="0.00" min="0" step="0.25">
+                    </div>
+                    
+                    <button id="check-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg mb-4 btn-bounce flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        ตรวจสอบยอด
+                    </button>
+                    
+                    <button id="new-customer" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg btn-bounce flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        ลูกค้าคนใหม่
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Character Helper -->
+    <div class="character">
+        <div class="speech-bubble">
+            <p id="character-speech">มาดูรางวัลที่คุณได้รับกัน!</p>
+        </div>
+        <svg viewBox="0 0 200 200" class="w-full h-full">
+            <circle cx="100" cy="100" r="90" fill="#FFD54F" stroke="#FFA000" stroke-width="4"></circle>
+            <circle cx="70" cy="80" r="12" fill="white" stroke="#000" stroke-width="2"></circle>
+            <circle cx="130" cy="80" r="12" fill="white" stroke="#000" stroke-width="2"></circle>
+            <circle cx="70" cy="80" r="6" fill="#000"></circle>
+            <circle cx="130" cy="80" r="6" fill="#000"></circle>
+            <path d="M70 130 Q100 150 130 130" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round"></path>
+            <path d="M60 60 Q70 40 90 55" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"></path>
+            <path d="M140 60 Q130 40 110 55" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"></path>
+        </svg>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 transform transition-all">
+            <div id="feedback-content" class="text-center py-4">
+                    <div class="text-3xl mb-3">🎉</div>
+                    <h3 class="text-xl font-bold text-green-600 mb-2">ยอดเงินถูกต้อง!</h3>
+                    <p class="mb-2">เงินทอน: ฿32.00</p>
+                    <p class="text-sm text-gray-600">คุณได้รับ 20 คะแนน</p>
+                </div>
+            <button id="close-modal" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg mt-4 btn-bounce">
+                ตกลง
+            </button>
+        </div>
+    </div>
+
+    <!-- Badges Modal -->
+    <div id="badges-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">รางวัลความสำเร็จ</h2>
+            <div class="grid grid-cols-3 gap-4" id="badges-container"><div class="p-3 rounded-lg text-center bg-yellow-50 border-2 border-yellow-200">
+                    <div class="text-4xl mb-2">🌟</div>
+                    <h3 class="font-bold text-yellow-800">พนักงานใหม่</h3>
+                    <p class="text-xs text-gray-600">ทำรายการแรกสำเร็จ</p>
+                </div><div class="p-3 rounded-lg text-center bg-gray-100 opacity-50">
+                    <div class="text-4xl mb-2">🏆</div>
+                    <h3 class="font-bold text-gray-500">พนักงานดีเด่น</h3>
+                    <p class="text-xs text-gray-400">ทำรายการถูกต้อง 5 ครั้ง</p>
+                </div><div class="p-3 rounded-lg text-center bg-gray-100 opacity-50">
+                    <div class="text-4xl mb-2">👑</div>
+                    <h3 class="font-bold text-gray-500">ผู้จัดการร้าน</h3>
+                    <p class="text-xs text-gray-400">ทำรายการถูกต้อง 10 ครั้ง</p>
+                </div><div class="p-3 rounded-lg text-center bg-gray-100 opacity-50">
+                    <div class="text-4xl mb-2">🧮</div>
+                    <h3 class="font-bold text-gray-500">นักคณิตศาสตร์</h3>
+                    <p class="text-xs text-gray-400">คำนวณเงินทอนถูกต้อง 3 ครั้งติดต่อกัน</p>
+                </div><div class="p-3 rounded-lg text-center bg-gray-100 opacity-50">
+                    <div class="text-4xl mb-2">🛒</div>
+                    <h3 class="font-bold text-gray-500">พ่อค้าแม่ค้า</h3>
+                    <p class="text-xs text-gray-400">ขายสินค้าครบทุกประเภท</p>
+                </div><div class="p-3 rounded-lg text-center bg-gray-100 opacity-50">
+                    <div class="text-4xl mb-2">💰</div>
+                    <h3 class="font-bold text-gray-500">เศรษฐี</h3>
+                    <p class="text-xs text-gray-400">ทำยอดขายรวมเกิน 1,000 บาท</p>
+                </div></div>
+            <button id="close-badges" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg mt-6 btn-bounce">
+                ปิด
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white p-4 mt-12">
+        <div class="container mx-auto text-center">
+            <p>developed by Tle Narongphisit | CTTC19 @ CPD</p>
+            <p class="text-gray-400 text-sm mt-1">รองรับการใช้งานหลากหลายอุปกรณ์ พร้อม UI เหมาะกับเด็กยุคดิจิทัล (Gen Alpha)</p>
+        </div>
+    </footer>
+
+    <script>
+        // Products data
+        const products = [
+            { id: 1, name: "สมุดปกอ่อน", price: 5, image: "📓" },
+            { id: 2, name: "สมุดปกแข็ง", price: 15, image: "📔" },
+            { id: 3, name: "ดินสอ", price: 3, image: "✏️" },
+            { id: 4, name: "ยางลบ", price: 5, image: "🧽" },
+            { id: 5, name: "ไม้บรรทัด", price: 10, image: "📏" },
+            { id: 6, name: "กบเหลา", price: 7, image: "🔄" },
+            { id: 7, name: "ปากกาลูกลื่น", price: 8, image: "🖊️" },
+            { id: 8, name: "น้ำยาลบคำผิด", price: 20, image: "🖌️" },
+            { id: 9, name: "กรรไกร", price: 15, image: "✂️" },
+            { id: 10, name: "เทปกาว", price: 12, image: "📎" },
+            { id: 11, name: "ขนมปัง", price: 10, image: "🍞" },
+            { id: 12, name: "นม", price: 8, image: "🥛" },
+            { id: 13, name: "น้ำผลไม้", price: 12, image: "🧃" },
+            { id: 14, name: "ขนมขบเคี้ยว", price: 5, image: "🍪" },
+            { id: 15, name: "ช็อกโกแลต", price: 15, image: "🍫" },
+            { id: 16, name: "ไอศกรีม", price: 10, image: "🍦" }
+        ];
+
+        // Badges data
+        const badges = [
+            { id: 1, name: "พนักงานใหม่", description: "ทำรายการแรกสำเร็จ", image: "🌟", requirement: 1 },
+            { id: 2, name: "พนักงานดีเด่น", description: "ทำรายการถูกต้อง 5 ครั้ง", image: "🏆", requirement: 5 },
+            { id: 3, name: "ผู้จัดการร้าน", description: "ทำรายการถูกต้อง 10 ครั้ง", image: "👑", requirement: 10 },
+            { id: 4, name: "นักคณิตศาสตร์", description: "คำนวณเงินทอนถูกต้อง 3 ครั้งติดต่อกัน", image: "🧮", requirement: 3 },
+            { id: 5, name: "พ่อค้าแม่ค้า", description: "ขายสินค้าครบทุกประเภท", image: "🛒", requirement: 16 },
+            { id: 6, name: "เศรษฐี", description: "ทำยอดขายรวมเกิน 1,000 บาท", image: "💰", requirement: 1000 }
+        ];
+
+        // Game state
+        let cart = [];
+        let totalSales = 0;
+        let correctStreak = 0;
+        let score = 0;
+        let level = 1;
+        let earnedBadges = [];
+        let soldProductTypes = new Set();
+
+        // DOM elements
+        const productsContainer = document.getElementById('products-container');
+        const cartContainer = document.getElementById('cart-container');
+        const totalPriceElement = document.getElementById('total-price');
+        const customerPaymentInput = document.getElementById('customer-payment');
+        const changeAmountInput = document.getElementById('change-amount');
+        const checkButton = document.getElementById('check-button');
+        const newCustomerButton = document.getElementById('new-customer');
+        const clearPaymentButton = document.getElementById('clear-payment');
+        const feedbackModal = document.getElementById('feedback-modal');
+        const feedbackContent = document.getElementById('feedback-content');
+        const closeModalButton = document.getElementById('close-modal');
+        const badgesModal = document.getElementById('badges-modal');
+        const badgesContainer = document.getElementById('badges-container');
+        const closeBadgesButton = document.getElementById('close-badges');
+        const characterSpeech = document.getElementById('character-speech');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const coinButtons = document.querySelectorAll('.coin');
+
+        // Initialize the game
+        function initGame() {
+            loadGameState();
+            renderProducts();
+            renderCart();
+            updateTotalPrice();
+            renderBadges();
+            updateScoreDisplay();
+        }
+
+        // Render products
+        function renderProducts() {
+            productsContainer.innerHTML = '';
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center cursor-pointer hover:border-blue-500';
+                productCard.innerHTML = `
+                    <div class="text-4xl mb-2">${product.image}</div>
+                    <h3 class="font-medium text-gray-800 text-center">${product.name}</h3>
+                    <p class="text-blue-600 font-bold mt-1">฿${product.price.toFixed(2)}</p>
+                `;
+                productCard.addEventListener('click', () => addToCart(product));
+                productsContainer.appendChild(productCard);
+            });
+        }
+
+        // Add product to cart
+        function addToCart(product) {
+            const existingItem = cart.find(item => item.id === product.id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    quantity: 1
+                });
+            }
+            
+            renderCart();
+            updateTotalPrice();
+            saveGameState();
+            
+            // Character reaction
+            characterSpeech.textContent = `เพิ่ม ${product.name} ลงในรายการแล้ว!`;
+            setTimeout(() => {
+                characterSpeech.textContent = "มีอะไรให้ช่วยอีกไหม?";
+            }, 2000);
+        }
+
+        // Render cart
+        function renderCart() {
+            if (cart.length === 0) {
+                cartContainer.innerHTML = '<p class="text-gray-500 text-center py-4">ยังไม่มีสินค้าในรายการ</p>';
+                return;
+            }
+            
+            cartContainer.innerHTML = '';
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'flex justify-between items-center mb-2 p-2 bg-white rounded-lg';
+                cartItem.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-2">${item.image}</span>
+                        <span>${item.name}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="flex items-center mr-3">
+                            <button class="decrease-btn bg-gray-200 hover:bg-gray-300 w-6 h-6 rounded-full flex items-center justify-center" data-id="${item.id}">-</button>
+                            <span class="mx-2 font-medium">${item.quantity}</span>
+                            <button class="increase-btn bg-gray-200 hover:bg-gray-300 w-6 h-6 rounded-full flex items-center justify-center" data-id="${item.id}">+</button>
+                        </div>
+                        <span class="font-medium">฿${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `;
+                cartContainer.appendChild(cartItem);
+            });
+            
+            // Add event listeners for quantity buttons
+            document.querySelectorAll('.decrease-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(button.getAttribute('data-id'));
+                    decreaseQuantity(id);
+                });
+            });
+            
+            document.querySelectorAll('.increase-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(button.getAttribute('data-id'));
+                    increaseQuantity(id);
+                });
+            });
+        }
+
+        // Decrease item quantity
+        function decreaseQuantity(id) {
+            const itemIndex = cart.findIndex(item => item.id === id);
+            if (itemIndex !== -1) {
+                if (cart[itemIndex].quantity > 1) {
+                    cart[itemIndex].quantity -= 1;
+                } else {
+                    cart.splice(itemIndex, 1);
+                }
+                renderCart();
+                updateTotalPrice();
+                saveGameState();
+            }
+        }
+
+        // Increase item quantity
+        function increaseQuantity(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += 1;
+                renderCart();
+                updateTotalPrice();
+                saveGameState();
+            }
+        }
+
+        // Update total price
+        function updateTotalPrice() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalPriceElement.textContent = `฿${total.toFixed(2)}`;
+        }
+
+        // Calculate total price
+        function calculateTotal() {
+            return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        }
+
+        // Check transaction
+        function checkTransaction() {
+            const total = calculateTotal();
+            const customerPayment = parseFloat(customerPaymentInput.value) || 0;
+            const changeAmount = parseFloat(changeAmountInput.value) || 0;
+            const correctChange = customerPayment - total;
+            
+            if (cart.length === 0) {
+                showFeedback('error', 'ไม่มีสินค้าในรายการ กรุณาเลือกสินค้าก่อน');
+                return;
+            }
+            
+            if (customerPayment <= 0) {
+                showFeedback('error', 'กรุณาระบุจำนวนเงินที่ลูกค้าจ่าย');
+                return;
+            }
+            
+            if (customerPayment < total) {
+                showFeedback('error', 'เงินที่ลูกค้าจ่ายไม่พอ');
+                return;
+            }
+            
+            if (changeAmount === correctChange) {
+                // Correct change calculation
+                correctStreak++;
+                score += cart.length * 10;
+                totalSales += total;
+                
+                // Add sold products to tracking
+                cart.forEach(item => {
+                    soldProductTypes.add(item.id);
+                });
+                
+                // Check for level up
+                checkLevelUp();
+                
+                // Check for badges
+                checkBadges();
+                
+                showFeedback('success', `
+                    <div class="text-3xl mb-3">🎉</div>
+                    <h3 class="text-xl font-bold text-green-600 mb-2">ยอดเงินถูกต้อง!</h3>
+                    <p class="mb-2">เงินทอน: ฿${correctChange.toFixed(2)}</p>
+                    <p class="text-sm text-gray-600">คุณได้รับ ${cart.length * 10} คะแนน</p>
+                `);
+                
+                updateScoreDisplay();
+                saveGameState();
+            } else {
+                // Incorrect change calculation
+                correctStreak = 0;
+                
+                showFeedback('error', `
+                    <div class="text-3xl mb-3">❌</div>
+                    <h3 class="text-xl font-bold text-red-600 mb-2">ยอดเงินไม่ถูกต้อง</h3>
+                    <p class="mb-2">เงินทอนที่ถูกต้องคือ: ฿${correctChange.toFixed(2)}</p>
+                    <p class="text-sm text-gray-600">ลองคำนวณใหม่อีกครั้ง</p>
+                `);
+            }
+        }
+
+        // Show feedback modal
+        function showFeedback(type, message) {
+            feedbackContent.innerHTML = message;
+            feedbackModal.classList.remove('hidden');
+            
+            if (type === 'success') {
+                characterSpeech.textContent = "เยี่ยมมาก! คุณคำนวณเงินทอนได้ถูกต้อง";
+            } else {
+                characterSpeech.textContent = "ไม่เป็นไร ลองใหม่อีกครั้งนะ!";
+            }
+        }
+
+        // New customer
+        function newCustomer() {
+            cart = [];
+            renderCart();
+            updateTotalPrice();
+            customerPaymentInput.value = '';
+            changeAmountInput.value = '';
+            saveGameState();
+            
+            characterSpeech.textContent = "ยินดีต้อนรับลูกค้าคนใหม่!";
+        }
+
+        // Check for level up
+        function checkLevelUp() {
+            const newLevel = Math.floor(score / 500) + 1;
+            if (newLevel > level) {
+                level = newLevel;
+                showFeedback('success', `
+                    <div class="text-3xl mb-3">🌟</div>
+                    <h3 class="text-xl font-bold text-purple-600 mb-2">เลเวลอัพ!</h3>
+                    <p>คุณได้เลื่อนระดับเป็นระดับ ${level}</p>
+                `);
+            }
+        }
+
+        // Check for badges
+        function checkBadges() {
+            let newBadges = [];
+            
+            // Check first sale badge
+            if (!earnedBadges.includes(1) && score > 0) {
+                earnedBadges.push(1);
+                newBadges.push(badges.find(b => b.id === 1));
+            }
+            
+            // Check sales count badges
+            const salesCount = Math.floor(score / 10);
+            if (!earnedBadges.includes(2) && salesCount >= 5) {
+                earnedBadges.push(2);
+                newBadges.push(badges.find(b => b.id === 2));
+            }
+            
+            if (!earnedBadges.includes(3) && salesCount >= 10) {
+                earnedBadges.push(3);
+                newBadges.push(badges.find(b => b.id === 3));
+            }
+            
+            // Check streak badge
+            if (!earnedBadges.includes(4) && correctStreak >= 3) {
+                earnedBadges.push(4);
+                newBadges.push(badges.find(b => b.id === 4));
+            }
+            
+            // Check product variety badge
+            if (!earnedBadges.includes(5) && soldProductTypes.size >= products.length) {
+                earnedBadges.push(5);
+                newBadges.push(badges.find(b => b.id === 5));
+            }
+            
+            // Check total sales badge
+            if (!earnedBadges.includes(6) && totalSales >= 1000) {
+                earnedBadges.push(6);
+                newBadges.push(badges.find(b => b.id === 6));
+            }
+            
+            // Show new badges
+            if (newBadges.length > 0) {
+                let badgesHTML = '';
+                newBadges.forEach(badge => {
+                    badgesHTML += `
+                        <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-3 text-center animate-pop">
+                            <div class="text-4xl mb-2">${badge.image}</div>
+                            <h3 class="font-bold text-yellow-800">${badge.name}</h3>
+                            <p class="text-sm text-gray-600">${badge.description}</p>
+                        </div>
+                    `;
+                });
+                
+                showFeedback('success', `
+                    <div class="text-3xl mb-3">🏆</div>
+                    <h3 class="text-xl font-bold text-yellow-600 mb-3">คุณได้รับรางวัลใหม่!</h3>
+                    <div class="grid grid-cols-1 gap-3">
+                        ${badgesHTML}
+                    </div>
+                `);
+                
+                renderBadges();
+                saveGameState();
+            }
+        }
+
+        // Render badges
+        function renderBadges() {
+            badgesContainer.innerHTML = '';
+            badges.forEach(badge => {
+                const badgeElement = document.createElement('div');
+                const isEarned = earnedBadges.includes(badge.id);
+                
+                badgeElement.className = `p-3 rounded-lg text-center ${isEarned ? 'bg-yellow-50 border-2 border-yellow-200' : 'bg-gray-100 opacity-50'}`;
+                badgeElement.innerHTML = `
+                    <div class="text-4xl mb-2">${badge.image}</div>
+                    <h3 class="font-bold ${isEarned ? 'text-yellow-800' : 'text-gray-500'}">${badge.name}</h3>
+                    <p class="text-xs ${isEarned ? 'text-gray-600' : 'text-gray-400'}">${badge.description}</p>
+                `;
+                badgesContainer.appendChild(badgeElement);
+            });
+        }
+
+        // Update score display
+        function updateScoreDisplay() {
+            scoreElement.textContent = score;
+            levelElement.textContent = level;
+        }
+
+        // Save game state to localStorage
+        function saveGameState() {
+            const gameState = {
+                cart,
+                score,
+                level,
+                totalSales,
+                correctStreak,
+                earnedBadges,
+                soldProductTypes: Array.from(soldProductTypes)
+            };
+            localStorage.setItem('posGameState', JSON.stringify(gameState));
+        }
+
+        // Load game state from localStorage
+        function loadGameState() {
+            const savedState = localStorage.getItem('posGameState');
+            if (savedState) {
+                const gameState = JSON.parse(savedState);
+                cart = gameState.cart || [];
+                score = gameState.score || 0;
+                level = gameState.level || 1;
+                totalSales = gameState.totalSales || 0;
+                correctStreak = gameState.correctStreak || 0;
+                earnedBadges = gameState.earnedBadges || [];
+                soldProductTypes = new Set(gameState.soldProductTypes || []);
+            }
+        }
+
+        // Event listeners
+        checkButton.addEventListener('click', checkTransaction);
+        newCustomerButton.addEventListener('click', newCustomer);
+        closeModalButton.addEventListener('click', () => {
+            feedbackModal.classList.add('hidden');
+        });
+        closeBadgesButton.addEventListener('click', () => {
+            badgesModal.classList.add('hidden');
+        });
+        clearPaymentButton.addEventListener('click', () => {
+            customerPaymentInput.value = '';
+        });
+        
+        // Coin buttons
+        coinButtons.forEach(coin => {
+            coin.addEventListener('click', () => {
+                const value = parseFloat(coin.getAttribute('data-value'));
+                const currentValue = parseFloat(customerPaymentInput.value) || 0;
+                customerPaymentInput.value = (currentValue + value).toFixed(2);
+                coin.classList.add('animate-pop');
+                setTimeout(() => {
+                    coin.classList.remove('animate-pop');
+                }, 300);
+            });
+        });
+        
+        // Character interactions
+        document.querySelector('.character').addEventListener('click', () => {
+            badgesModal.classList.remove('hidden');
+            characterSpeech.textContent = "มาดูรางวัลที่คุณได้รับกัน!";
+        });
+
+        // Initialize the game
+        initGame();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95e121c8646a4f5d',t:'MTc1MjMyOTUwOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>
