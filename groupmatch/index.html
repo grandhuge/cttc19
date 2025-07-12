@@ -1,0 +1,560 @@
+<html lang="th"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมจัดกลุ่ม: สิทธิและหน้าที่สมาชิกสหกรณ์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+        
+        .drag-item {
+            transition: all 0.3s ease;
+            cursor: grab;
+        }
+        
+        .drag-item:active {
+            cursor: grabbing;
+            transform: rotate(5deg) scale(1.05);
+        }
+        
+        .drag-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg) scale(1.05);
+        }
+        
+        .drop-zone {
+            transition: all 0.3s ease;
+            min-height: 200px;
+        }
+        
+        .drop-zone.drag-over {
+            background-color: #e0f2fe;
+            border-color: #0284c7;
+            transform: scale(1.02);
+        }
+        
+        .correct-drop {
+            animation: correctPulse 0.6s ease-in-out;
+        }
+        
+        .wrong-drop {
+            animation: wrongShake 0.6s ease-in-out;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); background-color: #dcfce7; }
+        }
+        
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); background-color: #fef2f2; }
+            75% { transform: translateX(10px); background-color: #fef2f2; }
+        }
+        
+        .timer-warning {
+            animation: timerPulse 1s infinite;
+        }
+        
+        @keyframes timerPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .score-popup {
+            animation: scoreAppear 0.5s ease-out;
+        }
+        
+        @keyframes scoreAppear {
+            0% { opacity: 0; transform: translateY(-20px) scale(0.8); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.inset-0{inset:0px}.z-50{z-index:50}.mx-4{margin-left:1rem;margin-right:1rem}.mx-auto{margin-left:auto;margin-right:auto}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mt-12{margin-top:3rem}.mt-2{margin-top:0.5rem}.mt-8{margin-top:2rem}.flex{display:flex}.grid{display:grid}.hidden{display:none}.min-h-\[300px\]{min-height:300px}.min-h-\[400px\]{min-height:400px}.min-h-screen{min-height:100vh}.max-w-md{max-width:28rem}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.cursor-grab{cursor:grab}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.items-center{align-items:center}.justify-center{justify-content:center}.gap-6{gap:1.5rem}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-8 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(2rem * var(--tw-space-x-reverse));margin-left:calc(2rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.rounded-2xl{border-radius:1rem}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border-2{border-width:2px}.border-b-4{border-bottom-width:4px}.border-blue-600{--tw-border-opacity:1;border-color:rgb(37 99 235 / var(--tw-border-opacity, 1))}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-gray-600{--tw-bg-opacity:1;background-color:rgb(75 85 99 / var(--tw-bg-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-opacity-50{--tw-bg-opacity:0.5}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.from-blue-50{--tw-gradient-from:#eff6ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(239 246 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-green-50{--tw-gradient-from:#f0fdf4 var(--tw-gradient-from-position);--tw-gradient-to:rgb(240 253 244 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-blue-100{--tw-gradient-to:#dbeafe var(--tw-gradient-to-position)}.to-green-100{--tw-gradient-to:#dcfce7 var(--tw-gradient-to-position)}.to-indigo-100{--tw-gradient-to:#e0e7ff var(--tw-gradient-to-position)}.p-6{padding:1.5rem}.p-8{padding:2rem}.p-3{padding:0.75rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.px-8{padding-left:2rem;padding-right:2rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-6xl{font-size:3.75rem;line-height:1}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-semibold{font-weight:600}.font-medium{font-weight:500}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-green-800{--tw-text-opacity:1;color:rgb(22 101 52 / var(--tw-text-opacity, 1))}.text-orange-600{--tw-text-opacity:1;color:rgb(234 88 12 / var(--tw-text-opacity, 1))}.text-red-600{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.hover\:bg-gray-700:hover{--tw-bg-opacity:1;background-color:rgb(55 65 81 / var(--tw-bg-opacity, 1))}.hover\:shadow-md:hover{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}}</style></head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white shadow-lg border-b-4 border-blue-600">
+        <div class="container mx-auto px-6 py-4">
+            <h1 class="text-3xl font-bold text-gray-800 text-center">🎯 เกมจัดกลุ่ม: สิทธิและหน้าที่สมาชิกสหกรณ์</h1>
+            <p class="text-gray-600 text-center mt-2">ลากและวางคำศัพท์ให้ถูกกลุ่ม เร็วแรงได้คะแนนมาก!</p>
+        </div>
+    </div>
+
+    <!-- Game Stats -->
+    <div class="container mx-auto px-6 py-6">
+        <div class="flex justify-center space-x-8 mb-6">
+            <div class="bg-white rounded-xl shadow-md px-6 py-4 text-center">
+                <div class="text-2xl font-bold text-blue-600" id="score">0</div>
+                <div class="text-sm text-gray-600">คะแนน</div>
+            </div>
+            <div class="bg-white rounded-xl shadow-md px-6 py-4 text-center">
+                <div class="text-2xl font-bold text-orange-600" id="timer">60</div>
+                <div class="text-sm text-gray-600">วินาที</div>
+            </div>
+            <div class="bg-white rounded-xl shadow-md px-6 py-4 text-center">
+                <div class="text-2xl font-bold text-green-600" id="correct">0</div>
+                <div class="text-sm text-gray-600">ถูก</div>
+            </div>
+            <div class="bg-white rounded-xl shadow-md px-6 py-4 text-center">
+                <div class="text-2xl font-bold text-red-600" id="wrong">0</div>
+                <div class="text-sm text-gray-600">ผิด</div>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Items Pool -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">📝 คำศัพท์</h3>
+                <div id="items-pool" class="space-y-3 min-h-[400px]"><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="rights" data-index="0">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">🏪</span>
+                        <span class="font-medium text-gray-800">ได้รับบริการจากสหกรณ์</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="duties" data-index="1">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">💳</span>
+                        <span class="font-medium text-gray-800">ชำระค่าหุ้นตามกำหนด</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="rights" data-index="2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">📰</span>
+                        <span class="font-medium text-gray-800">ได้รับข้อมูลข่าวสาร</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="rights" data-index="3">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">🏦</span>
+                        <span class="font-medium text-gray-800">ขอกู้เงินจากสหกรณ์</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="duties" data-index="4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">👥</span>
+                        <span class="font-medium text-gray-800">เข้าร่วมประชุมสมาชิก</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="rights" data-index="5">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">🔍</span>
+                        <span class="font-medium text-gray-800">ตรวจสอบการดำเนินงาน</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="duties" data-index="6">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">📝</span>
+                        <span class="font-medium text-gray-800">แจ้งการเปลี่ยนแปลงข้อมูล</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="rights" data-index="7">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">✋</span>
+                        <span class="font-medium text-gray-800">ออกเสียงลงคะแนน</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="duties" data-index="8">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">📈</span>
+                        <span class="font-medium text-gray-800">ส่งเสริมกิจการสหกรณ์</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="rights" data-index="9">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">💰</span>
+                        <span class="font-medium text-gray-800">ได้รับเงินปันผล</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="rights" data-index="10">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">🗳️</span>
+                        <span class="font-medium text-gray-800">เข้าร่วมประชุมใหญ่</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="duties" data-index="11">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">📜</span>
+                        <span class="font-medium text-gray-800">ปฏิบัติตามข้อบังคับ</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="duties" data-index="12">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">💸</span>
+                        <span class="font-medium text-gray-800">ชำระหนี้ตามกำหนด</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="rights" data-index="13">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">💭</span>
+                        <span class="font-medium text-gray-800">เสนอความคิดเห็น</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="duties" data-index="14">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">🤐</span>
+                        <span class="font-medium text-gray-800">รักษาความลับของสหกรณ์</span>
+                    </div>
+                </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="duties" data-index="15">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">🤝</span>
+                        <span class="font-medium text-gray-800">ให้ความร่วมมือในการตรวจสอบ</span>
+                    </div>
+                </div></div>
+            </div>
+
+            <!-- Drop Zones -->
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Rights Group -->
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-lg p-6 drop-zone" data-group="rights" id="rights-zone">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-4 text-center">
+                        ⚖️ สิทธิของสมาชิกสหกรณ์
+                    </h3>
+                    <div class="text-sm text-blue-600 text-center mb-4">
+                        สิ่งที่สมาชิกมีสิทธิได้รับหรือทำได้
+                    </div>
+                    <div class="space-y-2 min-h-[300px]" id="rights-items">
+                        <!-- Dropped items will appear here -->
+                    </div>
+                </div>
+
+                <!-- Duties Group -->
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-lg p-6 drop-zone" data-group="duties" id="duties-zone">
+                    <h3 class="text-xl font-semibold text-green-800 mb-4 text-center">
+                        📋 หน้าที่ของสมาชิกสหกรณ์
+                    </h3>
+                    <div class="text-sm text-green-600 text-center mb-4">
+                        สิ่งที่สมาชิกต้องปฏิบัติหรือรับผิดชอบ
+                    </div>
+                    <div class="space-y-2 min-h-[300px]" id="duties-items">
+                        <!-- Dropped items will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="text-center mt-8 space-x-4">
+            <button id="start-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105">
+                🚀 เริ่มเกม
+            </button>
+            <button id="reset-btn" class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105" disabled="">
+                🔄 เริ่มใหม่
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-4 score-popup">
+            <div class="text-center">
+                <div class="text-6xl mb-4">🎉</div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">เกมจบแล้ว!</h2>
+                <div class="space-y-2 mb-6">
+                    <div class="text-lg">คะแนนรวม: <span class="font-bold text-blue-600" id="final-score">0</span></div>
+                    <div class="text-sm text-gray-600">ตอบถูก: <span id="final-correct">0</span> | ตอบผิด: <span id="final-wrong">0</span></div>
+                    <div class="text-sm text-gray-600">เวลาที่ใช้: <span id="time-used">0</span> วินาที</div>
+                </div>
+                <div id="performance-message" class="text-lg font-semibold mb-4"></div>
+                <button id="play-again-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold">
+                    เล่นอีกครั้ง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4 mt-12">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-sm">developed by Tle Narongphisit | CTTC19 @ CPD</p>
+        </div>
+    </footer>
+
+    <script>
+        // Game data
+        const gameItems = [
+            // Rights (สิทธิ)
+            { text: "ได้รับเงินปันผล", group: "rights", icon: "💰" },
+            { text: "เข้าร่วมประชุมใหญ่", group: "rights", icon: "🗳️" },
+            { text: "ออกเสียงลงคะแนน", group: "rights", icon: "✋" },
+            { text: "ได้รับบริการจากสหกรณ์", group: "rights", icon: "🏪" },
+            { text: "เสนอความคิดเห็น", group: "rights", icon: "💭" },
+            { text: "ตรวจสอบการดำเนินงาน", group: "rights", icon: "🔍" },
+            { text: "ได้รับข้อมูลข่าวสาร", group: "rights", icon: "📰" },
+            { text: "ขอกู้เงินจากสหกรณ์", group: "rights", icon: "🏦" },
+            
+            // Duties (หน้าที่)
+            { text: "ชำระค่าหุ้นตามกำหนด", group: "duties", icon: "💳" },
+            { text: "เข้าร่วมประชุมสมาชิก", group: "duties", icon: "👥" },
+            { text: "ปฏิบัติตามข้อบังคับ", group: "duties", icon: "📜" },
+            { text: "ส่งเสริมกิจการสหกรณ์", group: "duties", icon: "📈" },
+            { text: "รักษาความลับของสหกรณ์", group: "duties", icon: "🤐" },
+            { text: "ชำระหนี้ตามกำหนด", group: "duties", icon: "💸" },
+            { text: "ให้ความร่วมมือในการตรวจสอบ", group: "duties", icon: "🤝" },
+            { text: "แจ้งการเปลี่ยนแปลงข้อมูล", group: "duties", icon: "📝" }
+        ];
+
+        // Game state
+        let gameState = {
+            score: 0,
+            timeLeft: 60,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            gameStarted: false,
+            gameEnded: false,
+            timer: null,
+            startTime: null
+        };
+
+        // DOM elements
+        const scoreEl = document.getElementById('score');
+        const timerEl = document.getElementById('timer');
+        const correctEl = document.getElementById('correct');
+        const wrongEl = document.getElementById('wrong');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const itemsPool = document.getElementById('items-pool');
+        const gameOverModal = document.getElementById('game-over-modal');
+
+        // Initialize game
+        function initGame() {
+            shuffleArray(gameItems);
+            renderItems();
+            setupDragAndDrop();
+            updateUI();
+        }
+
+        // Shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Render items in pool
+        function renderItems() {
+            itemsPool.innerHTML = '';
+            gameItems.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab';
+                itemEl.draggable = true;
+                itemEl.dataset.group = item.group;
+                itemEl.dataset.index = index;
+                itemEl.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl">${item.icon}</span>
+                        <span class="font-medium text-gray-800">${item.text}</span>
+                    </div>
+                `;
+                itemsPool.appendChild(itemEl);
+            });
+        }
+
+        // Setup drag and drop
+        function setupDragAndDrop() {
+            // Drag events for items
+            document.querySelectorAll('.drag-item').forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Drop events for zones
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+        }
+
+        function handleDragStart(e) {
+            if (!gameState.gameStarted) return;
+            e.dataTransfer.setData('text/plain', e.target.dataset.index);
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            if (!gameState.gameStarted) return;
+
+            const itemIndex = e.dataTransfer.getData('text/plain');
+            const item = gameItems[itemIndex];
+            const dropZone = e.currentTarget.dataset.group;
+            
+            const draggedElement = document.querySelector(`[data-index="${itemIndex}"]`);
+            
+            if (item.group === dropZone) {
+                // Correct answer
+                handleCorrectAnswer(draggedElement, e.currentTarget, item);
+            } else {
+                // Wrong answer
+                handleWrongAnswer(draggedElement, e.currentTarget);
+            }
+        }
+
+        function handleCorrectAnswer(element, zone, item) {
+            gameState.correctAnswers++;
+            gameState.score += calculateScore();
+            
+            // Visual feedback
+            zone.classList.add('correct-drop');
+            setTimeout(() => zone.classList.remove('correct-drop'), 600);
+            
+            // Move item to correct zone
+            const targetContainer = zone.querySelector('[id$="-items"]');
+            element.classList.remove('drag-item');
+            element.classList.add('bg-green-100', 'border-green-300');
+            element.draggable = false;
+            targetContainer.appendChild(element);
+            
+            updateUI();
+            checkGameComplete();
+        }
+
+        function handleWrongAnswer(element, zone) {
+            gameState.wrongAnswers++;
+            gameState.score = Math.max(0, gameState.score - 10);
+            
+            // Visual feedback
+            zone.classList.add('wrong-drop');
+            setTimeout(() => zone.classList.remove('wrong-drop'), 600);
+            
+            updateUI();
+        }
+
+        function calculateScore() {
+            const timeBonus = Math.max(0, gameState.timeLeft - 30) * 2;
+            const baseScore = 50;
+            const speedBonus = gameState.timeLeft > 45 ? 20 : gameState.timeLeft > 30 ? 10 : 0;
+            return baseScore + timeBonus + speedBonus;
+        }
+
+        function startGame() {
+            gameState.gameStarted = true;
+            gameState.gameEnded = false;
+            gameState.startTime = Date.now();
+            startBtn.disabled = true;
+            resetBtn.disabled = false;
+            
+            // Start timer
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                updateUI();
+                
+                if (gameState.timeLeft <= 10) {
+                    timerEl.classList.add('timer-warning');
+                }
+                
+                if (gameState.timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            gameState.gameEnded = true;
+            gameState.gameStarted = false;
+            clearInterval(gameState.timer);
+            
+            // Disable all drag items
+            document.querySelectorAll('.drag-item').forEach(item => {
+                item.draggable = false;
+                item.classList.add('opacity-50');
+            });
+            
+            showGameOverModal();
+        }
+
+        function checkGameComplete() {
+            const totalItems = gameItems.length;
+            const placedItems = gameState.correctAnswers;
+            
+            if (placedItems === totalItems) {
+                // Bonus for completing all items
+                gameState.score += 100;
+                updateUI();
+                setTimeout(endGame, 1000);
+            }
+        }
+
+        function showGameOverModal() {
+            const timeUsed = 60 - gameState.timeLeft;
+            const accuracy = gameState.correctAnswers / (gameState.correctAnswers + gameState.wrongAnswers) * 100;
+            
+            document.getElementById('final-score').textContent = gameState.score;
+            document.getElementById('final-correct').textContent = gameState.correctAnswers;
+            document.getElementById('final-wrong').textContent = gameState.wrongAnswers;
+            document.getElementById('time-used').textContent = timeUsed;
+            
+            // Performance message
+            let message = '';
+            if (gameState.score >= 800) {
+                message = '🏆 ยอดเยี่ยม! คุณเป็นผู้เชี่ยวชาญด้านสหกรณ์!';
+            } else if (gameState.score >= 600) {
+                message = '🌟 ดีมาก! คุณมีความรู้ดีเรื่องสหกรณ์';
+            } else if (gameState.score >= 400) {
+                message = '👍 ดี! ควรศึกษาเพิ่มเติมนิดหน่อย';
+            } else {
+                message = '📚 ควรศึกษาเรื่องสิทธิและหน้าที่เพิ่มเติม';
+            }
+            
+            document.getElementById('performance-message').textContent = message;
+            gameOverModal.classList.remove('hidden');
+            gameOverModal.classList.add('flex');
+        }
+
+        function resetGame() {
+            // Reset game state
+            gameState = {
+                score: 0,
+                timeLeft: 60,
+                correctAnswers: 0,
+                wrongAnswers: 0,
+                gameStarted: false,
+                gameEnded: false,
+                timer: null,
+                startTime: null
+            };
+            
+            // Reset UI
+            timerEl.classList.remove('timer-warning');
+            startBtn.disabled = false;
+            resetBtn.disabled = true;
+            gameOverModal.classList.add('hidden');
+            gameOverModal.classList.remove('flex');
+            
+            // Clear drop zones
+            document.getElementById('rights-items').innerHTML = '';
+            document.getElementById('duties-items').innerHTML = '';
+            
+            // Re-initialize
+            initGame();
+        }
+
+        function updateUI() {
+            scoreEl.textContent = gameState.score;
+            timerEl.textContent = gameState.timeLeft;
+            correctEl.textContent = gameState.correctAnswers;
+            wrongEl.textContent = gameState.wrongAnswers;
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', startGame);
+        resetBtn.addEventListener('click', resetGame);
+        document.getElementById('play-again-btn').addEventListener('click', resetGame);
+
+        // Initialize on load
+        initGame();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95dd8920d795732b',t:'MTc1MjI5MTgwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: none; visibility: hidden;"></iframe>
+
+</body></html>
