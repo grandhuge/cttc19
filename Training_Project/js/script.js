@@ -309,6 +309,10 @@
                             </select>
                         </div>
                         ${evaluationQuestions}
+                        <div class="mt-8">
+                            <label for="suggestions" class="block font-medium mb-2">ข้อเสนอแนะเพิ่มเติม</label>
+                            <textarea id="suggestions" name="suggestions" class="form-input" rows="4" placeholder="ความคิดเห็นของคุณมีค่าสำหรับเรา..."></textarea>
+                        </div>
                         <div class="mt-6"><button type="submit" class="btn btn-primary w-full justify-center">ส่งแบบประเมิน</button></div>
                     </form>
                 </div>`;
@@ -317,39 +321,103 @@
 
         async function renderEvaluationResults() {
              pageContent.innerHTML = `<div class="card"><p>กำลังโหลดผลการประเมิน...</p></div>`;
-             const results = await fetchData('getEvaluationResults');
+             const [results, evalQuestions] = await Promise.all([
+                fetchData('getEvaluationResults'),
+                fetchData('getEvaluations')
+             ]);
+             
              if (!results || results.length === 0) {
                  pageContent.innerHTML = `<div class="card text-center"><h2 class="text-2xl font-bold">ยังไม่มีข้อมูลผลประเมิน</h2><p class="mt-4">ยังไม่มีผู้ทำแบบประเมินความพึงพอใจ</p></div>`;
                  return;
              }
+             
+             state.evaluations = evalQuestions || [];
              const totalEvaluators = results.length;
-             const questions = Object.keys(results[0]).filter(k => k.startsWith('q_'));
-             const questionTexts = state.evaluations.map(e => e.question);
+             const questionKeys = Object.keys(results[0]).filter(k => k.startsWith('q'));
+             const questionMap = state.evaluations.reduce((map, q, i) => {
+                map[`q${i}`] = q.question;
+                return map;
+             }, {});
+
+             let overallTotalScore = 0;
+             let overallTotalRatings = 0;
              let chartsHtml = `<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">`;
-             questions.forEach((q_key, index) => {
-                 chartsHtml += `<div class="card"><h3 class="font-semibold mb-2">${index + 1}. ${questionTexts[index] || q_key}</h3><canvas id="chart-${index}"></canvas></div>`;
+             
+             questionKeys.forEach((q_key, index) => {
+                let questionTotalScore = 0;
+                let questionRatingCount = 0;
+                const scores = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+
+                results.forEach(res => {
+                    const score = parseInt(res[q_key]);
+                    if (!isNaN(score)) {
+                        scores[score]++;
+                        questionTotalScore += score;
+                        questionRatingCount++;
+                    }
+                });
+                
+                const questionAverage = questionRatingCount > 0 ? (questionTotalScore / questionRatingCount) : 0;
+                overallTotalScore += questionTotalScore;
+                overallTotalRatings += questionRatingCount;
+
+                chartsHtml += `
+                    <div class="card">
+                        <h3 class="font-semibold mb-2">${index + 1}. ${questionMap[q_key] || q_key}</h3>
+                        <canvas id="chart-${index}"></canvas>
+                        <p class="text-center font-bold text-lg text-blue-600 mt-3">ค่าเฉลี่ย: ${questionAverage.toFixed(2)}</p>
+                    </div>`;
              });
              chartsHtml += `</div>`;
+             
+             const overallAverage = overallTotalRatings > 0 ? (overallTotalScore / overallTotalRatings) : 0;
+             const suggestions = results.map(r => r.suggestions).filter(s => s && s.trim() !== "");
+             
+             let suggestionsHtml = '';
+             if (suggestions.length > 0) {
+                suggestionsHtml = `
+                    <div class="card mt-8">
+                        <h3 class="text-xl font-bold mb-4">ข้อเสนอแนะเพิ่มเติม (${suggestions.length} รายการ)</h3>
+                        <ul class="list-disc list-inside space-y-2 bg-gray-50 p-4 rounded-lg max-h-64 overflow-y-auto">
+                            ${suggestions.map(s => `<li class="text-gray-700">${s}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+             }
+
              pageContent.innerHTML = `
-                <div class="card">
-                    <h2 class="text-2xl font-bold mb-4">สรุปผลการประเมินความพึงพอใจ</h2>
-                    <p class="text-lg mb-6">จำนวนผู้ประเมินทั้งหมด: <span class="font-bold text-blue-600">${totalEvaluators}</span> คน</p>
+                <div>
+                    <h2 class="text-3xl font-bold mb-6 text-center">สรุปผลการประเมินความพึงพอใจ</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="card text-center justify-center flex flex-col">
+                            <p class="text-lg text-gray-600">จำนวนผู้ประเมินทั้งหมด</p>
+                            <p class="text-5xl font-bold text-blue-600">${totalEvaluators}</p>
+                        </div>
+                        <div class="card text-center justify-center flex flex-col bg-indigo-50">
+                            <p class="text-lg text-indigo-800">คะแนนความพึงพอใจเฉลี่ยรวม</p>
+                            <p class="text-5xl font-bold text-indigo-600">${overallAverage.toFixed(2)}</p>
+                        </div>
+                    </div>
                     ${chartsHtml}
+                    ${suggestionsHtml}
                 </div>`;
+             
              setTimeout(() => {
-                questions.forEach((q_key, index) => {
+                questionKeys.forEach((q_key, index) => {
                     const ctx = document.getElementById(`chart-${index}`).getContext('2d');
                     const scores = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
-                    results.forEach(res => { scores[res[q_key]]++; });
+                    results.forEach(res => {
+                        const score = parseInt(res[q_key]);
+                        if (!isNaN(score)) scores[score]++;
+                    });
                     new Chart(ctx, {
                         type: 'bar',
                         data: {
-                            labels: ['😠 น้อยที่สุด', '😟 น้อย', '😐 ปานกลาง', '😊 มาก', '🤩 มากที่สุด'],
+                            labels: ['😠 1', '😟 2', '😐 3', '😊 4', '🤩 5'],
                             datasets: [{
-                                label: 'จำนวนผู้ประเมิน',
+                                label: 'จำนวนผู้ให้คะแนน',
                                 data: Object.values(scores),
-                                backgroundColor: ['rgba(239, 68, 68, 0.6)','rgba(249, 115, 22, 0.6)','rgba(234, 179, 8, 0.6)','rgba(132, 204, 22, 0.6)','rgba(34, 197, 94, 0.6)'],
-                                borderColor: ['rgba(239, 68, 68, 1)','rgba(249, 115, 22, 1)','rgba(234, 179, 8, 1)','rgba(132, 204, 22, 1)','rgba(34, 197, 94, 1)'],
+                                backgroundColor: ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e'],
                                 borderWidth: 1
                             }]
                         },
