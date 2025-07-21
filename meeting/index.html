@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมเรียงลำดับวาระการประชุมสหกรณ์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Prompt', sans-serif;
+        }
+        
+        .draggable {
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        
+        .draggable.dragging {
+            opacity: 0.8;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .drop-zone {
+            transition: background-color 0.3s;
+        }
+        
+        .drop-zone.highlight {
+            background-color: rgba(59, 130, 246, 0.2);
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .bounce {
+            animation: bounce 0.5s;
+        }
+        
+        @keyframes celebrate {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .celebrate {
+            animation: celebrate 0.5s;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .info-tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .info-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 280px;
+            background-color: #555;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .info-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .info-tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        
+        .correct {
+            background-color: #d1fae5;
+            border-color: #34d399;
+            transition: all 0.3s ease;
+        }
+        
+        .incorrect {
+            background-color: #fee2e2;
+            border-color: #f87171;
+            transition: all 0.3s ease;
+        }
+        
+        .drop-indicator {
+            height: 2px;
+            background-color: #3b82f6;
+            margin: 4px 0;
+            transition: height 0.2s;
+        }
+        
+        .drop-indicator.active {
+            height: 6px;
+        }
+        
+        .status-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+        
+        .position-indicator {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-blue-100 to-green-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-700 mb-2">เกมเรียงลำดับวาระการประชุมสหกรณ์</h1>
+            <p class="text-lg text-blue-600 mb-2">จัดเรียงวาระการประชุมสหกรณ์ตามลำดับที่ถูกต้อง</p>
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-md inline-block text-left">
+                <p class="text-yellow-700">วาระการประชุมสหกรณ์มีลำดับที่เป็นมาตรฐานตามระเบียบการประชุมใหญ่สามัญประจำปี เพื่อให้การดำเนินการประชุมเป็นไปอย่างมีประสิทธิภาพ</p>
+            </div>
+        </header>
+
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- คำอธิบายและคะแนน -->
+            <div class="md:w-1/3 bg-white rounded-xl p-6 shadow-lg">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-blue-700 mb-2">วิธีเล่น</h2>
+                    <p class="text-gray-700 mb-2">ลากและวางวาระการประชุมทั้ง 8 วาระ เพื่อจัดเรียงตามลำดับที่ถูกต้องตามระเบียบการประชุมสหกรณ์</p>
+                    <div class="flex items-center">
+                        <button id="helpBtn" class="bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold py-1 px-3 rounded-lg transition-colors mr-2">
+                            ดูคำอธิบาย
+                        </button>
+                        <div class="info-tooltip">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="tooltip-text">คุณสามารถลากวาระการประชุมไปวางในตำแหน่งใดก็ได้ และสามารถสลับตำแหน่งได้ตามต้องการ เมื่อกดตรวจคำตอบ วาระที่อยู่ในตำแหน่งที่ถูกต้องจะเป็นสีเขียว ส่วนที่ไม่ถูกต้องจะเป็นสีแดง</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-blue-700 mb-2">คะแนน</h2>
+                    <p class="text-2xl font-bold text-green-600" id="score">0 คะแนน</p>
+                </div>
+                
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-blue-700 mb-2">เวลา</h2>
+                    <p class="text-2xl font-bold text-orange-500" id="timer">02:00</p>
+                </div>
+                
+                <button id="checkBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                    ตรวจคำตอบ
+                </button>
+                
+                <button id="restartBtn" class="w-full mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition-colors">
+                    เริ่มเกมใหม่
+                </button>
+                
+                <div id="legend" class="mt-6 p-3 bg-gray-50 rounded-lg hidden">
+                    <h3 class="font-bold text-gray-700 mb-2">คำอธิบายสัญลักษณ์:</h3>
+                    <div class="flex items-center mb-2">
+                        <div class="w-4 h-4 bg-green-200 border border-green-500 rounded mr-2"></div>
+                        <span class="text-sm">ตำแหน่งถูกต้อง</span>
+                    </div>
+                    <div class="flex items-center mb-2">
+                        <div class="w-4 h-4 bg-red-200 border border-red-500 rounded mr-2"></div>
+                        <span class="text-sm">ตำแหน่งไม่ถูกต้อง</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-sm mr-2">ตัวเลขแสดงลำดับที่ถูกต้อง</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- พื้นที่เล่นเกม -->
+            <div class="md:w-2/3 bg-white rounded-xl p-6 shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-blue-700">พื้นที่จัดเรียง</h2>
+                    <div class="text-sm text-gray-500">ลากและวางเพื่อจัดเรียง</div>
+                </div>
+                
+                <!-- พื้นที่วางคำตอบ -->
+                <div id="dropZone" class="border-2 border-dashed border-blue-300 rounded-lg p-4 min-h-[400px] flex flex-col gap-2 relative">
+                    <!-- คำตอบจะถูกเพิ่มที่นี่ด้วย JavaScript -->
+                </div>
+                
+                <div class="mt-6">
+                    <h2 class="text-xl font-bold text-blue-700 mb-2">วาระการประชุม</h2>
+                    <div id="wordBank" class="flex flex-wrap gap-2">
+                        <!-- คำจะถูกเพิ่มที่นี่ด้วย JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal สำหรับแสดงผลลัพธ์ -->
+        <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+                <h2 id="resultTitle" class="text-2xl font-bold text-center mb-4"></h2>
+                <p id="resultMessage" class="text-lg text-center mb-6"></p>
+                <div id="correctAnswers" class="mb-6 hidden">
+                    <h3 class="font-bold text-lg mb-2">ลำดับที่ถูกต้อง:</h3>
+                    <ol id="correctList" class="list-decimal pl-6"></ol>
+                </div>
+                <button id="closeModal" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                    ตกลง
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal สำหรับแสดงคำอธิบาย -->
+        <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <h2 class="text-2xl font-bold text-center mb-4 text-blue-700">วาระการประชุมใหญ่สามัญประจำปีสหกรณ์</h2>
+                <div class="mb-6">
+                    <p class="text-gray-700 mb-4">วาระการประชุมใหญ่สามัญประจำปีของสหกรณ์มีลำดับที่เป็นมาตรฐานตามระเบียบ ดังนี้:</p>
+                    
+                    <ol class="list-decimal pl-6 space-y-4">
+                        <li class="text-gray-800">
+                            <span class="font-bold">เรื่องที่ประธานแจ้งให้ที่ประชุมทราบ</span>
+                            <p class="text-gray-600 mt-1">ประธานแจ้งข้อมูลสำคัญหรือเรื่องที่ควรทราบให้สมาชิกทราบก่อนเริ่มการประชุม</p>
+                        </li>
+                        <li class="text-gray-800">
+                            <span class="font-bold">รับรองรายงานการประชุมครั้งที่แล้ว</span>
+                            <p class="text-gray-600 mt-1">สมาชิกพิจารณารายงานการประชุมครั้งที่แล้วว่าถูกต้องหรือไม่ หากมีข้อแก้ไขจะดำเนินการแก้ไขและรับรอง</p>
+                        </li>
+                        <li class="text-gray-800">
+                            <span class="font-bold">เรื่องสืบเนื่องจากการประชุมครั้งที่แล้ว</span>
+                            <p class="text-gray-600 mt-1">พิจารณาเรื่องที่ยังไม่ได้ข้อสรุปหรือต้องติดตามผลจากการประชุมครั้งที่แล้ว</p>
+                        </li>
+                        <li class="text-gray-800">
+                            <span class="font-bold">รายงานผลการดำเนินงานประจำปี</span>
+                            <p class="text-gray-600 mt-1">คณะกรรมการรายงานผลการดำเนินงานของสหกรณ์ในรอบปีที่ผ่านมา</p>
+                        </li>
+                        <li class="text-gray-800">
+                            <span class="font-bold">พิจารณาอนุมัติงบการเงินประจำปี</span>
+                            <p class="text-gray-600 mt-1">สมาชิกพิจารณาและลงมติอนุมัติงบการเงินประจำปีของสหกรณ์</p>
+                        </li>
+                        <li class="text-gray-800">
+                            <span class="font-bold">พิจารณาจัดสรรกำไรสุทธิประจำปี</span>
+                            <p class="text-gray-600 mt-1">สมาชิกพิจารณาและลงมติเห็นชอบการจัดสรรกำไรสุทธิประจำปีของสหกรณ์</p>
+                        </li>
+                        <li class="text-gray-800">
+                            <span class="font-bold">พิจารณาแผนงานและงบประมาณประจำปี</span>
+                            <p class="text-gray-600 mt-1">สมาชิกพิจารณาและลงมติอนุมัติแผนงานและงบประมาณสำหรับปีถัดไป</p>
+                        </li>
+                        <li class="text-gray-800">
+                            <span class="font-bold">เรื่องอื่นๆ (ถ้ามี)</span>
+                            <p class="text-gray-600 mt-1">พิจารณาเรื่องอื่นๆ ที่ไม่ได้อยู่ในวาระการประชุมที่กำหนดไว้ล่วงหน้า</p>
+                        </li>
+                    </ol>
+                </div>
+                <p class="text-sm text-gray-500 mb-4">หมายเหตุ: ลำดับวาระการประชุมอาจมีการปรับเปลี่ยนได้ตามความเหมาะสม แต่โดยทั่วไปจะเป็นไปตามลำดับข้างต้น</p>
+                <button id="closeHelpModal" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                    เข้าใจแล้ว
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-blue-800 text-white py-4 text-center mt-8">
+        <p>© developed by Tle Narongphisit | CTTC19 @ CPD</p>
+    </footer>
+
+    <script>
+        // วาระการประชุมสหกรณ์
+        const agendaItems = [
+            { 
+                text: "เรื่องที่ประธานแจ้งให้ที่ประชุมทราบ", 
+                correct: 1,
+                description: "ประธานแจ้งข้อมูลสำคัญหรือเรื่องที่ควรทราบให้สมาชิกทราบก่อนเริ่มการประชุม"
+            },
+            { 
+                text: "รับรองรายงานการประชุมครั้งที่แล้ว", 
+                correct: 2,
+                description: "สมาชิกพิจารณารายงานการประชุมครั้งที่แล้วว่าถูกต้องหรือไม่"
+            },
+            { 
+                text: "เรื่องสืบเนื่องจากการประชุมครั้งที่แล้ว", 
+                correct: 3,
+                description: "พิจารณาเรื่องที่ยังไม่ได้ข้อสรุปหรือต้องติดตามผลจากการประชุมครั้งที่แล้ว"
+            },
+            { 
+                text: "รายงานผลการดำเนินงานประจำปี", 
+                correct: 4,
+                description: "คณะกรรมการรายงานผลการดำเนินงานของสหกรณ์ในรอบปีที่ผ่านมา"
+            },
+            { 
+                text: "พิจารณาอนุมัติงบการเงินประจำปี", 
+                correct: 5,
+                description: "สมาชิกพิจารณาและลงมติอนุมัติงบการเงินประจำปีของสหกรณ์"
+            },
+            { 
+                text: "พิจารณาจัดสรรกำไรสุทธิประจำปี", 
+                correct: 6,
+                description: "สมาชิกพิจารณาและลงมติเห็นชอบการจัดสรรกำไรสุทธิประจำปีของสหกรณ์"
+            },
+            { 
+                text: "พิจารณาแผนงานและงบประมาณประจำปี", 
+                correct: 7,
+                description: "สมาชิกพิจารณาและลงมติอนุมัติแผนงานและงบประมาณสำหรับปีถัดไป"
+            },
+            { 
+                text: "เรื่องอื่นๆ (ถ้ามี)", 
+                correct: 8,
+                description: "พิจารณาเรื่องอื่นๆ ที่ไม่ได้อยู่ในวาระการประชุมที่กำหนดไว้ล่วงหน้า"
+            }
+        ];
+        
+        // สลับวาระการประชุม
+        const shuffledAgendaItems = [...agendaItems].sort(() => Math.random() - 0.5);
+        
+        // เพิ่มคำลงในธนาคารคำ
+        const wordBank = document.getElementById('wordBank');
+        const dropZone = document.getElementById('dropZone');
+        const checkBtn = document.getElementById('checkBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const resultModal = document.getElementById('resultModal');
+        const closeModal = document.getElementById('closeModal');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
+        const correctAnswers = document.getElementById('correctAnswers');
+        const correctList = document.getElementById('correctList');
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const helpBtn = document.getElementById('helpBtn');
+        const helpModal = document.getElementById('helpModal');
+        const closeHelpModal = document.getElementById('closeHelpModal');
+        const legend = document.getElementById('legend');
+        
+        let score = 0;
+        let timeLeft = 120; // 2 นาที
+        let timerInterval;
+        let draggingElement = null;
+        let gameCompleted = false;
+        let dropIndicator = null;
+        let hasCheckedAnswer = false;
+        
+        // เริ่มเกม
+        function initGame() {
+            // ล้างพื้นที่
+            wordBank.innerHTML = '';
+            dropZone.innerHTML = '';
+            
+            // เพิ่มคำลงในธนาคารคำ
+            shuffledAgendaItems.forEach((item, index) => {
+                const wordElement = document.createElement('div');
+                wordElement.className = 'draggable bg-yellow-100 border-2 border-yellow-300 rounded-lg p-3 shadow-md text-center font-medium w-full md:w-auto';
+                wordElement.textContent = item.text;
+                wordElement.dataset.correct = item.correct;
+                wordElement.draggable = true;
+                
+                wordElement.addEventListener('dragstart', dragStart);
+                wordElement.addEventListener('dragend', dragEnd);
+                
+                // สำหรับอุปกรณ์สัมผัส
+                wordElement.addEventListener('touchstart', touchStart);
+                wordElement.addEventListener('touchmove', touchMove);
+                wordElement.addEventListener('touchend', touchEnd);
+                
+                wordBank.appendChild(wordElement);
+            });
+            
+            // สร้าง drop indicator
+            dropIndicator = document.createElement('div');
+            dropIndicator.className = 'drop-indicator';
+            dropIndicator.style.display = 'none';
+            
+            // เริ่มจับเวลา
+            startTimer();
+            
+            // รีเซ็ตคะแนน
+            score = 0;
+            scoreElement.textContent = '0 คะแนน';
+            
+            // รีเซ็ตสถานะเกม
+            gameCompleted = false;
+            hasCheckedAnswer = false;
+            
+            // ซ่อนคำอธิบายสัญลักษณ์
+            legend.classList.add('hidden');
+            
+            // ล้างสถานะการตรวจสอบ
+            const statusIcons = document.querySelectorAll('.status-icon');
+            statusIcons.forEach(icon => icon.remove());
+            
+            const positionIndicators = document.querySelectorAll('.position-indicator');
+            positionIndicators.forEach(indicator => indicator.remove());
+        }
+        
+        // ฟังก์ชันจับเวลา
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 120;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if (!gameCompleted) {
+                        checkAnswer();
+                    }
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // ฟังก์ชันลาก (Drag and Drop)
+        function dragStart(e) {
+            draggingElement = this;
+            setTimeout(() => {
+                this.classList.add('dragging');
+                this.classList.add('opacity-50');
+            }, 0);
+            
+            // เก็บข้อมูลที่จะลาก
+            e.dataTransfer.setData('text/plain', this.dataset.correct);
+        }
+        
+        function dragEnd() {
+            this.classList.remove('dragging');
+            this.classList.remove('opacity-50');
+            draggingElement = null;
+            
+            // ซ่อน drop indicator
+            if (dropIndicator && dropIndicator.parentNode) {
+                dropIndicator.remove();
+            }
+        }
+        
+        // สำหรับอุปกรณ์สัมผัส
+        function touchStart(e) {
+            draggingElement = this;
+            this.classList.add('dragging');
+            
+            const touch = e.targetTouches[0];
+            const offsetX = touch.clientX - this.getBoundingClientRect().left;
+            const offsetY = touch.clientY - this.getBoundingClientRect().top;
+            
+            this.dataset.offsetX = offsetX;
+            this.dataset.offsetY = offsetY;
+        }
+        
+        function touchMove(e) {
+            if (!draggingElement) return;
+            e.preventDefault();
+            
+            const touch = e.targetTouches[0];
+            const offsetX = parseInt(this.dataset.offsetX);
+            const offsetY = parseInt(this.dataset.offsetY);
+            
+            draggingElement.style.position = 'absolute';
+            draggingElement.style.left = `${touch.clientX - offsetX}px`;
+            draggingElement.style.top = `${touch.clientY - offsetY}px`;
+            draggingElement.style.zIndex = 1000;
+            
+            // หาตำแหน่งที่จะวาง
+            const dropZoneRect = dropZone.getBoundingClientRect();
+            if (
+                touch.clientX >= dropZoneRect.left &&
+                touch.clientX <= dropZoneRect.right &&
+                touch.clientY >= dropZoneRect.top &&
+                touch.clientY <= dropZoneRect.bottom
+            ) {
+                const dropZoneItems = Array.from(dropZone.children).filter(child => !child.classList.contains('drop-indicator'));
+                
+                // หาตำแหน่งที่จะแทรก
+                let insertIndex = -1;
+                for (let i = 0; i < dropZoneItems.length; i++) {
+                    const item = dropZoneItems[i];
+                    const itemRect = item.getBoundingClientRect();
+                    
+                    if (touch.clientY < itemRect.top + itemRect.height / 2) {
+                        insertIndex = i;
+                        break;
+                    }
+                }
+                
+                // แสดง drop indicator
+                if (insertIndex === -1) {
+                    dropZone.appendChild(dropIndicator);
+                } else {
+                    dropZone.insertBefore(dropIndicator, dropZoneItems[insertIndex]);
+                }
+                dropIndicator.style.display = 'block';
+                dropIndicator.classList.add('active');
+            } else {
+                dropIndicator.style.display = 'none';
+            }
+        }
+        
+        function touchEnd(e) {
+            if (!draggingElement) return;
+            
+            const touch = e.changedTouches[0];
+            const dropZoneRect = dropZone.getBoundingClientRect();
+            
+            if (
+                touch.clientX >= dropZoneRect.left &&
+                touch.clientX <= dropZoneRect.right &&
+                touch.clientY >= dropZoneRect.top &&
+                touch.clientY <= dropZoneRect.bottom
+            ) {
+                // ถ้าอยู่เหนือ drop zone
+                draggingElement.style.position = '';
+                draggingElement.style.left = '';
+                draggingElement.style.top = '';
+                draggingElement.style.zIndex = '';
+                
+                const dropZoneItems = Array.from(dropZone.children).filter(child => !child.classList.contains('drop-indicator'));
+                
+                // หาตำแหน่งที่จะแทรก
+                let insertIndex = -1;
+                for (let i = 0; i < dropZoneItems.length; i++) {
+                    const item = dropZoneItems[i];
+                    const itemRect = item.getBoundingClientRect();
+                    
+                    if (touch.clientY < itemRect.top + itemRect.height / 2) {
+                        insertIndex = i;
+                        break;
+                    }
+                }
+                
+                // แทรกที่ตำแหน่งที่กำหนด
+                if (insertIndex === -1) {
+                    dropZone.appendChild(draggingElement);
+                } else {
+                    dropZone.insertBefore(draggingElement, dropZoneItems[insertIndex]);
+                }
+                
+                draggingElement.classList.add('bounce');
+                setTimeout(() => {
+                    draggingElement.classList.remove('bounce');
+                }, 500);
+                
+                // ล้างสถานะการตรวจสอบเมื่อมีการเปลี่ยนแปลง
+                clearCheckStatus();
+            } else if (draggingElement.parentElement === dropZone) {
+                // ถ้าลากออกจาก drop zone
+                draggingElement.style.position = '';
+                draggingElement.style.left = '';
+                draggingElement.style.top = '';
+                draggingElement.style.zIndex = '';
+                
+                wordBank.appendChild(draggingElement);
+                
+                // ล้างสถานะการตรวจสอบเมื่อมีการเปลี่ยนแปลง
+                clearCheckStatus();
+            } else {
+                // ถ้าไม่ได้อยู่เหนือ drop zone และไม่ได้มาจาก drop zone
+                draggingElement.style.position = '';
+                draggingElement.style.left = '';
+                draggingElement.style.top = '';
+                draggingElement.style.zIndex = '';
+            }
+            
+            // ซ่อน drop indicator
+            dropIndicator.style.display = 'none';
+            
+            draggingElement.classList.remove('dragging');
+            draggingElement = null;
+        }
+        
+        // เพิ่ม event listeners สำหรับ drop zone
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('highlight');
+            
+            // หาตำแหน่งที่จะแทรก
+            const afterElement = getDragAfterElement(dropZone, e.clientY);
+            
+            // แสดง drop indicator
+            if (afterElement == null) {
+                dropZone.appendChild(dropIndicator);
+            } else {
+                dropZone.insertBefore(dropIndicator, afterElement);
+            }
+            dropIndicator.style.display = 'block';
+            dropIndicator.classList.add('active');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('highlight');
+            dropIndicator.style.display = 'none';
+        });
+        
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('highlight');
+            dropIndicator.style.display = 'none';
+            
+            if (draggingElement) {
+                // หาตำแหน่งที่จะแทรก
+                const afterElement = getDragAfterElement(dropZone, e.clientY);
+                
+                if (afterElement == null) {
+                    dropZone.appendChild(draggingElement);
+                } else {
+                    dropZone.insertBefore(draggingElement, afterElement);
+                }
+                
+                draggingElement.classList.add('bounce');
+                setTimeout(() => {
+                    draggingElement.classList.remove('bounce');
+                }, 500);
+                
+                // ล้างสถานะการตรวจสอบเมื่อมีการเปลี่ยนแปลง
+                clearCheckStatus();
+            }
+        });
+        
+        // ฟังก์ชันหาตำแหน่งที่จะแทรก
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+        
+        // เพิ่ม event listeners สำหรับ word bank
+        wordBank.addEventListener('dragover', e => {
+            e.preventDefault();
+        });
+        
+        wordBank.addEventListener('drop', e => {
+            e.preventDefault();
+            
+            if (draggingElement && draggingElement.parentElement === dropZone) {
+                wordBank.appendChild(draggingElement);
+                
+                // ล้างสถานะการตรวจสอบเมื่อมีการเปลี่ยนแปลง
+                clearCheckStatus();
+            }
+        });
+        
+        // ล้างสถานะการตรวจสอบ
+        function clearCheckStatus() {
+            if (hasCheckedAnswer) {
+                const items = document.querySelectorAll('.draggable');
+                items.forEach(item => {
+                    item.classList.remove('correct', 'incorrect');
+                    
+                    // ลบไอคอนสถานะ
+                    const statusIcon = item.querySelector('.status-icon');
+                    if (statusIcon) {
+                        statusIcon.remove();
+                    }
+                    
+                    // ลบตัวบอกตำแหน่ง
+                    const positionIndicator = item.querySelector('.position-indicator');
+                    if (positionIndicator) {
+                        positionIndicator.remove();
+                    }
+                });
+                
+                hasCheckedAnswer = false;
+            }
+        }
+        
+        // ตรวจคำตอบ
+        function checkAnswer() {
+            const placedItems = Array.from(dropZone.children);
+            
+            if (placedItems.length < 8) {
+                showResult(false, "คุณยังจัดเรียงไม่ครบทุกวาระ กรุณาลองอีกครั้ง");
+                return;
+            }
+            
+            let correctCount = 0;
+            let allCorrect = true;
+            
+            // แสดงคำอธิบายสัญลักษณ์
+            legend.classList.remove('hidden');
+            
+            // ตรวจสอบและทำสีแต่ละวาระ
+            placedItems.forEach((item, index) => {
+                const correctPosition = parseInt(item.dataset.correct);
+                
+                // ลบไอคอนสถานะเดิม (ถ้ามี)
+                const oldStatusIcon = item.querySelector('.status-icon');
+                if (oldStatusIcon) {
+                    oldStatusIcon.remove();
+                }
+                
+                // ลบตัวบอกตำแหน่งเดิม (ถ้ามี)
+                const oldPositionIndicator = item.querySelector('.position-indicator');
+                if (oldPositionIndicator) {
+                    oldPositionIndicator.remove();
+                }
+                
+                // สร้างไอคอนสถานะใหม่
+                const statusIcon = document.createElement('span');
+                statusIcon.className = 'status-icon';
+                
+                // สร้างตัวบอกตำแหน่งที่ถูกต้อง
+                const positionIndicator = document.createElement('div');
+                positionIndicator.className = 'position-indicator';
+                positionIndicator.textContent = correctPosition;
+                
+                if (correctPosition === index + 1) {
+                    // ถูกต้อง
+                    item.classList.add('correct');
+                    item.classList.remove('incorrect');
+                    statusIcon.innerHTML = '✓';
+                    statusIcon.className += ' text-green-600';
+                    positionIndicator.style.backgroundColor = '#34d399';
+                    correctCount++;
+                } else {
+                    // ไม่ถูกต้อง
+                    item.classList.add('incorrect');
+                    item.classList.remove('correct');
+                    statusIcon.innerHTML = '✗';
+                    statusIcon.className += ' text-red-600';
+                    positionIndicator.style.backgroundColor = '#f87171';
+                    allCorrect = false;
+                }
+                
+                // เพิ่มไอคอนสถานะและตัวบอกตำแหน่งเข้าไปในไอเท็ม
+                item.style.position = 'relative';
+                item.appendChild(statusIcon);
+                item.appendChild(positionIndicator);
+                
+                // เพิ่มเอฟเฟกต์เพื่อให้สังเกตเห็นง่าย
+                statusIcon.classList.add('pulse');
+                setTimeout(() => {
+                    statusIcon.classList.remove('pulse');
+                }, 1000);
+            });
+            
+            // คำนวณคะแนนโดยคำนึงถึงเวลาที่เหลือ
+            const baseScore = Math.round((correctCount / 8) * 100);
+            const timeBonus = Math.round((timeLeft / 120) * 20); // โบนัสสูงสุด 20 คะแนน
+            score = Math.min(100, baseScore + timeBonus);
+            
+            scoreElement.textContent = `${score} คะแนน`;
+            
+            hasCheckedAnswer = true;
+            
+            if (allCorrect) {
+                // หยุดเวลาเมื่อทำถูกทั้งหมด
+                clearInterval(timerInterval);
+                gameCompleted = true;
+                
+                showResult(true, `ยอดเยี่ยม! คุณจัดเรียงได้ถูกต้องทั้งหมด\nคะแนนของคุณ: ${score} คะแนน (รวมโบนัสเวลา ${timeBonus} คะแนน)`);
+                createConfetti();
+            } else {
+                // แสดงข้อความแนะนำ
+                const notification = document.createElement('div');
+                notification.className = 'fixed bottom-4 right-4 bg-blue-600 text-white p-4 rounded-lg shadow-lg z-50';
+                notification.innerHTML = `
+                    <p class="font-bold">คำแนะนำ</p>
+                    <p>จัดเรียงวาระให้ถูกต้องตามลำดับ ตัวเลขในวงกลมคือลำดับที่ถูกต้อง</p>
+                `;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.add('opacity-0');
+                    notification.style.transition = 'opacity 0.5s';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 500);
+                }, 5000);
+            }
+        }
+        
+        // แสดงผลลัพธ์
+        function showResult(isSuccess, message) {
+            if (!isSuccess && !gameCompleted) {
+                // ถ้าไม่สำเร็จและเกมยังไม่จบ ไม่แสดง modal
+                return;
+            }
+            
+            resultTitle.textContent = isSuccess ? "🎉 ยอดเยี่ยม! 🎉" : "ลองอีกครั้ง";
+            resultTitle.className = isSuccess ? "text-2xl font-bold text-center mb-4 text-green-600" : "text-2xl font-bold text-center mb-4 text-orange-500";
+            resultMessage.textContent = message;
+            
+            if (!isSuccess) {
+                correctAnswers.classList.remove('hidden');
+                
+                // แสดงคำตอบที่ถูกต้อง
+                correctList.innerHTML = '';
+                agendaItems.sort((a, b) => a.correct - b.correct).forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item.text;
+                    correctList.appendChild(li);
+                });
+            } else {
+                correctAnswers.classList.add('hidden');
+            }
+            
+            resultModal.classList.remove('hidden');
+        }
+        
+        // สร้างเอฟเฟกต์ confetti
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.top = '0';
+                confetti.style.animation = `float ${Math.random() * 3 + 2}s linear forwards`;
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+        
+        // Event listeners
+        checkBtn.addEventListener('click', () => {
+            checkAnswer();
+            
+            // ถ้าทำถูกทั้งหมดแล้ว ให้หยุดเวลา
+            const placedItems = Array.from(dropZone.children);
+            let allCorrect = true;
+            
+            placedItems.forEach((item, index) => {
+                const correctPosition = parseInt(item.dataset.correct);
+                if (correctPosition !== index + 1) {
+                    allCorrect = false;
+                }
+            });
+            
+            if (allCorrect && placedItems.length === 8) {
+                clearInterval(timerInterval);
+                gameCompleted = true;
+            }
+        });
+        
+        restartBtn.addEventListener('click', () => {
+            // ล้างคลาสที่เพิ่มไว้
+            const allItems = document.querySelectorAll('.draggable');
+            allItems.forEach(item => {
+                item.classList.remove('correct', 'incorrect');
+                
+                // ลบไอคอนสถานะ
+                const statusIcon = item.querySelector('.status-icon');
+                if (statusIcon) {
+                    statusIcon.remove();
+                }
+                
+                // ลบตัวบอกตำแหน่ง
+                const positionIndicator = item.querySelector('.position-indicator');
+                if (positionIndicator) {
+                    positionIndicator.remove();
+                }
+            });
+            
+            initGame();
+        });
+        
+        closeModal.addEventListener('click', () => {
+            resultModal.classList.add('hidden');
+        });
+
+        helpBtn.addEventListener('click', () => {
+            helpModal.classList.remove('hidden');
+        });
+
+        closeHelpModal.addEventListener('click', () => {
+            helpModal.classList.add('hidden');
+        });
+        
+        // เริ่มเกม
+        initGame();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96294ffca0a04f51',t:'MTc1MzA4NjM3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
