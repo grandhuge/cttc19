@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>กำลังพัฒนา | ศูนย์เรียนรู้คอมพิวเตอร์</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(135deg, #ffe0b2, #ffccbc);
+      color: #333;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    .logo {
+      width: 160px;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+    .mascot {
+      width: 130px;
+      margin: 30px auto;
+      animation: bounce 1s ease infinite alternate;
+    }
+    h1 {
+      font-size: 2.4rem;
+      color: #d84315;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    p.lead {
+      font-size: 1.3rem;
+      color: #e65100;
+      margin-bottom: 25px;
+    }
+    p.description {
+      font-size: 1.1rem;
+      color: #5d4037;
+      margin-bottom: 30px;
+      line-height: 1.8;
+    }
+    .alert {
+      background-color: #fff3e0;
+      border-left: 6px solid #ff8a65;
+      padding: 15px;
+      margin: 30px auto;
+      max-width: 600px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      color: #c46a00;
+    }
+    footer {
+      margin-top: auto;
+      padding: 20px;
+      background-color: #bf360c;
+      color: white;
+      font-size: 0.95rem;
+    }
+
+    /* Animation */
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Logo -->
+    <img src="https://cttc19.onrender.com/game/img/logo.png" alt="Logo" class="logo" />
+
+    <!-- Main Content -->
+    <h1>ขออภัยครับ!</h1>
+    <p class="lead">หน้านี้กำลังอยู่ระหว่างการปรับปรุง</p>
+
+    <img src="https://cttc19.onrender.com/game/img/mascot.gif" alt="มาสคอต" class="mascot" />
+
+    <p class="description">
+      ขณะนี้ทีมงานกำลังพัฒนาเนื้อหาให้สมบูรณ์และน่าสนใจยิ่งขึ้น<br>
+      เพื่อประสบการณ์การเรียนรู้ที่ปลอดภัย สนุกสนาน และเข้าใจง่ายสำหรับน้องๆ นักเรียนประถมศึกษา
+    </p>
+
+    <div class="alert">
+      ⏳ กรุณากลับมาใหม่ในเร็วๆ นี้
+    </div>
+
+    <p><strong>ขอบคุณที่รอคอยนะครับ! 🌟</strong></p>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© developed by Tle Narongphisit | CTTC19 @ CPD</p>
+  </footer>
+</body>
+</html>

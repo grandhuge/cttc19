@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ศูนย์การเรียนรู้คอมพิวเตอร์ผ่านเกม Interactive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .zone-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .zone-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <div class="fixed top-0 left-0 right-0 bg-white shadow-lg z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-lg font-semibold text-gray-800">งานนำเสนอ</h1>
+                <span class="text-sm text-gray-600">สไลด์ <span id="currentSlide">1</span> จาก <span id="totalSlides">12</span></span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button id="prevBtn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300">
+                    ← ก่อนหน้า
+                </button>
+                <button id="nextBtn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300">
+                    ถัดไป →
+                </button>
+            </div>
+        </div>
+        <div class="w-full bg-gray-200 h-1">
+            <div id="progressBar" class="progress-bar bg-blue-500 h-1" style="width: 8.33%"></div>
+        </div>
+    </div>
+
+    <!-- Slides Container -->
+    <div class="pt-20 min-h-screen">
+        
+        <!-- Slide 1: Cover -->
+        <div class="slide active">
+            <div class="gradient-bg min-h-screen flex items-center justify-center">
+                <div class="text-center text-white px-8">
+                    <div class="mb-8">
+                        <div class="text-6xl mb-4">🎮</div>
+                        <h1 class="text-5xl font-bold mb-6 leading-tight">
+                            ศูนย์การเรียนรู้คอมพิวเตอร์<br>
+                            ผ่านเกม Interactive
+                        </h1>
+                        <p class="text-2xl mb-8 opacity-90">สำหรับนักเรียนระดับประถมศึกษา</p>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-8 max-w-2xl mx-auto">
+                        <p class="text-lg mb-4">
+                            <strong>หน่วยงาน:</strong><br>
+                            ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19<br>
+                            จังหวัดสุราษฎร์ธานี
+                        </p>
+                        <p class="text-lg">
+                            <strong>ผู้ออกแบบ:</strong><br>
+                            นายณรงพิสิษฐ์ วรวิวัฒน์
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Principles -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-12">
+                        <div class="text-6xl mb-6">🧠</div>
+                        <h2 class="text-4xl font-bold mb-8">หลักการและเหตุผล</h2>
+                        <h3 class="text-3xl font-semibold mb-12 text-yellow-300">
+                            ทำไมต้องใช้ "เกม" ในการเรียนรู้คอมพิวเตอร์?
+                        </h3>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-4xl mb-4">😊</div>
+                            <p class="text-lg">เด็กประถมมีแนวโน้มเรียนรู้ดีเมื่อมี<br><strong>รูปแบบการเรียนที่สนุก</strong></p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-4xl mb-4">🎯</div>
+                            <p class="text-lg">การใช้เกมช่วย<br><strong>กระตุ้นการมีส่วนร่วม</strong></p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-4xl mb-4">💪</div>
+                            <p class="text-lg">ฝึกทักษะการใช้คอมพิวเตอร์<br><strong>ควบคู่กับการคิดวิเคราะห์</strong></p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-4xl mb-4">📚</div>
+                            <p class="text-lg">สอดคล้องกับแนวทาง<br><strong>Active Learning และ Game-based Learning</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Objectives -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-12">
+                        <div class="text-6xl mb-6">🎯</div>
+                        <h2 class="text-4xl font-bold mb-8">วัตถุประสงค์ของศูนย์การเรียนรู้</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-center">
+                            <div class="text-3xl mr-6">💻</div>
+                            <p class="text-xl">ให้นักเรียนมีความรู้พื้นฐานเกี่ยวกับคอมพิวเตอร์</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-center">
+                            <div class="text-3xl mr-6">🖱️</div>
+                            <p class="text-xl">ส่งเสริมทักษะการใช้งานอุปกรณ์คอมพิวเตอร์</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-center">
+                            <div class="text-3xl mr-6">🧠</div>
+                            <p class="text-xl">ฝึกการคิดวิเคราะห์ แยกแยะ และค้นหาข้อมูลอย่างปลอดภัย</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-center">
+                            <div class="text-3xl mr-6">🌐</div>
+                            <p class="text-xl">สร้างเจตคติที่ดีในการใช้อินเทอร์เน็ต</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Structure -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center px-8">
+                <div class="max-w-5xl mx-auto text-white">
+                    <div class="text-center mb-12">
+                        <div class="text-6xl mb-6">🗂️</div>
+                        <h2 class="text-4xl font-bold mb-8">โครงสร้างของศูนย์การเรียนรู้</h2>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-8">
+                            <h3 class="text-3xl font-bold text-yellow-300">🕹️ Cyber Learning Quest</h3>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="zone-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
+                            <div class="text-4xl mb-4">💻</div>
+                            <h4 class="text-xl font-semibold mb-2">โลกแห่งคอมพิวเตอร์</h4>
+                            <p class="text-sm opacity-90">(Computer World)</p>
+                        </div>
+                        <div class="zone-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
+                            <div class="text-4xl mb-4">⌨️</div>
+                            <h4 class="text-xl font-semibold mb-2">นักสำรวจคีย์บอร์ด</h4>
+                            <p class="text-sm opacity-90">(Keyboard Explorer)</p>
+                        </div>
+                        <div class="zone-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
+                            <div class="text-4xl mb-4">🖱️</div>
+                            <h4 class="text-xl font-semibold mb-2">คลิกพิชิตโลก</h4>
+                            <p class="text-sm opacity-90">(Mouse Adventure)</p>
+                        </div>
+                        <div class="zone-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
+                            <div class="text-4xl mb-4">🛡️</div>
+                            <h4 class="text-xl font-semibold mb-2">อัศวินไซเบอร์</h4>
+                            <p class="text-sm opacity-90">(Cyber Knight)</p>
+                        </div>
+                    </div>
+                    <div class="text-center mt-8">
+                        <div class="bg-green-500/30 backdrop-blur-sm rounded-2xl p-4">
+                            <p class="text-lg">✅ แต่ละโซนจะมีเกมฝึกทักษะ พร้อมระดับความยากหลากหลาย</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Zone 1 -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-8">
+                        <div class="text-6xl mb-4">💻</div>
+                        <h2 class="text-3xl font-bold mb-6">โซนที่ 1 – โลกแห่งคอมพิวเตอร์</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">ทักษะเป้าหมาย:</h3>
+                            <p class="text-lg">รู้จักอุปกรณ์พื้นฐานของคอมพิวเตอร์และการเปิด-ปิดเครื่อง</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">กิจกรรม:</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>🎯 เกมลาก-วาง "จับคู่ชื่อกับภาพอุปกรณ์"</li>
+                                <li>🧩 เกมไขปริศนา "ใครคือฮีโร่ฮาร์ดแวร์"</li>
+                                <li>⚡ เกม Simulation "เปิด-ปิดคอมให้ถูกวิธี"</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-yellow-300">พื้นฐานความรู้ที่ต้องมี:</h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🖥️</div>
+                                <p>อุปกรณ์คอมพิวเตอร์คืออะไร?</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">⚙️</div>
+                                <p>หน้าที่ของฮาร์ดแวร์แต่ละชนิด</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🔒</div>
+                                <p>วิธีใช้งานคอมพิวเตอร์อย่างปลอดภัย</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Zone 2 -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-green-600 to-blue-700 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-8">
+                        <div class="text-6xl mb-4">⌨️</div>
+                        <h2 class="text-3xl font-bold mb-6">โซนที่ 2 – นักสำรวจคีย์บอร์ด</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">ทักษะเป้าหมาย:</h3>
+                            <p class="text-lg">รู้จักปุ่มต่างๆ และฝึกพิมพ์ให้ถูกต้อง/รวดเร็ว</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">กิจกรรม:</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>⚡ เกมพิมพ์คำให้ทันเวลา (Speed Typing)</li>
+                                <li>🔍 เกมตามหาปุ่ม (หาให้เจอในแป้นพิมพ์)</li>
+                                <li>🏆 เกมแข่งพิมพ์คำศัพท์ภาษาอังกฤษพื้นฐาน</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-yellow-300">พื้นฐานความรู้ที่ต้องมี:</h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🎯</div>
+                                <p>ตำแหน่งของปุ่มต่างๆ บนแป้นพิมพ์</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">✋</div>
+                                <p>วิธีพิมพ์สัมผัสเบื้องต้น</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">⌨️</div>
+                                <p>การใช้คีย์ลัดง่ายๆ</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Zone 3 -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-purple-600 to-pink-700 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-8">
+                        <div class="text-6xl mb-4">🖱️</div>
+                        <h2 class="text-3xl font-bold mb-6">โซนที่ 3 – คลิกพิชิตโลก</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">ทักษะเป้าหมาย:</h3>
+                            <p class="text-lg">ฝึกควบคุมเมาส์และใช้เมาส์คล่องแคล่ว</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">กิจกรรม:</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>🎯 เกมลากไอเทมเข้าตำแหน่งให้ถูก</li>
+                                <li>🌀 เกมหาทางออกในเขาวงกตโดยใช้เมาส์ควบคุม</li>
+                                <li>⚡ เกมแข่งใช้เมาส์ให้ทันเวลา</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-yellow-300">พื้นฐานความรู้ที่ต้องมี:</h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">👆</div>
+                                <p>วิธีใช้เมาส์ (คลิก, ลาก, เลื่อน)</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">👁️</div>
+                                <p>ฝึกประสานสายตากับการควบคุมมือ</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🎮</div>
+                                <p>ใช้เมาส์กับซอฟต์แวร์หรือเกมได้คล่อง</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Zone 4 -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-red-600 to-orange-700 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-8">
+                        <div class="text-6xl mb-4">🛡️</div>
+                        <h2 class="text-3xl font-bold mb-6">โซนที่ 4 – อัศวินไซเบอร์</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">ทักษะเป้าหมาย:</h3>
+                            <p class="text-lg">เรียนรู้การใช้อินเทอร์เน็ตอย่างปลอดภัย และรู้จักแหล่งข้อมูลที่เชื่อถือได้</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">กิจกรรม:</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>✅ เกมจำแนกเว็บดี-เว็บปลอม</li>
+                                <li>🕵️ เกม "ใครคือผู้ร้ายไซเบอร์"</li>
+                                <li>🧩 เกม Puzzle จัดเรียงขั้นตอนการค้นหาข้อมูล</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-yellow-300">พื้นฐานความรู้ที่ต้องมี:</h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🔒</div>
+                                <p>URL ที่ปลอดภัยหน้าตาเป็นอย่างไร</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🔐</div>
+                                <p>ข้อมูลส่วนตัวคืออะไร และควรระวังอย่างไร</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🔍</div>
+                                <p>วิธีค้นหาข้อมูลจาก Google อย่างถูกต้อง</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Advantages -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-teal-600 to-green-700 flex items-center justify-center px-8">
+                <div class="max-w-5xl mx-auto text-white">
+                    <div class="text-center mb-12">
+                        <div class="text-6xl mb-6">🧩</div>
+                        <h2 class="text-4xl font-bold mb-8">จุดเด่นของศูนย์การเรียนรู้แบบเกม</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full bg-white/20 backdrop-blur-sm rounded-2xl overflow-hidden">
+                            <thead class="bg-white/30">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xl font-semibold">ด้าน</th>
+                                    <th class="px-6 py-4 text-left text-xl font-semibold">รายละเอียด</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/20">
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">😊</span>
+                                            <span class="text-lg font-semibold">สนุก</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">เด็กเรียนรู้ผ่านเกมที่ออกแบบอย่างสร้างสรรค์</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">💪</span>
+                                            <span class="text-lg font-semibold">ใช้ได้จริง</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">ทักษะที่เรียนสามารถประยุกต์ใช้ในชีวิตประจำวัน</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">🧠</span>
+                                            <span class="text-lg font-semibold">ฝึกคิด</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">มีการวิเคราะห์ แยกแยะ จัดลำดับเหตุผล</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">📊</span>
+                                            <span class="text-lg font-semibold">ประเมินได้</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">คะแนนเกมสามารถใช้เป็นเครื่องมือประเมินผลเบื้องต้น</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Teaching Approach -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-12">
+                        <div class="text-6xl mb-6">🧑‍🏫</div>
+                        <h2 class="text-4xl font-bold mb-8">แนวทางการจัดการเรียนการสอน</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-start">
+                            <div class="text-3xl mr-6 mt-1">👥</div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">การจัดกลุ่ม</h3>
+                                <p class="text-lg">แบ่งกลุ่มนักเรียนให้ผลัดเปลี่ยนกันเล่นเกมแต่ละโซน</p>
+                            </div>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-start">
+                            <div class="text-3xl mr-6 mt-1">📋</div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">การประเมินผล</h3>
+                                <p class="text-lg">ใช้แบบประเมินก่อน-หลัง เพื่อวัดผลสัมฤทธิ์</p>
+                            </div>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-start">
+                            <div class="text-3xl mr-6 mt-1">🤝</div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">การเรียนรู้ร่วมกัน</h3>
+                                <p class="text-lg">ส่งเสริมให้เด็กช่วยกันเรียนรู้แบบ "เพื่อนช่วยเพื่อน"</p>
+                            </div>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-start">
+                            <div class="text-3xl mr-6 mt-1">🎯</div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">บทบาทผู้สอน</h3>
+                                <p class="text-lg">ผู้สอนทำหน้าที่เป็น "โค้ช" มากกว่าผู้บรรยาย</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Benefits -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-pink-600 to-red-700 flex items-center justify-center px-8">
+                <div class="max-w-5xl mx-auto text-white">
+                    <div class="text-center mb-12">
+                        <div class="text-6xl mb-6">🎓</div>
+                        <h2 class="text-4xl font-bold mb-8">ประโยชน์ที่คาดว่าจะได้รับ</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full bg-white/20 backdrop-blur-sm rounded-2xl overflow-hidden">
+                            <thead class="bg-white/30">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xl font-semibold">กลุ่มเป้าหมาย</th>
+                                    <th class="px-6 py-4 text-left text-xl font-semibold">ประโยชน์ที่ได้รับ</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/20">
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">👨‍🎓</span>
+                                            <span class="text-lg font-semibold">ผู้เรียน</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">ได้รับความรู้ ทักษะ และเจตคติที่ดี</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">👩‍🏫</span>
+                                            <span class="text-lg font-semibold">ครูผู้สอน</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">มีเครื่องมือในการจัดการเรียนรู้ที่น่าสนใจ</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">🏫</span>
+                                            <span class="text-lg font-semibold">โรงเรียน</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">พัฒนาคุณภาพผู้เรียนด้านเทคโนโลยีสารสนเทศ</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">🏘️</span>
+                                            <span class="text-lg font-semibold">ชุมชน</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">ได้เยาวชนที่รู้เท่าทันโลกดิจิทัล</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Conclusion -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white text-center">
+                    <div class="mb-8">
+                        <div class="text-6xl mb-6">📌</div>
+                        <h2 class="text-4xl font-bold mb-8">สรุปและเชิญชวน</h2>
+                        <h3 class="text-3xl font-semibold mb-12 text-yellow-100">
+                            ร่วมเป็นส่วนหนึ่งของการพัฒนา<br>"อัศวินดิจิทัลตัวน้อย"
+                        </h3>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-3xl mb-4">🎮</div>
+                            <p class="text-xl">ศูนย์การเรียนรู้คอมพิวเตอร์ผ่านเกมเป็นเครื่องมือที่สนุกและทรงพลัง</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-3xl mb-4">🌟</div>
+                            <p class="text-xl">เด็กจะได้เรียนรู้ผ่านประสบการณ์จริง</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-3xl mb-4">🤝</div>
+                            <p class="text-xl">ขอความร่วมมือทุกฝ่ายในการสนับสนุนและพัฒนาอย่างต่อเนื่อง</p>
+                        </div>
+                    </div>
+                    <div class="mt-12">
+                        <div class="text-4xl mb-4">🙏</div>
+                        <p class="text-2xl font-semibold">ขอบคุณสำหรับการรับฟัง</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        const currentSlideSpan = document.getElementById('currentSlide');
+        const totalSlidesSpan = document.getElementById('totalSlides');
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        totalSlidesSpan.textContent = totalSlides;
+        
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlideIndex);
+            });
+            
+            currentSlideSpan.textContent = currentSlideIndex + 1;
+            progressBar.style.width = `${((currentSlideIndex + 1) / totalSlides) * 100}%`;
+            
+            prevBtn.disabled = currentSlideIndex === 0;
+            nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+            
+            if (prevBtn.disabled) {
+                prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            
+            if (nextBtn.disabled) {
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+        
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                currentSlideIndex++;
+                updateSlide();
+            }
+        }
+        
+        function prevSlide() {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                updateSlide();
+            }
+        }
+        
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+        
+        // Initialize
+        updateSlide();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97603476b4e94f51',t:'MTc1NjM0NjMyMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

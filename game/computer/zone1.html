@@ -1,0 +1,2665 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 ศูนย์การเรียนรู้คอมพิวเตอร์สำหรับเด็ก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        .drag-item {
+            transition: all 0.3s ease;
+            cursor: grab;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .drag-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .drag-item:active {
+            cursor: grabbing;
+            transform: scale(1.05) rotate(2deg);
+        }
+        
+        .drag-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .drag-item:hover::before {
+            left: 100%;
+        }
+        
+        .drop-zone {
+            transition: all 0.3s ease;
+            border: 3px dashed #cbd5e1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .drop-zone:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .drop-zone.drag-over {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            animation: glow 1s ease-in-out infinite alternate;
+        }
+        
+        .drop-zone.correct {
+            border-color: #10b981;
+            background-color: #d1fae5;
+            animation: correctPulse 0.8s ease-in-out;
+        }
+        
+        .drop-zone.incorrect {
+            border-color: #ef4444;
+            background-color: #fee2e2;
+            animation: shake 0.6s ease-in-out;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+            to { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+        }
+        
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.05); }
+            50% { transform: scale(1.1) rotate(1deg); }
+            75% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-8px) rotate(-2deg); }
+            75% { transform: translateX(8px) rotate(2deg); }
+        }
+        
+        .celebration {
+            animation: bounce 0.8s ease-in-out;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            25% { transform: translateY(-15px) scale(1.1); }
+            50% { transform: translateY(-20px) scale(1.15); }
+            75% { transform: translateY(-10px) scale(1.05); }
+        }
+        
+        .game-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+        
+        .device-icon {
+            font-size: 4rem;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+            transition: all 0.3s ease;
+        }
+        
+        .device-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+            filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.4));
+        }
+        
+        .button-hover {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .button-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .button-hover:active {
+            transform: translateY(0);
+            animation: buttonPress 0.1s ease-in-out;
+        }
+        
+        @keyframes buttonPress {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+        
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle 1s ease-out forwards;
+        }
+        
+        @keyframes particle {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--dx), var(--dy)) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .score-popup {
+            position: absolute;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #10b981;
+            pointer-events: none;
+            animation: scoreFloat 1s ease-out forwards;
+            z-index: 100;
+        }
+        
+        @keyframes scoreFloat {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px) scale(1.2);
+                opacity: 0;
+            }
+        }
+        
+        .combo-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 1000;
+            animation: comboShow 1s ease-out forwards;
+        }
+        
+        @keyframes comboShow {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                opacity: 0;
+            }
+        }
+        
+        .sound-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .sound-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .landing-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .landing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .landing-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .page-transition {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .achievement-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ffd700;
+            color: #000;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 min-h-screen">
+    <!-- Sound Toggle Button -->
+    <button id="soundToggle" class="sound-toggle" title="เปิด/ปิดเสียง">
+        🔊
+    </button>
+
+    <!-- Back Button (Hidden on landing page) -->
+    <button id="backButton" class="back-button hidden" title="กลับหน้าหลัก">
+        ⬅️
+    </button>
+
+    <!-- Landing Page -->
+    <div id="landingPage" class="container mx-auto px-4 max-w-6xl py-8">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <!-- Logo -->
+            <div class="flex justify-center mb-6">
+                <img src="https://cttc19.onrender.com/game/img/logo.png" 
+                     alt="CTTC19 Logo" 
+                     class="h-20 md:h-24 object-contain drop-shadow-lg"
+                     onerror="this.style.display='none';">
+            </div>
+            
+            <h1 class="text-5xl font-bold text-white mb-4">🎮 ศูนย์การเรียนรู้คอมพิวเตอร์</h1>
+            <p class="text-2xl text-white/90 mb-2">สำหรับนักเรียนประถมศึกษา</p>
+            <p class="text-lg text-white/80">โซน 1: โลกแห่งคอมพิวเตอร์ (Computer World - Level 1)</p>
+            
+            <!-- Mascot -->
+            <div class="flex justify-center mt-6">
+                <img src="https://cttc19.onrender.com/game/img/mascot.gif" 
+                     alt="Mascot" 
+                     class="h-16 md:h-20 object-contain drop-shadow-lg"
+                     onerror="this.style.display='none';">
+            </div>
+        </div>
+
+        <!-- Overall Stats Summary -->
+        <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm mb-8 fade-in">
+            <h3 class="text-2xl font-bold text-white mb-4 text-center">📊 สถิติรวมของคุณ</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-yellow-400/20 rounded-lg p-4">
+                    <div class="text-3xl mb-2">🏆</div>
+                    <div class="text-sm text-white/80">คะแนนรวม</div>
+                    <div id="totalScore" class="text-2xl font-bold text-yellow-300">0</div>
+                </div>
+                <div class="bg-blue-400/20 rounded-lg p-4">
+                    <div class="text-3xl mb-2">🎯</div>
+                    <div class="text-sm text-white/80">เล่นทั้งหมด</div>
+                    <div id="totalGamesPlayed" class="text-2xl font-bold text-blue-300">0</div>
+                </div>
+                <div class="bg-green-400/20 rounded-lg p-4">
+                    <div class="text-3xl mb-2">⚡</div>
+                    <div class="text-sm text-white/80">เวลารวม</div>
+                    <div id="totalTimeSpent" class="text-2xl font-bold text-green-300">00:00</div>
+                </div>
+                <div class="bg-purple-400/20 rounded-lg p-4">
+                    <div class="text-3xl mb-2">🌟</div>
+                    <div class="text-sm text-white/80">เกมโปรด</div>
+                    <div id="favoriteGame" class="text-2xl font-bold text-purple-300">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Selection Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Game 1 Card -->
+            <div class="landing-card p-6 text-center fade-in" onclick="selectGame(1)" style="animation-delay: 0.1s">
+                <div class="relative">
+                    <div class="text-5xl mb-3">🧲</div>
+                    <div id="game1Badge" class="achievement-badge hidden">🏆</div>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">จับคู่อุปกรณ์</h3>
+                <p class="text-white/90 mb-3 text-sm">ลากชื่ออุปกรณ์ไปจับคู่กับภาพ</p>
+                <div class="bg-white/20 rounded-lg p-3 mb-3 text-xs text-left">
+                    <div class="font-semibold text-white mb-1">📖 วิธีเล่น:</div>
+                    <div class="text-white/90 space-y-1">
+                        <div>• ลากชื่ออุปกรณ์ไปวางบนภาพที่ตรงกัน</div>
+                        <div>• ตอบถูกได้คะแนน ตอบผิดหักคะแนน</div>
+                        <div>• ตอบถูกติดต่อกันได้โบนัส Combo</div>
+                        <div>• เสร็จเร็วได้โบนัสเวลา</div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="progress-bar mb-3">
+                    <div id="game1Progress" class="progress-fill" style="width: 0%"></div>
+                </div>
+                
+                <div class="bg-white/20 rounded-lg p-2 text-xs">
+                    <div class="flex justify-between mb-1">
+                        <span>🏆 สูงสุด:</span>
+                        <span id="game1BestScore" class="font-bold">0</span>
+                    </div>
+                    <div class="flex justify-between mb-1">
+                        <span>⏱️ เร็วสุด:</span>
+                        <span id="game1BestTime" class="font-bold">--:--</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>🎮 เล่นแล้ว:</span>
+                        <span id="game1Total" class="font-bold">0 รอบ</span>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <span class="inline-block bg-blue-500/30 text-white px-2 py-1 rounded-full text-xs mr-1">ง่าย</span>
+                    <span class="inline-block bg-green-500/30 text-white px-2 py-1 rounded-full text-xs">สนุก</span>
+                </div>
+            </div>
+
+            <!-- Game 2 Card -->
+            <div class="landing-card p-6 text-center fade-in" onclick="selectGame(2)" style="animation-delay: 0.2s">
+                <div class="relative">
+                    <div class="text-5xl mb-3">🧠</div>
+                    <div id="game2Badge" class="achievement-badge hidden">🏆</div>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">ฮีโร่ฮาร์ดแวร์</h3>
+                <p class="text-white/90 mb-3 text-sm">ตอบคำถามเกี่ยวกับหน้าที่อุปกรณ์</p>
+                <div class="bg-white/20 rounded-lg p-3 mb-3 text-xs text-left">
+                    <div class="font-semibold text-white mb-1">📖 วิธีเล่น:</div>
+                    <div class="text-white/90 space-y-1">
+                        <div>• ดูภาพอุปกรณ์และอ่านคำถาม</div>
+                        <div>• เลือกคำตอบที่ถูกต้องจาก 4 ตัวเลือก</div>
+                        <div>• มี 5 ข้อ ข้อละ 10 คะแนน</div>
+                        <div>• ตอบถูกทุกข้อได้คะแนนเต็ม 50</div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="progress-bar mb-3">
+                    <div id="game2Progress" class="progress-fill" style="width: 0%"></div>
+                </div>
+                
+                <div class="bg-white/20 rounded-lg p-2 text-xs">
+                    <div class="flex justify-between mb-1">
+                        <span>🏆 สูงสุด:</span>
+                        <span id="game2BestScore" class="font-bold">0</span>
+                    </div>
+                    <div class="flex justify-between mb-1">
+                        <span>⏱️ เร็วสุด:</span>
+                        <span id="game2BestTime" class="font-bold">--:--</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>🎮 เล่นแล้ว:</span>
+                        <span id="game2Total" class="font-bold">0 รอบ</span>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <span class="inline-block bg-yellow-500/30 text-white px-2 py-1 rounded-full text-xs mr-1">ปานกลาง</span>
+                    <span class="inline-block bg-purple-500/30 text-white px-2 py-1 rounded-full text-xs">ท้าทาย</span>
+                </div>
+            </div>
+
+            <!-- Game 3 Card - เปิดเครื่อง -->
+            <div class="landing-card p-6 text-center fade-in" onclick="selectGame(3)" style="animation-delay: 0.3s">
+                <div class="relative">
+                    <div class="text-5xl mb-3">🚀</div>
+                    <div id="game3Badge" class="achievement-badge hidden">🏆</div>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">เปิดเครื่องคอม</h3>
+                <p class="text-white/90 mb-3 text-sm">เรียงลำดับการเปิดเครื่องให้ถูกต้อง</p>
+                <div class="bg-white/20 rounded-lg p-3 mb-3 text-xs text-left">
+                    <div class="font-semibold text-white mb-1">📖 วิธีเล่น:</div>
+                    <div class="text-white/90 space-y-1">
+                        <div>• ลากขั้นตอนไปวางในช่องตามลำดับ</div>
+                        <div>• เรียงจากขั้นตอนแรกไปสุดท้าย</div>
+                        <div>• เลือกระดับความยาก 3 แบบ</div>
+                        <div>• เรียงถูกทุกขั้นตอนได้คะแนนเต็ม</div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="progress-bar mb-3">
+                    <div id="game3Progress" class="progress-fill" style="width: 0%"></div>
+                </div>
+                
+                <div class="bg-white/20 rounded-lg p-2 text-xs">
+                    <div class="flex justify-between mb-1">
+                        <span>🏆 สูงสุด:</span>
+                        <span id="game3BestScore" class="font-bold">0</span>
+                    </div>
+                    <div class="flex justify-between mb-1">
+                        <span>⏱️ เร็วสุด:</span>
+                        <span id="game3BestTime" class="font-bold">--:--</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>🎮 เล่นแล้ว:</span>
+                        <span id="game3Total" class="font-bold">0 รอบ</span>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <span class="inline-block bg-green-500/30 text-white px-2 py-1 rounded-full text-xs mr-1">ปานกลาง</span>
+                    <span class="inline-block bg-blue-500/30 text-white px-2 py-1 rounded-full text-xs">ลำดับ</span>
+                </div>
+            </div>
+
+            <!-- Game 4 Card - ปิดเครื่อง -->
+            <div class="landing-card p-6 text-center fade-in" onclick="selectGame(4)" style="animation-delay: 0.4s">
+                <div class="relative">
+                    <div class="text-5xl mb-3">🌙</div>
+                    <div id="game4Badge" class="achievement-badge hidden">🏆</div>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">ปิดเครื่องคอม</h3>
+                <p class="text-white/90 mb-3 text-sm">เรียงลำดับการปิดเครื่องอย่างปลอดภัย</p>
+                <div class="bg-white/20 rounded-lg p-3 mb-3 text-xs text-left">
+                    <div class="font-semibold text-white mb-1">📖 วิธีเล่น:</div>
+                    <div class="text-white/90 space-y-1">
+                        <div>• ลากขั้นตอนไปวางในช่องตามลำดับ</div>
+                        <div>• เรียงตามขั้นตอนการปิดเครื่องที่ถูกต้อง</div>
+                        <div>• เน้นความปลอดภัยของข้อมูล</div>
+                        <div>• เรียงถูกทุกขั้นตอนได้คะแนนเต็ม</div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="progress-bar mb-3">
+                    <div id="game4Progress" class="progress-fill" style="width: 0%"></div>
+                </div>
+                
+                <div class="bg-white/20 rounded-lg p-2 text-xs">
+                    <div class="flex justify-between mb-1">
+                        <span>🏆 สูงสุด:</span>
+                        <span id="game4BestScore" class="font-bold">0</span>
+                    </div>
+                    <div class="flex justify-between mb-1">
+                        <span>⏱️ เร็วสุด:</span>
+                        <span id="game4BestTime" class="font-bold">--:--</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>🎮 เล่นแล้ว:</span>
+                        <span id="game4Total" class="font-bold">0 รอบ</span>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <span class="inline-block bg-orange-500/30 text-white px-2 py-1 rounded-full text-xs mr-1">ยาก</span>
+                    <span class="inline-block bg-red-500/30 text-white px-2 py-1 rounded-full text-xs">ปลอดภัย</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Games History -->
+        <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm fade-in" style="animation-delay: 0.4s">
+            <h3 class="text-xl font-bold text-white mb-4 text-center">📈 ประวัติการเล่นล่าสุด</h3>
+            <div id="recentGames" class="space-y-2 max-h-60 overflow-y-auto">
+                <p class="text-white/70 text-center">ยังไม่มีประวัติการเล่น</p>
+            </div>
+            <div class="text-center mt-4">
+                <button id="clearHistory" class="button-hover bg-red-500/20 hover:bg-red-500/30 text-white font-semibold px-4 py-2 rounded-full transition-all">
+                    🗑️ ล้างประวัติ
+                </button>
+                <button id="clearAllStats" class="button-hover bg-orange-500/20 hover:bg-orange-500/30 text-white font-semibold px-4 py-2 rounded-full ml-2 transition-all">
+                    🔄 รีเซ็ตทั้งหมด
+                </button>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center mt-12 pt-8 border-t border-white/20 fade-in" style="animation-delay: 0.5s">
+            <p class="text-white/70 text-sm">
+                © developed by Tle Narongphisit | CTTC19 @ CPD
+            </p>
+        </div>
+    </div>
+
+    <!-- Game 1: Drag & Drop -->
+    <div id="game1" class="hidden page-transition">
+        <div class="container mx-auto px-4 max-w-6xl py-8">
+            <div class="game-card p-8">
+                <div class="text-center mb-6">
+                    <h2 class="text-3xl font-bold text-white mb-2">🧲 เกมที่ 1: จับคู่ชื่อกับภาพอุปกรณ์</h2>
+                    <p class="text-white/90 text-lg">ลากชื่ออุปกรณ์ไปวางให้ตรงกับภาพ</p>
+                    <div class="bg-blue-100 rounded-lg p-4 mt-4 text-left max-w-4xl mx-auto">
+                        <div class="text-blue-800 font-semibold mb-2">💡 เคล็ดลับการเล่น:</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-blue-700">
+                            <div>🖱️ <strong>เมาส์:</strong> ใช้ชี้และคลิกบนหน้าจอ</div>
+                            <div>⌨️ <strong>คีย์บอร์ด:</strong> ใช้พิมพ์ตัวอักษรและตัวเลข</div>
+                            <div>🖥️ <strong>จอมอนิเตอร์:</strong> แสดงภาพและข้อความ</div>
+                            <div>💻 <strong>ซีพียู:</strong> สมองของคอมพิวเตอร์</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center items-center gap-4 mt-4 flex-wrap">
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">คะแนน: </span>
+                            <span id="score" class="text-yellow-300 font-bold text-xl">0</span>
+                        </div>
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">เวลา: </span>
+                            <span id="timer" class="text-green-300 font-bold text-xl">00:00</span>
+                        </div>
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">ระดับ: </span>
+                            <select id="difficulty" class="bg-transparent text-white font-bold">
+                                <option value="easy" class="text-black">ง่าย</option>
+                                <option value="medium" class="text-black">ปานกลาง</option>
+                                <option value="hard" class="text-black">ยาก</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Area -->
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+                    <!-- Device Images -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                        <div class="drop-zone bg-white rounded-xl p-4 text-center min-h-[150px] flex flex-col items-center justify-center" data-device="mouse">
+                            <div class="device-icon">🖱️</div>
+                            <div class="device-name text-gray-600 font-semibold mt-2 hidden">เมาส์</div>
+                            <div class="hint text-sm text-gray-500 mt-1 hidden">ใช้สำหรับชี้และคลิก</div>
+                        </div>
+                        
+                        <div class="drop-zone bg-white rounded-xl p-4 text-center min-h-[150px] flex flex-col items-center justify-center" data-device="keyboard">
+                            <div class="device-icon">⌨️</div>
+                            <div class="device-name text-gray-600 font-semibold mt-2 hidden">คีย์บอร์ด</div>
+                            <div class="hint text-sm text-gray-500 mt-1 hidden">ใช้สำหรับพิมพ์ตัวอักษร</div>
+                        </div>
+                        
+                        <div class="drop-zone bg-white rounded-xl p-4 text-center min-h-[150px] flex flex-col items-center justify-center" data-device="monitor">
+                            <div class="device-icon">🖥️</div>
+                            <div class="device-name text-gray-600 font-semibold mt-2 hidden">จอมอนิเตอร์</div>
+                            <div class="hint text-sm text-gray-500 mt-1 hidden">แสดงภาพและข้อความ</div>
+                        </div>
+                        
+                        <div class="drop-zone bg-white rounded-xl p-4 text-center min-h-[150px] flex flex-col items-center justify-center" data-device="cpu">
+                            <div class="device-icon">💻</div>
+                            <div class="device-name text-gray-600 font-semibold mt-2 hidden">ซีพียู</div>
+                            <div class="hint text-sm text-gray-500 mt-1 hidden">สมองของคอมพิวเตอร์</div>
+                        </div>
+                    </div>
+
+                    <!-- Draggable Names -->
+                    <div class="border-t-2 border-white/30 pt-6">
+                        <h3 class="text-white text-xl font-semibold mb-4 text-center">🏷️ ลากชื่ออุปกรณ์เหล่านี้</h3>
+                        <div id="dragItems" class="flex flex-wrap justify-center gap-4">
+                            <div class="drag-item bg-yellow-400 hover:bg-yellow-300 text-black font-semibold px-6 py-3 rounded-full shadow-lg" draggable="true" data-device="mouse">
+                                🖱️ เมาส์
+                            </div>
+                            <div class="drag-item bg-green-400 hover:bg-green-300 text-black font-semibold px-6 py-3 rounded-full shadow-lg" draggable="true" data-device="keyboard">
+                                ⌨️ คีย์บอร์ด
+                            </div>
+                            <div class="drag-item bg-blue-400 hover:bg-blue-300 text-black font-semibold px-6 py-3 rounded-full shadow-lg" draggable="true" data-device="monitor">
+                                🖥️ จอมอนิเตอร์
+                            </div>
+                            <div class="drag-item bg-purple-400 hover:bg-purple-300 text-black font-semibold px-6 py-3 rounded-full shadow-lg" draggable="true" data-device="cpu">
+                                💻 ซีพียู
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="text-center mt-6">
+                    <button id="resetGame" class="button-hover bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-full mr-4 transition-all">
+                        🔄 เริ่มใหม่
+                    </button>
+                    <button id="showHints" class="button-hover bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-full mr-4 transition-all">
+                        💡 แสดงคำใบ้
+                    </button>
+                    <button id="showStats" class="button-hover bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-full transition-all">
+                        📊 สถิติการเล่น
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 2: Hardware Hero Quiz -->
+    <div id="game2" class="hidden page-transition">
+        <div class="container mx-auto px-4 max-w-6xl py-8">
+            <div class="game-card p-8">
+                <div class="text-center mb-6">
+                    <h2 class="text-3xl font-bold text-white mb-2">🧠 เกมที่ 2: ใครคือฮีโร่ฮาร์ดแวร์</h2>
+                    <p class="text-white/90 text-lg">ตอบคำถามเกี่ยวกับหน้าที่ของอุปกรณ์คอมพิวเตอร์</p>
+                    <div class="bg-green-100 rounded-lg p-4 mt-4 text-left max-w-4xl mx-auto">
+                        <div class="text-green-800 font-semibold mb-2">🎯 เป้าหมายการเรียนรู้:</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-green-700">
+                            <div>📚 <strong>ความรู้:</strong> เรียนรู้หน้าที่ของอุปกรณ์</div>
+                            <div>🧠 <strong>ความเข้าใจ:</strong> จำแนกประเภทอุปกรณ์</div>
+                            <div>⚡ <strong>ความเร็ว:</strong> ตอบคำถามให้เร็วที่สุด</div>
+                            <div>🏆 <strong>เป้าหมาย:</strong> ตอบถูกทุกข้อได้ 50 คะแนน</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center items-center gap-4 mt-4 flex-wrap">
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">คะแนน: </span>
+                            <span id="quizScore" class="text-yellow-300 font-bold text-xl">0</span>
+                        </div>
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">เวลา: </span>
+                            <span id="quizTimer" class="text-green-300 font-bold text-xl">00:00</span>
+                        </div>
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">ข้อที่: </span>
+                            <span id="questionNumber" class="text-blue-300 font-bold text-xl">1/5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+                    <div id="quizContainer" class="text-center">
+                        <div class="text-6xl mb-4" id="questionIcon">🖱️</div>
+                        <h3 class="text-2xl font-bold text-white mb-6" id="questionText">อุปกรณ์นี้ใช้ทำอะไร?</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                            <button class="quiz-option button-hover bg-blue-500 hover:bg-blue-600 text-white font-semibold p-4 rounded-xl transition-all" data-answer="0">
+                                <span class="option-text">ใช้สำหรับชี้และคลิก</span>
+                            </button>
+                            <button class="quiz-option button-hover bg-green-500 hover:bg-green-600 text-white font-semibold p-4 rounded-xl transition-all" data-answer="1">
+                                <span class="option-text">ใช้สำหรับพิมพ์ตัวอักษร</span>
+                            </button>
+                            <button class="quiz-option button-hover bg-purple-500 hover:bg-purple-600 text-white font-semibold p-4 rounded-xl transition-all" data-answer="2">
+                                <span class="option-text">ใช้สำหรับแสดงภาพ</span>
+                            </button>
+                            <button class="quiz-option button-hover bg-red-500 hover:bg-red-600 text-white font-semibold p-4 rounded-xl transition-all" data-answer="3">
+                                <span class="option-text">ใช้สำหรับประมวลผล</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="quizResult" class="text-center mt-6 hidden">
+                        <div class="text-4xl mb-4" id="resultIcon">🎉</div>
+                        <h3 class="text-2xl font-bold text-white mb-4" id="resultText">ยินดีด้วย!</h3>
+                        <div class="bg-white/20 rounded-lg p-4 mb-4">
+                            <p class="text-white font-semibold">🏆 คะแนนรวม: <span id="quizFinalScore">0</span>/50</p>
+                            <p class="text-white">⏱️ เวลาที่ใช้: <span id="quizFinalTime">00:00</span></p>
+                        </div>
+                        <button id="restartQuiz" class="button-hover bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-full transition-all">
+                            🔄 เล่นใหม่
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 3: Computer Startup Sequence -->
+    <div id="game3" class="hidden page-transition">
+        <div class="container mx-auto px-4 max-w-6xl py-8">
+            <div class="game-card p-8">
+                <div class="text-center mb-6">
+                    <h2 class="text-3xl font-bold text-white mb-2">🚀 เกมที่ 3: เปิดเครื่องคอมพิวเตอร์</h2>
+                    <p class="text-white/90 text-lg">เรียงลำดับขั้นตอนการเปิดเครื่องคอมพิวเตอร์ให้ถูกต้อง</p>
+                    <div class="flex justify-center items-center gap-4 mt-4 flex-wrap">
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">คะแนน: </span>
+                            <span id="sequenceScore" class="text-yellow-300 font-bold text-xl">0</span>
+                        </div>
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">เวลา: </span>
+                            <span id="sequenceTimer" class="text-green-300 font-bold text-xl">00:00</span>
+                        </div>
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">ระดับ: </span>
+                            <select id="startupDifficulty" class="bg-gray-800 text-white font-bold px-2 py-1 rounded border-none outline-none cursor-pointer">
+                                <option value="basic" class="bg-gray-800 text-white">🟢 พื้นฐาน</option>
+                                <option value="detailed" class="bg-gray-800 text-white">🟡 รายละเอียด</option>
+                                <option value="advanced" class="bg-gray-800 text-white">🔴 ขั้นสูง</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-white mb-4">🎯 เรียงลำดับขั้นตอนการเปิดเครื่องให้ถูกต้อง</h3>
+                        <div class="bg-green-100 rounded-lg p-4 mb-4">
+                            <p class="text-green-800 font-semibold">📝 วิธีเล่น: ลากขั้นตอนไปวางในช่องตามลำดับที่ถูกต้อง</p>
+                            <div class="mt-2 text-sm text-green-700">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+                                    <div>🟢 <strong>พื้นฐาน:</strong> ขั้นตอนหลักการเปิดเครื่อง</div>
+                                    <div>🟡 <strong>รายละเอียด:</strong> ขั้นตอนที่ละเอียดมากขึ้น</div>
+                                    <div>🔴 <strong>ขั้นสูง:</strong> ขั้นตอนครบถ้วนทุกรายละเอียด</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Drop Zones for Sequence -->
+                    <div id="startupDropZones" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <!-- Drop zones will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Draggable Steps -->
+                    <div class="border-t-2 border-white/30 pt-6">
+                        <h3 class="text-white text-xl font-semibold mb-4 text-center">📋 ลากขั้นตอนเหล่านี้</h3>
+                        <div id="startupSteps" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Steps will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-6">
+                        <button id="checkStartupSequence" class="button-hover bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-full mr-4 transition-all">
+                            ✅ ตรวจสอบ
+                        </button>
+                        <button id="resetStartupSequence" class="button-hover bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-full transition-all">
+                            🔄 เริ่มใหม่
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 4: Computer Shutdown Sequence -->
+    <div id="game4" class="hidden page-transition">
+        <div class="container mx-auto px-4 max-w-6xl py-8">
+            <div class="game-card p-8">
+                <div class="text-center mb-6">
+                    <h2 class="text-3xl font-bold text-white mb-2">🌙 เกมที่ 4: ปิดเครื่องคอมพิวเตอร์</h2>
+                    <p class="text-white/90 text-lg">เรียงลำดับขั้นตอนการปิดเครื่องคอมพิวเตอร์อย่างปลอดภัย</p>
+                    <div class="flex justify-center items-center gap-4 mt-4 flex-wrap">
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">คะแนน: </span>
+                            <span id="shutdownScore" class="text-yellow-300 font-bold text-xl">0</span>
+                        </div>
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">เวลา: </span>
+                            <span id="shutdownTimer" class="text-green-300 font-bold text-xl">00:00</span>
+                        </div>
+                        <div class="bg-white/20 rounded-lg px-4 py-2">
+                            <span class="text-white font-semibold">ระดับ: </span>
+                            <select id="shutdownDifficulty" class="bg-gray-800 text-white font-bold px-2 py-1 rounded border-none outline-none cursor-pointer">
+                                <option value="basic" class="bg-gray-800 text-white">🟢 พื้นฐาน</option>
+                                <option value="safe" class="bg-gray-800 text-white">🟡 ปลอดภัย</option>
+                                <option value="complete" class="bg-gray-800 text-white">🔴 สมบูรณ์</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-white mb-4">🎯 เรียงลำดับขั้นตอนการปิดเครื่องให้ถูกต้อง</h3>
+                        <div class="bg-blue-100 rounded-lg p-4 mb-4">
+                            <p class="text-blue-800 font-semibold">📝 วิธีเล่น: ลากขั้นตอนไปวางในช่องตามลำดับที่ถูกต้อง</p>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
+                                    <div>🟢 <strong>พื้นฐาน:</strong> ขั้นตอนหลักการปิดเครื่อง</div>
+                                    <div>🟡 <strong>ปลอดภัย:</strong> ขั้นตอนปิดเครื่องอย่างปลอดภัย</div>
+                                    <div>🔴 <strong>สมบูรณ์:</strong> ขั้นตอนครบถ้วนทุกรายละเอียด</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Drop Zones for Sequence -->
+                    <div id="shutdownDropZones" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <!-- Drop zones will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Draggable Steps -->
+                    <div class="border-t-2 border-white/30 pt-6">
+                        <h3 class="text-white text-xl font-semibold mb-4 text-center">📋 ลากขั้นตอนเหล่านี้</h3>
+                        <div id="shutdownSteps" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Steps will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-6">
+                        <button id="checkShutdownSequence" class="button-hover bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-full mr-4 transition-all">
+                            ✅ ตรวจสอบ
+                        </button>
+                        <button id="resetShutdownSequence" class="button-hover bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-full transition-all">
+                            🔄 เริ่มใหม่
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Result Modal -->
+    <div id="gameResultModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 max-w-lg mx-4 text-center">
+            <div id="resultModalIcon" class="text-6xl mb-4">🎉</div>
+            <h3 id="resultModalTitle" class="text-2xl font-bold text-gray-800 mb-2">ยินดีด้วย!</h3>
+            <p id="resultModalMessage" class="text-gray-600 mb-4">คุณเล่นเกมเสร็จเรียบร้อยแล้ว</p>
+            
+            <!-- Current Round Summary -->
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 mb-4 border-2 border-blue-200">
+                <h4 class="text-lg font-bold text-gray-800 mb-3">📊 สรุปผลรอบนี้</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="bg-white/70 rounded-lg p-3">
+                        <div class="text-2xl mb-1">🏆</div>
+                        <div class="text-gray-600">คะแนนพื้นฐาน</div>
+                        <div id="currentBaseScore" class="text-xl font-bold text-blue-600">0</div>
+                    </div>
+                    <div class="bg-white/70 rounded-lg p-3">
+                        <div class="text-2xl mb-1">⚡</div>
+                        <div class="text-gray-600">โบนัสเวลา</div>
+                        <div id="currentTimeBonus" class="text-xl font-bold text-green-600">+0</div>
+                    </div>
+                    <div class="bg-white/70 rounded-lg p-3">
+                        <div class="text-2xl mb-1">🎯</div>
+                        <div class="text-gray-600">คะแนนรวม</div>
+                        <div id="currentTotalScore" class="text-xl font-bold text-purple-600">0</div>
+                    </div>
+                    <div class="bg-white/70 rounded-lg p-3">
+                        <div class="text-2xl mb-1">⏱️</div>
+                        <div class="text-gray-600">เวลาที่ใช้</div>
+                        <div id="currentGameTime" class="text-xl font-bold text-orange-600">00:00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievement & Records -->
+            <div class="bg-yellow-50 rounded-lg p-4 mb-4 border-2 border-yellow-200">
+                <div id="newRecord" class="text-green-800 font-bold mb-2 hidden">
+                    🌟 สถิติใหม่! คะแนนสูงสุด!
+                </div>
+                <div id="achievementText" class="text-yellow-800 font-semibold">
+                    🎖️ ได้รับเหรียญ "นักเรียนดีเด่น"
+                </div>
+                <div id="encouragementText" class="text-gray-600 text-sm mt-2">
+                    เก่งมาก! ความรู้เรื่องคอมพิวเตอร์ของคุณดีขึ้นแล้ว
+                </div>
+            </div>
+
+            <!-- Overall Stats Comparison -->
+            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                <h4 class="text-md font-bold text-gray-700 mb-2">📈 เปรียบเทียบสถิติ</h4>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                    <div class="text-center">
+                        <div class="text-gray-500">คะแนนสูงสุด</div>
+                        <div id="bestScoreComparison" class="font-bold text-blue-600">0</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-gray-500">เวลาเร็วสุด</div>
+                        <div id="bestTimeComparison" class="font-bold text-green-600">--:--</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-gray-500">เล่นทั้งหมด</div>
+                        <div id="totalGamesComparison" class="font-bold text-purple-600">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3 justify-center flex-wrap">
+                <button id="playAgainButton" class="button-hover bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-full transition-all">
+                    🎮 เล่นอีกครั้ง
+                </button>
+                <button id="tryOtherGameButton" class="button-hover bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-full transition-all">
+                    🎯 ลองเกมอื่น
+                </button>
+                <button id="backToHomeButton" class="button-hover bg-purple-500 hover:bg-purple-600 text-white font-semibold px-6 py-3 rounded-full transition-all">
+                    🏠 หน้าหลัก
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="statsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 max-w-lg mx-4 text-center">
+            <div class="text-4xl mb-4">📊</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">สถิติการเล่น</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-lg p-4">
+                    <div class="text-2xl mb-2">🏆</div>
+                    <div class="text-sm text-gray-600">คะแนนสูงสุด</div>
+                    <div id="bestScore" class="text-xl font-bold text-yellow-800">0</div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg p-4">
+                    <div class="text-2xl mb-2">⚡</div>
+                    <div class="text-sm text-gray-600">เวลาเร็วสุด</div>
+                    <div id="bestTime" class="text-xl font-bold text-blue-800">--:--</div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-green-100 to-green-200 rounded-lg p-4">
+                    <div class="text-2xl mb-2">🎮</div>
+                    <div class="text-sm text-gray-600">เล่นทั้งหมด</div>
+                    <div id="totalGames" class="text-xl font-bold text-green-800">0</div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                <h4 class="font-semibold text-gray-700 mb-2">🎯 สถิติตามระดับความยาก</h4>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>ง่าย:</span>
+                        <span id="easyStats" class="font-semibold">0 เกม</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>ปานกลาง:</span>
+                        <span id="mediumStats" class="font-semibold">0 เกม</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>ยาก:</span>
+                        <span id="hardStats" class="font-semibold">0 เกม</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-4 justify-center">
+                <button id="clearStats" class="button-hover bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-full transition-all">
+                    🗑️ ล้างสถิติ
+                </button>
+                <button id="closeStats" class="button-hover bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-full transition-all">
+                    ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let correctAnswers = 0;
+        let totalItems = 4;
+        let wrongAttempts = {};
+        let soundEnabled = true;
+        let comboCount = 0;
+        let lastCorrectTime = 0;
+        let gameStartTime = 0;
+        let gameTimer = null;
+        let currentGameTime = 0;
+        let currentGame = 1;
+        let currentPage = 'landing'; // Track current page
+        
+        // Quiz Game Variables
+        let quizScore = 0;
+        let currentQuestion = 0;
+        let quizStartTime = 0;
+        let quizTimer = null;
+        let quizGameTime = 0;
+        
+        // Sequence Game Variables
+        let sequenceScore = 0;
+        let sequenceStartTime = 0;
+        let sequenceTimer = null;
+        let sequenceGameTime = 0;
+        let droppedSequence = [];
+        
+        // Shutdown Game Variables
+        let shutdownScore = 0;
+        let shutdownStartTime = 0;
+        let shutdownTimer = null;
+        let shutdownGameTime = 0;
+        let droppedShutdownSequence = [];
+        
+        // Game statistics
+        let gameStats = {
+            game1: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+            game2: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+            game3: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+            game4: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+            difficultyStats: {
+                easy: 0,
+                medium: 0,
+                hard: 0
+            },
+            gameHistory: []
+        };
+
+        // Quiz Questions Data
+        const quizQuestions = [
+            {
+                icon: "🖱️",
+                question: "อุปกรณ์นี้ใช้ทำอะไร?",
+                options: ["ใช้สำหรับชี้และคลิก", "ใช้สำหรับพิมพ์ตัวอักษร", "ใช้สำหรับแสดงภาพ", "ใช้สำหรับประมวลผล"],
+                correct: 0
+            },
+            {
+                icon: "⌨️",
+                question: "คีย์บอร์ดมีหน้าที่อะไร?",
+                options: ["แสดงผลข้อมูล", "พิมพ์ตัวอักษรและตัวเลข", "เก็บข้อมูล", "เชื่อมต่ออินเทอร์เน็ต"],
+                correct: 1
+            },
+            {
+                icon: "🖥️",
+                question: "จอมอนิเตอร์ทำหน้าที่อะไร?",
+                options: ["ประมวลผลข้อมูล", "เก็บไฟล์", "แสดงภาพและข้อความ", "เชื่อมต่อเครือข่าย"],
+                correct: 2
+            },
+            {
+                icon: "💻",
+                question: "CPU คืออะไร?",
+                options: ["หน่วยความจำ", "หน่วยแสดงผล", "หน่วยเก็บข้อมูล", "หน่วยประมวลผลกลาง"],
+                correct: 3
+            },
+            {
+                icon: "🔌",
+                question: "ก่อนใช้คอมพิวเตอร์ต้องทำอะไรก่อน?",
+                options: ["เปิดโปรแกรม", "เสียบปลั๊กไฟ", "กดปุ่มรีเซ็ต", "ใส่แผ่น CD"],
+                correct: 1
+            }
+        ];
+
+        // Startup Sequence Steps Data
+        const startupSequenceSteps = {
+            basic: [
+                { id: 0, text: "เสียบปลั๊กไฟ", icon: "🔌", detail: "เชื่อมต่อสายไฟเข้ากับเต้าเสียบ" },
+                { id: 1, text: "กดปุ่มเปิดเครื่อง", icon: "⚡", detail: "กดปุ่ม Power บนตัวเครื่อง" },
+                { id: 2, text: "รอระบบโหลด", icon: "⏳", detail: "รอให้ระบบปฏิบัติการเริ่มทำงาน" },
+                { id: 3, text: "เข้าสู่หน้าจอหลัก", icon: "🖥️", detail: "พร้อมใช้งานคอมพิวเตอร์" }
+            ],
+            detailed: [
+                { id: 0, text: "ตรวจสอบสายไฟ", icon: "🔍", detail: "ตรวจดูสายไฟว่าเสียบแน่นหรือไม่" },
+                { id: 1, text: "เปิดสวิตช์ที่เต้าเสียบ", icon: "🔌", detail: "เปิดสวิตช์ที่เต้าเสียบไฟ" },
+                { id: 2, text: "กดปุ่ม Power", icon: "⚡", detail: "กดปุ่มเปิดเครื่องบนตัวเครื่อง" },
+                { id: 3, text: "เปิดจอมอนิเตอร์", icon: "🖥️", detail: "กดปุ่มเปิดจอมอนิเตอร์" },
+                { id: 4, text: "รอ BIOS โหลด", icon: "⏳", detail: "รอให้ระบบ BIOS ทำงาน" },
+                { id: 5, text: "เข้าสู่ระบบปฏิบัติการ", icon: "💻", detail: "รอให้ Windows หรือ OS โหลด" }
+            ],
+            advanced: [
+                { id: 0, text: "ตรวจสอบการเชื่อมต่อ", icon: "🔍", detail: "ตรวจสายไฟ คีย์บอร์ด เมาส์" },
+                { id: 1, text: "เปิดสวิตช์ PSU", icon: "🔌", detail: "เปิดสวิตช์ที่ Power Supply" },
+                { id: 2, text: "เปิดสวิตช์เต้าเสียบ", icon: "⚡", detail: "เปิดสวิตช์ที่เต้าเสียบไฟ" },
+                { id: 3, text: "กดปุ่ม Power", icon: "💻", detail: "กดปุ่มเปิดเครื่องบนเคส" },
+                { id: 4, text: "เปิดจอมอนิเตอร์", icon: "🖥️", detail: "กดปุ่มเปิดจอมอนิเตอร์" },
+                { id: 5, text: "ตรวจสอบ POST", icon: "⏳", detail: "ดู Power-On Self Test" },
+                { id: 6, text: "โหลด BIOS/UEFI", icon: "🛠️", detail: "ระบบ BIOS เริ่มทำงาน" },
+                { id: 7, text: "เข้าสู่ระบบปฏิบัติการ", icon: "🏠", detail: "เข้าสู่หน้าจอ Desktop" }
+            ]
+        };
+
+        // Shutdown Sequence Steps Data
+        const shutdownSequenceSteps = {
+            basic: [
+                { id: 0, text: "บันทึกงานทั้งหมด", icon: "💾", detail: "Save ไฟล์ที่กำลังทำงานอยู่" },
+                { id: 1, text: "ปิดโปรแกรมทั้งหมด", icon: "❌", detail: "ปิดแอปพลิเคชันที่เปิดอยู่" },
+                { id: 2, text: "คลิก Shutdown", icon: "🔄", detail: "เลือก Shut down จากเมนู Start" },
+                { id: 3, text: "รอเครื่องปิดสนิท", icon: "🌙", detail: "รอให้หน้าจอดับและเครื่องหยุดทำงาน" }
+            ],
+            safe: [
+                { id: 0, text: "บันทึกงานทั้งหมด", icon: "💾", detail: "Save ไฟล์และเอกสารทั้งหมด" },
+                { id: 1, text: "ปิดโปรแกรมทีละตัว", icon: "❌", detail: "ปิดแอปพลิเคชันทีละตัวอย่างระมัดระวัง" },
+                { id: 2, text: "ตรวจสอบงานที่ยังไม่บันทึก", icon: "🔍", detail: "ดูว่ามีงานที่ยังไม่ได้ Save หรือไม่" },
+                { id: 3, text: "คลิก Start Menu", icon: "🏠", detail: "คลิกที่ปุ่ม Start ที่มุมซ้ายล่าง" },
+                { id: 4, text: "เลือก Shut down", icon: "🔄", detail: "คลิกเลือก Shut down จากเมนู" },
+                { id: 5, text: "รอระบบปิดตัว", icon: "🌙", detail: "รอให้ระบบปิดตัวเองอย่างสมบูรณ์" }
+            ],
+            complete: [
+                { id: 0, text: "บันทึกงานทั้งหมด", icon: "💾", detail: "Save ไฟล์และเอกสารทั้งหมด" },
+                { id: 1, text: "ปิดโปรแกรมทีละตัว", icon: "❌", detail: "ปิดแอปพลิเคชันทีละตัวอย่างระมัดระวัง" },
+                { id: 2, text: "ตรวจสอบ Background Apps", icon: "🔍", detail: "ดูแอปที่ทำงานอยู่เบื้องหลัง" },
+                { id: 3, text: "ปิดการเชื่อมต่อเครือข่าย", icon: "📡", detail: "ตัดการเชื่อมต่อ Internet อย่างปลอดภัย" },
+                { id: 4, text: "คลิก Start Menu", icon: "🏠", detail: "คลิกที่ปุ่ม Start ที่มุมซ้ายล่าง" },
+                { id: 5, text: "เลือก Shut down", icon: "🔄", detail: "คลิกเลือก Shut down จากเมนู" },
+                { id: 6, text: "รอระบบปิดตัว", icon: "⏳", detail: "รอให้ระบบปิดตัวเองอย่างสมบูรณ์" },
+                { id: 7, text: "ปิดจอมอนิเตอร์", icon: "🌙", detail: "กดปุ่มปิดจอมอนิเตอร์เมื่อเครื่องปิดแล้ว" }
+            ]
+        };
+
+        // Page Navigation Functions
+        function showLandingPage() {
+            currentPage = 'landing';
+            document.getElementById('landingPage').classList.remove('hidden');
+            document.getElementById('game1').classList.add('hidden');
+            document.getElementById('game2').classList.add('hidden');
+            document.getElementById('game3').classList.add('hidden');
+            document.getElementById('game4').classList.add('hidden');
+            document.getElementById('backButton').classList.add('hidden');
+            
+            // Stop all timers
+            stopAllTimers();
+            
+            // Update stats display
+            updateMainPageStats();
+            updateGameHistory();
+            updateProgressBars();
+            updateAchievementBadges();
+            
+            playButtonSound();
+        }
+
+        function selectGame(gameNumber) {
+            currentPage = `game${gameNumber}`;
+            currentGame = gameNumber;
+            
+            // Hide landing page
+            document.getElementById('landingPage').classList.add('hidden');
+            
+            // Hide all games first
+            document.getElementById('game1').classList.add('hidden');
+            document.getElementById('game2').classList.add('hidden');
+            document.getElementById('game3').classList.add('hidden');
+            document.getElementById('game4').classList.add('hidden');
+            
+            // Show selected game
+            document.getElementById(`game${gameNumber}`).classList.remove('hidden');
+            document.getElementById('backButton').classList.remove('hidden');
+            
+            // Stop all timers
+            stopAllTimers();
+            
+            // Initialize specific game
+            if (gameNumber === 1) {
+                resetGame();
+            } else if (gameNumber === 2) {
+                initQuizGame();
+            } else if (gameNumber === 3) {
+                initStartupGame();
+            } else if (gameNumber === 4) {
+                initShutdownGame();
+            }
+            
+            playButtonSound();
+            const gameNames = ['', 'จับคู่อุปกรณ์', 'ฮีโร่ฮาร์ดแวร์', 'เปิดเครื่องคอม', 'ปิดเครื่องคอม'];
+            showFeedback(`🎮 เริ่มเกม${gameNames[gameNumber]}!`, 'success');
+        }
+
+        function updateProgressBars() {
+            // Calculate progress based on games played
+            const maxGames = 10; // Consider 10 games as 100% progress
+            
+            const game1Progress = Math.min((gameStats.game1.totalGames / maxGames) * 100, 100);
+            const game2Progress = Math.min((gameStats.game2.totalGames / maxGames) * 100, 100);
+            const game3Progress = Math.min((gameStats.game3.totalGames / maxGames) * 100, 100);
+            const game4Progress = Math.min((gameStats.game4.totalGames / maxGames) * 100, 100);
+            
+            document.getElementById('game1Progress').style.width = `${game1Progress}%`;
+            document.getElementById('game2Progress').style.width = `${game2Progress}%`;
+            document.getElementById('game3Progress').style.width = `${game3Progress}%`;
+            document.getElementById('game4Progress').style.width = `${game4Progress}%`;
+        }
+
+        function updateAchievementBadges() {
+            // Show badges for high achievers
+            if (gameStats.game1.bestScore >= 50) {
+                document.getElementById('game1Badge').classList.remove('hidden');
+            }
+            if (gameStats.game2.bestScore >= 40) {
+                document.getElementById('game2Badge').classList.remove('hidden');
+            }
+            if (gameStats.game3.bestScore >= 80) {
+                document.getElementById('game3Badge').classList.remove('hidden');
+            }
+            if (gameStats.game4.bestScore >= 80) {
+                document.getElementById('game4Badge').classList.remove('hidden');
+            }
+        }
+
+        // Load stats from localStorage
+        function loadStats() {
+            const saved = localStorage.getItem('computerGameStats');
+            if (saved) {
+                try {
+                    gameStats = { ...gameStats, ...JSON.parse(saved) };
+                } catch (e) {
+                    console.error('Error loading stats:', e);
+                    // Reset stats if corrupted
+                    gameStats = {
+                        game1: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                        game2: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                        game3: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                        game4: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                        difficultyStats: { easy: 0, medium: 0, hard: 0 },
+                        gameHistory: []
+                    };
+                }
+            }
+        }
+
+        // Save stats to localStorage
+        function saveStats() {
+            try {
+                // Validate data before saving
+                if (!gameStats || typeof gameStats !== 'object') {
+                    console.warn('Invalid game stats data, skipping save');
+                    return;
+                }
+                
+                const dataToSave = JSON.stringify(gameStats);
+                if (dataToSave.length > 1024 * 1024) { // 1MB limit
+                    console.warn('Game stats data too large, truncating history');
+                    gameStats.gameHistory = gameStats.gameHistory.slice(0, 10);
+                }
+                
+                localStorage.setItem('computerGameStats', JSON.stringify(gameStats));
+            } catch (e) {
+                console.error('Error saving stats:', e);
+                if (e.name === 'QuotaExceededError') {
+                    // Clear old data if storage is full
+                    gameStats.gameHistory = [];
+                    try {
+                        localStorage.setItem('computerGameStats', JSON.stringify(gameStats));
+                    } catch (e2) {
+                        console.error('Failed to save even after clearing history:', e2);
+                    }
+                }
+            }
+        }
+
+        // Timer functions
+        function startTimer() {
+            gameStartTime = Date.now();
+            gameTimer = setInterval(updateTimer, 100);
+        }
+
+        function stopTimer() {
+            if (gameTimer) {
+                clearInterval(gameTimer);
+                gameTimer = null;
+            }
+        }
+
+        function updateTimer() {
+            currentGameTime = Date.now() - gameStartTime;
+            const seconds = Math.floor(currentGameTime / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const displaySeconds = seconds % 60;
+            const displayTime = `${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer').textContent = displayTime;
+        }
+
+        function formatTime(milliseconds) {
+            if (!milliseconds) return '--:--';
+            const seconds = Math.floor(milliseconds / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const displaySeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+        }
+
+        function stopAllTimers() {
+            if (gameTimer) clearInterval(gameTimer);
+            if (quizTimer) clearInterval(quizTimer);
+            if (sequenceTimer) clearInterval(sequenceTimer);
+            if (shutdownTimer) clearInterval(shutdownTimer);
+            gameTimer = quizTimer = sequenceTimer = shutdownTimer = null;
+        }
+
+        // Quiz Game Functions
+        function initQuizGame() {
+            quizScore = 0;
+            currentQuestion = 0;
+            quizGameTime = 0;
+            document.getElementById('quizScore').textContent = '0';
+            document.getElementById('quizTimer').textContent = '00:00';
+            document.getElementById('quizResult').classList.add('hidden');
+            document.getElementById('quizContainer').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestion >= quizQuestions.length) {
+                endQuizGame();
+                return;
+            }
+
+            const question = quizQuestions[currentQuestion];
+            document.getElementById('questionIcon').textContent = question.icon;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('questionNumber').textContent = `${currentQuestion + 1}/${quizQuestions.length}`;
+
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach((option, index) => {
+                option.querySelector('.option-text').textContent = question.options[index];
+                option.dataset.answer = index;
+                option.classList.remove('correct', 'incorrect');
+                option.disabled = false;
+            });
+
+            // Start timer on first question
+            if (currentQuestion === 0) {
+                startQuizTimer();
+            }
+        }
+
+        function startQuizTimer() {
+            quizStartTime = Date.now();
+            quizTimer = setInterval(() => {
+                quizGameTime = Date.now() - quizStartTime;
+                const seconds = Math.floor(quizGameTime / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const displaySeconds = seconds % 60;
+                const displayTime = `${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+                document.getElementById('quizTimer').textContent = displayTime;
+            }, 100);
+        }
+
+        function answerQuestion(selectedAnswer) {
+            const question = quizQuestions[currentQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+            
+            options.forEach(option => option.disabled = true);
+
+            if (selectedAnswer == question.correct) {
+                // Correct answer
+                options[selectedAnswer].classList.add('correct');
+                quizScore += 10;
+                document.getElementById('quizScore').textContent = quizScore;
+                playCorrectSound();
+                createParticles(options[selectedAnswer], 8);
+                showFeedback('✅ ถูกต้อง!', 'success');
+            } else {
+                // Wrong answer
+                options[selectedAnswer].classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+                playIncorrectSound();
+                showFeedback('❌ ผิด! คำตอบที่ถูกคือตัวเลือกที่เปลี่ยนสี', 'error');
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                loadQuestion();
+            }, 2000);
+        }
+
+        function endQuizGame() {
+            clearInterval(quizTimer);
+            playCompletionSound();
+            createParticles(document.querySelector('#game2 .game-card'), 15);
+            
+            // Show result modal instead of inline result
+            setTimeout(() => {
+                showGameResultModal('game2', quizScore, quizGameTime, 'เกมฮีโร่ฮาร์ดแวร์');
+            }, 1000);
+        }
+
+        // Startup Game Functions
+        function initStartupGame() {
+            sequenceScore = 0;
+            sequenceGameTime = 0;
+            document.getElementById('sequenceScore').textContent = '0';
+            document.getElementById('sequenceTimer').textContent = '00:00';
+            loadStartupSteps();
+            resetStartupDropZones();
+        }
+
+        function loadStartupSteps() {
+            const difficulty = document.getElementById('startupDifficulty').value;
+            const steps = startupSequenceSteps[difficulty];
+            const container = document.getElementById('startupSteps');
+            const dropZonesContainer = document.getElementById('startupDropZones');
+            
+            // Reset dropped sequence array based on difficulty
+            droppedSequence = new Array(steps.length).fill(null);
+            
+            // Create drop zones
+            dropZonesContainer.innerHTML = '';
+            dropZonesContainer.className = `grid grid-cols-1 md:grid-cols-${Math.min(steps.length, 4)} gap-4 mb-8`;
+            
+            for (let i = 0; i < steps.length; i++) {
+                const dropZone = document.createElement('div');
+                dropZone.className = 'startup-drop bg-white rounded-xl p-4 text-center min-h-[120px] flex flex-col items-center justify-center border-4 border-dashed border-gray-300';
+                dropZone.dataset.position = i;
+                dropZone.innerHTML = `
+                    <div class="text-2xl font-bold text-gray-400 mb-2">${i + 1}</div>
+                    <div class="text-gray-500 font-semibold">ขั้นตอนที่ ${i + 1}</div>
+                    <div class="dropped-step hidden"></div>
+                `;
+                
+                dropZone.addEventListener('dragover', (e) => e.preventDefault());
+                dropZone.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-over');
+                });
+                dropZone.addEventListener('dragleave', (e) => {
+                    dropZone.classList.remove('drag-over');
+                });
+                dropZone.addEventListener('drop', handleStartupDrop);
+                
+                dropZonesContainer.appendChild(dropZone);
+            }
+            
+            // Shuffle steps for challenge
+            const shuffledSteps = [...steps].sort(() => Math.random() - 0.5);
+            
+            container.innerHTML = '';
+            shuffledSteps.forEach(step => {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'startup-step drag-item bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold p-4 rounded-xl transition-all cursor-grab shadow-lg';
+                stepElement.draggable = true;
+                stepElement.dataset.stepId = step.id;
+                stepElement.innerHTML = `
+                    <div class="text-2xl mb-2">${step.icon}</div>
+                    <div class="text-sm font-bold mb-1">${step.text}</div>
+                    <div class="text-xs opacity-80">${step.detail}</div>
+                `;
+                
+                stepElement.addEventListener('dragstart', handleStartupDragStart);
+                stepElement.addEventListener('dragend', handleStartupDragEnd);
+                
+                container.appendChild(stepElement);
+            });
+        }
+
+        function resetStartupDropZones() {
+            document.querySelectorAll('.startup-drop').forEach(zone => {
+                zone.classList.remove('correct', 'incorrect');
+                const droppedStep = zone.querySelector('.dropped-step');
+                if (droppedStep) {
+                    droppedStep.classList.add('hidden');
+                    droppedStep.innerHTML = '';
+                }
+            });
+        }
+
+        // Shutdown Game Functions
+        function initShutdownGame() {
+            shutdownScore = 0;
+            shutdownGameTime = 0;
+            document.getElementById('shutdownScore').textContent = '0';
+            document.getElementById('shutdownTimer').textContent = '00:00';
+            loadShutdownSteps();
+            resetShutdownDropZones();
+        }
+
+        function loadShutdownSteps() {
+            const difficulty = document.getElementById('shutdownDifficulty').value;
+            const steps = shutdownSequenceSteps[difficulty];
+            const container = document.getElementById('shutdownSteps');
+            const dropZonesContainer = document.getElementById('shutdownDropZones');
+            
+            // Reset dropped sequence array based on difficulty
+            droppedShutdownSequence = new Array(steps.length).fill(null);
+            
+            // Create drop zones
+            dropZonesContainer.innerHTML = '';
+            dropZonesContainer.className = `grid grid-cols-1 md:grid-cols-${Math.min(steps.length, 4)} gap-4 mb-8`;
+            
+            for (let i = 0; i < steps.length; i++) {
+                const dropZone = document.createElement('div');
+                dropZone.className = 'shutdown-drop bg-white rounded-xl p-4 text-center min-h-[120px] flex flex-col items-center justify-center border-4 border-dashed border-gray-300';
+                dropZone.dataset.position = i;
+                dropZone.innerHTML = `
+                    <div class="text-2xl font-bold text-gray-400 mb-2">${i + 1}</div>
+                    <div class="text-gray-500 font-semibold">ขั้นตอนที่ ${i + 1}</div>
+                    <div class="dropped-step hidden"></div>
+                `;
+                
+                dropZone.addEventListener('dragover', (e) => e.preventDefault());
+                dropZone.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-over');
+                });
+                dropZone.addEventListener('dragleave', (e) => {
+                    dropZone.classList.remove('drag-over');
+                });
+                dropZone.addEventListener('drop', handleShutdownDrop);
+                
+                dropZonesContainer.appendChild(dropZone);
+            }
+            
+            // Shuffle steps for challenge
+            const shuffledSteps = [...steps].sort(() => Math.random() - 0.5);
+            
+            container.innerHTML = '';
+            shuffledSteps.forEach(step => {
+                const stepElement = document.createElement('div');
+                stepElement.className = 'shutdown-step drag-item bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold p-4 rounded-xl transition-all cursor-grab shadow-lg';
+                stepElement.draggable = true;
+                stepElement.dataset.stepId = step.id;
+                stepElement.innerHTML = `
+                    <div class="text-2xl mb-2">${step.icon}</div>
+                    <div class="text-sm font-bold mb-1">${step.text}</div>
+                    <div class="text-xs opacity-80">${step.detail}</div>
+                `;
+                
+                stepElement.addEventListener('dragstart', handleShutdownDragStart);
+                stepElement.addEventListener('dragend', handleShutdownDragEnd);
+                
+                container.appendChild(stepElement);
+            });
+        }
+
+        function resetShutdownDropZones() {
+            document.querySelectorAll('.shutdown-drop').forEach(zone => {
+                zone.classList.remove('correct', 'incorrect');
+                const droppedStep = zone.querySelector('.dropped-step');
+                if (droppedStep) {
+                    droppedStep.classList.add('hidden');
+                    droppedStep.innerHTML = '';
+                }
+            });
+        }
+
+        // Startup Game Drag Handlers
+        function handleStartupDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.stepId);
+            e.target.style.opacity = '0.5';
+            playButtonSound();
+            
+            // Start timer on first drag
+            if (!sequenceTimer) {
+                startSequenceTimer();
+            }
+        }
+
+        function handleStartupDragEnd(e) {
+            e.target.style.opacity = '1';
+        }
+
+        function handleStartupDrop(e) {
+            e.preventDefault();
+            const stepId = parseInt(e.dataTransfer.getData('text/plain'));
+            const position = parseInt(e.target.closest('.startup-drop').dataset.position);
+            const difficulty = document.getElementById('startupDifficulty').value;
+            const step = startupSequenceSteps[difficulty].find(s => s.id === stepId);
+            
+            e.target.closest('.startup-drop').classList.remove('drag-over');
+            
+            // Update dropped sequence
+            droppedSequence[position] = stepId;
+            
+            // Show dropped step
+            const droppedStepDiv = e.target.closest('.startup-drop').querySelector('.dropped-step');
+            droppedStepDiv.innerHTML = `
+                <div class="text-2xl mb-1">${step.icon}</div>
+                <div class="text-xs text-gray-600 font-semibold">${step.text}</div>
+                <div class="text-xs text-gray-500 mt-1">${step.detail}</div>
+            `;
+            droppedStepDiv.classList.remove('hidden');
+            
+            // Hide original step
+            const originalStep = document.querySelector(`[data-step-id="${stepId}"]`);
+            if (originalStep) {
+                originalStep.style.display = 'none';
+            }
+            
+            playButtonSound();
+        }
+
+        // Shutdown Game Drag Handlers
+        function handleShutdownDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.stepId);
+            e.target.style.opacity = '0.5';
+            playButtonSound();
+            
+            // Start timer on first drag
+            if (!shutdownTimer) {
+                startShutdownTimer();
+            }
+        }
+
+        function handleShutdownDragEnd(e) {
+            e.target.style.opacity = '1';
+        }
+
+        function handleShutdownDrop(e) {
+            e.preventDefault();
+            const stepId = parseInt(e.dataTransfer.getData('text/plain'));
+            const position = parseInt(e.target.closest('.shutdown-drop').dataset.position);
+            const difficulty = document.getElementById('shutdownDifficulty').value;
+            const step = shutdownSequenceSteps[difficulty].find(s => s.id === stepId);
+            
+            e.target.closest('.shutdown-drop').classList.remove('drag-over');
+            
+            // Update dropped sequence
+            droppedShutdownSequence[position] = stepId;
+            
+            // Show dropped step
+            const droppedStepDiv = e.target.closest('.shutdown-drop').querySelector('.dropped-step');
+            droppedStepDiv.innerHTML = `
+                <div class="text-2xl mb-1">${step.icon}</div>
+                <div class="text-xs text-gray-600 font-semibold">${step.text}</div>
+                <div class="text-xs text-gray-500 mt-1">${step.detail}</div>
+            `;
+            droppedStepDiv.classList.remove('hidden');
+            
+            // Hide original step
+            const originalStep = document.querySelector(`[data-step-id="${stepId}"]`);
+            if (originalStep) {
+                originalStep.style.display = 'none';
+            }
+            
+            playButtonSound();
+        }
+
+        function startSequenceTimer() {
+            sequenceStartTime = Date.now();
+            sequenceTimer = setInterval(() => {
+                sequenceGameTime = Date.now() - sequenceStartTime;
+                const seconds = Math.floor(sequenceGameTime / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const displaySeconds = seconds % 60;
+                const displayTime = `${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+                document.getElementById('sequenceTimer').textContent = displayTime;
+            }, 100);
+        }
+
+        function startShutdownTimer() {
+            shutdownStartTime = Date.now();
+            shutdownTimer = setInterval(() => {
+                shutdownGameTime = Date.now() - shutdownStartTime;
+                const seconds = Math.floor(shutdownGameTime / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const displaySeconds = seconds % 60;
+                const displayTime = `${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+                document.getElementById('shutdownTimer').textContent = displayTime;
+            }, 100);
+        }
+
+        function checkStartupSequence() {
+            const difficulty = document.getElementById('startupDifficulty').value;
+            const steps = startupSequenceSteps[difficulty];
+            const correctSequence = steps.map((_, index) => index);
+            let correctCount = 0;
+            
+            document.querySelectorAll('.startup-drop').forEach((zone, index) => {
+                if (droppedSequence[index] === correctSequence[index]) {
+                    zone.classList.add('correct');
+                    correctCount++;
+                } else if (droppedSequence[index] !== null) {
+                    zone.classList.add('incorrect');
+                }
+            });
+            
+            if (correctCount === steps.length) {
+                // Perfect sequence
+                clearInterval(sequenceTimer);
+                sequenceScore = Math.max(0, 100 - Math.floor(sequenceGameTime / 1000));
+                document.getElementById('sequenceScore').textContent = sequenceScore;
+                playCompletionSound();
+                createParticles(document.querySelector('#game3'), 15);
+                
+                showFeedback('🚀 ยอดเยี่ยม! คุณเปิดเครื่องได้ถูกต้องแล้ว!', 'success');
+                
+                // Show result modal after a short delay
+                setTimeout(() => {
+                    showGameResultModal('game3', sequenceScore, sequenceGameTime, 'เกมเปิดเครื่องคอม');
+                }, 1500);
+            } else {
+                playIncorrectSound();
+                showFeedback(`❌ ถูก ${correctCount}/${steps.length} ขั้นตอน ลองใหม่นะ!`, 'error');
+                setTimeout(() => {
+                    document.querySelectorAll('.startup-drop').forEach(zone => {
+                        zone.classList.remove('correct', 'incorrect');
+                    });
+                }, 2000);
+            }
+        }
+
+        function checkShutdownSequence() {
+            const difficulty = document.getElementById('shutdownDifficulty').value;
+            const steps = shutdownSequenceSteps[difficulty];
+            const correctSequence = steps.map((_, index) => index);
+            let correctCount = 0;
+            
+            document.querySelectorAll('.shutdown-drop').forEach((zone, index) => {
+                if (droppedShutdownSequence[index] === correctSequence[index]) {
+                    zone.classList.add('correct');
+                    correctCount++;
+                } else if (droppedShutdownSequence[index] !== null) {
+                    zone.classList.add('incorrect');
+                }
+            });
+            
+            if (correctCount === steps.length) {
+                // Perfect sequence
+                clearInterval(shutdownTimer);
+                shutdownScore = Math.max(0, 100 - Math.floor(shutdownGameTime / 1000));
+                document.getElementById('shutdownScore').textContent = shutdownScore;
+                playCompletionSound();
+                createParticles(document.querySelector('#game4'), 15);
+                
+                showFeedback('🌙 เยี่ยมมาก! คุณปิดเครื่องอย่างปลอดภัยแล้ว!', 'success');
+                
+                // Show result modal after a short delay
+                setTimeout(() => {
+                    showGameResultModal('game4', shutdownScore, shutdownGameTime, 'เกมปิดเครื่องคอม');
+                }, 1500);
+            } else {
+                playIncorrectSound();
+                showFeedback(`❌ ถูก ${correctCount}/${steps.length} ขั้นตอน ลองใหม่นะ!`, 'error');
+                setTimeout(() => {
+                    document.querySelectorAll('.shutdown-drop').forEach(zone => {
+                        zone.classList.remove('correct', 'incorrect');
+                    });
+                }, 2000);
+            }
+        }
+
+        function resetStartupGame() {
+            playButtonSound();
+            clearInterval(sequenceTimer);
+            sequenceTimer = null;
+            initStartupGame();
+            showFeedback('🔄 เริ่มเกมใหม่!', 'success');
+        }
+
+        function resetShutdownGame() {
+            playButtonSound();
+            clearInterval(shutdownTimer);
+            shutdownTimer = null;
+            initShutdownGame();
+            showFeedback('🔄 เริ่มเกมใหม่!', 'success');
+        }
+
+
+
+        // Stats functions
+        function updateGameStats(gameKey, finalScore, gameTime) {
+            let isNewRecord = false;
+            
+            // Calculate time-adjusted score (bonus for faster completion)
+            const timeBonus = Math.max(0, 60 - Math.floor(gameTime / 1000)); // Bonus for completing under 60 seconds
+            const adjustedScore = finalScore + timeBonus;
+            
+            // Update total games and cumulative stats
+            gameStats[gameKey].totalGames++;
+            gameStats[gameKey].totalScore += adjustedScore;
+            gameStats[gameKey].totalTime += gameTime;
+            
+            // Check for new high score (using adjusted score)
+            if (adjustedScore > gameStats[gameKey].bestScore) {
+                gameStats[gameKey].bestScore = adjustedScore;
+                isNewRecord = true;
+            }
+            
+            // Check for best time (only if score is good)
+            if (finalScore > 0 && (gameStats[gameKey].bestTime === null || gameTime < gameStats[gameKey].bestTime)) {
+                gameStats[gameKey].bestTime = gameTime;
+            }
+            
+            // Update difficulty stats for game1
+            if (gameKey === 'game1') {
+                const difficulty = document.getElementById('difficulty').value;
+                gameStats.difficultyStats[difficulty]++;
+            }
+            
+            // Add to game history
+            const gameNames = {
+                'game1': 'จับคู่อุปกรณ์',
+                'game2': 'ฮีโร่ฮาร์ดแวร์',
+                'game3': 'เปิดเครื่องคอม',
+                'game4': 'ปิดเครื่องคอม'
+            };
+            
+            const historyEntry = {
+                game: gameNames[gameKey],
+                gameKey: gameKey,
+                score: finalScore,
+                adjustedScore: adjustedScore,
+                time: gameTime,
+                timeBonus: timeBonus,
+                timestamp: new Date().toLocaleString('th-TH'),
+                isNewRecord: isNewRecord
+            };
+            
+            gameStats.gameHistory.unshift(historyEntry); // Add to beginning
+            
+            // Keep only last 20 games
+            if (gameStats.gameHistory.length > 20) {
+                gameStats.gameHistory = gameStats.gameHistory.slice(0, 20);
+            }
+            
+            saveStats();
+            updateMainPageStats();
+            updateGameHistory();
+            updateProgressBars();
+            updateAchievementBadges();
+            return isNewRecord;
+        }
+
+        function showStatsModal() {
+            const game = `game${currentGame}`;
+            document.getElementById('bestScore').textContent = gameStats[game].bestScore;
+            document.getElementById('bestTime').textContent = gameStats[game].bestTime ? formatTime(gameStats[game].bestTime) : '--:--';
+            document.getElementById('totalGames').textContent = gameStats[game].totalGames;
+            
+            document.getElementById('easyStats').textContent = `${gameStats.difficultyStats.easy} เกม`;
+            document.getElementById('mediumStats').textContent = `${gameStats.difficultyStats.medium} เกม`;
+            document.getElementById('hardStats').textContent = `${gameStats.difficultyStats.hard} เกม`;
+            
+            document.getElementById('statsModal').classList.remove('hidden');
+        }
+
+        function updateMainPageStats() {
+            // Update individual game stats on main page
+            document.getElementById('game1BestScore').textContent = gameStats.game1.bestScore;
+            document.getElementById('game1BestTime').textContent = gameStats.game1.bestTime ? formatTime(gameStats.game1.bestTime) : '--:--';
+            document.getElementById('game1Total').textContent = `${gameStats.game1.totalGames} รอบ`;
+            
+            document.getElementById('game2BestScore').textContent = gameStats.game2.bestScore;
+            document.getElementById('game2BestTime').textContent = gameStats.game2.bestTime ? formatTime(gameStats.game2.bestTime) : '--:--';
+            document.getElementById('game2Total').textContent = `${gameStats.game2.totalGames} รอบ`;
+            
+            document.getElementById('game3BestScore').textContent = gameStats.game3.bestScore;
+            document.getElementById('game3BestTime').textContent = gameStats.game3.bestTime ? formatTime(gameStats.game3.bestTime) : '--:--';
+            document.getElementById('game3Total').textContent = `${gameStats.game3.totalGames} รอบ`;
+            
+            document.getElementById('game4BestScore').textContent = gameStats.game4.bestScore;
+            document.getElementById('game4BestTime').textContent = gameStats.game4.bestTime ? formatTime(gameStats.game4.bestTime) : '--:--';
+            document.getElementById('game4Total').textContent = `${gameStats.game4.totalGames} รอบ`;
+            
+            // Update overall stats
+            const totalScore = gameStats.game1.totalScore + gameStats.game2.totalScore + gameStats.game3.totalScore + gameStats.game4.totalScore;
+            const totalGames = gameStats.game1.totalGames + gameStats.game2.totalGames + gameStats.game3.totalGames + gameStats.game4.totalGames;
+            const totalTime = gameStats.game1.totalTime + gameStats.game2.totalTime + gameStats.game3.totalTime + gameStats.game4.totalTime;
+            
+            document.getElementById('totalScore').textContent = totalScore;
+            document.getElementById('totalGamesPlayed').textContent = totalGames;
+            document.getElementById('totalTimeSpent').textContent = formatTime(totalTime);
+            
+            // Find favorite game
+            let favoriteGame = '-';
+            if (totalGames > 0) {
+                const games = [
+                    { name: 'จับคู่', count: gameStats.game1.totalGames },
+                    { name: 'ฮีโร่', count: gameStats.game2.totalGames },
+                    { name: 'เปิดเครื่อง', count: gameStats.game3.totalGames },
+                    { name: 'ปิดเครื่อง', count: gameStats.game4.totalGames }
+                ];
+                games.sort((a, b) => b.count - a.count);
+                favoriteGame = games[0].count > 0 ? games[0].name : '-';
+            }
+            document.getElementById('favoriteGame').textContent = favoriteGame;
+        }
+
+        function updateGameHistory() {
+            const container = document.getElementById('recentGames');
+            
+            if (gameStats.gameHistory.length === 0) {
+                container.innerHTML = '<p class="text-white/70 text-center">ยังไม่มีประวัติการเล่น</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            gameStats.gameHistory.forEach((entry, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = `bg-white/10 rounded-lg p-3 text-left ${entry.isNewRecord ? 'border-2 border-yellow-400' : ''}`;
+                
+                const gameIcon = {
+                    'game1': '🧲',
+                    'game2': '🧠',
+                    'game3': '🚀',
+                    'game4': '🌙'
+                };
+                
+                historyItem.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">${gameIcon[entry.gameKey]}</span>
+                            <div>
+                                <div class="font-semibold text-white text-sm">${entry.game}</div>
+                                <div class="text-xs text-white/70">${entry.timestamp}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-white">
+                                ${entry.adjustedScore} คะแนน
+                                ${entry.isNewRecord ? '<span class="text-yellow-400 ml-1">🏆</span>' : ''}
+                            </div>
+                            <div class="text-xs text-white/70">
+                                ${entry.score} + ${entry.timeBonus} โบนัส
+                            </div>
+                            <div class="text-xs text-white/70">
+                                ⏱️ ${formatTime(entry.time)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(historyItem);
+            });
+        }
+
+        function clearHistory() {
+            if (confirm('คุณแน่ใจหรือไม่ที่จะล้างประวัติการเล่น?')) {
+                gameStats.gameHistory = [];
+                saveStats();
+                updateGameHistory();
+                showFeedback('🗑️ ล้างประวัติเรียบร้อยแล้ว!', 'success');
+            }
+        }
+
+        function clearAllStats() {
+            if (confirm('คุณแน่ใจหรือไม่ที่จะรีเซ็ตสถิติทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้!')) {
+                gameStats = {
+                    game1: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                    game2: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                    game3: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                    game4: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                    difficultyStats: {
+                        easy: 0,
+                        medium: 0,
+                        hard: 0
+                    },
+                    gameHistory: []
+                };
+                saveStats();
+                updateMainPageStats();
+                updateGameHistory();
+                updateProgressBars();
+                updateAchievementBadges();
+                showFeedback('🔄 รีเซ็ตสถิติทั้งหมดเรียบร้อยแล้ว!', 'success');
+            }
+        }
+
+        function clearStats() {
+            if (confirm('คุณแน่ใจหรือไม่ที่จะล้างสถิติทั้งหมด?')) {
+                gameStats = {
+                    game1: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                    game2: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                    game3: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                    game4: { bestScore: 0, bestTime: null, totalGames: 0, totalScore: 0, totalTime: 0 },
+                    difficultyStats: {
+                        easy: 0,
+                        medium: 0,
+                        hard: 0
+                    },
+                    gameHistory: []
+                };
+                saveStats();
+                updateMainPageStats();
+                updateGameHistory();
+                showStatsModal(); // Refresh the display
+                showFeedback('🗑️ ล้างสถิติเรียบร้อยแล้ว!', 'success');
+            }
+        }
+
+        // Sound Effects using Web Audio API
+        let audioContext;
+        
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+        
+        function playSound(frequency, duration, type = 'sine', volume = 0.3) {
+            if (!soundEnabled) return;
+            
+            try {
+                initAudioContext();
+                
+                if (!audioContext || audioContext.state === 'suspended') {
+                    return; // Skip if audio context is not available
+                }
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            } catch (e) {
+                console.warn('Audio playback failed:', e);
+                // Disable sound if there are persistent errors
+                if (e.name === 'NotAllowedError') {
+                    soundEnabled = false;
+                    document.getElementById('soundToggle').textContent = '🔇';
+                }
+            }
+        }
+
+        function playCorrectSound() {
+            // Happy ascending notes
+            playSound(523.25, 0.2); // C5
+            setTimeout(() => playSound(659.25, 0.2), 100); // E5
+            setTimeout(() => playSound(783.99, 0.3), 200); // G5
+        }
+
+        function playIncorrectSound() {
+            // Descending sad notes
+            playSound(392, 0.3, 'sawtooth', 0.2); // G4
+            setTimeout(() => playSound(349.23, 0.4, 'sawtooth', 0.2), 150); // F4
+        }
+
+        function playButtonSound() {
+            playSound(800, 0.1, 'square', 0.1);
+        }
+
+        function playComboSound(comboLevel) {
+            // Special combo sound
+            for (let i = 0; i < comboLevel; i++) {
+                setTimeout(() => {
+                    playSound(1000 + (i * 200), 0.15, 'triangle', 0.2);
+                }, i * 50);
+            }
+        }
+
+        function playCompletionSound() {
+            // Victory fanfare
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            notes.forEach((note, index) => {
+                setTimeout(() => {
+                    playSound(note, 0.4, 'triangle', 0.3);
+                }, index * 150);
+            });
+        }
+
+        function createParticles(element, count = 8) {
+            const rect = element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const angle = (i / count) * Math.PI * 2;
+                const distance = 50 + Math.random() * 50;
+                const dx = Math.cos(angle) * distance;
+                const dy = Math.sin(angle) * distance;
+                
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.setProperty('--dx', dx + 'px');
+                particle.style.setProperty('--dy', dy + 'px');
+                particle.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                
+                document.body.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        function showScorePopup(element, points) {
+            const popup = document.createElement('div');
+            popup.className = 'score-popup';
+            popup.textContent = `+${points}`;
+            
+            const rect = element.getBoundingClientRect();
+            popup.style.left = (rect.left + rect.width / 2) + 'px';
+            popup.style.top = rect.top + 'px';
+            
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1000);
+        }
+
+        function showComboIndicator(combo) {
+            const indicator = document.createElement('div');
+            indicator.className = 'combo-indicator';
+            
+            if (combo === 2) indicator.textContent = '🔥 COMBO x2!';
+            else if (combo === 3) indicator.textContent = '⚡ SUPER COMBO x3!';
+            else if (combo >= 4) indicator.textContent = '💫 MEGA COMBO x' + combo + '!';
+            
+            document.body.appendChild(indicator);
+            setTimeout(() => indicator.remove(), 1000);
+        }
+
+        function checkCombo() {
+            const currentTime = Date.now();
+            if (currentTime - lastCorrectTime < 3000) { // 3 seconds for combo
+                comboCount++;
+                if (comboCount >= 2) {
+                    showComboIndicator(comboCount);
+                    playComboSound(comboCount);
+                    // Bonus points for combo
+                    score += comboCount * 5;
+                    updateScore();
+                }
+            } else {
+                comboCount = 1;
+            }
+            lastCorrectTime = currentTime;
+        }
+
+        // Initialize drag and drop
+        function initDragAndDrop() {
+            const dragItems = document.querySelectorAll('.drag-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            dragItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.device);
+            e.target.style.opacity = '0.5';
+            playButtonSound();
+            
+            // Start timer on first drag
+            if (!gameTimer && correctAnswers === 0) {
+                startTimer();
+            }
+        }
+
+        function handleDragEnd(e) {
+            e.target.style.opacity = '1';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            const dropZone = e.target.closest('.drop-zone');
+            if (dropZone) {
+                dropZone.classList.add('drag-over');
+                playSound(400, 0.1, 'sine', 0.1);
+            }
+        }
+
+        function handleDragLeave(e) {
+            const dropZone = e.target.closest('.drop-zone');
+            if (dropZone) {
+                dropZone.classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const draggedDevice = e.dataTransfer.getData('text/plain');
+            const dropZone = e.target.closest('.drop-zone');
+            const targetDevice = dropZone.dataset.device;
+            
+            dropZone.classList.remove('drag-over');
+
+            if (draggedDevice === targetDevice) {
+                // Correct answer
+                dropZone.classList.add('correct');
+                dropZone.querySelector('.device-name').classList.remove('hidden');
+                
+                // Remove the dragged item
+                const draggedItem = document.querySelector(`[data-device="${draggedDevice}"]`);
+                if (draggedItem.classList.contains('drag-item')) {
+                    draggedItem.style.display = 'none';
+                }
+
+                // Play correct sound and effects
+                playCorrectSound();
+                createParticles(dropZone, 12);
+                checkCombo();
+                
+                // Update score
+                const basePoints = 10;
+                const comboBonus = comboCount > 1 ? comboCount * 5 : 0;
+                const totalPoints = basePoints + comboBonus;
+                score += totalPoints;
+                correctAnswers++;
+                updateScore();
+                showScorePopup(dropZone, totalPoints);
+
+                // Visual feedback
+                showFeedback('✅ ถูกต้อง!', 'success');
+                dropZone.classList.add('celebration');
+
+                // Check if game is complete
+                if (correctAnswers === totalItems) {
+                    stopTimer();
+                    setTimeout(() => {
+                        playCompletionSound();
+                        createParticles(document.querySelector('.game-card'), 20);
+                        showGameResultModal('game1', score, currentGameTime, 'เกมจับคู่อุปกรณ์');
+                    }, 1000);
+                }
+
+                setTimeout(() => {
+                    dropZone.classList.remove('correct', 'celebration');
+                }, 800);
+
+            } else {
+                // Wrong answer
+                dropZone.classList.add('incorrect');
+                playIncorrectSound();
+                comboCount = 0; // Reset combo on wrong answer
+                
+                // Track wrong attempts
+                if (!wrongAttempts[targetDevice]) {
+                    wrongAttempts[targetDevice] = 0;
+                }
+                wrongAttempts[targetDevice]++;
+
+                score = Math.max(0, score - 5);
+                updateScore();
+
+                // Show hint after 3 wrong attempts
+                if (wrongAttempts[targetDevice] >= 3) {
+                    dropZone.querySelector('.hint').classList.remove('hidden');
+                    showFeedback('💡 ดูคำใบ้ด้านล่างภาพ', 'hint');
+                } else {
+                    showFeedback('❌ ลองใหม่นะ', 'error');
+                }
+
+                setTimeout(() => {
+                    dropZone.classList.remove('incorrect');
+                }, 600);
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.createElement('div');
+            feedback.className = `fixed top-4 right-4 px-6 py-3 rounded-lg font-semibold z-50 ${
+                type === 'success' ? 'bg-green-500 text-white' :
+                type === 'error' ? 'bg-red-500 text-white' :
+                'bg-blue-500 text-white'
+            }`;
+            feedback.textContent = message;
+            document.body.appendChild(feedback);
+
+            setTimeout(() => {
+                feedback.remove();
+            }, 2000);
+        }
+
+        function showGameResultModal(gameKey, baseScore, gameTime, gameTitle) {
+            const timeBonus = Math.max(0, 60 - Math.floor(gameTime / 1000));
+            const totalScore = baseScore + timeBonus;
+            const isNewRecord = updateGameStats(gameKey, baseScore, gameTime);
+            
+            // Update modal content
+            document.getElementById('currentBaseScore').textContent = baseScore;
+            document.getElementById('currentTimeBonus').textContent = `+${timeBonus}`;
+            document.getElementById('currentTotalScore').textContent = totalScore;
+            document.getElementById('currentGameTime').textContent = formatTime(gameTime);
+            
+            // Update comparison stats
+            document.getElementById('bestScoreComparison').textContent = gameStats[gameKey].bestScore;
+            document.getElementById('bestTimeComparison').textContent = gameStats[gameKey].bestTime ? formatTime(gameStats[gameKey].bestTime) : '--:--';
+            document.getElementById('totalGamesComparison').textContent = gameStats[gameKey].totalGames;
+            
+            // Set appropriate messages based on game and performance
+            let icon = '🎉';
+            let title = 'ยินดีด้วย!';
+            let message = `คุณเล่น${gameTitle}เสร็จเรียบร้อยแล้ว`;
+            let achievement = '🎖️ ได้รับเหรียญ "นักเรียนดีเด่น"';
+            let encouragement = 'เก่งมาก! ความรู้เรื่องคอมพิวเตอร์ของคุณดีขึ้นแล้ว';
+            
+            // Customize based on performance
+            if (isNewRecord) {
+                icon = '🏆';
+                title = 'สถิติใหม่!';
+                achievement = '🌟 ได้รับเหรียญ "แชมป์ใหม่"';
+                encouragement = 'ยอดเยี่ยม! คุณทำลายสถิติเดิมได้สำเร็จ!';
+                document.getElementById('newRecord').classList.remove('hidden');
+                playSound(1200, 0.5, 'triangle', 0.3);
+            } else {
+                document.getElementById('newRecord').classList.add('hidden');
+            }
+            
+            // Performance-based messages with game-specific content
+            if (totalScore >= 90) {
+                icon = '🏆';
+                title = 'เซียนคอมพิวเตอร์!';
+                achievement = '🥇 ได้รับเหรียญ "ผู้เชี่ยวชาญระดับสูง"';
+                encouragement = 'เก่งสุดๆ! คุณเป็นเซียนคอมพิวเตอร์แล้ว!';
+            } else if (totalScore >= 80) {
+                icon = '🌟';
+                title = 'ยอดเยี่ยม!';
+                achievement = '🥇 ได้รับเหรียญ "ผู้เชี่ยวชาญ"';
+                encouragement = 'สุดยอด! คุณเป็นผู้เชี่ยวชาญด้านคอมพิวเตอร์แล้ว!';
+            } else if (totalScore >= 60) {
+                icon = '⭐';
+                title = 'ดีเยี่ยม!';
+                achievement = '🥈 ได้รับเหรียญ "นักเรียนเก่ง"';
+                encouragement = 'เยี่ยมมาก! คุณมีความรู้ด้านคอมพิวเตอร์ดีแล้ว!';
+            } else if (totalScore >= 40) {
+                icon = '👍';
+                title = 'ดีมาก!';
+                achievement = '🥉 ได้รับเหรียญ "นักเรียนดี"';
+                encouragement = 'ดีแล้ว! คุณกำลังเรียนรู้และพัฒนาตัวเอง!';
+            } else if (totalScore >= 20) {
+                icon = '💪';
+                title = 'พยายามดีแล้ว!';
+                achievement = '🎯 ได้รับเหรียญ "นักสู้"';
+                encouragement = 'ไม่เป็นไร! การฝึกฝนจะทำให้คุณเก่งขึ้น!';
+            } else {
+                icon = '🌱';
+                title = 'เริ่มต้นดี!';
+                achievement = '🌟 ได้รับเหรียญ "นักเรียนใหม่"';
+                encouragement = 'ยังมีโอกาสพัฒนาอีกเยอะ! ลองเล่นใหม่นะ!';
+            }
+            
+            document.getElementById('resultModalIcon').textContent = icon;
+            document.getElementById('resultModalTitle').textContent = title;
+            document.getElementById('resultModalMessage').textContent = message;
+            document.getElementById('achievementText').textContent = achievement;
+            document.getElementById('encouragementText').textContent = encouragement;
+            
+            // Store current game for button actions
+            document.getElementById('gameResultModal').dataset.currentGame = currentGame;
+            
+            document.getElementById('gameResultModal').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            playButtonSound();
+            
+            // Stop and reset timer
+            stopTimer();
+            currentGameTime = 0;
+            document.getElementById('timer').textContent = '00:00';
+            
+            score = 0;
+            correctAnswers = 0;
+            wrongAttempts = {};
+            comboCount = 0;
+            lastCorrectTime = 0;
+            updateScore();
+
+            // Reset drop zones
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.classList.remove('correct', 'incorrect', 'celebration');
+                zone.querySelector('.device-name').classList.add('hidden');
+                zone.querySelector('.hint').classList.add('hidden');
+            });
+
+            // Show all drag items with animation
+            document.querySelectorAll('.drag-item').forEach((item, index) => {
+                item.style.display = 'flex';
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    item.style.transition = 'all 0.3s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            document.getElementById('gameResultModal').classList.add('hidden');
+            showFeedback('🎮 เริ่มเกมใหม่!', 'success');
+        }
+
+        function toggleHints() {
+            playButtonSound();
+            const difficulty = document.getElementById('difficulty').value;
+            const hints = document.querySelectorAll('.hint');
+            
+            if (difficulty === 'easy') {
+                hints.forEach((hint, index) => {
+                    setTimeout(() => {
+                        hint.classList.remove('hidden');
+                        hint.style.animation = 'fadeIn 0.3s ease-in-out';
+                    }, index * 100);
+                });
+                showFeedback('💡 แสดงคำใบ้แล้ว!', 'hint');
+            } else {
+                hints.forEach(hint => {
+                    hint.classList.add('hidden');
+                });
+                showFeedback('🎯 ซ่อนคำใบ้แล้ว!', 'success');
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const button = document.getElementById('soundToggle');
+            button.textContent = soundEnabled ? '🔊' : '🔇';
+            button.title = soundEnabled ? 'ปิดเสียง' : 'เปิดเสียง';
+            
+            if (soundEnabled) {
+                playButtonSound();
+                showFeedback('🔊 เปิดเสียงแล้ว!', 'success');
+            } else {
+                showFeedback('🔇 ปิดเสียงแล้ว!', 'hint');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('resetGame').addEventListener('click', resetGame);
+        
+        // New modal button listeners
+        document.getElementById('playAgainButton').addEventListener('click', () => {
+            playButtonSound();
+            document.getElementById('gameResultModal').classList.add('hidden');
+            const gameNum = parseInt(document.getElementById('gameResultModal').dataset.currentGame);
+            if (gameNum === 1) {
+                resetGame();
+            } else if (gameNum === 2) {
+                initQuizGame();
+            } else if (gameNum === 3) {
+                initStartupGame();
+            } else if (gameNum === 4) {
+                initShutdownGame();
+            }
+        });
+        
+        document.getElementById('tryOtherGameButton').addEventListener('click', () => {
+            playButtonSound();
+            document.getElementById('gameResultModal').classList.add('hidden');
+            showLandingPage();
+        });
+        
+        document.getElementById('backToHomeButton').addEventListener('click', () => {
+            playButtonSound();
+            document.getElementById('gameResultModal').classList.add('hidden');
+            showLandingPage();
+        });
+        document.getElementById('showHints').addEventListener('click', toggleHints);
+        document.getElementById('showStats').addEventListener('click', () => {
+            playButtonSound();
+            showStatsModal();
+        });
+        document.getElementById('closeStats').addEventListener('click', () => {
+            playButtonSound();
+            document.getElementById('statsModal').classList.add('hidden');
+        });
+        document.getElementById('clearStats').addEventListener('click', () => {
+            playButtonSound();
+            clearStats();
+        });
+        document.getElementById('clearHistory').addEventListener('click', () => {
+            playButtonSound();
+            clearHistory();
+        });
+        document.getElementById('clearAllStats').addEventListener('click', () => {
+            playButtonSound();
+            clearAllStats();
+        });
+        document.getElementById('difficulty').addEventListener('change', (e) => {
+            playButtonSound();
+            toggleHints();
+        });
+        document.getElementById('soundToggle').addEventListener('click', toggleSound);
+        document.getElementById('backButton').addEventListener('click', showLandingPage);
+
+        // Quiz Game Event Listeners
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                const answer = parseInt(e.target.closest('.quiz-option').dataset.answer);
+                answerQuestion(answer);
+            });
+        });
+        document.getElementById('restartQuiz').addEventListener('click', () => {
+            playButtonSound();
+            initQuizGame();
+        });
+
+        // Startup Game Event Listeners
+        document.getElementById('startupDifficulty').addEventListener('change', () => {
+            playButtonSound();
+            initStartupGame();
+        });
+        document.getElementById('checkStartupSequence').addEventListener('click', () => {
+            playButtonSound();
+            checkStartupSequence();
+        });
+        document.getElementById('resetStartupSequence').addEventListener('click', resetStartupGame);
+
+        // Shutdown Game Event Listeners
+        document.getElementById('shutdownDifficulty').addEventListener('change', () => {
+            playButtonSound();
+            initShutdownGame();
+        });
+        document.getElementById('checkShutdownSequence').addEventListener('click', () => {
+            playButtonSound();
+            checkShutdownSequence();
+        });
+        document.getElementById('resetShutdownSequence').addEventListener('click', resetShutdownGame);
+
+        // Add hover effects to all interactive elements
+        document.querySelectorAll('.drag-item, .button-hover, .drop-zone, .landing-card').forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                if (soundEnabled) {
+                    playSound(600, 0.05, 'sine', 0.05);
+                }
+            });
+        });
+
+        // Initialize audio context on first user interaction
+        document.addEventListener('click', () => {
+            initAudioContext();
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }, { once: true });
+
+        // Initialize game
+        loadStats(); // Load saved statistics
+        updateMainPageStats(); // Update stats display
+        updateGameHistory(); // Update history display
+        updateProgressBars(); // Update progress bars
+        updateAchievementBadges(); // Update achievement badges
+        initDragAndDrop();
+        
+        // Show landing page by default
+        showLandingPage();
+        
+        // Welcome sound and animation
+        setTimeout(() => {
+            if (soundEnabled) {
+                playSound(523.25, 0.3, 'triangle', 0.2);
+                setTimeout(() => playSound(659.25, 0.3, 'triangle', 0.2), 200);
+            }
+            
+            // Show personalized welcome message based on stats
+            const totalGames = gameStats.game1.totalGames + gameStats.game2.totalGames + 
+                             gameStats.game3.totalGames + gameStats.game4.totalGames;
+            
+            let welcomeMessage = '🎮 ยินดีต้อนรับสู่ศูนย์การเรียนรู้คอมพิวเตอร์!';
+            
+            if (totalGames > 20) {
+                welcomeMessage = '🏆 ยินดีต้อนรับกลับมา ผู้เชี่ยวชาญคอมพิวเตอร์!';
+            } else if (totalGames > 10) {
+                welcomeMessage = '⭐ ยินดีต้อนรับกลับมา นักเรียนเก่ง!';
+            } else if (totalGames > 0) {
+                welcomeMessage = '👋 ยินดีต้อนรับกลับมา! พร้อมเรียนรู้ต่อแล้วหรือยัง?';
+            }
+            
+            showFeedback(welcomeMessage, 'success');
+        }, 500);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9760fae0e3147336',t:'MTc1NjM1NDQ0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
