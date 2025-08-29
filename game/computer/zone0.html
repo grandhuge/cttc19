@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โลกแห่งคอมพิวเตอร์ - สำหรับนักเรียนประถม</title>
+    <title>แนะนำกิจกรรม/เกม | ศูนย์การเรียนรู้คอมพิวเตอร์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
@@ -14,951 +14,556 @@
         
         .slide {
             display: none;
-            animation: slideIn 0.6s ease-in-out;
+            animation: fadeIn 0.5s ease-in-out;
         }
         
         .slide.active {
             display: block;
         }
         
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .computer-part {
-            transition: all 0.3s ease;
-            cursor: pointer;
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
-        .computer-part:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1);
+        .zone-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        .interactive-button {
-            transition: all 0.3s ease;
+        .zone-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
         
-        .interactive-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        
-        .typing-demo {
-            border-right: 2px solid #3B82F6;
-            animation: blink 1s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 50% { border-color: transparent; }
-            51%, 100% { border-color: #3B82F6; }
-        }
-        
-        .safety-badge {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .slide-counter {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(147, 51, 234, 0.8));
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .mascot-float {
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .logo-spin:hover {
-            animation: spin 1s linear;
-        }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .progress-bar {
+            transition: width 0.3s ease;
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-purple-50">
+<body class="bg-gray-50">
     <!-- Navigation -->
-    <div class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-sm shadow-lg z-50">
+    <div class="fixed top-0 left-0 right-0 bg-white shadow-lg z-50">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-4">
-                <img src="https://cttc19.onrender.com/game/img/logo.png" alt="CTTC19 Logo" class="w-8 h-8 object-contain logo-spin transition-transform duration-300" onerror="this.src=''; this.alt='Logo failed to load'; this.style.display='none';">
-                <div class="text-2xl">💻</div>
-                <div>
-                    <h1 class="text-lg font-semibold text-gray-800">โลกแห่งคอมพิวเตอร์</h1>
-                    <p class="text-xs text-gray-500">CTTC19 Learning Center</p>
-                </div>
-                <span class="slide-counter text-sm text-white px-3 py-1 rounded-full">สไลด์ <span id="currentSlide">1</span> จาก <span id="totalSlides">15</span></span>
+                <img src="https://cttc19.onrender.com/game/img/logo.png" alt="Logo" class="h-10" />
+                <h1 class="text-lg font-semibold text-gray-800">งานนำเสนอ</h1>
+                <span class="text-sm text-gray-600">สไลด์ <span id="currentSlide">1</span> จาก <span id="totalSlides">12</span></span>
             </div>
             <div class="flex items-center space-x-2">
-                <button id="prevBtn" class="interactive-button px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300">
+                <button id="prevBtn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300">
                     ← ก่อนหน้า
                 </button>
-                <button id="nextBtn" class="interactive-button px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300">
+                <button id="nextBtn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:bg-gray-300">
                     ถัดไป →
                 </button>
             </div>
         </div>
         <div class="w-full bg-gray-200 h-1">
-            <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-1 transition-all duration-300" style="width: 6.67%"></div>
+            <div id="progressBar" class="progress-bar bg-blue-500 h-1" style="width: 8.33%"></div>
         </div>
     </div>
 
     <!-- Slides Container -->
     <div class="pt-20 min-h-screen">
         
-        <!-- Slide 1: Cover - Computer World -->
+        <!-- Slide 1: Cover -->
         <div class="slide active">
-            <div class="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center px-8">
-                <div class="text-center text-white">
-                    <div class="mb-8 flex justify-center items-center">
-                        <img src="https://cttc19.onrender.com/game/img/mascot.gif" alt="CTTC19 Mascot" class="w-32 h-32 object-contain mascot-float" onerror="this.src=''; this.alt='Mascot failed to load'; this.innerHTML='<div class=\'text-8xl animate-bounce\'>💻</div>';">
+            <div class="gradient-bg min-h-screen flex items-center justify-center">
+                <div class="text-center text-white px-8">
+                    <div class="mb-8">
+                        <img src="https://cttc19.onrender.com/game/img/mascot.gif" alt="มาสคอต" class="mx-auto mb-6 w-32 h-32" />
+                        <h1 class="text-5xl font-bold mb-6 leading-tight">
+                            แนะนำกิจกรรม/เกม<br>
+                            ศูนย์การเรียนรู้คอมพิวเตอร์
+                        </h1>
+                        <p class="text-2xl mb-8 opacity-90">สำหรับนักเรียนระดับประถมศึกษา</p>
                     </div>
-                    <h1 class="text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">
-                        โลกแห่งคอมพิวเตอร์
-                    </h1>
-                    <p class="text-2xl mb-4 opacity-90">มาเรียนรู้เกี่ยวกับคอมพิวเตอร์กันเถอะ!</p>
-                    <div class="text-lg mb-8 bg-white/20 backdrop-blur-sm rounded-2xl p-4 inline-block">
-                        <p class="font-semibold text-yellow-300">แนะนำกิจกรรม/เกม</p>
-                        <p class="text-sm opacity-90">ศูนย์การเรียนรู้คอมพิวเตอร์</p>
-                    </div>
-                    <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8 max-w-2xl mx-auto">
-                        <div class="grid grid-cols-2 gap-6 text-lg">
-                            <div class="flex items-center justify-center">
-                                <span class="text-3xl mr-3">🖥️</span>
-                                <span>คอมพิวเตอร์คืออะไร?</span>
-                            </div>
-                            <div class="flex items-center justify-center">
-                                <span class="text-3xl mr-3">⌨️</span>
-                                <span>การใช้คีย์บอร์ด</span>
-                            </div>
-                            <div class="flex items-center justify-center">
-                                <span class="text-3xl mr-3">🖱️</span>
-                                <span>การใช้เมาส์</span>
-                            </div>
-                            <div class="flex items-center justify-center">
-                                <span class="text-3xl mr-3">🛡️</span>
-                                <span>อินเทอร์เน็ตปลอดภัย</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 2: What is Computer -->
-        <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center px-8">
-                <div class="max-w-5xl mx-auto text-white">
-                    <div class="text-center mb-12">
-                        <div class="text-6xl mb-6">🤔</div>
-                        <h2 class="text-5xl font-bold mb-8">คอมพิวเตอร์คืออะไร?</h2>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-12 items-center">
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <h3 class="text-3xl font-semibold mb-6 text-yellow-300">นิยามง่าย ๆ</h3>
-                            <div class="space-y-4 text-xl">
-                                <p class="flex items-center">
-                                    <span class="text-3xl mr-4">🧠</span>
-                                    เครื่องที่ฉลาดมาก
-                                </p>
-                                <p class="flex items-center">
-                                    <span class="text-3xl mr-4">⚡</span>
-                                    ทำงานได้เร็วมาก
-                                </p>
-                                <p class="flex items-center">
-                                    <span class="text-3xl mr-4">💾</span>
-                                    จำข้อมูลได้เยอะมาก
-                                </p>
-                                <p class="flex items-center">
-                                    <span class="text-3xl mr-4">🎮</span>
-                                    ช่วยเราทำงานและเล่นเกม
-                                </p>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <h3 class="text-3xl font-semibold mb-6 text-yellow-300">ใช้ทำอะไรได้บ้าง?</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="text-center p-4 bg-white/10 rounded-2xl">
-                                    <div class="text-4xl mb-2">📝</div>
-                                    <p class="text-lg">เขียนหนังสือ</p>
-                                </div>
-                                <div class="text-center p-4 bg-white/10 rounded-2xl">
-                                    <div class="text-4xl mb-2">🎨</div>
-                                    <p class="text-lg">วาดรูป</p>
-                                </div>
-                                <div class="text-center p-4 bg-white/10 rounded-2xl">
-                                    <div class="text-4xl mb-2">🎵</div>
-                                    <p class="text-lg">ฟังเพลง</p>
-                                </div>
-                                <div class="text-center p-4 bg-white/10 rounded-2xl">
-                                    <div class="text-4xl mb-2">📚</div>
-                                    <p class="text-lg">เรียนออนไลน์</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 3: Computer Components -->
-        <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center px-8">
-                <div class="max-w-6xl mx-auto text-white">
-                    <div class="text-center mb-12">
-                        <div class="text-6xl mb-6">🔧</div>
-                        <h2 class="text-4xl font-bold mb-8">องค์ประกอบหลักของคอมพิวเตอร์</h2>
-                    </div>
-                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="computer-part bg-white/20 backdrop-blur-sm rounded-3xl p-6 text-center" onclick="highlightPart(this)">
-                            <div class="text-6xl mb-4">🖥️</div>
-                            <h3 class="text-2xl font-semibold mb-3 text-yellow-300">หน้าจอ</h3>
-                            <p class="text-lg">แสดงภาพและข้อความให้เราเห็น</p>
-                        </div>
-                        <div class="computer-part bg-white/20 backdrop-blur-sm rounded-3xl p-6 text-center" onclick="highlightPart(this)">
-                            <div class="text-6xl mb-4">⌨️</div>
-                            <h3 class="text-2xl font-semibold mb-3 text-yellow-300">คีย์บอร์ด</h3>
-                            <p class="text-lg">ใช้พิมพ์ตัวอักษรและตัวเลข</p>
-                        </div>
-                        <div class="computer-part bg-white/20 backdrop-blur-sm rounded-3xl p-6 text-center" onclick="highlightPart(this)">
-                            <div class="text-6xl mb-4">🖱️</div>
-                            <h3 class="text-2xl font-semibold mb-3 text-yellow-300">เมาส์</h3>
-                            <p class="text-lg">ใช้คลิกและเลื่อนบนหน้าจอ</p>
-                        </div>
-                        <div class="computer-part bg-white/20 backdrop-blur-sm rounded-3xl p-6 text-center" onclick="highlightPart(this)">
-                            <div class="text-6xl mb-4">💻</div>
-                            <h3 class="text-2xl font-semibold mb-3 text-yellow-300">CPU</h3>
-                            <p class="text-lg">สมองของคอมพิวเตอร์</p>
-                        </div>
-                    </div>
-                    <div class="text-center mt-8">
-                        <p class="text-xl bg-white/20 backdrop-blur-sm rounded-2xl p-4 inline-block">
-                            💡 <strong>เคล็ดลับ:</strong> คลิกที่แต่ละส่วนเพื่อดูรายละเอียด!
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-8 max-w-2xl mx-auto">
+                        <p class="text-lg mb-4">
+                            <strong>หน่วยงาน:</strong><br>
+                            ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19<br>
+                            จังหวัดสุราษฎร์ธานี
+                        </p>
+                        <p class="text-lg">
+                            <strong>ผู้ออกแบบ:</strong><br>
+                            นายณรงพิสิษฐ์ วรวิวัฒน์
                         </p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 4: Hardware vs Software -->
+        <!-- Slide 2: Principles -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-12">
+                        <div class="text-6xl mb-6">🧠</div>
+                        <h2 class="text-4xl font-bold mb-8">หลักการและเหตุผล</h2>
+                        <h3 class="text-3xl font-semibold mb-12 text-yellow-300">
+                            ทำไมต้องใช้ "เกม" ในการเรียนรู้คอมพิวเตอร์?
+                        </h3>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-4xl mb-4">😊</div>
+                            <p class="text-lg">เด็กประถมมีแนวโน้มเรียนรู้ดีเมื่อมี<br><strong>รูปแบบการเรียนที่สนุก</strong></p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-4xl mb-4">🎯</div>
+                            <p class="text-lg">การใช้เกมช่วย<br><strong>กระตุ้นการมีส่วนร่วม</strong></p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-4xl mb-4">💪</div>
+                            <p class="text-lg">ฝึกทักษะการใช้คอมพิวเตอร์<br><strong>ควบคู่กับการคิดวิเคราะห์</strong></p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-4xl mb-4">📚</div>
+                            <p class="text-lg">สอดคล้องกับแนวทาง<br><strong>Active Learning และ Game-based Learning</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Objectives -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-12">
+                        <div class="text-6xl mb-6">🎯</div>
+                        <h2 class="text-4xl font-bold mb-8">วัตถุประสงค์ของศูนย์การเรียนรู้</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-center">
+                            <div class="text-3xl mr-6">💻</div>
+                            <p class="text-xl">ให้นักเรียนมีความรู้พื้นฐานเกี่ยวกับคอมพิวเตอร์</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-center">
+                            <div class="text-3xl mr-6">🖱️</div>
+                            <p class="text-xl">ส่งเสริมทักษะการใช้งานอุปกรณ์คอมพิวเตอร์</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-center">
+                            <div class="text-3xl mr-6">🧠</div>
+                            <p class="text-xl">ฝึกการคิดวิเคราะห์ แยกแยะ และค้นหาข้อมูลอย่างปลอดภัย</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-center">
+                            <div class="text-3xl mr-6">🌐</div>
+                            <p class="text-xl">สร้างเจตคติที่ดีในการใช้อินเทอร์เน็ต</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Structure -->
         <div class="slide">
             <div class="min-h-screen bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center px-8">
                 <div class="max-w-5xl mx-auto text-white">
                     <div class="text-center mb-12">
-                        <div class="text-6xl mb-6">⚖️</div>
-                        <h2 class="text-4xl font-bold mb-8">ฮาร์ดแวร์ vs ซอฟต์แวร์</h2>
-                        <p class="text-xl opacity-90">เปรียบเทียบแบบเข้าใจง่าย</p>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-6xl mb-4">🔧</div>
-                                <h3 class="text-3xl font-bold text-yellow-300">ฮาร์ดแวร์</h3>
-                                <p class="text-lg opacity-90">สิ่งที่จับต้องได้</p>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">🖥️</span>
-                                    <span class="text-lg">หน้าจอ</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">⌨️</span>
-                                    <span class="text-lg">คีย์บอร์ด</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">🖱️</span>
-                                    <span class="text-lg">เมาส์</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">💻</span>
-                                    <span class="text-lg">เครื่องคอมพิวเตอร์</span>
-                                </div>
-                            </div>
+                        <div class="text-6xl mb-6">🗂️</div>
+                        <h2 class="text-4xl font-bold mb-8">โครงสร้างของศูนย์การเรียนรู้</h2>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-8">
+                            <h3 class="text-3xl font-bold text-yellow-300">🕹️ Cyber Learning Quest</h3>
                         </div>
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-6xl mb-4">💿</div>
-                                <h3 class="text-3xl font-bold text-yellow-300">ซอฟต์แวร์</h3>
-                                <p class="text-lg opacity-90">โปรแกรมต่าง ๆ</p>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">🎮</span>
-                                    <span class="text-lg">เกม</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">📝</span>
-                                    <span class="text-lg">โปรแกรมเขียนหนังสือ</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">🌐</span>
-                                    <span class="text-lg">เว็บเบราว์เซอร์</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">🎵</span>
-                                    <span class="text-lg">โปรแกรมเล่นเพลง</span>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="zone-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
+                            <div class="text-4xl mb-4">💻</div>
+                            <h4 class="text-xl font-semibold mb-2">โลกแห่งคอมพิวเตอร์</h4>
+                            <p class="text-sm opacity-90">(Computer World)</p>
+                        </div>
+                        <div class="zone-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
+                            <div class="text-4xl mb-4">⌨️</div>
+                            <h4 class="text-xl font-semibold mb-2">นักสำรวจคีย์บอร์ด</h4>
+                            <p class="text-sm opacity-90">(Keyboard Explorer)</p>
+                        </div>
+                        <div class="zone-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
+                            <div class="text-4xl mb-4">🖱️</div>
+                            <h4 class="text-xl font-semibold mb-2">คลิกพิชิตโลก</h4>
+                            <p class="text-sm opacity-90">(Mouse Adventure)</p>
+                        </div>
+                        <div class="zone-card bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-center">
+                            <div class="text-4xl mb-4">🛡️</div>
+                            <h4 class="text-xl font-semibold mb-2">อัศวินไซเบอร์</h4>
+                            <p class="text-sm opacity-90">(Cyber Knight)</p>
                         </div>
                     </div>
                     <div class="text-center mt-8">
-                        <div class="bg-green-500/30 backdrop-blur-sm rounded-2xl p-6">
-                            <p class="text-xl">
-                                <strong>จำง่าย ๆ:</strong> ฮาร์ดแวร์ = ร่างกาย, ซอฟต์แวร์ = จิตใจ 🧠❤️
-                            </p>
+                        <div class="bg-green-500/30 backdrop-blur-sm rounded-2xl p-4">
+                            <p class="text-lg">✅ แต่ละโซนจะมีเกมฝึกทักษะ พร้อมระดับความยากหลากหลาย</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 5: How to Turn On/Off Computer -->
-        <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-teal-500 to-green-600 flex items-center justify-center px-8">
-                <div class="max-w-5xl mx-auto text-white">
-                    <div class="text-center mb-12">
-                        <div class="text-6xl mb-6">🔌</div>
-                        <h2 class="text-4xl font-bold mb-8">วิธีเปิด-ปิดคอมพิวเตอร์อย่างถูกต้อง</h2>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-5xl mb-4">✅</div>
-                                <h3 class="text-3xl font-bold text-green-300">วิธีเปิดเครื่อง</h3>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">1️⃣</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">เสียบปลั๊กไฟ</p>
-                                        <p class="text-sm opacity-80">ตรวจสอบให้แน่ใจว่าเสียบแน่น</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">2️⃣</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">กดปุ่ม Power</p>
-                                        <p class="text-sm opacity-80">ปุ่มกลม ๆ บนเครื่อง</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">3️⃣</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">รอให้เครื่องโหลด</p>
-                                        <p class="text-sm opacity-80">อดทนรอสักครู่</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-5xl mb-4">⚠️</div>
-                                <h3 class="text-3xl font-bold text-red-300">วิธีปิดเครื่อง</h3>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">1️⃣</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">บันทึกงานก่อน</p>
-                                        <p class="text-sm opacity-80">อย่าลืมเซฟไฟล์</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">2️⃣</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">คลิก Start → Shutdown</p>
-                                        <p class="text-sm opacity-80">ใช้เมนูปิดเครื่อง</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">❌</span>
-                                    <div>
-                                        <p class="text-lg font-semibold text-red-300">ห้ามดึงปลั๊ก!</p>
-                                        <p class="text-sm opacity-80">อาจทำให้เครื่องเสีย</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 6: Cover - Keyboard & Mouse -->
-        <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center px-8">
-                <div class="text-center text-white">
-                    <div class="flex justify-center items-center mb-8">
-                        <div class="text-6xl mr-4 animate-pulse">⌨️</div>
-                        <div class="text-6xl ml-4 animate-pulse">🖱️</div>
-                    </div>
-                    <h1 class="text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-300 to-pink-300 bg-clip-text text-transparent">
-                        สำรวจคีย์บอร์ดและเมาส์
-                    </h1>
-                    <p class="text-2xl mb-8 opacity-90">มาเรียนรู้การใช้งานให้เก่งกัน!</p>
-                    <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8 max-w-3xl mx-auto">
-                        <div class="grid grid-cols-2 gap-8 text-lg">
-                            <div class="text-center">
-                                <div class="text-4xl mb-4">⌨️</div>
-                                <h3 class="text-xl font-semibold mb-2">คีย์บอร์ด</h3>
-                                <p class="text-sm opacity-80">เรียนรู้การพิมพ์ที่ถูกต้อง</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-4xl mb-4">🖱️</div>
-                                <h3 class="text-xl font-semibold mb-2">เมาส์</h3>
-                                <p class="text-sm opacity-80">ฝึกการคลิกและลากให้แม่นยำ</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 7: Keyboard Layout -->
-        <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center px-8">
-                <div class="max-w-6xl mx-auto text-white">
-                    <div class="text-center mb-8">
-                        <div class="text-6xl mb-6">⌨️</div>
-                        <h2 class="text-4xl font-bold mb-8">รู้จักแป้นพิมพ์</h2>
-                    </div>
-                    <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8 mb-8">
-                        <h3 class="text-2xl font-semibold mb-6 text-center text-yellow-300">ตำแหน่งปุ่มสำคัญ</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-white/10 rounded-2xl p-6 text-center">
-                                <div class="text-4xl mb-4">🔤</div>
-                                <h4 class="text-xl font-semibold mb-3">ตัวอักษร A-Z</h4>
-                                <p class="text-sm">เรียงตามแบบ QWERTY<br>แถวบน: Q W E R T Y<br>แถวกลาง: A S D F G H<br>แถวล่าง: Z X C V B N</p>
-                            </div>
-                            <div class="bg-white/10 rounded-2xl p-6 text-center">
-                                <div class="text-4xl mb-4">🔢</div>
-                                <h4 class="text-xl font-semibold mb-3">ตัวเลข 0-9</h4>
-                                <p class="text-sm">อยู่แถวบนสุด<br>1 2 3 4 5 6 7 8 9 0<br>และมีแป้นตัวเลขด้านขวา</p>
-                            </div>
-                            <div class="bg-white/10 rounded-2xl p-6 text-center">
-                                <div class="text-4xl mb-4">⚡</div>
-                                <h4 class="text-xl font-semibold mb-3">ปุ่มพิเศษ</h4>
-                                <p class="text-sm">Enter = ขึ้นบรรทัดใหม่<br>Spacebar = เว้นวรรค<br>Backspace = ลบ<br>Shift = ตัวพิมพ์ใหญ่</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <div class="bg-green-500/30 backdrop-blur-sm rounded-2xl p-4 inline-block">
-                            <p class="text-lg">💡 <strong>เคล็ดลับ:</strong> ลองหาปุ่มต่าง ๆ บนคีย์บอร์ดของเรา!</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 8: Typing Tips -->
-        <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-green-600 to-teal-700 flex items-center justify-center px-8">
-                <div class="max-w-5xl mx-auto text-white">
-                    <div class="text-center mb-12">
-                        <div class="text-6xl mb-6">⚡</div>
-                        <h2 class="text-4xl font-bold mb-8">พิมพ์ยังไงให้เร็ว?</h2>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-5xl mb-4">🪑</div>
-                                <h3 class="text-3xl font-bold text-yellow-300">วิธีนั่งที่ถูกต้อง</h3>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">📏</span>
-                                    <span class="text-lg">นั่งตัวตรง หลังชิดพนักพิง</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">👀</span>
-                                    <span class="text-lg">สายตาอยู่ระดับหน้าจอ</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">🦶</span>
-                                    <span class="text-lg">เท้าแบนติดพื้น</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-5xl mb-4">✋</div>
-                                <h3 class="text-3xl font-bold text-yellow-300">การวางมือ</h3>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">👈</span>
-                                    <span class="text-lg">มือซ้าย: A S D F</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">👉</span>
-                                    <span class="text-lg">มือขวา: J K L ;</span>
-                                </div>
-                                <div class="flex items-center p-3 bg-white/10 rounded-2xl">
-                                    <span class="text-3xl mr-4">👍</span>
-                                    <span class="text-lg">นิ้วโป้ง: กด Spacebar</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-8">
-                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
-                            <p class="text-xl mb-4">ลองพิมพ์ตามนี้:</p>
-                            <div class="text-2xl font-mono bg-black/30 rounded-lg p-4">
-                                <span id="typingText" class="typing-demo">สวัสดี</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 9: Mouse Basics -->
-        <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-purple-600 to-pink-700 flex items-center justify-center px-8">
-                <div class="max-w-5xl mx-auto text-white">
-                    <div class="text-center mb-12">
-                        <div class="text-6xl mb-6">🖱️</div>
-                        <h2 class="text-4xl font-bold mb-8">รู้จักเมาส์</h2>
-                    </div>
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8 text-center">
-                            <div class="text-5xl mb-4">👆</div>
-                            <h3 class="text-2xl font-bold text-yellow-300 mb-4">การคลิก</h3>
-                            <div class="space-y-3 text-lg">
-                                <p><strong>คลิกซ้าย:</strong> เลือกสิ่งของ</p>
-                                <p><strong>คลิกขวา:</strong> เปิดเมนู</p>
-                                <p><strong>ดับเบิลคลิก:</strong> เปิดโปรแกรม</p>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8 text-center">
-                            <div class="text-5xl mb-4">👋</div>
-                            <h3 class="text-2xl font-bold text-yellow-300 mb-4">การลาก</h3>
-                            <div class="space-y-3 text-lg">
-                                <p><strong>กดค้าง:</strong> จับสิ่งของ</p>
-                                <p><strong>ลาก:</strong> ย้ายไปที่ต้องการ</p>
-                                <p><strong>ปล่อย:</strong> วางสิ่งของ</p>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8 text-center">
-                            <div class="text-5xl mb-4">🎡</div>
-                            <h3 class="text-2xl font-bold text-yellow-300 mb-4">การเลื่อน</h3>
-                            <div class="space-y-3 text-lg">
-                                <p><strong>ล้อเลื่อน:</strong> เลื่อนหน้าจอ</p>
-                                <p><strong>เลื่อนขึ้น:</strong> ดูด้านบน</p>
-                                <p><strong>เลื่อนลง:</strong> ดูด้านล่าง</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-8">
-                        <div class="bg-green-500/30 backdrop-blur-sm rounded-2xl p-6">
-                            <p class="text-xl">
-                                <strong>ฝึกหัด:</strong> ลองคลิกและลากสิ่งของบนหน้าจอ! 🎯
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 10: Mouse Usage Tips -->
-        <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-red-600 to-orange-700 flex items-center justify-center px-8">
-                <div class="max-w-5xl mx-auto text-white">
-                    <div class="text-center mb-12">
-                        <div class="text-6xl mb-6">🎯</div>
-                        <h2 class="text-4xl font-bold mb-8">วิธีใช้เมาส์อย่างถูกต้อง</h2>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-5xl mb-4">✋</div>
-                                <h3 class="text-3xl font-bold text-yellow-300">วางมือให้พอดี</h3>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">👆</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">นิ้วชี้บนปุ่มซ้าย</p>
-                                        <p class="text-sm opacity-80">พร้อมคลิกตลอดเวลา</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">🖕</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">นิ้วกลางบนล้อเลื่อน</p>
-                                        <p class="text-sm opacity-80">ใช้เลื่อนหน้าจอ</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">🤚</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">ฝ่ามือแนบเมาส์</p>
-                                        <p class="text-sm opacity-80">ไม่ยกมือขึ้น</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-5xl mb-4">🎯</div>
-                                <h3 class="text-3xl font-bold text-yellow-300">ควบคุมให้แม่น</h3>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">🐌</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">เคลื่อนไหวช้า ๆ</p>
-                                        <p class="text-sm opacity-80">ฝึกความแม่นยำก่อน</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">👀</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">มองตัวชี้เมาส์</p>
-                                        <p class="text-sm opacity-80">ติดตามลูกศรบนหน้าจอ</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-start p-4 bg-white/10 rounded-2xl">
-                                    <span class="text-2xl mr-4 mt-1">💪</span>
-                                    <div>
-                                        <p class="text-lg font-semibold">ฝึกบ่อย ๆ</p>
-                                        <p class="text-sm opacity-80">ยิ่งใช้ยิ่งเก่ง</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 11: Cover - Internet Safety -->
-        <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-cyan-600 to-blue-700 flex items-center justify-center px-8">
-                <div class="text-center text-white">
-                    <div class="text-8xl mb-8 safety-badge">🛡️</div>
-                    <h1 class="text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-300 to-green-300 bg-clip-text text-transparent">
-                        อินเทอร์เน็ตปลอดภัย
-                    </h1>
-                    <p class="text-2xl mb-8 opacity-90">เรียนรู้การใช้อินเทอร์เน็ตอย่างปลอดภัย</p>
-                    <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8 max-w-3xl mx-auto">
-                        <div class="grid grid-cols-2 gap-8 text-lg">
-                            <div class="text-center">
-                                <div class="text-4xl mb-4">🌐</div>
-                                <h3 class="text-xl font-semibold mb-2">อินเทอร์เน็ตคืออะไร?</h3>
-                                <p class="text-sm opacity-80">เข้าใจโลกออนไลน์</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-4xl mb-4">🔒</div>
-                                <h3 class="text-xl font-semibold mb-2">ข้อมูลส่วนตัว</h3>
-                                <p class="text-sm opacity-80">รู้จักปกป้องตัวเอง</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-4xl mb-4">✅</div>
-                                <h3 class="text-xl font-semibold mb-2">เว็บดี vs เว็บปลอม</h3>
-                                <p class="text-sm opacity-80">แยกแยะเว็บไซต์</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-4xl mb-4">🛡️</div>
-                                <h3 class="text-xl font-semibold mb-2">พฤติกรรมปลอดภัย</h3>
-                                <p class="text-sm opacity-80">เป็นอัศวินไซเบอร์</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 12: What is Internet -->
+        <!-- Slide 5: Zone 1 -->
         <div class="slide">
             <div class="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center px-8">
-                <div class="max-w-5xl mx-auto text-white">
-                    <div class="text-center mb-12">
-                        <div class="text-6xl mb-6">🌐</div>
-                        <h2 class="text-4xl font-bold mb-8">อินเทอร์เน็ตคืออะไร?</h2>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <h3 class="text-3xl font-semibold mb-6 text-yellow-300">อธิบายง่าย ๆ</h3>
-                            <div class="space-y-4 text-xl">
-                                <p class="flex items-center">
-                                    <span class="text-3xl mr-4">🕸️</span>
-                                    เหมือนใยแมงมุมยักษ์
-                                </p>
-                                <p class="flex items-center">
-                                    <span class="text-3xl mr-4">🔗</span>
-                                    เชื่อมโยงคอมพิวเตอร์ทั่วโลก
-                                </p>
-                                <p class="flex items-center">
-                                    <span class="text-3xl mr-4">📡</span>
-                                    ส่งข้อมูลไปมาได้
-                                </p>
-                                <p class="flex items-center">
-                                    <span class="text-3xl mr-4">⚡</span>
-                                    เร็วมาก ๆ ภายในวินาที
-                                </p>
-                            </div>
-                        </div>
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <h3 class="text-3xl font-semibold mb-6 text-yellow-300">ใช้ทำอะไรได้?</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="text-center p-4 bg-white/10 rounded-2xl">
-                                    <div class="text-4xl mb-2">📚</div>
-                                    <p class="text-lg">หาข้อมูล</p>
-                                </div>
-                                <div class="text-center p-4 bg-white/10 rounded-2xl">
-                                    <div class="text-4xl mb-2">🎮</div>
-                                    <p class="text-lg">เล่นเกม</p>
-                                </div>
-                                <div class="text-center p-4 bg-white/10 rounded-2xl">
-                                    <div class="text-4xl mb-2">📹</div>
-                                    <p class="text-lg">ดูวิดีโอ</p>
-                                </div>
-                                <div class="text-center p-4 bg-white/10 rounded-2xl">
-                                    <div class="text-4xl mb-2">💬</div>
-                                    <p class="text-lg">คุยกับเพื่อน</p>
-                                </div>
-                                <div class="text-center p-4 bg-white/10 rounded-2xl">
-                                    <div class="text-4xl mb-2">🛒</div>
-                                    <p class="text-lg">ซื้อของ</p>
-                                </div>
-                                <div class="text-center p-4 bg-white/10 rounded-2xl">
-                                    <div class="text-4xl mb-2">📖</div>
-                                    <p class="text-lg">เรียนออนไลน์</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 13: Personal Information -->
-        <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-red-600 to-pink-700 flex items-center justify-center px-8">
-                <div class="max-w-5xl mx-auto text-white">
-                    <div class="text-center mb-12">
-                        <div class="text-6xl mb-6">🔒</div>
-                        <h2 class="text-4xl font-bold mb-8">ข้อมูลส่วนตัวคืออะไร?</h2>
-                        <p class="text-xl text-red-200">ชื่อ-นามสกุล เบอร์โทร ที่อยู่ = ห้ามโพสต์!</p>
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-8">
+                        <div class="text-6xl mb-4">💻</div>
+                        <h2 class="text-3xl font-bold mb-6">โซนที่ 1 – โลกแห่งคอมพิวเตอร์</h2>
                     </div>
                     <div class="grid md:grid-cols-2 gap-8">
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-5xl mb-4">❌</div>
-                                <h3 class="text-3xl font-bold text-red-300">ห้ามบอกใคร!</h3>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-center p-4 bg-red-500/20 rounded-2xl border-2 border-red-400">
-                                    <span class="text-3xl mr-4">👤</span>
-                                    <span class="text-lg">ชื่อ-นามสกุลจริง</span>
-                                </div>
-                                <div class="flex items-center p-4 bg-red-500/20 rounded-2xl border-2 border-red-400">
-                                    <span class="text-3xl mr-4">📞</span>
-                                    <span class="text-lg">เบอร์โทรศัพท์</span>
-                                </div>
-                                <div class="flex items-center p-4 bg-red-500/20 rounded-2xl border-2 border-red-400">
-                                    <span class="text-3xl mr-4">🏠</span>
-                                    <span class="text-lg">ที่อยู่บ้าน</span>
-                                </div>
-                                <div class="flex items-center p-4 bg-red-500/20 rounded-2xl border-2 border-red-400">
-                                    <span class="text-3xl mr-4">🏫</span>
-                                    <span class="text-lg">ชื่อโรงเรียน</span>
-                                </div>
-                                <div class="flex items-center p-4 bg-red-500/20 rounded-2xl border-2 border-red-400">
-                                    <span class="text-3xl mr-4">🔑</span>
-                                    <span class="text-lg">รหัสผ่าน</span>
-                                </div>
-                            </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">ทักษะเป้าหมาย:</h3>
+                            <p class="text-lg">รู้จักอุปกรณ์พื้นฐานของคอมพิวเตอร์และการเปิด-ปิดเครื่อง</p>
                         </div>
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-5xl mb-4">✅</div>
-                                <h3 class="text-3xl font-bold text-green-300">บอกได้</h3>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-center p-4 bg-green-500/20 rounded-2xl border-2 border-green-400">
-                                    <span class="text-3xl mr-4">🎭</span>
-                                    <span class="text-lg">ชื่อเล่น/ชื่อเกม</span>
-                                </div>
-                                <div class="flex items-center p-4 bg-green-500/20 rounded-2xl border-2 border-green-400">
-                                    <span class="text-3xl mr-4">🎨</span>
-                                    <span class="text-lg">งานอดิเรก</span>
-                                </div>
-                                <div class="flex items-center p-4 bg-green-500/20 rounded-2xl border-2 border-green-400">
-                                    <span class="text-3xl mr-4">🎵</span>
-                                    <span class="text-lg">เพลงที่ชอบ</span>
-                                </div>
-                                <div class="flex items-center p-4 bg-green-500/20 rounded-2xl border-2 border-green-400">
-                                    <span class="text-3xl mr-4">🏆</span>
-                                    <span class="text-lg">ความสำเร็จ</span>
-                                </div>
-                            </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">กิจกรรม:</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>🎯 เกมลาก-วาง "จับคู่ชื่อกับภาพอุปกรณ์"</li>
+                                <li>🧩 เกมไขปริศนา "ใครคือฮีโร่ฮาร์ดแวร์"</li>
+                                <li>⚡ เกม Simulation "เปิด-ปิดคอมให้ถูกวิธี"</li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="text-center mt-8">
-                        <div class="bg-yellow-500/30 backdrop-blur-sm rounded-2xl p-6">
-                            <p class="text-xl">
-                                <strong>จำไว้:</strong> ข้อมูลส่วนตัว = ของลับ ห้ามบอกคนแปลกหน้า! 🤐
-                            </p>
+                    <div class="mt-8 bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-yellow-300">พื้นฐานความรู้ที่ต้องมี:</h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🖥️</div>
+                                <p>อุปกรณ์คอมพิวเตอร์คืออะไร?</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">⚙️</div>
+                                <p>หน้าที่ของฮาร์드แวร์แต่ละชนิด</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🔒</div>
+                                <p>วิธีใช้งานคอมพิวเตอร์อย่างปลอดภัย</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 14: Good vs Bad Websites -->
+        <!-- Slide 6: Zone 2 -->
         <div class="slide">
             <div class="min-h-screen bg-gradient-to-br from-green-600 to-blue-700 flex items-center justify-center px-8">
-                <div class="max-w-6xl mx-auto text-white">
-                    <div class="text-center mb-12">
-                        <div class="text-6xl mb-6">🔍</div>
-                        <h2 class="text-4xl font-bold mb-8">เว็บดี vs เว็บปลอม</h2>
-                        <p class="text-xl opacity-90">เทคนิคดู URL, ไม่กดลิงก์แปลก</p>
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-8">
+                        <div class="text-6xl mb-4">⌨️</div>
+                        <h2 class="text-3xl font-bold mb-6">โซนที่ 2 – นักสำรวจคีย์บอร์ด</h2>
                     </div>
                     <div class="grid md:grid-cols-2 gap-8">
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-5xl mb-4">✅</div>
-                                <h3 class="text-3xl font-bold text-green-300">เว็บดี</h3>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="p-4 bg-green-500/20 rounded-2xl border-2 border-green-400">
-                                    <div class="flex items-center mb-2">
-                                        <span class="text-2xl mr-3">🔒</span>
-                                        <span class="text-lg font-semibold">มี https://</span>
-                                    </div>
-                                    <p class="text-sm opacity-80">ปลอดภัย มีการเข้ารหัส</p>
-                                </div>
-                                <div class="p-4 bg-green-500/20 rounded-2xl border-2 border-green-400">
-                                    <div class="flex items-center mb-2">
-                                        <span class="text-2xl mr-3">🏢</span>
-                                        <span class="text-lg font-semibold">ชื่อเว็บที่รู้จัก</span>
-                                    </div>
-                                    <p class="text-sm opacity-80">Google, YouTube, Facebook</p>
-                                </div>
-                                <div class="p-4 bg-green-500/20 rounded-2xl border-2 border-green-400">
-                                    <div class="flex items-center mb-2">
-                                        <span class="text-2xl mr-3">📝</span>
-                                        <span class="text-lg font-semibold">เนื้อหาเหมาะสม</span>
-                                    </div>
-                                    <p class="text-sm opacity-80">ไม่มีภาพหรือคำหยาบ</p>
-                                </div>
-                            </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">ทักษะเป้าหมาย:</h3>
+                            <p class="text-lg">รู้จักปุ่มต่างๆ และฝึกพิมพ์ให้ถูกต้อง/รวดเร็ว</p>
                         </div>
-                        <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                            <div class="text-center mb-6">
-                                <div class="text-5xl mb-4">❌</div>
-                                <h3 class="text-3xl font-bold text-red-300">เว็บปลอม</h3>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="p-4 bg-red-500/20 rounded-2xl border-2 border-red-400">
-                                    <div class="flex items-center mb-2">
-                                        <span class="text-2xl mr-3">⚠️</span>
-                                        <span class="text-lg font-semibold">ไม่มี https://</span>
-                                    </div>
-                                    <p class="text-sm opacity-80">อันตราย ไม่ปลอดภัย</p>
-                                </div>
-                                <div class="p-4 bg-red-500/20 rounded-2xl border-2 border-red-400">
-                                    <div class="flex items-center mb-2">
-                                        <span class="text-2xl mr-3">🎁</span>
-                                        <span class="text-lg font-semibold">สัญญาของฟรี</span>
-                                    </div>
-                                    <p class="text-sm opacity-80">"คลิกรับเงิน 1000 บาท!"</p>
-                                </div>
-                                <div class="p-4 bg-red-500/20 rounded-2xl border-2 border-red-400">
-                                    <div class="flex items-center mb-2">
-                                        <span class="text-2xl mr-3">💳</span>
-                                        <span class="text-lg font-semibold">ขอข้อมูลส่วนตัว</span>
-                                    </div>
-                                    <p class="text-sm opacity-80">ถามรหัสผ่าน เบอร์โทร</p>
-                                </div>
-                            </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">กิจกรรม:</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>⚡ เกมพิมพ์คำให้ทันเวลา (Speed Typing)</li>
+                                <li>🔍 เกมตามหาปุ่ม (หาให้เจอในแป้นพิมพ์)</li>
+                                <li>🏆 เกมแข่งพิมพ์คำศัพท์ภาษาอังกฤษพื้นฐาน</li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="text-center mt-8">
-                        <div class="bg-yellow-500/30 backdrop-blur-sm rounded-2xl p-6">
-                            <p class="text-xl">
-                                <strong>กฎทอง:</strong> สงสัย = ไม่คลิก! ถามผู้ใหญ่ก่อน 🤔
-                            </p>
+                    <div class="mt-8 bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-yellow-300">พื้นฐานความรู้ที่ต้องมี:</h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🎯</div>
+                                <p>ตำแหน่งของปุ่มต่างๆ บนแป้นพิมพ์</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">✋</div>
+                                <p>วิธีพิมพ์สัมผัสเบื้องต้น</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">⌨️</div>
+                                <p>การใช้คีย์ลัดง่ายๆ</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 15: Cyber Knight Checklist -->
+        <!-- Slide 7: Zone 3 -->
         <div class="slide">
-            <div class="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center px-8">
+            <div class="min-h-screen bg-gradient-to-br from-purple-600 to-pink-700 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-8">
+                        <div class="text-6xl mb-4">🖱️</div>
+                        <h2 class="text-3xl font-bold mb-6">โซนที่ 3 – คลิกพิชิตโลก</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">ทักษะเป้าหมาย:</h3>
+                            <p class="text-lg">ฝึกควบคุมเมาส์และใช้เมาส์คล่องแคล่ว</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">กิจกรรม:</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>🎯 เกมลากไอเทมเข้าตำแหน่งให้ถูก</li>
+                                <li>🌀 เกมหาทางออกในเขาวงกตโดยใช้เมาส์ควบคุม</li>
+                                <li>⚡ เกมแข่งใช้เมาส์ให้ทันเวลา</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-yellow-300">พื้นฐานความรู้ที่ต้องมี:</h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">👆</div>
+                                <p>วิธีใช้เมาส์ (คลิก, ลาก, เลื่อน)</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">👁️</div>
+                                <p>ฝึกประสานสายตากับการควบคุมมือ</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🎮</div>
+                                <p>ใช้เมาส์กับซอฟต์แวร์หรือเกมได้คล่อง</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Zone 4 -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-red-600 to-orange-700 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-8">
+                        <div class="text-6xl mb-4">🛡️</div>
+                        <h2 class="text-3xl font-bold mb-6">โซนที่ 4 – อัศวินไซเบอร์</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">ทักษะเป้าหมาย:</h3>
+                            <p class="text-lg">เรียนรู้การใช้อินเทอร์เน็ตอย่างปลอดภัย และรู้จักแหล่งข้อมูลที่เชื่อถือได้</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <h3 class="text-xl font-semibold mb-4 text-yellow-300">กิจกรรม:</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>✅ เกมจำแนกเว็บดี-เว็บปลอม</li>
+                                <li>🕵️ เกม "ใครคือผู้ร้ายไซเบอร์"</li>
+                                <li>🧩 เกм Puzzle จัดเรียงขั้นตอนการค้นหาข้อมูล</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-yellow-300">พื้นฐานความรู้ที่ต้องมี:</h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🔒</div>
+                                <p>URL ที่ปลอดภัยหน้าตาเป็นอย่างไร</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🔐</div>
+                                <p>ข้อมูลส่วนตัวคืออะไร และควรระวังอย่างไร</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🔍</div>
+                                <p>วิธีค้นหาข้อมูลจาก Google อย่างถูกต้อง</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Advantages -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-teal-600 to-green-700 flex items-center justify-center px-8">
                 <div class="max-w-5xl mx-auto text-white">
                     <div class="text-center mb-12">
-                        <div class="text-6xl mb-6 safety-badge">🛡️</div>
-                        <h2 class="text-4xl font-bold mb-8">Cyber Knight Checklist</h2>
-                        <p class="text-xl opacity-90">แบบสำรวจพฤติกรรมปลอดภัยในชีวิตจริง</p>
+                        <div class="text-6xl mb-6">🧩</div>
+                        <h2 class="text-4xl font-bold mb-8">จุดเด่นของศูนย์การเรียนรู้แบบเกม</h2>
                     </div>
-                    <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-8">
-                        <h3 class="text-2xl font-semibold mb-6 text-center text-yellow-300">เช็คลิสต์อัศวินไซเบอร์</h3>
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div class="space-y-4">
-                                <div class="flex items-center p-4 bg-white/10 rounded-2xl">
-                                    <input type="checkbox" class="w-6 h-6 mr-4 rounded" id="check1">
-                                    <label for="check1" class="text-lg cursor-pointer">ไม่บอกข้อมูลส่วนตัวกับคนแปลกหน้า</label>
-                                </div>
-                                <div class="flex items-center p-4 bg-white/10 rounded-2xl">
-                                    <input type="checkbox" class="w-6 h-6 mr-4 rounded" id="check2">
-                                    <label for="check2" class="text-lg cursor-pointer">ตรวจสอบ URL ก่อนเข้าเว็บ</label>
-                                </div>
-                                <div class="flex items-center p-4 bg-white/10 rounded-2xl">
-                                    <input type="checkbox" class="w-6 h-6 mr-4 rounded" id="check3">
-                                    <label for="check3" class="text-lg cursor-pointer">ไม่คลิกลิงก์แปลก ๆ</label>
-                                </div>
-                                <div class="flex items-center p-4 bg-white/10 rounded-2xl">
-                                    <input type="checkbox" class="w-6 h-6 mr-4 rounded" id="check4">
-                                    <label for="check4" class="text-lg cursor-pointer">ไม่เปิดกล้องให้คนแปลกหน้า</label>
-                                </div>
-                            </div>
-                            <div class="space-y-4">
-                                <div class="flex items-center p-4 bg-white/10 rounded-2xl">
-                                    <input type="checkbox" class="w-6 h-6 mr-4 rounded" id="check5">
-                                    <label for="check5" class="text-lg cursor-pointer">ถามผู้ใหญ่เมื่อสงสัย</label>
-                                </div>
-                                <div class="flex items-center p-4 bg-white/10 rounded-2xl">
-                                    <input type="checkbox" class="w-6 h-6 mr-4 rounded" id="check6">
-                                    <label for="check6" class="text-lg cursor-pointer">ใช้รหัสผ่านที่แข็งแรง</label>
-                                </div>
-                                <div class="flex items-center p-4 bg-white/10 rounded-2xl">
-                                    <input type="checkbox" class="w-6 h-6 mr-4 rounded" id="check7">
-                                    <label for="check7" class="text-lg cursor-pointer">ไม่ดาวน์โหลดไฟล์แปลก ๆ</label>
-                                </div>
-                                <div class="flex items-center p-4 bg-white/10 rounded-2xl">
-                                    <input type="checkbox" class="w-6 h-6 mr-4 rounded" id="check8">
-                                    <label for="check8" class="text-lg cursor-pointer">เล่นอินเทอร์เน็ตในเวลาที่เหมาะสม</label>
-                                </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full bg-white/20 backdrop-blur-sm rounded-2xl overflow-hidden">
+                            <thead class="bg-white/30">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xl font-semibold">ด้าน</th>
+                                    <th class="px-6 py-4 text-left text-xl font-semibold">รายละเอียด</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/20">
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">😊</span>
+                                            <span class="text-lg font-semibold">สนุก</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">เด็กเรียนรู้ผ่านเกมที่ออกแบบอย่างสร้างสรรค์</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">💪</span>
+                                            <span class="text-lg font-semibold">ใช้ได้จริง</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">ทักษะที่เรียนสามารถประยุกต์ใช้ในชีวิตประจำวัน</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">🧠</span>
+                                            <span class="text-lg font-semibold">ฝึกคิด</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">มีการวิเคราะห์ แยกแยะ จัดลำดับเหตุผล</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">📊</span>
+                                            <span class="text-lg font-semibold">ประเมินได้</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">คะแนนเกมสามารถใช้เป็นเครื่องมือประเมินผลเบื้องต้น</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Teaching Approach -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white">
+                    <div class="text-center mb-12">
+                        <div class="text-6xl mb-6">🧑‍🏫</div>
+                        <h2 class="text-4xl font-bold mb-8">แนวทางการจัดการเรียนการสอน</h2>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-start">
+                            <div class="text-3xl mr-6 mt-1">👥</div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">การจัดกลุ่ม</h3>
+                                <p class="text-lg">แบ่งกลุ่มนักเรียนให้ผลัดเปลี่ยนกันเล่นเกมแต่ละโซน</p>
                             </div>
                         </div>
-                        <div class="text-center mt-8">
-                            <button id="checkAllBtn" class="interactive-button bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-2xl text-xl font-semibold hover:from-green-600 hover:to-blue-600">
-                                ✅ เช็คทั้งหมด - เป็นอัศวินไซเบอร์!
-                            </button>
-                            <div id="knightBadge" class="hidden mt-6 p-6 bg-gradient-to-r from-yellow-400 to-orange-400 text-black rounded-2xl">
-                                <div class="text-4xl mb-2">🏆</div>
-                                <p class="text-2xl font-bold">ยินดีด้วย! คุณเป็นอัศวินไซเบอร์แล้ว!</p>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-start">
+                            <div class="text-3xl mr-6 mt-1">📋</div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">การประเมินผล</h3>
+                                <p class="text-lg">ใช้แบบประเมินก่อน-หลัง เพื่อวัดผลสัมฤทธิ์</p>
                             </div>
                         </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-start">
+                            <div class="text-3xl mr-6 mt-1">🤝</div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">การเรียนรู้ร่วมกัน</h3>
+                                <p class="text-lg">ส่งเสริมให้เด็กช่วยกันเรียนรู้แบบ "เพื่อนช่วยเพื่อน"</p>
+                            </div>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 flex items-start">
+                            <div class="text-3xl mr-6 mt-1">🎯</div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2">บทบาทผู้สอน</h3>
+                                <p class="text-lg">ผู้สอนทำหน้าที่เป็น "โค้ช" มากกว่าผู้บรรยาย</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Benefits -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-pink-600 to-red-700 flex items-center justify-center px-8">
+                <div class="max-w-5xl mx-auto text-white">
+                    <div class="text-center mb-12">
+                        <div class="text-6xl mb-6">🎓</div>
+                        <h2 class="text-4xl font-bold mb-8">ประโยชน์ที่คาดว่าจะได้รับ</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full bg-white/20 backdrop-blur-sm rounded-2xl overflow-hidden">
+                            <thead class="bg-white/30">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xl font-semibold">กลุ่มเป้าหมาย</th>
+                                    <th class="px-6 py-4 text-left text-xl font-semibold">ประโยชน์ที่ได้รับ</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/20">
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">👨‍🎓</span>
+                                            <span class="text-lg font-semibold">ผู้เรียน</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">ได้รับความรู้ ทักษะ และเจตคติที่ดี</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">👩‍🏫</span>
+                                            <span class="text-lg font-semibold">ครูผู้สอน</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">มีเครื่องมือในการจัดการเรียนรู้ที่น่าสนใจ</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">🏫</span>
+                                            <span class="text-lg font-semibold">โรงเรียน</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">พัฒนาคุณภาพผู้เรียนด้านเทคโนโลยีสารสนเทศ</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <span class="text-2xl mr-3">🏘️</span>
+                                            <span class="text-lg font-semibold">ชุมชน</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-lg">ได้เยาวชนที่รู้เท่าทันโลกดิจิทัล</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Conclusion -->
+        <div class="slide">
+            <div class="min-h-screen bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center px-8">
+                <div class="max-w-4xl mx-auto text-white text-center">
+                    <div class="mb-8">
+                        <div class="text-6xl mb-6">📌</div>
+                        <h2 class="text-4xl font-bold mb-8">สรุปและเชิญชวน</h2>
+                        <h3 class="text-3xl font-semibold mb-12 text-yellow-100">
+                            ร่วมเป็นส่วนหนึ่งของการพัฒนา<br>"อัศวินดิจิทัลตัวน้อย"
+                        </h3>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-3xl mb-4">🎮</div>
+                            <p class="text-xl">ศูนย์การเรียนรู้คอมพิวเตอร์ผ่านเกมเป็นเครื่องมือที่สนุกและทรงพลัง</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-3xl mb-4">🌟</div>
+                            <p class="text-xl">เด็กจะได้เรียนรู้ผ่านประสบการณ์จริง</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
+                            <div class="text-3xl mb-4">🤝</div>
+                            <p class="text-xl">ขอความร่วมมือทุกฝ่ายในการสนับสนุนและพัฒนาอย่างต่อเนื่อง</p>
+                        </div>
+                    </div>
+                    <div class="mt-12">
+                        <div class="text-4xl mb-4">🙏</div>
+                        <p class="text-2xl font-semibold">ขอบคุณสำหรับการรับฟัง</p>
                     </div>
                 </div>
             </div>
@@ -967,25 +572,8 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-6 mt-8">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="flex items-center space-x-4 mb-4 md:mb-0">
-                    <img src="https://cttc19.onrender.com/game/img/logo.png" alt="CTTC19 Logo" class="w-8 h-8 object-contain" onerror="this.src=''; this.alt='Logo failed to load'; this.style.display='none';">
-                    <div class="text-center md:text-left">
-                        <p class="text-sm font-semibold">โลกแห่งคอมพิวเตอร์</p>
-                        <p class="text-xs opacity-75">ศูนย์การเรียนรู้คอมพิวเตอร์</p>
-                    </div>
-                </div>
-                <div class="text-center md:text-right">
-                    <p class="text-sm">© developed by <span class="font-semibold text-blue-400">Tle Narongphisit</span></p>
-                    <p class="text-xs opacity-75">CTTC19 @ CPD</p>
-                </div>
-            </div>
-            <div class="border-t border-gray-700 mt-4 pt-4 text-center">
-                <p class="text-xs opacity-60">สร้างขึ้นเพื่อการศึกษา | เรียนรู้อย่างปลอดภัยและสนุกสนาน</p>
-            </div>
-        </div>
+    <footer class="bg-blue-900 text-white py-4 text-center">
+        <p>© developed by Tle Narongphisit | CTTC19 @ CPD</p>
     </footer>
 
     <script>
@@ -1053,129 +641,8 @@
             }
         });
         
-        // Interactive features
-        function highlightPart(element) {
-            // Remove highlight from all parts
-            document.querySelectorAll('.computer-part').forEach(part => {
-                part.style.transform = 'scale(1)';
-                part.style.boxShadow = 'none';
-            });
-            
-            // Highlight clicked part
-            element.style.transform = 'scale(1.1)';
-            element.style.boxShadow = '0 20px 40px rgba(255,255,255,0.3)';
-            
-            // Reset after 2 seconds
-            setTimeout(() => {
-                element.style.transform = 'scale(1)';
-                element.style.boxShadow = 'none';
-            }, 2000);
-        }
-        
-        // Typing animation
-        let typingTexts = ['สวัสดี', 'Hello', 'Computer', 'เรียนรู้'];
-        let currentTextIndex = 0;
-        
-        function animateTyping() {
-            const typingElement = document.getElementById('typingText');
-            if (typingElement) {
-                typingElement.textContent = typingTexts[currentTextIndex];
-                currentTextIndex = (currentTextIndex + 1) % typingTexts.length;
-            }
-        }
-        
-        setInterval(animateTyping, 2000);
-        
-        // Cyber Knight Checklist
-        const checkAllBtn = document.getElementById('checkAllBtn');
-        const knightBadge = document.getElementById('knightBadge');
-        
-        if (checkAllBtn) {
-            checkAllBtn.addEventListener('click', () => {
-                // Check all checkboxes
-                for (let i = 1; i <= 8; i++) {
-                    const checkbox = document.getElementById(`check${i}`);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                    }
-                }
-                
-                // Show badge
-                knightBadge.classList.remove('hidden');
-                knightBadge.classList.add('animate-bounce');
-                
-                // Confetti effect (simple)
-                setTimeout(() => {
-                    knightBadge.classList.remove('animate-bounce');
-                }, 2000);
-            });
-        }
-        
-        // Sound effects (visual feedback only due to audio limitations)
-        function playClickSound() {
-            // Visual feedback instead of audio
-            const button = event.target;
-            button.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                button.style.transform = '';
-            }, 100);
-        }
-        
-        // Add click sound to all interactive buttons
-        document.querySelectorAll('.interactive-button').forEach(btn => {
-            btn.addEventListener('click', playClickSound);
-        });
-        
-        // Progress tracking
-        let slideVisited = new Array(totalSlides).fill(false);
-        
-        function trackProgress() {
-            slideVisited[currentSlideIndex] = true;
-            const visitedCount = slideVisited.filter(visited => visited).length;
-            const completionRate = Math.round((visitedCount / totalSlides) * 100);
-            
-            // Update progress in console for debugging
-            console.log(`Progress: ${completionRate}% (${visitedCount}/${totalSlides} slides visited)`);
-            
-            // Show completion message when all slides visited
-            if (completionRate === 100 && !localStorage.getItem('slideshow_completed')) {
-                localStorage.setItem('slideshow_completed', 'true');
-                setTimeout(() => {
-                    alert('🎉 ยินดีด้วย! คุณได้ดูสไลด์ครบทุกหน้าแล้ว!\nตอนนี้คุณรู้เรื่องคอมพิวเตอร์และอินเทอร์เน็ตปลอดภัยแล้ว!');
-                }, 1000);
-            }
-        }
-        
-        // Enhanced slide update function
-        function updateSlide() {
-            slides.forEach((slide, index) => {
-                slide.classList.toggle('active', index === currentSlideIndex);
-            });
-            
-            currentSlideSpan.textContent = currentSlideIndex + 1;
-            progressBar.style.width = `${((currentSlideIndex + 1) / totalSlides) * 100}%`;
-            
-            prevBtn.disabled = currentSlideIndex === 0;
-            nextBtn.disabled = currentSlideIndex === totalSlides - 1;
-            
-            if (prevBtn.disabled) {
-                prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            } else {
-                prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-            
-            if (nextBtn.disabled) {
-                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            } else {
-                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-            
-            // Track progress
-            trackProgress();
-        }
-        
         // Initialize
         updateSlide();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97689833252d731c',t:'MTc1NjQzNDI5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>

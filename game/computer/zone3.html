@@ -285,6 +285,118 @@
             80% { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-10px); }
         }
+        
+        /* Sound and Visual Effects Animations */
+        @keyframes soundWaveExpand {
+            0% { 
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(8);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes screenShake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+            20%, 40%, 60%, 80% { transform: translateX(2px); }
+        }
+        
+        @keyframes comboParticleFloat {
+            0% { 
+                transform: translate(-50%, -50%) rotate(0deg) scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) rotate(180deg) scale(1.2);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: translate(-50%, -50%) rotate(360deg) scale(0) translateY(-100px);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes fireworkExplode {
+            0% { 
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            20% {
+                transform: scale(1.5) rotate(90deg);
+                opacity: 1;
+            }
+            100% { 
+                transform: scale(0.5) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes rippleEffect {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes buttonPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes glowPulse {
+            0%, 100% { 
+                box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.6);
+            }
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-3deg); }
+            75% { transform: rotate(3deg); }
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Interactive Button Effects */
+        .interactive-btn {
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .interactive-btn:hover {
+            animation: buttonPulse 0.6s ease infinite;
+        }
+        
+        .interactive-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .game-card:hover {
+            animation: glowPulse 2s ease infinite;
+        }
+        
+        .mascot-wiggle {
+            animation: wiggle 2s ease-in-out infinite;
+        }
+        
+        .heartbeat-effect {
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 min-h-screen">
@@ -322,7 +434,7 @@
                         <div class="text-lg font-bold text-red-600" id="headerGame3Best">0</div>
                         <div class="text-xs text-gray-600">⏱️ สูงสุด</div>
                     </div>
-                    <button onclick="showStats()" class="bg-purple-500 hover:bg-purple-600 text-white px-3 md:px-4 py-2 rounded-lg transition-colors flex items-center space-x-1 md:space-x-2 text-sm md:text-base">
+                    <button onclick="showStats()" class="interactive-btn bg-purple-500 hover:bg-purple-600 text-white px-3 md:px-4 py-2 rounded-lg transition-colors flex items-center space-x-1 md:space-x-2 text-sm md:text-base">
                         <span>📊</span>
                         <span class="hidden md:inline">สถิติ</span>
                         <span class="md:hidden">สถิติ</span>
@@ -336,8 +448,8 @@
     <div class="container mx-auto px-4 py-6">
         <div class="bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-6 text-center shadow-lg">
             <div class="flex flex-col md:flex-row items-center justify-center gap-6">
-                <img src="https://cttc19.onrender.com/game/img/mascot.gif" alt="CTTC Mascot" class="w-24 h-24 object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <div class="text-6xl hidden">🤖</div>
+                <img src="https://cttc19.onrender.com/game/img/mascot.gif" alt="CTTC Mascot" class="w-24 h-24 object-contain mascot-wiggle" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="text-6xl hidden mascot-wiggle">🤖</div>
                 <div class="text-center md:text-left">
                     <h2 class="text-2xl font-bold text-blue-800 mb-2">สวัสดีครับ! ผมคือ CTTC Bot</h2>
                     <p class="text-blue-700 text-lg">ยินดีต้อนรับสู่โซน 3: คลิกพิชิตโลก!</p>
@@ -351,8 +463,8 @@
     <div class="container mx-auto px-4 py-8">
         <div class="grid md:grid-cols-3 gap-8">
             <!-- Game 1: Drag & Drop -->
-            <div class="game-card rounded-2xl p-6 text-white cursor-pointer" onclick="startGame(1)">
-                <div class="text-6xl mb-4 text-center">🧲</div>
+            <div class="game-card interactive-btn rounded-2xl p-6 text-white cursor-pointer" onclick="startGame(1)">
+                <div class="text-6xl mb-4 text-center heartbeat-effect">🧲</div>
                 <h3 class="text-2xl font-bold mb-2">เกมลากไอเทม</h3>
                 <p class="text-lg opacity-90 mb-3">ลากอุปกรณ์คอมพิวเตอร์ไปยังตำแหน่งที่ถูกต้อง</p>
                 <div class="bg-white bg-opacity-20 rounded-lg p-3 mb-4">
@@ -375,8 +487,8 @@
             </div>
 
             <!-- Game 2: Maze -->
-            <div class="game-card rounded-2xl p-6 text-white cursor-pointer" onclick="startGame(2)">
-                <div class="text-6xl mb-4 text-center">🌀</div>
+            <div class="game-card interactive-btn rounded-2xl p-6 text-white cursor-pointer" onclick="startGame(2)">
+                <div class="text-6xl mb-4 text-center heartbeat-effect">🌀</div>
                 <h3 class="text-2xl font-bold mb-2">เขาวงกตเมาส์</h3>
                 <p class="text-lg opacity-90 mb-3">ใช้เมาส์นำทางหาทางออกจากเขาวงกต</p>
                 <div class="bg-white bg-opacity-20 rounded-lg p-3 mb-4">
@@ -399,8 +511,8 @@
             </div>
 
             <!-- Game 3: Speed Click -->
-            <div class="game-card rounded-2xl p-6 text-white cursor-pointer" onclick="startGame(3)">
-                <div class="text-6xl mb-4 text-center">⏱️</div>
+            <div class="game-card interactive-btn rounded-2xl p-6 text-white cursor-pointer" onclick="startGame(3)">
+                <div class="text-6xl mb-4 text-center heartbeat-effect">⏱️</div>
                 <h3 class="text-2xl font-bold mb-2">แข่งความเร็ว</h3>
                 <p class="text-lg opacity-90 mb-3">คลิกเป้าหมายให้เร็วและแม่นยำ</p>
                 <div class="bg-white bg-opacity-20 rounded-lg p-3 mb-4">
@@ -429,7 +541,7 @@
         <div class="bg-white rounded-2xl shadow-2xl p-8">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-3xl font-bold text-gray-800">📊 สถิติการเล่น</h2>
-                <button onclick="hideStats()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+                <button onclick="hideStats()" class="interactive-btn bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
                     กลับเมนู
                 </button>
             </div>
@@ -636,15 +748,15 @@
             
             <!-- Action Buttons -->
             <div class="flex justify-center space-x-4 flex-wrap gap-4">
-                <button onclick="playAgain()" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg transition-colors text-lg font-bold flex items-center space-x-2">
+                <button onclick="playAgain()" class="interactive-btn bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg transition-colors text-lg font-bold flex items-center space-x-2">
                     <span>🔄</span>
                     <span>เล่นอีกครั้ง</span>
                 </button>
-                <button onclick="backToMenuFromSummary()" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg transition-colors text-lg font-bold flex items-center space-x-2">
+                <button onclick="backToMenuFromSummary()" class="interactive-btn bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg transition-colors text-lg font-bold flex items-center space-x-2">
                     <span>🏠</span>
                     <span>กลับหน้าแรก</span>
                 </button>
-                <button onclick="showStatsFromSummary()" class="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-lg transition-colors text-lg font-bold flex items-center space-x-2">
+                <button onclick="showStatsFromSummary()" class="interactive-btn bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-lg transition-colors text-lg font-bold flex items-center space-x-2">
                     <span>📊</span>
                     <span>ดูสถิติ</span>
                 </button>
@@ -670,7 +782,7 @@
                         <div class="text-xl font-bold text-orange-600" id="comboCount">0</div>
                         <div class="text-sm text-gray-600">คอมโบ</div>
                     </div>
-                    <button onclick="backToMenu()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    <button onclick="backToMenu()" class="interactive-btn bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
                         กลับเมนู
                     </button>
                 </div>
@@ -778,7 +890,7 @@
                         </div>
                         <div class="text-xs text-gray-500 mt-1" id="game1ProgressText">0/6 รายการ</div>
                     </div>
-                    <button onclick="resetGame1()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                    <button onclick="resetGame1()" class="interactive-btn bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
                         เริ่มใหม่
                     </button>
                 </div>
@@ -792,11 +904,30 @@
                     <div class="bg-purple-50 rounded-lg p-3 mt-3">
                         <h5 class="font-semibold text-purple-800 text-sm mb-2">💡 เคล็ดลับ:</h5>
                         <ul class="text-purple-700 text-sm space-y-1">
-                            <li>• กดปุ่ม "เริ่มเกม" ก่อนเลื่อนเมาส์</li>
+                            <li>• คลิกที่หุ่นยนต์ 🤖 เพื่อเริ่มเกม</li>
                             <li>• เลื่อนเมาส์ช้าๆ เพื่อความแม่นยำ</li>
                             <li>• หากชนกำแพง เกมจะเริ่มใหม่อัตโนมัติ</li>
                             <li>• หาเส้นทางที่สั้นที่สุดเพื่อได้คะแนนโบนัส</li>
                         </ul>
+                    </div>
+                </div>
+                
+                <!-- Difficulty Selection -->
+                <div class="mb-4 text-center">
+                    <h4 class="text-lg font-semibold mb-3 text-gray-700">🎚️ เลือกระดับความยาก</h4>
+                    <div class="flex justify-center space-x-4 flex-wrap gap-2">
+                        <button onclick="setMazeDifficulty('easy')" id="easyBtn" class="interactive-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-bold text-sm">
+                            😊 ง่าย
+                        </button>
+                        <button onclick="setMazeDifficulty('medium')" id="mediumBtn" class="interactive-btn bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors font-bold text-sm">
+                            😐 ปานกลาง
+                        </button>
+                        <button onclick="setMazeDifficulty('hard')" id="hardBtn" class="interactive-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors font-bold text-sm">
+                            😤 ยาก
+                        </button>
+                    </div>
+                    <div class="mt-2 text-sm text-gray-600" id="difficultyDescription">
+                        เลือกระดับความยากที่เหมาะกับคุณ
                     </div>
                 </div>
                 <div class="text-center mb-4">
@@ -819,7 +950,7 @@
                     <!-- Maze will be generated here -->
                 </div>
                 <div class="mt-6 text-center">
-                    <button onclick="resetGame2()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors">
+                    <button onclick="resetGame2()" class="interactive-btn bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors">
                         เริ่มใหม่
                     </button>
                 </div>
@@ -864,7 +995,7 @@
                     <!-- Targets will appear here -->
                 </div>
                 <div class="mt-6 text-center">
-                    <button id="startSpeedGame" onclick="startSpeedGame()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors text-lg font-bold">
+                    <button id="startSpeedGame" onclick="startSpeedGame()" class="interactive-btn bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors text-lg font-bold">
                         🚀 เริ่มเกม!
                     </button>
                 </div>
@@ -946,6 +1077,8 @@
         let maze = [];
         let gameWon = false;
         let mazeAttempts = 0;
+        let mazeDifficulty = 'medium';
+        let mazeSize = { width: 30, height: 20 };
         
         // Game 3 Variables
         let speedGameActive = false;
@@ -979,24 +1112,234 @@
             {id: 'webcam', name: 'กล้องเว็บแคม', emoji: '📹', description: 'ถ่ายวิดีโอและรูปภาพ'}
         ];
 
-        // Simple sound feedback system
+        // Enhanced sound and visual feedback system
+        function createAudioContext() {
+            try {
+                return new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                return null;
+            }
+        }
+        
+        let audioContext = null;
+        
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = createAudioContext();
+            }
+        }
+        
+        function playTone(frequency, duration, type = 'sine', volume = 0.1) {
+            initAudio();
+            if (!audioContext) return;
+            
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            } catch (e) {
+                console.log('Audio playback failed');
+            }
+        }
+        
         function playSuccessSound() {
-            // Visual feedback only - no audio due to browser restrictions
+            // Success chord progression
+            playTone(523.25, 0.15, 'sine', 0.08); // C5
+            setTimeout(() => playTone(659.25, 0.15, 'sine', 0.08), 50); // E5
+            setTimeout(() => playTone(783.99, 0.2, 'sine', 0.08), 100); // G5
+            
+            // Visual feedback
+            createSoundWave('success');
         }
         
         function playErrorSound() {
-            // Visual feedback only - no audio due to browser restrictions
+            // Error sound - descending tone
+            playTone(220, 0.1, 'sawtooth', 0.06);
+            setTimeout(() => playTone(196, 0.15, 'sawtooth', 0.06), 80);
+            setTimeout(() => playTone(174.61, 0.2, 'sawtooth', 0.06), 150);
+            
+            // Visual feedback
+            createSoundWave('error');
+            createScreenShake();
         }
         
         function playComboSound() {
-            // Visual feedback only - no audio due to browser restrictions
+            // Combo sound - ascending arpeggio
+            const frequencies = [261.63, 329.63, 392, 523.25, 659.25]; // C-E-G-C-E
+            frequencies.forEach((freq, index) => {
+                setTimeout(() => playTone(freq, 0.12, 'triangle', 0.07), index * 40);
+            });
+            
+            // Visual feedback
+            createSoundWave('combo');
+            createComboParticles();
         }
         
         function playPerfectSound() {
-            // Visual feedback only - no audio due to browser restrictions
+            // Perfect sound - triumphant fanfare
+            playTone(523.25, 0.3, 'sine', 0.1); // C5
+            setTimeout(() => playTone(659.25, 0.3, 'sine', 0.1), 100); // E5
+            setTimeout(() => playTone(783.99, 0.3, 'sine', 0.1), 200); // G5
+            setTimeout(() => playTone(1046.5, 0.4, 'sine', 0.12), 300); // C6
+            
+            // Visual feedback
+            createSoundWave('perfect');
+            createFireworks();
+        }
+        
+        function playClickSound() {
+            // Button click sound
+            playTone(800, 0.08, 'square', 0.04);
+            setTimeout(() => playTone(1000, 0.06, 'square', 0.03), 30);
+        }
+        
+        function playHoverSound() {
+            // Subtle hover sound
+            playTone(600, 0.05, 'sine', 0.02);
+        }
+        
+        function playStartSound() {
+            // Game start fanfare
+            playTone(392, 0.15, 'triangle', 0.08);
+            setTimeout(() => playTone(523.25, 0.15, 'triangle', 0.08), 100);
+            setTimeout(() => playTone(659.25, 0.2, 'triangle', 0.08), 200);
+        }
+        
+        // Visual Effects Functions
+        function createSoundWave(type) {
+            const wave = document.createElement('div');
+            wave.className = `sound-wave sound-wave-${type}`;
+            wave.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 9999;
+                transform: translate(-50%, -50%);
+                animation: soundWaveExpand 0.6s ease-out forwards;
+            `;
+            
+            const colors = {
+                success: 'rgba(34, 197, 94, 0.6)',
+                error: 'rgba(239, 68, 68, 0.6)',
+                combo: 'rgba(251, 191, 36, 0.6)',
+                perfect: 'rgba(168, 85, 247, 0.6)'
+            };
+            
+            wave.style.backgroundColor = colors[type] || colors.success;
+            document.body.appendChild(wave);
+            
+            setTimeout(() => {
+                if (wave.parentNode) wave.remove();
+            }, 600);
+        }
+        
+        function createScreenShake() {
+            document.body.style.animation = 'screenShake 0.3s ease-in-out';
+            setTimeout(() => {
+                document.body.style.animation = '';
+            }, 300);
+        }
+        
+        function createComboParticles() {
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'combo-particle';
+                    particle.innerHTML = ['✨', '⭐', '💫', '🌟'][Math.floor(Math.random() * 4)];
+                    particle.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        font-size: 20px;
+                        pointer-events: none;
+                        z-index: 9999;
+                        animation: comboParticleFloat 1s ease-out forwards;
+                        transform: translate(-50%, -50%) rotate(${Math.random() * 360}deg);
+                    `;
+                    
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (particle.parentNode) particle.remove();
+                    }, 1000);
+                }, i * 50);
+            }
+        }
+        
+        function createFireworks() {
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    firework.innerHTML = ['🎆', '🎇', '✨', '💥'][Math.floor(Math.random() * 4)];
+                    firework.style.cssText = `
+                        position: fixed;
+                        top: ${20 + Math.random() * 60}%;
+                        left: ${20 + Math.random() * 60}%;
+                        font-size: ${20 + Math.random() * 15}px;
+                        pointer-events: none;
+                        z-index: 9999;
+                        animation: fireworkExplode 1.5s ease-out forwards;
+                    `;
+                    
+                    document.body.appendChild(firework);
+                    
+                    setTimeout(() => {
+                        if (firework.parentNode) firework.remove();
+                    }, 1500);
+                }, i * 100);
+            }
+        }
+        
+        function createButtonRipple(element, event) {
+            const ripple = document.createElement('div');
+            const rect = element.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+            
+            ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                pointer-events: none;
+                animation: rippleEffect 0.6s ease-out forwards;
+            `;
+            
+            element.style.position = 'relative';
+            element.style.overflow = 'hidden';
+            element.appendChild(ripple);
+            
+            setTimeout(() => {
+                if (ripple.parentNode) ripple.remove();
+            }, 600);
         }
 
         function startGame(gameNum) {
+            // Play start sound and visual effect
+            playStartSound();
+            createSoundWave('success');
+            
             currentGame = gameNum;
             document.getElementById('gameArea').classList.remove('hidden');
             document.getElementById('statsArea').classList.add('hidden');
@@ -1301,16 +1644,19 @@
         }
         
         function showStats() {
+            playClickSound();
             document.getElementById('statsArea').classList.remove('hidden');
             document.getElementById('gameArea').classList.add('hidden');
             updateStatsDisplay();
         }
         
         function hideStats() {
+            playClickSound();
             document.getElementById('statsArea').classList.add('hidden');
         }
 
         function backToMenu() {
+            playClickSound();
             document.getElementById('gameArea').classList.add('hidden');
             document.getElementById('gameSummaryArea').classList.add('hidden');
             stopGameTimer();
@@ -1444,15 +1790,18 @@
         }
         
         function playAgain() {
+            playClickSound();
             startGame(currentGameSummary.gameNumber);
         }
         
         function backToMenuFromSummary() {
+            playClickSound();
             document.getElementById('gameSummaryArea').classList.add('hidden');
             updateTotalScore();
         }
         
         function showStatsFromSummary() {
+            playClickSound();
             document.getElementById('gameSummaryArea').classList.add('hidden');
             showStats();
         }
@@ -1471,6 +1820,16 @@
             
             popup.className = `score-popup bg-${bgColor}-500 text-white px-6 py-3 rounded-lg text-xl font-bold shadow-2xl`;
             popup.textContent = text;
+            
+            // Position popup outside game area for speed game
+            if (currentGame === 3 && speedGameActive) {
+                popup.style.position = 'fixed';
+                popup.style.top = '20%';
+                popup.style.left = '50%';
+                popup.style.transform = 'translateX(-50%)';
+                popup.style.zIndex = '10000';
+            }
+            
             document.body.appendChild(popup);
             
             if (type === 'record') {
@@ -1687,6 +2046,38 @@
         let mazeGameStarted = false;
         let lastValidPos = {x: 20, y: 20};
         
+        function setMazeDifficulty(difficulty) {
+            mazeDifficulty = difficulty;
+            
+            // Update button styles
+            document.getElementById('easyBtn').className = 'interactive-btn bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors font-bold text-sm';
+            document.getElementById('mediumBtn').className = 'interactive-btn bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors font-bold text-sm';
+            document.getElementById('hardBtn').className = 'interactive-btn bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors font-bold text-sm';
+            
+            // Highlight selected difficulty
+            switch(difficulty) {
+                case 'easy':
+                    document.getElementById('easyBtn').className = 'interactive-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-bold text-sm';
+                    document.getElementById('difficultyDescription').textContent = '😊 เขาวงกตขนาดเล็ก ทางเดินกว้าง เหมาะสำหรับผู้เริ่มต้น';
+                    mazeSize = { width: 25, height: 15 };
+                    break;
+                case 'medium':
+                    document.getElementById('mediumBtn').className = 'interactive-btn bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors font-bold text-sm';
+                    document.getElementById('difficultyDescription').textContent = '😐 เขาวงกตขนาดกลาง ความซับซ้อนปานกลาง';
+                    mazeSize = { width: 30, height: 20 };
+                    break;
+                case 'hard':
+                    document.getElementById('hardBtn').className = 'interactive-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors font-bold text-sm';
+                    document.getElementById('difficultyDescription').textContent = '😤 เขาวงกตขนาดใหญ่ ทางเดินแคบ ท้าทายสุดๆ!';
+                    mazeSize = { width: 35, height: 25 };
+                    break;
+            }
+            
+            // Regenerate maze with new difficulty
+            initGame2();
+            playClickSound();
+        }
+        
         function initGame2() {
             gameWon = false;
             mazeAttempts = 0;
@@ -1697,52 +2088,101 @@
             const container = document.getElementById('mazeContainer');
             container.innerHTML = '';
             
-            // Create more complex maze
+            // Adjust container size based on difficulty
+            const cellSize = mazeDifficulty === 'hard' ? 16 : 20;
+            const containerWidth = mazeSize.width * cellSize;
+            const containerHeight = mazeSize.height * cellSize;
+            
+            container.style.width = containerWidth + 'px';
+            container.style.height = containerHeight + 'px';
+            
+            // Create realistic maze using recursive backtracking algorithm
             maze = [];
-            for (let y = 0; y < 20; y++) {
+            for (let y = 0; y < mazeSize.height; y++) {
                 maze[y] = [];
-                for (let x = 0; x < 30; x++) {
-                    // Enhanced maze pattern
-                    if (y === 0 || y === 19 || x === 0 || x === 29 || 
-                        (x === 8 && y > 3 && y < 16 && y !== 9) || 
-                        (x === 15 && y > 6 && y < 18 && y !== 12) ||
-                        (x === 22 && y > 2 && y < 15 && y !== 8) ||
-                        (y === 6 && x > 8 && x < 22 && x !== 15) ||
-                        (y === 13 && x > 3 && x < 28 && x !== 8 && x !== 22)) {
-                        maze[y][x] = 1; // Wall
-                    } else {
-                        maze[y][x] = 0; // Path
+                for (let x = 0; x < mazeSize.width; x++) {
+                    maze[y][x] = 1; // Start with all walls
+                }
+            }
+            
+            // Generate maze paths using modified recursive backtracking
+            function carvePath(x, y) {
+                maze[y][x] = 0; // Mark as path
+                
+                // Directions: up, right, down, left
+                const directions = [
+                    [0, -2], [2, 0], [0, 2], [-2, 0]
+                ];
+                
+                // Shuffle directions for randomness
+                for (let i = directions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [directions[i], directions[j]] = [directions[j], directions[i]];
+                }
+                
+                for (const [dx, dy] of directions) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    
+                    if (nx > 0 && nx < mazeSize.width - 1 && ny > 0 && ny < mazeSize.height - 1 && maze[ny][nx] === 1) {
+                        // Carve the wall between current and next cell
+                        maze[y + dy/2][x + dx/2] = 0;
+                        carvePath(nx, ny);
                     }
                 }
             }
             
-            // Ensure start and end are clear
-            maze[1][1] = 0;
-            maze[18][28] = 0;
-            // Create some guaranteed paths
-            for (let i = 1; i < 8; i++) {
-                maze[9][i] = 0; // Horizontal path
+            // Start carving from position (1,1)
+            carvePath(1, 1);
+            
+            // Ensure borders are walls
+            for (let x = 0; x < mazeSize.width; x++) {
+                maze[0][x] = 1;
+                maze[mazeSize.height - 1][x] = 1;
             }
-            for (let i = 9; i < 13; i++) {
-                maze[i][15] = 0; // Vertical path
+            for (let y = 0; y < mazeSize.height; y++) {
+                maze[y][0] = 1;
+                maze[y][mazeSize.width - 1] = 1;
             }
-            for (let i = 15; i < 22; i++) {
-                maze[12][i] = 0; // Horizontal path
-            }
-            for (let i = 8; i < 13; i++) {
-                maze[i][22] = 0; // Vertical path
+            
+            // Ensure start and end positions are clear
+            maze[1][1] = 0; // Start position
+            maze[mazeSize.height - 2][mazeSize.width - 2] = 0; // End position
+            
+            // Create additional connections to ensure solvability
+            maze[mazeSize.height - 2][mazeSize.width - 3] = 0;
+            maze[mazeSize.height - 3][mazeSize.width - 2] = 0;
+            
+            // Add difficulty-based maze modifications
+            if (mazeDifficulty === 'easy') {
+                // Add more openings for easy mode
+                for (let i = 0; i < 8; i++) {
+                    const x = 2 + Math.floor(Math.random() * (mazeSize.width - 4));
+                    const y = 2 + Math.floor(Math.random() * (mazeSize.height - 4));
+                    if (Math.random() > 0.3) maze[y][x] = 0;
+                }
+            } else if (mazeDifficulty === 'hard') {
+                // Remove some paths for hard mode (but ensure solvability)
+                for (let i = 0; i < 5; i++) {
+                    const x = 3 + Math.floor(Math.random() * (mazeSize.width - 6));
+                    const y = 3 + Math.floor(Math.random() * (mazeSize.height - 6));
+                    if (Math.random() > 0.7 && maze[y][x] === 0) {
+                        // Only block if it doesn't disconnect the maze
+                        maze[y][x] = 1;
+                    }
+                }
             }
             
             // Draw maze with enhanced graphics
-            for (let y = 0; y < 20; y++) {
-                for (let x = 0; x < 30; x++) {
+            for (let y = 0; y < mazeSize.height; y++) {
+                for (let x = 0; x < mazeSize.width; x++) {
                     const cell = document.createElement('div');
                     cell.className = maze[y][x] ? 'maze-wall' : 'maze-path';
                     cell.style.position = 'absolute';
-                    cell.style.left = x * 20 + 'px';
-                    cell.style.top = y * 20 + 'px';
-                    cell.style.width = '20px';
-                    cell.style.height = '20px';
+                    cell.style.left = x * cellSize + 'px';
+                    cell.style.top = y * cellSize + 'px';
+                    cell.style.width = cellSize + 'px';
+                    cell.style.height = cellSize + 'px';
                     container.appendChild(cell);
                 }
             }
@@ -1751,38 +2191,36 @@
             const player = document.createElement('div');
             player.className = 'player';
             player.id = 'mazePlayer';
-            player.style.left = playerPos.x + 'px';
-            player.style.top = playerPos.y + 'px';
+            player.style.left = cellSize + 'px';
+            player.style.top = cellSize + 'px';
             player.innerHTML = '🤖';
-            player.style.fontSize = '14px';
+            player.style.fontSize = (cellSize - 4) + 'px';
             player.style.textAlign = 'center';
-            player.style.lineHeight = '18px';
+            player.style.lineHeight = (cellSize - 2) + 'px';
+            player.style.width = (cellSize - 2) + 'px';
+            player.style.height = (cellSize - 2) + 'px';
+            player.style.cursor = 'pointer';
+            player.style.border = '2px solid #3b82f6';
+            player.style.borderRadius = '50%';
+            player.style.background = 'linear-gradient(45deg, #60a5fa, #3b82f6)';
+            player.onclick = startMazeGame;
             container.appendChild(player);
             
-            // Add start button near the robot
-            const startButton = document.createElement('button');
-            startButton.id = 'mazeStartButton';
-            startButton.className = 'bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors shadow-lg';
-            startButton.innerHTML = '🚀 เริ่มเกม!';
-            startButton.style.position = 'absolute';
-            startButton.style.left = '60px';
-            startButton.style.top = '15px';
-            startButton.style.zIndex = '100';
-            startButton.onclick = startMazeGame;
-            container.appendChild(startButton);
+            // Update player position variables
+            playerPos = {x: cellSize, y: cellSize};
             
             // Add goal with enhanced styling
             const goal = document.createElement('div');
             goal.className = 'maze-goal';
             goal.style.position = 'absolute';
-            goal.style.left = '560px';
-            goal.style.top = '360px';
-            goal.style.width = '20px';
-            goal.style.height = '20px';
+            goal.style.left = (mazeSize.width - 2) * cellSize + 'px';
+            goal.style.top = (mazeSize.height - 2) * cellSize + 'px';
+            goal.style.width = cellSize + 'px';
+            goal.style.height = cellSize + 'px';
             goal.innerHTML = '🚩';
-            goal.style.fontSize = '14px';
+            goal.style.fontSize = (cellSize - 4) + 'px';
             goal.style.textAlign = 'center';
-            goal.style.lineHeight = '20px';
+            goal.style.lineHeight = cellSize + 'px';
             goal.style.borderRadius = '50%';
             container.appendChild(goal);
             
@@ -1790,13 +2228,15 @@
             const instruction = document.createElement('div');
             instruction.id = 'mazeInstruction';
             instruction.className = 'bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold';
-            instruction.innerHTML = '👆 กดปุ่มเริ่มเกม แล้วเลื่อนเมาส์เพื่อควบคุมหุ่นยนต์';
+            instruction.innerHTML = '👆 คลิกที่หุ่นยนต์ 🤖 เพื่อเริ่มเกม แล้วเลื่อนเมาส์เพื่อควบคุม';
             instruction.style.position = 'absolute';
-            instruction.style.left = '150px';
-            instruction.style.top = '180px';
+            instruction.style.left = '50%';
+            instruction.style.top = '50%';
+            instruction.style.transform = 'translate(-50%, -50%)';
             instruction.style.zIndex = '50';
             instruction.style.textAlign = 'center';
             instruction.style.maxWidth = '300px';
+            instruction.style.pointerEvents = 'none';
             container.appendChild(instruction);
         }
         
@@ -1809,45 +2249,61 @@
             }
             
             const container = document.getElementById('mazeContainer');
-            const startButton = document.getElementById('mazeStartButton');
             const instruction = document.getElementById('mazeInstruction');
+            const player = document.getElementById('mazePlayer');
             
-            if (startButton) startButton.remove();
             if (instruction) instruction.remove();
+            
+            // Remove click handler from player and add visual feedback
+            if (player) {
+                player.onclick = null;
+                player.style.cursor = 'default';
+                player.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.8)';
+                player.style.animation = 'glowPulse 2s ease infinite';
+            }
             
             container.addEventListener('mousemove', handleMazeMouseMove);
             container.addEventListener('mouseleave', handleMazeMouseLeave);
             
+            // Play start sound
+            playStartSound();
+            
             // Show brief popup that disappears quickly
             const popup = document.createElement('div');
             popup.className = 'bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-bold';
-            popup.innerHTML = '🚀 เริ่มเกมแล้ว! เลื่อนเมาส์เพื่อควบคุม';
+            popup.innerHTML = '🚀 เริ่มเกมแล้ว! เลื่อนเมาส์เพื่อควบคุมหุ่นยนต์';
             popup.style.position = 'absolute';
-            popup.style.left = '150px';
-            popup.style.top = '180px';
+            popup.style.left = '50%';
+            popup.style.top = '20%';
+            popup.style.transform = 'translateX(-50%)';
             popup.style.zIndex = '200';
             popup.style.textAlign = 'center';
             popup.style.maxWidth = '300px';
-            popup.style.animation = 'fadeInOut 1.5s ease forwards';
+            popup.style.animation = 'fadeInOut 2s ease forwards';
+            popup.style.pointerEvents = 'none';
             container.appendChild(popup);
             
-            // Remove popup after 1.5 seconds
+            // Remove popup after 2 seconds
             setTimeout(() => {
                 if (popup.parentNode) popup.remove();
-            }, 1500);
+            }, 2000);
         }
 
         function handleMazeMouseMove(e) {
             if (gameWon || !mazeGameStarted) return;
             
             const rect = e.currentTarget.getBoundingClientRect();
-            const newX = Math.floor((e.clientX - rect.left) / 20) * 20;
-            const newY = Math.floor((e.clientY - rect.top) / 20) * 20;
+            const cellSize = mazeDifficulty === 'hard' ? 16 : 20;
+            const newX = Math.floor((e.clientX - rect.left) / cellSize) * cellSize;
+            const newY = Math.floor((e.clientY - rect.top) / cellSize) * cellSize;
             
-            if (newX < 0 || newX >= 600 || newY < 0 || newY >= 400) return;
+            const containerWidth = mazeSize.width * cellSize;
+            const containerHeight = mazeSize.height * cellSize;
             
-            const gridX = Math.floor(newX / 20);
-            const gridY = Math.floor(newY / 20);
+            if (newX < 0 || newX >= containerWidth || newY < 0 || newY >= containerHeight) return;
+            
+            const gridX = Math.floor(newX / cellSize);
+            const gridY = Math.floor(newY / cellSize);
             
             if (maze[gridY] && maze[gridY][gridX] === 0) {
                 // Valid move
@@ -1863,21 +2319,33 @@
                 
                 // Count attempts (significant moves)
                 const distance = Math.abs(newX - oldX) + Math.abs(newY - oldY);
-                if (distance >= 20) {
+                if (distance >= cellSize) {
                     mazeAttempts++;
                 }
                 
                 // Check if reached goal
-                if (newX >= 560 && newY >= 360) {
+                const goalX = (mazeSize.width - 2) * cellSize;
+                const goalY = (mazeSize.height - 2) * cellSize;
+                
+                if (newX >= goalX && newY >= goalY) {
                     gameWon = true;
                     stopGameTimer();
                     playPerfectSound();
                     
-                    gameScore += 100;
+                    // Base score varies by difficulty
+                    let baseScore = 100;
+                    if (mazeDifficulty === 'easy') baseScore = 75;
+                    else if (mazeDifficulty === 'hard') baseScore = 150;
                     
-                    // Efficiency bonus
-                    if (mazeAttempts < 50) {
-                        const efficiencyBonus = Math.max(0, 50 - mazeAttempts);
+                    gameScore += baseScore;
+                    
+                    // Efficiency bonus based on difficulty
+                    let maxAttempts = 50;
+                    if (mazeDifficulty === 'easy') maxAttempts = 30;
+                    else if (mazeDifficulty === 'hard') maxAttempts = 80;
+                    
+                    if (mazeAttempts < maxAttempts) {
+                        const efficiencyBonus = Math.max(0, maxAttempts - mazeAttempts);
                         gameScore += efficiencyBonus;
                         showScorePopup(`🎯 โบนัสเส้นทางสั้น! +${efficiencyBonus} คะแนน!`, 'combo');
                     }
@@ -1889,14 +2357,27 @@
                     
                     saveGameStats(2, gameScore, gameTimeElapsed);
                     
-                    if (gameTimeElapsed < 30) {
+                    // Difficulty-based achievements
+                    if (mazeDifficulty === 'easy' && gameTimeElapsed < 20) {
+                        addBadge('🚀');
+                        showScorePopup('นักสำรวจเร็วจี๋! 🚀', 'combo');
+                    } else if (mazeDifficulty === 'medium' && gameTimeElapsed < 40) {
+                        addBadge('🚀');
+                        showScorePopup('นักสำรวจเร็วจี๋! 🚀', 'combo');
+                    } else if (mazeDifficulty === 'hard' && gameTimeElapsed < 60) {
                         addBadge('🚀');
                         showScorePopup('นักสำรวจเร็วจี๋! 🚀', 'combo');
                     }
                     
-                    if (mazeAttempts < 30) {
+                    if (mazeAttempts < maxAttempts * 0.6) {
                         addBadge('🧭');
                         showScorePopup('นักนำทางมืออาชีพ! 🧭', 'combo');
+                    }
+                    
+                    // Special achievement for hard mode
+                    if (mazeDifficulty === 'hard') {
+                        addBadge('💎');
+                        showScorePopup('เซียนเขาวงกต! 💎', 'combo');
                     }
                 }
             } else {
@@ -2147,7 +2628,12 @@
             updateGameScore();
             loadStatsFromStorage();
             updateHeaderStats();
+            
+            // Set default difficulty to medium when page loads
+            if (typeof setMazeDifficulty === 'function') {
+                setMazeDifficulty('medium');
+            }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'976117af4031732e',t:'MTc1NjM1NTYyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97693cc47410731c',t:'MTc1NjQ0MTAzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

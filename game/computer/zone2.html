@@ -211,7 +211,7 @@
                             <div>• กดปุ่มตามที่หน้าจอแสดง</div>
                             <div>• ใช้แป้นพิมพ์หรือคลิกบนหน้าจอ</div>
                             <div>• พิมพ์ให้เร็วเพื่อคะแนนโบนัส</div>
-                            <div>• เวลา 30 วินาที</div>
+                            <div>• เวลา 60 วินาที</div>
                         </div>
                     </div>
                     
@@ -383,7 +383,7 @@
                 <div class="text-white flex gap-4">
                     <div>
                         <span class="font-bold">เวลา: </span>
-                        <span id="huntTimer" class="text-2xl font-bold">30</span>
+                        <span id="huntTimer" class="text-2xl font-bold">60</span>
                     </div>
                     <div>
                         <span class="font-bold">คะแนน: </span>
@@ -502,8 +502,8 @@
             <div class="text-center mb-4">
                 <label class="text-white font-medium mr-4">ระดับความยาก:</label>
                 <select id="raceLevel" class="px-3 py-2 rounded-lg border border-gray-300">
-                    <option value="easy">ง่าย (คำสั้น 3-4 ตัวอักษร)</option>
-                    <option value="medium" selected>ปานกลาง (คำยาว 5-7 ตัวอักษร)</option>
+                    <option value="easy" selected>ง่าย (คำสั้น 3-4 ตัวอักษร)</option>
+                    <option value="medium">ปานกลาง (คำยาว 5-7 ตัวอักษร)</option>
                     <option value="hard">ยาก (คำซับซ้อน 8+ ตัวอักษร)</option>
                 </select>
             </div>
@@ -960,13 +960,13 @@
         
         function resetKeyHuntGame() {
             keyHuntGame.score = 0;
-            keyHuntGame.timeLeft = 30;
+            keyHuntGame.timeLeft = 60;
             keyHuntGame.streak = 0;
             keyHuntGame.reactionTimes = [];
             keyHuntGame.currentKey = '';
             keyHuntGame.challengeStartTime = 0;
             
-            document.getElementById('huntTimer').textContent = '30';
+            document.getElementById('huntTimer').textContent = '60';
             document.getElementById('huntScore').textContent = '0';
             document.getElementById('huntStreak').textContent = '0';
             document.getElementById('startHuntBtn').textContent = 'เริ่มเกม';
@@ -994,14 +994,19 @@
             document.getElementById('raceWins').textContent = '0';
             document.getElementById('raceRound').textContent = '1';
             document.getElementById('raceInput').value = '';
-            document.getElementById('startRaceBtn').textContent = 'เริ่มแข่ง';
+            
+            const startBtn = document.getElementById('startRaceBtn');
+            startBtn.textContent = 'เริ่มแข่ง';
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            
             document.getElementById('playerCar').style.transform = 'translateX(0px)';
             document.getElementById('computerCar').style.transform = 'translateX(0px)';
             document.getElementById('playerProgress').textContent = '0%';
             document.getElementById('computerProgress').textContent = '0%';
             document.getElementById('raceTimer').classList.remove('timer-warning');
-            document.getElementById('raceWord').textContent = 'elephant';
-            document.getElementById('wordMeaning').textContent = 'แปลว่า: ช้าง';
+            document.getElementById('raceWord').textContent = 'cat';
+            document.getElementById('wordMeaning').textContent = 'แปลว่า: แมว';
             document.getElementById('avgTime').textContent = '-';
         }
 
@@ -1060,17 +1065,18 @@
             document.getElementById('typingInput').value = '';
             document.getElementById('startSpeedBtn').classList.remove('hidden');
             document.getElementById('pauseSpeedBtn').classList.add('hidden');
+            document.getElementById('gameHint').classList.remove('hidden');
             document.getElementById('speedTimer').textContent = '60';
             document.getElementById('speedScore').textContent = '0';
             document.getElementById('speedCombo').textContent = '0';
             
             // Reset Key Hunt
             keyHuntGame.score = 0;
-            keyHuntGame.timeLeft = 30;
+            keyHuntGame.timeLeft = 60;
             keyHuntGame.streak = 0;
             keyHuntGame.reactionTimes = [];
             document.getElementById('startHuntBtn').textContent = 'เริ่มเกม';
-            document.getElementById('huntTimer').textContent = '30';
+            document.getElementById('huntTimer').textContent = '60';
             document.getElementById('huntScore').textContent = '0';
             document.getElementById('huntStreak').textContent = '0';
             
@@ -1081,8 +1087,13 @@
             typingRace.playerProgress = 0;
             typingRace.computerProgress = 0;
             document.getElementById('raceInput').value = '';
-            document.getElementById('startRaceBtn').textContent = 'เริ่มแข่ง';
-            document.getElementById('raceTimer').textContent = '10';
+            
+            const startBtn = document.getElementById('startRaceBtn');
+            startBtn.textContent = 'เริ่มแข่ง';
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            document.getElementById('raceTimer').textContent = '20';
             document.getElementById('raceScore').textContent = '0';
             document.getElementById('raceWins').textContent = '0';
             document.getElementById('raceRound').textContent = '1';
@@ -1107,26 +1118,46 @@
             clearInterval(speedGame.timer);
             clearInterval(window.speedInterval);
             
-            speedGame.active = true;
-            speedGame.score = 0;
-            speedGame.timeLeft = 60;
-            speedGame.combo = 0;
-            speedGame.perfectStreak = 0;
-            speedGame.wordsTypedThisRound = 0;
-            speedGame.level = document.getElementById('speedLevel').value;
+            // Check if this is resuming a paused game
+            const isResuming = document.getElementById('startSpeedBtn').textContent === 'ต่อเกม';
             
+            if (!isResuming) {
+                // Starting new game
+                speedGame.score = 0;
+                speedGame.timeLeft = 60;
+                speedGame.combo = 0;
+                speedGame.perfectStreak = 0;
+                speedGame.wordsTypedThisRound = 0;
+                speedGame.level = document.getElementById('speedLevel').value;
+                
+                // Clear game area for new game
+                const gameArea = document.getElementById('gameArea');
+                gameArea.innerHTML = '<div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg">พิมพ์คำก่อนที่จะถึงเส้นนี้!</div>';
+                
+                // Update display
+                document.getElementById('speedTimer').textContent = '60';
+                document.getElementById('speedScore').textContent = '0';
+                document.getElementById('speedCombo').textContent = '0';
+            }
+            
+            speedGame.active = true;
             document.getElementById('startSpeedBtn').classList.add('hidden');
             document.getElementById('pauseSpeedBtn').classList.remove('hidden');
+            document.getElementById('startSpeedBtn').textContent = 'เริ่มเกม'; // Reset button text
             
             // Clean up and setup input
             const typingInput = document.getElementById('typingInput');
             typingInput.value = '';
-            typingInput.focus();
             
             // Remove any existing event listeners and add new one
             const newTypingInput = typingInput.cloneNode(true);
             typingInput.parentNode.replaceChild(newTypingInput, typingInput);
             document.getElementById('typingInput').addEventListener('input', checkSpeedTyping);
+            
+            // Focus on input after a short delay to ensure it's ready
+            setTimeout(() => {
+                document.getElementById('typingInput').focus();
+            }, 100);
             
             // Start timer
             speedGame.timer = setInterval(() => {
@@ -1145,8 +1176,10 @@
                 }
             }, 1000);
             
-            // Start spawning words
-            spawnWord();
+            // Start spawning words (only for new games or if no words exist)
+            if (!isResuming || document.querySelectorAll('.falling-word').length === 0) {
+                spawnWord();
+            }
             window.speedInterval = setInterval(spawnWord, getSpawnInterval());
         }
         
@@ -1311,9 +1344,14 @@
 
         function pauseSpeedTyping() {
             speedGame.active = false;
+            clearInterval(speedGame.timer);
             clearInterval(window.speedInterval);
+            speedGame.timer = null;
+            window.speedInterval = null;
+            
             document.getElementById('startSpeedBtn').classList.remove('hidden');
             document.getElementById('pauseSpeedBtn').classList.add('hidden');
+            document.getElementById('startSpeedBtn').textContent = 'ต่อเกม';
         }
 
         function updateSpeedScore() {
@@ -1365,7 +1403,7 @@
         function startKeyHunt() {
             keyHuntGame.active = true;
             keyHuntGame.score = 0;
-            keyHuntGame.timeLeft = 30;
+            keyHuntGame.timeLeft = 60;
             keyHuntGame.streak = 0;
             keyHuntGame.reactionTimes = [];
             
@@ -1376,9 +1414,11 @@
                 keyHuntGame.timeLeft--;
                 updateHuntTimer();
                 
-                if (keyHuntGame.timeLeft <= 5) {
+                if (keyHuntGame.timeLeft <= 10) {
                     document.getElementById('huntTimer').classList.add('timer-warning');
-                    playTimerWarning();
+                    if (keyHuntGame.timeLeft <= 5) {
+                        playTimerWarning();
+                    }
                 }
                 
                 if (keyHuntGame.timeLeft <= 0) {
@@ -1401,7 +1441,7 @@
                 Math.round(keyHuntGame.reactionTimes.reduce((a, b) => a + b, 0) / keyHuntGame.reactionTimes.length) : 0;
             
             // Calculate round stats
-            const timeUsed = 30 - keyHuntGame.timeLeft;
+            const timeUsed = 60 - keyHuntGame.timeLeft;
             const finalScore = keyHuntGame.score;
             const speedBonus = avgReaction > 0 ? Math.max(0, Math.round((1000 - avgReaction) / 10)) : 0; // Bonus for fast reactions
             const totalRoundScore = finalScore + speedBonus;
@@ -1428,7 +1468,7 @@
             // Reset UI
             document.getElementById('startHuntBtn').textContent = 'เริ่มเกม';
             document.getElementById('huntTimer').classList.remove('timer-warning');
-            document.getElementById('huntTimer').textContent = '30';
+            document.getElementById('huntTimer').textContent = '60';
             document.getElementById('huntScore').textContent = '0';
             document.getElementById('huntStreak').textContent = '0';
             document.getElementById('huntStreak').classList.remove('perfect-streak');
@@ -1551,17 +1591,25 @@
             typingRace.roundTimes = [];
             typingRace.computerSpeed = getComputerSpeedForLevel();
             
-            document.getElementById('startRaceBtn').textContent = 'กำลังแข่ง...';
+            // Disable start button during race
+            const startBtn = document.getElementById('startRaceBtn');
+            startBtn.textContent = 'กำลังแข่ง...';
+            startBtn.disabled = true;
+            startBtn.classList.add('opacity-50', 'cursor-not-allowed');
             
             // Clean up and setup input
             const raceInput = document.getElementById('raceInput');
             raceInput.value = '';
-            raceInput.focus();
             
             // Remove any existing event listeners and add new one
             const newRaceInput = raceInput.cloneNode(true);
             raceInput.parentNode.replaceChild(newRaceInput, raceInput);
             document.getElementById('raceInput').addEventListener('input', checkRaceTyping);
+            
+            // Focus on input after a short delay to ensure it's ready
+            setTimeout(() => {
+                document.getElementById('raceInput').focus();
+            }, 100);
             
             generateRaceWord();
             startComputerRace();
@@ -1620,8 +1668,14 @@
             if (!typingRace.active) return;
             
             const input = document.getElementById('raceInput').value.trim().toLowerCase();
+            const targetWord = typingRace.currentWord.toLowerCase();
             
-            if (input === typingRace.currentWord.toLowerCase()) {
+            // Update player progress based on typing progress
+            const progress = Math.min((input.length / targetWord.length) * 100, 100);
+            typingRace.playerProgress = progress;
+            updateRaceProgress();
+            
+            if (input === targetWord) {
                 // Correct word - player wins this round
                 const roundTime = (Date.now() - typingRace.wordStartTime) / 1000;
                 typingRace.roundTimes.push(roundTime);
@@ -1760,7 +1814,11 @@
                 raceInput.parentNode.replaceChild(newRaceInput, raceInput);
                 
                 // Reset UI for new game
-                document.getElementById('startRaceBtn').textContent = 'เริ่มแข่ง';
+                const startBtn = document.getElementById('startRaceBtn');
+                startBtn.textContent = 'เริ่มแข่ง';
+                startBtn.disabled = false;
+                startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                
                 document.getElementById('raceTimer').classList.remove('timer-warning');
                 document.getElementById('raceTimer').textContent = getTimeForLevel();
                 document.getElementById('raceScore').textContent = '0';
@@ -1770,8 +1828,8 @@
                 document.getElementById('computerCar').style.transform = 'translateX(0px)';
                 document.getElementById('playerProgress').textContent = '0%';
                 document.getElementById('computerProgress').textContent = '0%';
-                document.getElementById('raceWord').textContent = 'elephant';
-                document.getElementById('wordMeaning').textContent = 'แปลว่า: ช้าง';
+                document.getElementById('raceWord').textContent = 'cat';
+                document.getElementById('wordMeaning').textContent = 'แปลว่า: แมว';
                 document.getElementById('avgTime').textContent = '-';
                 
                 // Show game summary
@@ -1880,5 +1938,5 @@
         // Initialize the application when page loads
         window.onload = init;
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97610810713f732e',t:'MTc1NjM1NDk4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'976938dc7535731c',t:'MTc1NjQ0MDg3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
