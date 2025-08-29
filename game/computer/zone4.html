@@ -1,114 +1,2119 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>กำลังพัฒนา | ศูนย์เรียนรู้คอมพิวเตอร์</title>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Kanit', sans-serif;
-      background: linear-gradient(135deg, #ffe0b2, #ffccbc);
-      color: #333;
-      text-align: center;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 20px;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-    }
-    .logo {
-      width: 160px;
-      margin-bottom: 20px;
-      animation: float 3s ease-in-out infinite;
-    }
-    .mascot {
-      width: 130px;
-      margin: 30px auto;
-      animation: bounce 1s ease infinite alternate;
-    }
-    h1 {
-      font-size: 2.4rem;
-      color: #d84315;
-      margin-bottom: 15px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    }
-    p.lead {
-      font-size: 1.3rem;
-      color: #e65100;
-      margin-bottom: 25px;
-    }
-    p.description {
-      font-size: 1.1rem;
-      color: #5d4037;
-      margin-bottom: 30px;
-      line-height: 1.8;
-    }
-    .alert {
-      background-color: #fff3e0;
-      border-left: 6px solid #ff8a65;
-      padding: 15px;
-      margin: 30px auto;
-      max-width: 600px;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      color: #c46a00;
-    }
-    footer {
-      margin-top: auto;
-      padding: 20px;
-      background-color: #bf360c;
-      color: white;
-      font-size: 0.95rem;
-    }
-
-    /* Animation */
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
-      100% { transform: translateY(0px); }
-    }
-    @keyframes bounce {
-      from { transform: translateY(0); }
-      to { transform: translateY(-10px); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ศูนย์การเรียนรู้ไซเบอร์สำหรับเด็ก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        .game-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .website-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .website-card:hover {
+            transform: scale(1.02);
+        }
+        
+        .correct {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            animation: correctPulse 0.5s ease;
+        }
+        
+        .incorrect {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .draggable {
+            cursor: grab;
+            transition: all 0.2s ease;
+        }
+        
+        .draggable:active {
+            cursor: grabbing;
+            transform: rotate(5deg);
+        }
+        
+        .drop-zone {
+            min-height: 60px;
+            border: 2px dashed #cbd5e1;
+            transition: all 0.2s ease;
+        }
+        
+        .drop-zone.drag-over {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+        }
+        
+        .timer-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(#ef4444 0deg, #fbbf24 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: timerPulse 1s infinite;
+        }
+        
+        .timer-circle.warning {
+            animation: timerWarning 0.5s infinite;
+        }
+        
+        @keyframes timerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes timerWarning {
+            0%, 100% { transform: scale(1); background-color: #ef4444; }
+            50% { transform: scale(1.1); background-color: #dc2626; }
+        }
+        
+        .button-click {
+            animation: buttonClick 0.2s ease;
+        }
+        
+        @keyframes buttonClick {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+        
+        .score-popup {
+            animation: scorePopup 1s ease;
+        }
+        
+        @keyframes scorePopup {
+            0% { transform: scale(0) rotate(180deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #fbbf24;
+            animation: confetti 3s ease-out forwards;
+            z-index: 1000;
+        }
+        
+        @keyframes confetti {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .floating-text {
+            position: absolute;
+            font-weight: bold;
+            font-size: 1.5rem;
+            animation: floatingText 2s ease-out forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        @keyframes floatingText {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <!-- Logo -->
-    <img src="https://cttc19.onrender.com/game/img/logo.png" alt="Logo" class="logo" />
-
-    <!-- Main Content -->
-    <h1>ขออภัยครับ!</h1>
-    <p class="lead">หน้านี้กำลังอยู่ระหว่างการปรับปรุง</p>
-
-    <img src="https://cttc19.onrender.com/game/img/mascot.gif" alt="มาสคอต" class="mascot" />
-
-    <p class="description">
-      ขณะนี้ทีมงานกำลังพัฒนาเนื้อหาให้สมบูรณ์และน่าสนใจยิ่งขึ้น<br>
-      เพื่อประสบการณ์การเรียนรู้ที่ปลอดภัย สนุกสนาน และเข้าใจง่ายสำหรับน้องๆ นักเรียนประถมศึกษา
-    </p>
-
-    <div class="alert">
-      ⏳ กรุณากลับมาใหม่ในเร็วๆ นี้
+<body class="bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white/20 backdrop-blur-sm border-b border-white/30">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <img src="https://cttc19.onrender.com/game/img/logo.png" alt="CTTC19 Logo" class="w-12 h-12 rounded-lg bg-white/20 p-1" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="text-4xl hidden">🛡️</div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-white">ศูนย์การเรียนรู้คอมพิวเตอร์แบบเกม</h1>
+                        <p class="text-white/80 text-xs md:text-sm">สำหรับนักเรียนระดับประถมศึกษา</p>
+                        <p class="text-white/70 text-xs font-semibold">โซน 4: อัศวินไซเบอร์ (Cyber Knight - Level 4)</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="bg-white/20 rounded-full px-4 py-2">
+                        <span class="text-white font-semibold">คะแนน: <span id="totalScore">0</span></span>
+                    </div>
+                    <button onclick="showStats()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full transition-colors">
+                        📊 สถิติ
+                    </button>
+                    <div id="badges" class="flex space-x-2"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <p><strong>ขอบคุณที่รอคอยนะครับ! 🌟</strong></p>
-  </div>
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Game Selection -->
+        <div id="gameSelection" class="space-y-6">
+            <div class="text-center mb-8">
+                <div class="flex justify-center mb-4">
+                    <img src="https://cttc19.onrender.com/game/img/mascot.gif" alt="Cyber Knight Mascot" class="w-24 h-24 rounded-full bg-white/20 p-2" onerror="this.style.display='none';">
+                </div>
+                <h2 class="text-3xl font-bold text-white mb-4">🎮 เลือกเกมที่ต้องการเล่น</h2>
+                <p class="text-white/90 mb-4">คลิกเกมที่ต้องการเพื่อเริ่มการเรียนรู้!</p>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 max-w-4xl mx-auto">
+                    <h3 class="text-lg font-semibold text-white mb-3">📋 คำแนะนำการเล่น</h3>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm text-white/90">
+                        <div class="bg-white/10 rounded-lg p-3">
+                            <div class="text-2xl mb-2">🌐</div>
+                            <div class="font-semibold mb-1">เกมจำแนกเว็บดี-เว็บปลอม</div>
+                            <p class="text-xs">ดูเว็บไซต์แล้วตัดสินใจว่าปลอดภัยหรือไม่ ระวังเว็บปลอมที่อาจหลอกลวง!</p>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-3">
+                            <div class="text-2xl mb-2">👮‍♂️</div>
+                            <div class="font-semibold mb-1">ใครคือผู้ร้ายไซเบอร์</div>
+                            <p class="text-xs">วิเคราะห์สถานการณ์และตัดสินใจว่าพฤติกรรมนั้นปลอดภัยหรือไม่</p>
+                        </div>
+                        <div class="bg-white/10 rounded-lg p-3">
+                            <div class="text-2xl mb-2">🔍</div>
+                            <div class="font-semibold mb-1">จัดเรียงขั้นตอนค้นหา</div>
+                            <p class="text-xs">ลากและวางขั้นตอนให้เรียงลำดับถูกต้องสำหรับการค้นหาข้อมูลอย่างปลอดภัย</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- High Score Summary Section -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8">
+                <h3 class="text-2xl font-bold text-white text-center mb-6 flex items-center justify-center">
+                    🏆 สถิติคะแนนสูงสุด
+                </h3>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl p-4 text-white text-center border border-white/20">
+                        <div class="text-3xl mb-2">🌐</div>
+                        <div class="font-semibold text-sm mb-1">เว็บดี-เว็บปลอม</div>
+                        <div class="text-2xl font-bold text-yellow-300" id="mainHighScore1">0</div>
+                        <div class="text-xs opacity-80">คะแนน</div>
+                        <div class="text-xs opacity-70 mt-1">
+                            เวลา: <span id="mainHighTime1">-</span>
+                        </div>
+                        <div class="text-xs opacity-70">
+                            เล่น: <span id="mainPlayCount1">0</span> ครั้ง
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-xl p-4 text-white text-center border border-white/20">
+                        <div class="text-3xl mb-2">👮‍♂️</div>
+                        <div class="font-semibold text-sm mb-1">ผู้ร้ายไซเบอร์</div>
+                        <div class="text-2xl font-bold text-yellow-300" id="mainHighScore2">0</div>
+                        <div class="text-xs opacity-80">คะแนน</div>
+                        <div class="text-xs opacity-70 mt-1">
+                            เวลา: <span id="mainHighTime2">-</span>
+                        </div>
+                        <div class="text-xs opacity-70">
+                            เล่น: <span id="mainPlayCount2">0</span> ครั้ง
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl p-4 text-white text-center border border-white/20">
+                        <div class="text-3xl mb-2">🔍</div>
+                        <div class="font-semibold text-sm mb-1">จัดเรียงขั้นตอน</div>
+                        <div class="text-2xl font-bold text-yellow-300" id="mainHighScore3">0</div>
+                        <div class="text-xs opacity-80">คะแนน</div>
+                        <div class="text-xs opacity-70 mt-1">
+                            เวลา: <span id="mainHighTime3">-</span>
+                        </div>
+                        <div class="text-xs opacity-70">
+                            เล่น: <span id="mainPlayCount3">0</span> ครั้ง
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Overall Stats -->
+                <div class="mt-6 grid md:grid-cols-2 gap-4">
+                    <div class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl p-4 text-white text-center border border-white/20">
+                        <div class="text-2xl mb-2">🎯</div>
+                        <div class="font-semibold text-sm mb-1">คะแนนรวมทั้งหมด</div>
+                        <div class="text-xl font-bold text-yellow-300" id="mainTotalScore">0</div>
+                    </div>
+                    <div class="bg-gradient-to-r from-pink-500/20 to-red-500/20 rounded-xl p-4 text-white text-center border border-white/20">
+                        <div class="text-2xl mb-2">🏅</div>
+                        <div class="font-semibold text-sm mb-1">รางวัลที่ได้รับ</div>
+                        <div class="text-xl font-bold text-yellow-300" id="mainTotalBadges">0</div>
+                    </div>
+                </div>
+            </div>
 
-  <!-- Footer -->
-  <footer>
-    <p>© developed by Tle Narongphisit | CTTC19 @ CPD</p>
-  </footer>
-</body>
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Game 1 -->
+                <div class="game-card rounded-2xl p-6 text-white cursor-pointer" onclick="startGame(1)">
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">🌐</div>
+                        <h3 class="text-xl font-bold mb-2">เกมจำแนกเว็บดี-เว็บปลอม</h3>
+                        <p class="text-sm opacity-90 mb-3">ฝึกการแยกแยะเว็บไซต์ที่ปลอดภัย</p>
+                        <div class="bg-white/10 rounded-lg p-2 mb-3 text-xs">
+                            <p>• ดู URL และเนื้อหาเว็บไซต์</p>
+                            <p>• ระวังเว็บปลอมและการหลอกลวง</p>
+                            <p>• เวลา: 30 วินาที/ข้อ</p>
+                        </div>
+                        <div class="bg-white/20 rounded-full px-3 py-1 text-xs mb-2">
+                            ระดับ: ง่าย - ยาก | 5 ข้อ
+                        </div>
+                        <div class="bg-yellow-400/20 rounded-lg px-3 py-2 text-xs">
+                            <div class="font-semibold">🏆 สถิติดีที่สุด</div>
+                            <div id="game1BestDisplay">คะแนน: <span id="game1MainBest">0</span> | เวลา: <span id="game1MainTime">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game 2 -->
+                <div class="game-card rounded-2xl p-6 text-white cursor-pointer" onclick="startGame(2)">
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">👮‍♂️</div>
+                        <h3 class="text-xl font-bold mb-2">ใครคือผู้ร้ายไซเบอร์</h3>
+                        <p class="text-sm opacity-90 mb-3">แยกแยะพฤติกรรมที่ไม่ปลอดภัย</p>
+                        <div class="bg-white/10 rounded-lg p-2 mb-3 text-xs">
+                            <p>• วิเคราะห์สถานการณ์ต่างๆ</p>
+                            <p>• ตัดสินใจว่าปลอดภัยหรือไม่</p>
+                            <p>• เวลา: 25 วินาที/ข้อ</p>
+                        </div>
+                        <div class="bg-white/20 rounded-full px-3 py-1 text-xs mb-2">
+                            ระดับ: ง่าย - ยาก | 5 ข้อ
+                        </div>
+                        <div class="bg-yellow-400/20 rounded-lg px-3 py-2 text-xs">
+                            <div class="font-semibold">🏆 สถิติดีที่สุด</div>
+                            <div id="game2BestDisplay">คะแนน: <span id="game2MainBest">0</span> | เวลา: <span id="game2MainTime">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game 3 -->
+                <div class="game-card rounded-2xl p-6 text-white cursor-pointer" onclick="startGame(3)">
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">🔍</div>
+                        <h3 class="text-xl font-bold mb-2">จัดเรียงขั้นตอนค้นหา</h3>
+                        <p class="text-sm opacity-90 mb-3">เรียนรู้การค้นหาข้อมูลอย่างปลอดภัย</p>
+                        <div class="bg-white/10 rounded-lg p-2 mb-3 text-xs">
+                            <p>• ลากและวางขั้นตอนให้ถูกต้อง</p>
+                            <p>• เรียนรู้วิธีค้นหาที่ปลอดภัย</p>
+                            <p>• เวลา: 60 วินาที/ด่าน</p>
+                        </div>
+                        <div class="bg-white/20 rounded-full px-3 py-1 text-xs mb-2">
+                            ระดับ: ง่าย - ยาก | 3 ด่าน
+                        </div>
+                        <div class="bg-yellow-400/20 rounded-lg px-3 py-2 text-xs">
+                            <div class="font-semibold">🏆 สถิติดีที่สุด</div>
+                            <div id="game3BestDisplay">คะแนน: <span id="game3MainBest">0</span> | เวลา: <span id="game3MainTime">-</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game 1: Website Detection -->
+        <div id="game1" class="hidden">
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-white flex items-center">
+                        🌐 เกมจำแนกเว็บดี-เว็บปลอม
+                    </h2>
+                    <button onclick="backToMenu()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors">
+                        ← กลับ
+                    </button>
+                </div>
+                <div class="text-white/90 mb-6">
+                    <p>ดูเว็บไซต์ด้านล่างแล้วเลือกว่าเป็น "เว็บไซต์ดี" หรือ "เว็บไซต์ปลอม"</p>
+                    <div class="mt-2 flex items-center justify-between">
+                        <div>
+                            <span class="bg-green-500/20 text-green-200 px-3 py-1 rounded-full text-sm mr-2">คะแนน: <span id="game1Score">0</span></span>
+                            <span class="bg-blue-500/20 text-blue-200 px-3 py-1 rounded-full text-sm">ข้อ: <span id="game1Question">1</span>/5</span>
+                        </div>
+                        <div class="timer-circle bg-white/20" id="game1Timer">
+                            <span class="text-white font-bold text-lg" id="game1TimeLeft">30</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 mb-6">
+                <div id="websiteDisplay" class="border-2 border-gray-200 rounded-lg p-4 mb-6">
+                    <!-- Website content will be inserted here -->
+                </div>
+                
+                <div class="flex justify-center space-x-4">
+                    <button onclick="selectAnswer(true)" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                        ✅ เว็บไซต์ดี
+                    </button>
+                    <button onclick="selectAnswer(false)" class="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                        ❌ เว็บไซต์ปลอม
+                    </button>
+                </div>
+            </div>
+
+            <div id="game1Feedback" class="hidden bg-white rounded-2xl p-6">
+                <div id="feedbackContent"></div>
+                <button onclick="nextQuestion()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                    ข้อถัดไป →
+                </button>
+            </div>
+        </div>
+
+        <!-- Game 2: Cyber Villain Detective -->
+        <div id="game2" class="hidden">
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-white flex items-center">
+                        👮‍♂️ เกม "ใครคือผู้ร้ายไซเบอร์"
+                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <button id="game2SpeechToggle" class="speak-button bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                            <span class="speak-icon">🔊</span> อ่าน
+                        </button>
+                        <button onclick="backToMenu()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors">
+                            ← กลับ
+                        </button>
+                    </div>
+                </div>
+                <div class="text-white/90 mb-6">
+                    <p>ดูสถานการณ์แล้วเลือกว่าพฤติกรรมนั้น "ปลอดภัย" หรือ "ไม่ปลอดภัย"</p>
+                    <div class="mt-2 flex items-center justify-between">
+                        <div>
+                            <span class="bg-green-500/20 text-green-200 px-3 py-1 rounded-full text-sm mr-2">คะแนน: <span id="game2Score">0</span></span>
+                            <span class="bg-blue-500/20 text-blue-200 px-3 py-1 rounded-full text-sm">ข้อ: <span id="game2Question">1</span>/5</span>
+                        </div>
+                        <div class="timer-circle bg-white/20" id="game2Timer">
+                            <span class="text-white font-bold text-lg" id="game2TimeLeft">25</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 mb-6">
+                <div id="scenarioDisplay" class="text-center mb-6">
+                    <!-- Scenario content will be inserted here -->
+                </div>
+                
+                <div class="flex justify-center space-x-4 mb-4">
+                    <button onclick="selectBehavior(true)" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                        ✅ ปลอดภัย
+                    </button>
+                    <button onclick="selectBehavior(false)" class="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                        ⚠️ ไม่ปลอดภัย
+                    </button>
+                </div>
+                
+                <div class="text-center">
+                    <button id="game2ScenarioSpeech" class="speak-button bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                        <span class="speak-icon">🔊</span> อ่านสถานการณ์
+                    </button>
+                </div>
+            </div>
+
+            <div id="game2Feedback" class="hidden bg-white rounded-2xl p-6">
+                <div id="behaviorFeedbackContent"></div>
+                <button onclick="nextScenario()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                    สถานการณ์ถัดไป →
+                </button>
+            </div>
+        </div>
+
+        <!-- Game 3: Search Steps Puzzle -->
+        <div id="game3" class="hidden">
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-white flex items-center">
+                        🔍 เกม Puzzle จัดเรียงขั้นตอนการค้นหา
+                    </h2>
+                    <div class="flex items-center space-x-2">
+                        <button id="game3SpeechToggle" class="speak-button bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm transition-colors">
+                            <span class="speak-icon">🔊</span> อ่าน
+                        </button>
+                        <button onclick="backToMenu()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors">
+                            ← กลับ
+                        </button>
+                    </div>
+                </div>
+                <div class="text-white/90 mb-6">
+                    <p id="puzzleTask">ลากขั้นตอนด้านล่างไปเรียงลำดับให้ถูกต้อง</p>
+                    <div class="mt-2 flex items-center justify-between">
+                        <div>
+                            <span class="bg-green-500/20 text-green-200 px-3 py-1 rounded-full text-sm mr-2">คะแนน: <span id="game3Score">0</span></span>
+                            <span class="bg-blue-500/20 text-blue-200 px-3 py-1 rounded-full text-sm">ด่าน: <span id="game3Level">1</span>/3</span>
+                        </div>
+                        <div class="timer-circle bg-white/20" id="game3Timer">
+                            <span class="text-white font-bold text-lg" id="game3TimeLeft">60</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">ขั้นตอนที่ต้องเรียง</h3>
+                        <button id="game3StepsSpeech" class="speak-button bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                            <span class="speak-icon">🔊</span> อ่าน
+                        </button>
+                    </div>
+                    <div id="stepsList" class="space-y-3">
+                        <!-- Steps will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">ลำดับที่ถูกต้อง</h3>
+                    <div id="dropZones" class="space-y-3">
+                        <!-- Drop zones will be inserted here -->
+                    </div>
+                    <div class="mt-4 space-y-2">
+                        <button onclick="checkPuzzleAnswer()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors">
+                            ตรวจคำตอบ
+                        </button>
+                        <button onclick="resetPuzzle()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-colors text-sm">
+                            🔄 เริ่มใหม่
+                        </button>
+                        <div class="text-center mt-2">
+                            <button id="game3TaskSpeech" class="speak-button bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                <span class="speak-icon">🔊</span> อ่านภารกิจ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="game3Feedback" class="hidden mt-6 bg-white rounded-2xl p-6">
+                <div id="puzzleFeedbackContent"></div>
+                <button onclick="nextPuzzle()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                    ด่านถัดไป →
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Page -->
+        <div id="statsPage" class="hidden">
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-white flex items-center">
+                        📊 สถิติการเล่น
+                    </h2>
+                    <button onclick="backToMenu()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors">
+                        ← กลับ
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Game 1 Stats -->
+                <div class="stats-card rounded-2xl p-6 text-white">
+                    <div class="text-center">
+                        <div class="text-4xl mb-3">🌐</div>
+                        <h3 class="text-lg font-bold mb-3">เกมจำแนกเว็บดี-เว็บปลอม</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="bg-white/20 rounded-lg p-2">
+                                <span class="block">คะแนนสูงสุด</span>
+                                <span class="text-xl font-bold" id="game1BestScore">0</span>
+                            </div>
+                            <div class="bg-white/20 rounded-lg p-2">
+                                <span class="block">เวลาที่ใช้</span>
+                                <span class="font-semibold" id="game1BestTime">-</span>
+                            </div>
+                            <div class="bg-white/20 rounded-lg p-2">
+                                <span class="block">เล่นไปแล้ว</span>
+                                <span class="font-semibold" id="game1PlayCount">0 ครั้ง</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game 2 Stats -->
+                <div class="stats-card rounded-2xl p-6 text-white">
+                    <div class="text-center">
+                        <div class="text-4xl mb-3">👮‍♂️</div>
+                        <h3 class="text-lg font-bold mb-3">ใครคือผู้ร้ายไซเบอร์</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="bg-white/20 rounded-lg p-2">
+                                <span class="block">คะแนนสูงสุด</span>
+                                <span class="text-xl font-bold" id="game2BestScore">0</span>
+                            </div>
+                            <div class="bg-white/20 rounded-lg p-2">
+                                <span class="block">เวลาที่ใช้</span>
+                                <span class="font-semibold" id="game2BestTime">-</span>
+                            </div>
+                            <div class="bg-white/20 rounded-lg p-2">
+                                <span class="block">เล่นไปแล้ว</span>
+                                <span class="font-semibold" id="game2PlayCount">0 ครั้ง</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game 3 Stats -->
+                <div class="stats-card rounded-2xl p-6 text-white">
+                    <div class="text-center">
+                        <div class="text-4xl mb-3">🔍</div>
+                        <h3 class="text-lg font-bold mb-3">จัดเรียงขั้นตอนค้นหา</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="bg-white/20 rounded-lg p-2">
+                                <span class="block">คะแนนสูงสุด</span>
+                                <span class="text-xl font-bold" id="game3BestScore">0</span>
+                            </div>
+                            <div class="bg-white/20 rounded-lg p-2">
+                                <span class="block">เวลาที่ใช้</span>
+                                <span class="font-semibold" id="game3BestTime">-</span>
+                            </div>
+                            <div class="bg-white/20 rounded-lg p-2">
+                                <span class="block">เล่นไปแล้ว</span>
+                                <span class="font-semibold" id="game3PlayCount">0 ครั้ง</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+                <h3 class="text-xl font-bold text-white mb-4 text-center">🏆 ความสำเร็จทั้งหมด</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-white/20 rounded-lg p-4 text-white text-center">
+                        <div class="text-2xl mb-2">🎯</div>
+                        <div class="font-semibold">คะแนนรวมทั้งหมด</div>
+                        <div class="text-2xl font-bold" id="totalAllTimeScore">0</div>
+                    </div>
+                    <div class="bg-white/20 rounded-lg p-4 text-white text-center">
+                        <div class="text-2xl mb-2">🏅</div>
+                        <div class="font-semibold">รางวัลที่ได้รับ</div>
+                        <div class="text-lg font-bold" id="totalBadges">0 รางวัล</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black/20 backdrop-blur-sm border-t border-white/20 mt-12">
+        <div class="container mx-auto px-4 py-6">
+            <div class="text-center text-white/80 text-sm">
+                <p>© developed by Tle Narongphisit | CTTC19 @ CPD</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let gameState = {
+            totalScore: 0,
+            game1: { 
+                score: 0, 
+                question: 1, 
+                timer: null, 
+                timeLeft: 30, 
+                startTime: null, 
+                initialDuration: 30,
+                bestScore: 0, 
+                bestTime: null, 
+                playCount: 0,
+                isActive: false
+            },
+            game2: { 
+                score: 0, 
+                question: 1, 
+                timer: null, 
+                timeLeft: 25, 
+                startTime: null, 
+                initialDuration: 25,
+                bestScore: 0, 
+                bestTime: null, 
+                playCount: 0,
+                isActive: false
+            },
+            game3: { 
+                score: 0, 
+                level: 1, 
+                timer: null, 
+                timeLeft: 60, 
+                startTime: null, 
+                initialDuration: 60,
+                bestScore: 0, 
+                bestTime: null, 
+                playCount: 0,
+                isActive: false
+            },
+            badges: [],
+            stats: {
+                totalAllTimeScore: 0,
+                totalBadges: 0
+            }
+        };
+
+        // Sound system using Web Audio API
+        let audioContext;
+        
+        function initAudioContext() {
+            if (!audioContext) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Audio context not supported');
+                    return false;
+                }
+            }
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            return true;
+        }
+
+        // Text-to-Speech system
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+        let isSpeaking = false;
+
+        function initTTS() {
+            // Check if browser supports speech synthesis
+            if (!speechSynthesis) {
+                console.log('Text-to-speech not supported');
+                return false;
+            }
+            return true;
+        }
+
+        function speakText(text, options = {}) {
+            if (!initTTS()) return;
+            
+            // Stop any current speech
+            stopSpeech();
+            
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            
+            // Set voice properties
+            currentUtterance.lang = 'th-TH'; // Thai language
+            currentUtterance.rate = options.rate || 0.9; // Slightly slower for children
+            currentUtterance.pitch = options.pitch || 1.1; // Slightly higher pitch for friendliness
+            currentUtterance.volume = options.volume || 0.8;
+            
+            // Try to find a Thai voice, fallback to default
+            const voices = speechSynthesis.getVoices();
+            const thaiVoice = voices.find(voice => voice.lang.includes('th')) || 
+                             voices.find(voice => voice.lang.includes('TH'));
+            
+            if (thaiVoice) {
+                currentUtterance.voice = thaiVoice;
+            }
+            
+            currentUtterance.onstart = () => {
+                isSpeaking = true;
+                updateSpeechButtons();
+            };
+            
+            currentUtterance.onend = () => {
+                isSpeaking = false;
+                currentUtterance = null;
+                updateSpeechButtons();
+            };
+            
+            currentUtterance.onerror = () => {
+                isSpeaking = false;
+                currentUtterance = null;
+                updateSpeechButtons();
+            };
+            
+            speechSynthesis.speak(currentUtterance);
+        }
+
+        function stopSpeech() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            isSpeaking = false;
+            currentUtterance = null;
+            updateSpeechButtons();
+        }
+
+        function toggleSpeech(text) {
+            if (isSpeaking) {
+                stopSpeech();
+            } else {
+                speakText(text);
+            }
+        }
+
+        function updateSpeechButtons() {
+            const speakButtons = document.querySelectorAll('.speak-button');
+            speakButtons.forEach(button => {
+                const icon = button.querySelector('.speak-icon');
+                if (icon) {
+                    icon.textContent = isSpeaking ? '🔇' : '🔊';
+                }
+                button.title = isSpeaking ? 'หยุดอ่าน' : 'อ่านข้อความ';
+            });
+        }
+
+
+        
+        function playSound(frequency, duration, type = 'sine') {
+            if (!initAudioContext()) return;
+            
+            try {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+            
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            } catch (error) {
+                console.log('Audio playback failed');
+            }
+        }
+
+        function playCorrectSound() {
+            playSound(523, 0.2); // C5
+            setTimeout(() => playSound(659, 0.2), 100); // E5
+            setTimeout(() => playSound(784, 0.3), 200); // G5
+        }
+
+        function playIncorrectSound() {
+            playSound(220, 0.3, 'sawtooth'); // A3
+            setTimeout(() => playSound(196, 0.4, 'sawtooth'), 150); // G3
+        }
+
+        function playClickSound() {
+            playSound(800, 0.1, 'square');
+        }
+
+        function playTimerWarningSound() {
+            playSound(440, 0.1, 'triangle');
+        }
+
+        function playCompleteSound() {
+            const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
+            notes.forEach((note, index) => {
+                setTimeout(() => playSound(note, 0.3), index * 150);
+            });
+        }
+
+        // Visual effects
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = ['#fbbf24', '#f59e0b', '#d97706', '#92400e'][Math.floor(Math.random() * 4)];
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        function showFloatingText(text, element, color = '#22c55e') {
+            const floatingText = document.createElement('div');
+            floatingText.className = 'floating-text';
+            floatingText.textContent = text;
+            floatingText.style.color = color;
+            
+            const rect = element.getBoundingClientRect();
+            floatingText.style.left = rect.left + rect.width / 2 - 50 + 'px';
+            floatingText.style.top = rect.top - 20 + 'px';
+            
+            document.body.appendChild(floatingText);
+            setTimeout(() => floatingText.remove(), 2000);
+        }
+
+        function addButtonClickEffect(button) {
+            button.classList.add('button-click');
+            setTimeout(() => button.classList.remove('button-click'), 200);
+        }
+
+        // Timer functions
+        function startTimer(gameNumber, duration) {
+            const game = gameState[`game${gameNumber}`];
+            game.timeLeft = duration;
+            game.startTime = Date.now();
+            game.initialDuration = duration;
+            
+            const timerElement = document.getElementById(`game${gameNumber}TimeLeft`);
+            const timerCircle = document.getElementById(`game${gameNumber}Timer`);
+            
+            // Clear any existing timer
+            if (game.timer) {
+                clearInterval(game.timer);
+            }
+            
+            game.timer = setInterval(() => {
+                game.timeLeft--;
+                timerElement.textContent = game.timeLeft;
+                
+                // Update timer circle color
+                const percentage = (game.timeLeft / duration) * 100;
+                const color = percentage > 50 ? '#22c55e' : percentage > 25 ? '#fbbf24' : '#ef4444';
+                timerCircle.style.background = `conic-gradient(${color} ${percentage * 3.6}deg, #e5e7eb ${percentage * 3.6}deg)`;
+                
+                // Warning effects
+                if (game.timeLeft <= 10) {
+                    timerCircle.classList.add('warning');
+                    if (game.timeLeft <= 5) {
+                        playTimerWarningSound();
+                    }
+                }
+                
+                // Time up
+                if (game.timeLeft <= 0) {
+                    clearInterval(game.timer);
+                    game.timer = null;
+                    handleTimeUp(gameNumber);
+                }
+            }, 1000);
+        }
+
+        function stopTimer(gameNumber) {
+            const game = gameState[`game${gameNumber}`];
+            if (game.timer) {
+                clearInterval(game.timer);
+                game.timer = null;
+            }
+        }
+
+        function getElapsedTime(gameNumber) {
+            const game = gameState[`game${gameNumber}`];
+            if (game.startTime) {
+                return Math.floor((Date.now() - game.startTime) / 1000);
+            }
+            return 0;
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function handleTimeUp(gameNumber) {
+            playIncorrectSound();
+            showFloatingText('หมดเวลา!', document.getElementById(`game${gameNumber}Timer`), '#ef4444');
+            
+            if (gameNumber === 1) {
+                selectAnswer(false, true); // Auto-select wrong answer
+            } else if (gameNumber === 2) {
+                selectBehavior(false, true); // Auto-select wrong answer
+            } else if (gameNumber === 3) {
+                checkPuzzleAnswer(true); // Auto-check with time up flag
+            }
+        }
+
+        // Game data
+        const websiteQuestions = [
+            {
+                url: "https://www.kids-learning.com",
+                content: "🎓 ศูนย์การเรียนรู้สำหรับเด็ก<br>📚 บทเรียนออนไลน์ฟรี<br>👨‍🏫 ครูผู้เชี่ยวชาญ<br>📞 ติดต่อ: 02-123-4567",
+                isGood: true,
+                explanation: "เว็บไซต์นี้ดีเพราะ: มี https://, ชื่อเว็บชัดเจน, มีข้อมูลติดต่อ, และเนื้อหาเหมาะสมกับเด็ก"
+            },
+            {
+                url: "http://get-free-prize.xyz",
+                content: "🎁 รับของรางวัลฟรี!!!<br>💰 คลิกเลย!!! รวยใน 1 วัน<br>⚡ จำกัดเวลา!!! เหลือ 5 นาที<br>🔥 กรอกข้อมูลส่วนตัวเลย!",
+                isGood: false,
+                explanation: "เว็บไซต์นี้ปลอมเพราะ: ไม่มี https://, ชื่อเว็บแปลก, โฆษณาฉูดฉาด, และขอข้อมูลส่วนตัว"
+            },
+            {
+                url: "https://www.googlee.com",
+                content: "🔍 Googlee Search<br>ค้นหาทุกอย่างที่ต้องการ<br>ผลการค้นหาที่แม่นยำ<br>ใช้งานฟรี",
+                isGood: false,
+                explanation: "เว็บไซต์นี้ปลอมเพราะ: ชื่อเว็บเลียนแบบ Google (googlee แทน google) ซึ่งเป็นเทคนิคหลอกลวง"
+            },
+            {
+                url: "https://www.school.ac.th",
+                content: "🏫 โรงเรียนประถมบ้านดอกไม้<br>📋 ประกาศข่าวสาร<br>📅 ปฏิทินการเรียน<br>📧 อีเมล: info@school.ac.th",
+                isGood: true,
+                explanation: "เว็บไซต์นี้ดีเพราะ: มี https://, ใช้โดเมน .ac.th ของสถาบันการศึกษา, มีข้อมูลติดต่อชัดเจน"
+            },
+            {
+                url: "http://faceb00k.net",
+                content: "👥 Faceb00k<br>เชื่อมต่อกับเพื่อนๆ<br>แชร์ภาพและวิดีโอ<br>เข้าสู่ระบบเลย!",
+                isGood: false,
+                explanation: "เว็บไซต์นี้ปลอมเพราะ: ไม่มี https://, ชื่อเว็บเลียนแบบ Facebook (ใช้ 00 แทน oo), และโดเมน .net แทน .com"
+            }
+        ];
+
+        const behaviorScenarios = [
+            {
+                character: "น้องออม",
+                situation: "เล่นเกมออนไลน์ และมีคนแปลกหน้าขอที่อยู่บ้าน",
+                emoji: "🎮",
+                isSafe: false,
+                explanation: "ไม่ปลอดภัย! ไม่ควรให้ข้อมูลส่วนตัวกับคนแปลกหน้า ควรบอกพ่อแม่หรือครูทันที"
+            },
+            {
+                character: "น้องมิ้น",
+                situation: "เจอลิงก์น่าสงสัยในอีเมล แล้วไปถามครูก่อนคลิก",
+                emoji: "📧",
+                isSafe: true,
+                explanation: "ปลอดภัย! การถามครูหรือผู้ใหญ่ก่อนคลิกลิงก์ที่ไม่แน่ใจเป็นสิ่งที่ถูกต้อง"
+            },
+            {
+                character: "น้องโบ",
+                situation: "โพสต์รูปบ้านพร้อมเบอร์โทรศัพท์ในโซเชียลมีเดีย",
+                emoji: "📱",
+                isSafe: false,
+                explanation: "ไม่ปลอดภัย! การโพสต์ข้อมูลส่วนตัวเช่น ที่อยู่ เบอร์โทร อาจทำให้คนไม่ดีมาทำร้ายได้"
+            },
+            {
+                character: "น้องแป้ง",
+                situation: "ใช้รหัสผ่านที่แข็งแกร่งและไม่บอกใครเลย",
+                emoji: "🔐",
+                isSafe: true,
+                explanation: "ปลอดภัย! รหัสผ่านที่ดีควรเก็บเป็นความลับ และควรมีตัวอักษร ตัวเลข สัญลักษณ์ผสมกัน"
+            },
+            {
+                character: "น้องเก่ง",
+                situation: "เพื่อนส่งลิงก์เกมใหม่มาให้ แต่ดูแปลกๆ เลยไม่กดคลิก",
+                emoji: "🎯",
+                isSafe: true,
+                explanation: "ปลอดภัย! แม้จะเป็นเพื่อน แต่ถ้าลิงก์ดูแปลกควรระวัง อาจเป็นไวรัสหรือเว็บไซต์อันตราย"
+            }
+        ];
+
+        const searchPuzzles = [
+            {
+                task: "หาข้อมูลเรื่อง 'สัตว์เลี้ยงในบ้าน' อย่างปลอดภัย",
+                steps: [
+                    "เปิดเบราว์เซอร์",
+                    "พิมพ์คำค้นหาใน Google",
+                    "เลือกเว็บไซต์ที่น่าเชื่อถือ",
+                    "อ่านและจดบันทึกข้อมูล",
+                    "อ้างอิงแหล่งที่มา"
+                ]
+            },
+            {
+                task: "ค้นหาคำศัพท์ภาษาอังกฤษสำหรับการบ้าน",
+                steps: [
+                    "เปิดเบราว์เซอร์",
+                    "เข้าเว็บพจนานุกรมที่เชื่อถือได้",
+                    "พิมพ์คำศัพท์ที่ต้องการหา",
+                    "อ่านความหมายและตัวอย่าง",
+                    "จดบันทึกความหมายลงสมุด"
+                ]
+            },
+            {
+                task: "หาวิดีโอการ์ตูนเพื่อการศึกษาอย่างปลอดภัย",
+                steps: [
+                    "ขออนุญาตพ่อแม่ก่อน",
+                    "เข้าเว็บไซต์วิดีโอที่ปลอดภัย",
+                    "ค้นหาด้วยคำที่เหมาะสม",
+                    "เลือกวิดีโอที่เหมาะกับอายุ",
+                    "ดูพร้อมกับผู้ใหญ่"
+                ]
+            }
+        ];
+
+        function startGame(gameNumber) {
+            playClickSound();
+            document.getElementById('gameSelection').classList.add('hidden');
+            document.getElementById('statsPage').classList.add('hidden');
+            document.getElementById(`game${gameNumber}`).classList.remove('hidden');
+            
+            if (gameNumber === 1) {
+                initGame1();
+            } else if (gameNumber === 2) {
+                initGame2();
+            } else if (gameNumber === 3) {
+                initGame3();
+            }
+        }
+
+        function backToMenu() {
+            playClickSound();
+            // Stop any running timers
+            [1, 2, 3].forEach(num => stopTimer(num));
+            
+            // Stop any speech
+            stopSpeech();
+            
+            document.querySelectorAll('[id^="game"]').forEach(game => game.classList.add('hidden'));
+            document.getElementById('statsPage').classList.add('hidden');
+            document.getElementById('gameSelection').classList.remove('hidden');
+        }
+
+        function showStats() {
+            playClickSound();
+            document.getElementById('gameSelection').classList.add('hidden');
+            document.querySelectorAll('[id^="game"]').forEach(game => game.classList.add('hidden'));
+            document.getElementById('statsPage').classList.remove('hidden');
+            updateStatsDisplay();
+        }
+
+        function initGame1() {
+            // Reset game state
+            gameState.game1.score = 0;
+            gameState.game1.question = 1;
+            gameState.game1.isActive = true;
+            gameState.game1.playCount++;
+            
+            // Reset UI
+            document.getElementById('game1Feedback').classList.add('hidden');
+            const timerCircle = document.getElementById('game1Timer');
+            timerCircle.classList.remove('warning');
+            
+            // Re-enable buttons
+            const buttons = document.querySelectorAll('#game1 button[onclick*="selectAnswer"]');
+            buttons.forEach(btn => btn.disabled = false);
+            
+            // Update display immediately
+            updateGame1Display();
+            showWebsite();
+            startTimer(1, 30);
+        }
+
+        function showWebsite() {
+            const question = websiteQuestions[gameState.game1.question - 1];
+            const display = document.getElementById('websiteDisplay');
+            
+            display.innerHTML = `
+                <div class="bg-gray-100 p-3 rounded-lg mb-4">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                        <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                        <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                        <div class="bg-white rounded px-3 py-1 text-sm font-mono">${question.url}</div>
+                    </div>
+                </div>
+                <div class="text-center py-8">
+                    ${question.content}
+                </div>
+            `;
+            
+            document.getElementById('game1Feedback').classList.add('hidden');
+            
+            // Reset timer circle
+            const timerCircle = document.getElementById('game1Timer');
+            timerCircle.classList.remove('warning');
+            timerCircle.style.background = 'conic-gradient(#22c55e 360deg, #e5e7eb 360deg)';
+        }
+
+        function selectAnswer(isGood, timeUp = false) {
+            // Prevent multiple selections
+            if (!gameState.game1.isActive && !timeUp) return;
+            
+            if (!timeUp) {
+                playClickSound();
+                stopTimer(1);
+                gameState.game1.isActive = false;
+                
+                // Disable buttons
+                const buttons = document.querySelectorAll('#game1 button[onclick*="selectAnswer"]');
+                buttons.forEach(btn => btn.disabled = true);
+            }
+            
+            const question = websiteQuestions[gameState.game1.question - 1];
+            const isCorrect = isGood === question.isGood;
+            
+            // Add button click effect
+            const buttons = document.querySelectorAll('#game1 button');
+            buttons.forEach(btn => {
+                if ((isGood && btn.textContent.includes('เว็บไซต์ดี')) || 
+                    (!isGood && btn.textContent.includes('เว็บไซต์ปลอม'))) {
+                    addButtonClickEffect(btn);
+                }
+            });
+            
+            let points = 0;
+            if (isCorrect && !timeUp) {
+                // Base points + time bonus
+                const basePoints = 10;
+                const timeBonus = Math.max(0, Math.floor(gameState.game1.timeLeft / 3)); // 1 point per 3 seconds left
+                points = basePoints + timeBonus;
+                
+                gameState.game1.score += points;
+                gameState.totalScore += points;
+                playCorrectSound();
+                showFloatingText(`+${points}`, document.getElementById('game1Score'), '#22c55e');
+            } else {
+                playIncorrectSound();
+                if (!timeUp) {
+                    showFloatingText('0', document.getElementById('game1Score'), '#ef4444');
+                }
+            }
+            
+            showGame1Feedback(isCorrect, question.explanation, timeUp, points);
+            // Force update display after scoring
+            setTimeout(() => {
+                updateGame1Display();
+                updateTotalScore();
+                updateMainPageStats();
+            }, 100);
+        }
+
+        function showGame1Feedback(isCorrect, explanation, timeUp = false, points = 0) {
+            const feedback = document.getElementById('game1Feedback');
+            const content = document.getElementById('feedbackContent');
+            
+            let message = isCorrect ? 'ถูกต้อง!' : 'ลองใหม่นะ!';
+            if (timeUp) message = 'หมดเวลา!';
+            
+            let pointsBreakdown = '';
+            if (isCorrect && !timeUp && points > 10) {
+                const basePoints = 10;
+                const timeBonus = points - basePoints;
+                pointsBreakdown = `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                        <div class="text-sm text-green-800">
+                            <div class="font-semibold mb-1">🎯 การให้คะแนน:</div>
+                            <div>• คะแนนพื้นฐาน: ${basePoints} คะแนน</div>
+                            <div>• โบนัสเวลา: ${timeBonus} คะแนน</div>
+                            <div class="font-bold border-t border-green-300 pt-1 mt-1">รวม: ${points} คะแนน</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            content.innerHTML = `
+                <div class="text-center mb-4 score-popup">
+                    <div class="text-6xl mb-2">${isCorrect ? '🎉' : timeUp ? '⏰' : '😅'}</div>
+                    <h3 class="text-xl font-bold ${isCorrect ? 'text-green-600' : 'text-red-600'} mb-2">
+                        ${message}
+                    </h3>
+                    <p class="text-gray-700">${explanation}</p>
+                    ${pointsBreakdown}
+                </div>
+            `;
+            
+            feedback.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            playClickSound();
+            
+            // Re-enable buttons for next question
+            const buttons = document.querySelectorAll('#game1 button[onclick*="selectAnswer"]');
+            buttons.forEach(btn => btn.disabled = false);
+            
+            if (gameState.game1.question < websiteQuestions.length) {
+                gameState.game1.question++;
+                gameState.game1.isActive = true;
+                // Force immediate display update
+                updateGame1Display();
+                showWebsite();
+                startTimer(1, 30);
+            } else {
+                showGame1Complete();
+            }
+        }
+
+        function showGame1Complete() {
+            stopTimer(1);
+            const totalTime = getElapsedTime(1);
+            
+            // Calculate final score with completion bonus
+            const completionBonus = 20;
+            const roundScore = gameState.game1.score; // Score from this round only
+            const finalRoundScore = roundScore + completionBonus;
+            
+            // Add to total score
+            gameState.totalScore += completionBonus;
+            gameState.stats.totalAllTimeScore += finalRoundScore;
+            
+            // Update best score and time
+            const isNewBest = finalRoundScore > gameState.game1.bestScore;
+            if (isNewBest) {
+                gameState.game1.bestScore = finalRoundScore;
+                gameState.game1.bestTime = totalTime;
+            }
+            updateMainPageBestScores();
+            
+            const feedback = document.getElementById('game1Feedback');
+            const content = document.getElementById('feedbackContent');
+            
+            let badge = '';
+            if (finalRoundScore >= 60) {
+                badge = '🛡️ โล่ห์แห่งความปลอดภัย';
+                addBadge('🛡️');
+            }
+            
+            playCompleteSound();
+            if (finalRoundScore >= 60) {
+                createConfetti();
+            }
+            
+            content.innerHTML = `
+                <div class="text-center score-popup">
+                    <div class="text-6xl mb-4">🏆</div>
+                    <h3 class="text-2xl font-bold text-green-600 mb-2">เกมจบแล้ว!</h3>
+                    <div class="bg-blue-50 rounded-lg p-4 mb-4">
+                        <div class="text-sm text-gray-600 mb-2">📊 สรุปคะแนนรอบนี้:</div>
+                        <div class="text-left text-sm mb-2">
+                            <div>• คะแนนจากการตอบ: ${roundScore} คะแนน</div>
+                            <div>• โบนัสจบเกม: ${completionBonus} คะแนน</div>
+                        </div>
+                        <div class="border-t border-blue-200 pt-2">
+                            <p class="text-lg font-bold text-blue-600">คะแนนรอบนี้: ${finalRoundScore} คะแนน</p>
+                            <p class="text-sm text-gray-600">เวลาที่ใช้: ${formatTime(totalTime)}</p>
+                        </div>
+                        ${isNewBest ? 
+                            '<div class="bg-yellow-50 border border-yellow-200 rounded p-2 mt-2"><span class="text-yellow-800 text-xs font-semibold">🌟 สถิติใหม่!</span></div>' : ''}
+                    </div>
+                    ${badge ? `<div class="bg-yellow-100 border border-yellow-400 rounded-lg p-3 mb-4">
+                        <p class="text-yellow-800 font-semibold">🎉 ได้รับรางวัล: ${badge}</p>
+                    </div>` : ''}
+                    <div class="flex space-x-3 justify-center">
+                        <button onclick="initGame1()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors">
+                            🔄 เล่นอีกครั้ง
+                        </button>
+                        <button onclick="backToMenu()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                            กลับเมนูหลัก
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            feedback.classList.remove('hidden');
+            updateGame1Display();
+            updateTotalScore();
+            
+            // Auto return to menu after 5 seconds
+            setTimeout(() => {
+                backToMenu();
+            }, 5000);
+        }
+
+        function updateGame1Display() {
+            const scoreElement = document.getElementById('game1Score');
+            const questionElement = document.getElementById('game1Question');
+            
+            if (scoreElement) scoreElement.textContent = gameState.game1.score;
+            if (questionElement) questionElement.textContent = gameState.game1.question;
+        }
+
+        function initGame2() {
+            // Reset game state
+            gameState.game2.score = 0;
+            gameState.game2.question = 1;
+            gameState.game2.isActive = true;
+            gameState.game2.playCount++;
+            
+            // Reset UI
+            document.getElementById('game2Feedback').classList.add('hidden');
+            const timerCircle = document.getElementById('game2Timer');
+            timerCircle.classList.remove('warning');
+            
+            // Re-enable buttons
+            const buttons = document.querySelectorAll('#game2 button[onclick*="selectBehavior"]');
+            buttons.forEach(btn => btn.disabled = false);
+            
+            // Update display immediately
+            updateGame2Display();
+            showScenario();
+            startTimer(2, 25);
+        }
+
+        function showScenario() {
+            const scenario = behaviorScenarios[gameState.game2.question - 1];
+            const display = document.getElementById('scenarioDisplay');
+            
+            display.innerHTML = `
+                <div class="text-8xl mb-4">${scenario.emoji}</div>
+                <h3 class="text-xl font-bold mb-4 text-gray-800">สถานการณ์:</h3>
+                <div class="bg-blue-50 rounded-lg p-4 mb-4">
+                    <p class="text-lg text-gray-700">
+                        <strong>${scenario.character}</strong> ${scenario.situation}
+                    </p>
+                </div>
+                <p class="text-gray-600">พฤติกรรมนี้ปลอดภัยหรือไม่?</p>
+            `;
+            
+            // Setup TTS for scenario
+            const scenarioText = `สถานการณ์: ${scenario.character} ${scenario.situation}. พฤติกรรมนี้ปลอดภัยหรือไม่?`;
+            
+            // Update speech buttons
+            const game2SpeechToggle = document.getElementById('game2SpeechToggle');
+            const game2ScenarioSpeech = document.getElementById('game2ScenarioSpeech');
+            
+            game2SpeechToggle.onclick = (e) => {
+                e.preventDefault();
+                playClickSound();
+                toggleSpeech(scenarioText);
+            };
+            
+            game2ScenarioSpeech.onclick = (e) => {
+                e.preventDefault();
+                playClickSound();
+                toggleSpeech(scenarioText);
+            };
+            
+            document.getElementById('game2Feedback').classList.add('hidden');
+            
+            // Auto-read scenario after a short delay (optional)
+            setTimeout(() => {
+                if (gameState.game2.isActive) {
+                    speakText(scenarioText);
+                }
+            }, 1000);
+        }
+
+        function selectBehavior(isSafe, timeUp = false) {
+            // Prevent multiple selections
+            if (!gameState.game2.isActive && !timeUp) return;
+            
+            if (!timeUp) {
+                playClickSound();
+                stopTimer(2);
+                gameState.game2.isActive = false;
+                
+                // Disable buttons
+                const buttons = document.querySelectorAll('#game2 button[onclick*="selectBehavior"]');
+                buttons.forEach(btn => btn.disabled = true);
+            }
+            
+            const scenario = behaviorScenarios[gameState.game2.question - 1];
+            const isCorrect = isSafe === scenario.isSafe;
+            
+            // Add button click effect
+            const buttons = document.querySelectorAll('#game2 button');
+            buttons.forEach(btn => {
+                if ((isSafe && btn.textContent.includes('ปลอดภัย')) || 
+                    (!isSafe && btn.textContent.includes('ไม่ปลอดภัย'))) {
+                    addButtonClickEffect(btn);
+                }
+            });
+            
+            let points = 0;
+            if (isCorrect && !timeUp) {
+                // Base points + time bonus
+                const basePoints = 10;
+                const timeBonus = Math.max(0, Math.floor(gameState.game2.timeLeft / 2.5)); // 1 point per 2.5 seconds left
+                points = basePoints + timeBonus;
+                
+                gameState.game2.score += points;
+                gameState.totalScore += points;
+                playCorrectSound();
+                showFloatingText(`+${points}`, document.getElementById('game2Score'), '#22c55e');
+            } else {
+                playIncorrectSound();
+                if (!timeUp) {
+                    showFloatingText('0', document.getElementById('game2Score'), '#ef4444');
+                }
+            }
+            
+            showGame2Feedback(isCorrect, scenario.explanation, timeUp, points);
+            // Force update display after scoring
+            setTimeout(() => {
+                updateGame2Display();
+                updateTotalScore();
+                updateMainPageStats();
+            }, 100);
+        }
+
+        function showGame2Feedback(isCorrect, explanation, timeUp = false, points = 0) {
+            const feedback = document.getElementById('game2Feedback');
+            const content = document.getElementById('behaviorFeedbackContent');
+            
+            let message = isCorrect ? 'ถูกต้อง!' : 'ลองใหม่นะ!';
+            if (timeUp) message = 'หมดเวลา!';
+            
+            let pointsBreakdown = '';
+            if (isCorrect && !timeUp && points > 10) {
+                const basePoints = 10;
+                const timeBonus = points - basePoints;
+                pointsBreakdown = `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                        <div class="text-sm text-green-800">
+                            <div class="font-semibold mb-1">🎯 การให้คะแนน:</div>
+                            <div>• คะแนนพื้นฐาน: ${basePoints} คะแนน</div>
+                            <div>• โบนัสเวลา: ${timeBonus} คะแนน</div>
+                            <div class="font-bold border-t border-green-300 pt-1 mt-1">รวม: ${points} คะแนน</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            content.innerHTML = `
+                <div class="text-center mb-4 score-popup">
+                    <div class="text-6xl mb-2">${isCorrect ? '🎉' : timeUp ? '⏰' : '😅'}</div>
+                    <h3 class="text-xl font-bold ${isCorrect ? 'text-green-600' : 'text-red-600'} mb-2">
+                        ${message}
+                    </h3>
+                    <p class="text-gray-700">${explanation}</p>
+                    ${pointsBreakdown}
+                </div>
+            `;
+            
+            feedback.classList.remove('hidden');
+        }
+
+        function nextScenario() {
+            playClickSound();
+            
+            // Re-enable buttons for next scenario
+            const buttons = document.querySelectorAll('#game2 button[onclick*="selectBehavior"]');
+            buttons.forEach(btn => btn.disabled = false);
+            
+            if (gameState.game2.question < behaviorScenarios.length) {
+                gameState.game2.question++;
+                gameState.game2.isActive = true;
+                // Force immediate display update
+                updateGame2Display();
+                showScenario();
+                startTimer(2, 25);
+            } else {
+                showGame2Complete();
+            }
+        }
+
+        function showGame2Complete() {
+            stopTimer(2);
+            const totalTime = getElapsedTime(2);
+            
+            // Calculate final score with completion bonus
+            const completionBonus = 20;
+            const roundScore = gameState.game2.score; // Score from this round only
+            const finalRoundScore = roundScore + completionBonus;
+            
+            // Add to total score
+            gameState.totalScore += completionBonus;
+            gameState.stats.totalAllTimeScore += finalRoundScore;
+            
+            // Update best score and time
+            const isNewBest = finalRoundScore > gameState.game2.bestScore;
+            if (isNewBest) {
+                gameState.game2.bestScore = finalRoundScore;
+                gameState.game2.bestTime = totalTime;
+            }
+            updateMainPageBestScores();
+            
+            const feedback = document.getElementById('game2Feedback');
+            const content = document.getElementById('behaviorFeedbackContent');
+            
+            let badge = '';
+            if (finalRoundScore >= 70) {
+                badge = '⚔️ ดาบแห่งความปลอดภัย';
+                addBadge('⚔️');
+            }
+            
+            playCompleteSound();
+            if (finalRoundScore >= 70) {
+                createConfetti();
+            }
+            
+            content.innerHTML = `
+                <div class="text-center score-popup">
+                    <div class="text-6xl mb-4">🏆</div>
+                    <h3 class="text-2xl font-bold text-green-600 mb-2">เกมจบแล้ว!</h3>
+                    <div class="bg-blue-50 rounded-lg p-4 mb-4">
+                        <div class="text-sm text-gray-600 mb-2">📊 สรุปคะแนนรอบนี้:</div>
+                        <div class="text-left text-sm mb-2">
+                            <div>• คะแนนจากการตอบ: ${roundScore} คะแนน</div>
+                            <div>• โบนัสจบเกม: ${completionBonus} คะแนน</div>
+                        </div>
+                        <div class="border-t border-blue-200 pt-2">
+                            <p class="text-lg font-bold text-blue-600">คะแนนรอบนี้: ${finalRoundScore} คะแนน</p>
+                            <p class="text-sm text-gray-600">เวลาที่ใช้: ${formatTime(totalTime)}</p>
+                        </div>
+                        ${isNewBest ? 
+                            '<div class="bg-yellow-50 border border-yellow-200 rounded p-2 mt-2"><span class="text-yellow-800 text-xs font-semibold">🌟 สถิติใหม่!</span></div>' : ''}
+                    </div>
+                    ${badge ? `<div class="bg-yellow-100 border border-yellow-400 rounded-lg p-3 mb-4">
+                        <p class="text-yellow-800 font-semibold">🎉 ได้รับรางวัล: ${badge}</p>
+                    </div>` : ''}
+                    <div class="flex space-x-3 justify-center">
+                        <button onclick="initGame2()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors">
+                            🔄 เล่นอีกครั้ง
+                        </button>
+                        <button onclick="backToMenu()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                            กลับเมนูหลัก
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            feedback.classList.remove('hidden');
+            updateGame2Display();
+            updateTotalScore();
+            
+            // Auto return to menu after 5 seconds
+            setTimeout(() => {
+                backToMenu();
+            }, 5000);
+        }
+
+        function updateGame2Display() {
+            const scoreElement = document.getElementById('game2Score');
+            const questionElement = document.getElementById('game2Question');
+            
+            if (scoreElement) scoreElement.textContent = gameState.game2.score;
+            if (questionElement) questionElement.textContent = gameState.game2.question;
+        }
+
+        function initGame3() {
+            // Reset game state
+            gameState.game3.score = 0;
+            gameState.game3.level = 1;
+            gameState.game3.isActive = true;
+            gameState.game3.playCount++;
+            
+            // Reset UI
+            document.getElementById('game3Feedback').classList.add('hidden');
+            const timerCircle = document.getElementById('game3Timer');
+            timerCircle.classList.remove('warning');
+            
+            // Re-enable check button
+            const checkButton = document.querySelector('button[onclick="checkPuzzleAnswer()"]');
+            if (checkButton) checkButton.disabled = false;
+            
+            // Update display immediately
+            updateGame3Display();
+            showPuzzle();
+            startTimer(3, 60);
+        }
+
+        function showPuzzle() {
+            const puzzle = searchPuzzles[gameState.game3.level - 1];
+            document.getElementById('puzzleTask').textContent = `ภารกิจ: ${puzzle.task}`;
+            
+            const stepsList = document.getElementById('stepsList');
+            const dropZones = document.getElementById('dropZones');
+            
+            // Shuffle steps
+            const shuffledSteps = [...puzzle.steps].sort(() => Math.random() - 0.5);
+            
+            stepsList.innerHTML = '';
+            shuffledSteps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'draggable bg-blue-100 border border-blue-300 rounded-lg p-3 text-center cursor-grab';
+                stepDiv.draggable = true;
+                stepDiv.textContent = step;
+                stepDiv.dataset.step = step;
+                
+                stepDiv.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', step);
+                    stepDiv.style.opacity = '0.5';
+                });
+                
+                stepDiv.addEventListener('dragend', () => {
+                    stepDiv.style.opacity = '1';
+                });
+                
+                stepsList.appendChild(stepDiv);
+            });
+            
+            // Create drop zones
+            dropZones.innerHTML = '';
+            puzzle.steps.forEach((_, index) => {
+                const dropZone = document.createElement('div');
+                dropZone.className = 'drop-zone bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-3 text-center text-gray-500';
+                dropZone.textContent = `ขั้นตอนที่ ${index + 1}`;
+                dropZone.dataset.position = index;
+                
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-over');
+                });
+                
+                dropZone.addEventListener('dragleave', () => {
+                    dropZone.classList.remove('drag-over');
+                });
+                
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const step = e.dataTransfer.getData('text/plain');
+                    
+                    // If zone already has content, return it to steps list
+                    if (dropZone.dataset.step) {
+                        const returnStep = dropZone.dataset.step;
+                        const stepDiv = document.createElement('div');
+                        stepDiv.className = 'draggable bg-blue-100 border border-blue-300 rounded-lg p-3 text-center cursor-grab';
+                        stepDiv.draggable = true;
+                        stepDiv.textContent = returnStep;
+                        stepDiv.dataset.step = returnStep;
+                        
+                        // Add drag events
+                        stepDiv.addEventListener('dragstart', (e) => {
+                            e.dataTransfer.setData('text/plain', returnStep);
+                            stepDiv.style.opacity = '0.5';
+                        });
+                        stepDiv.addEventListener('dragend', () => {
+                            stepDiv.style.opacity = '1';
+                        });
+                        
+                        document.getElementById('stepsList').appendChild(stepDiv);
+                    }
+                    
+                    dropZone.textContent = step;
+                    dropZone.dataset.step = step;
+                    dropZone.classList.remove('drag-over', 'bg-gray-50', 'border-gray-300');
+                    dropZone.classList.add('bg-green-50', 'border-green-300');
+                    
+                    // Remove the dragged item from steps list
+                    const draggedItem = document.querySelector(`#stepsList [data-step="${step}"]`);
+                    if (draggedItem) {
+                        draggedItem.remove();
+                    }
+                });
+                
+                dropZones.appendChild(dropZone);
+            });
+            
+            // Setup TTS for puzzle
+            const taskText = `ภารกิจ: ${puzzle.task}`;
+            const stepsText = `ขั้นตอนที่ต้องเรียง: ${shuffledSteps.join(', ')}`;
+            
+            // Update speech buttons
+            const game3SpeechToggle = document.getElementById('game3SpeechToggle');
+            const game3TaskSpeech = document.getElementById('game3TaskSpeech');
+            const game3StepsSpeech = document.getElementById('game3StepsSpeech');
+            
+            game3SpeechToggle.onclick = (e) => {
+                e.preventDefault();
+                playClickSound();
+                toggleSpeech(`${taskText}. ${stepsText}`);
+            };
+            
+            game3TaskSpeech.onclick = (e) => {
+                e.preventDefault();
+                playClickSound();
+                toggleSpeech(taskText);
+            };
+            
+            game3StepsSpeech.onclick = (e) => {
+                e.preventDefault();
+                playClickSound();
+                toggleSpeech(stepsText);
+            };
+            
+            document.getElementById('game3Feedback').classList.add('hidden');
+            
+            // Auto-read task after a short delay (optional)
+            setTimeout(() => {
+                if (gameState.game3.isActive) {
+                    speakText(taskText);
+                }
+            }, 1000);
+        }
+
+        function checkPuzzleAnswer(timeUp = false) {
+            // Prevent multiple submissions
+            if (!gameState.game3.isActive && !timeUp) return;
+            
+            if (!timeUp) {
+                playClickSound();
+                stopTimer(3);
+                gameState.game3.isActive = false;
+            }
+            
+            const puzzle = searchPuzzles[gameState.game3.level - 1];
+            const dropZones = document.querySelectorAll('#dropZones .drop-zone');
+            let isCorrect = true;
+            
+            dropZones.forEach((zone, index) => {
+                const userStep = zone.dataset.step;
+                const correctStep = puzzle.steps[index];
+                
+                if (userStep !== correctStep) {
+                    isCorrect = false;
+                    zone.classList.add('bg-red-50', 'border-red-300');
+                } else {
+                    zone.classList.add('bg-green-50', 'border-green-300');
+                }
+            });
+            
+            let points = 0;
+            if (isCorrect && !timeUp) {
+                // Base points + time bonus
+                const basePoints = 15;
+                const timeBonus = Math.max(0, Math.floor(gameState.game3.timeLeft / 6)); // 1 point per 6 seconds left
+                points = basePoints + timeBonus;
+                
+                gameState.game3.score += points;
+                gameState.totalScore += points;
+                playCorrectSound();
+                showFloatingText(`+${points}`, document.getElementById('game3Score'), '#22c55e');
+            } else {
+                playIncorrectSound();
+                if (!timeUp) {
+                    showFloatingText('0', document.getElementById('game3Score'), '#ef4444');
+                }
+            }
+            
+            showGame3Feedback(isCorrect, timeUp, points);
+            // Force update display after scoring
+            setTimeout(() => {
+                updateGame3Display();
+                updateTotalScore();
+                updateMainPageStats();
+            }, 100);
+        }
+
+        function showGame3Feedback(isCorrect, timeUp = false, points = 0) {
+            const feedback = document.getElementById('game3Feedback');
+            const content = document.getElementById('puzzleFeedbackContent');
+            
+            let message = isCorrect ? 'เรียงถูกต้อง!' : 'ลองใหม่นะ!';
+            if (timeUp) message = 'หมดเวลา!';
+            
+            let pointsBreakdown = '';
+            if (isCorrect && !timeUp && points > 15) {
+                const basePoints = 15;
+                const timeBonus = points - basePoints;
+                pointsBreakdown = `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                        <div class="text-sm text-green-800">
+                            <div class="font-semibold mb-1">🎯 การให้คะแนน:</div>
+                            <div>• คะแนนพื้นฐาน: ${basePoints} คะแนน</div>
+                            <div>• โบนัสเวลา: ${timeBonus} คะแนน</div>
+                            <div class="font-bold border-t border-green-300 pt-1 mt-1">รวม: ${points} คะแนน</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            content.innerHTML = `
+                <div class="text-center mb-4 score-popup">
+                    <div class="text-6xl mb-2">${isCorrect ? '🎉' : timeUp ? '⏰' : '😅'}</div>
+                    <h3 class="text-xl font-bold ${isCorrect ? 'text-green-600' : 'text-red-600'} mb-2">
+                        ${message}
+                    </h3>
+                    <p class="text-gray-700">
+                        ${isCorrect ? 'เก่งมาก! คุณเข้าใจขั้นตอนการค้นหาข้อมูลอย่างปลอดภัยแล้ว' : 'ไม่เป็นไร ลองดูขั้นตอนที่ถูกต้องแล้วลองใหม่'}
+                    </p>
+                    ${pointsBreakdown}
+                </div>
+            `;
+            
+            feedback.classList.remove('hidden');
+        }
+
+        function nextPuzzle() {
+            playClickSound();
+            
+            if (gameState.game3.level < searchPuzzles.length) {
+                gameState.game3.level++;
+                gameState.game3.isActive = true;
+                
+                // Re-enable check button for next level
+                const checkButton = document.querySelector('button[onclick="checkPuzzleAnswer()"]');
+                if (checkButton) checkButton.disabled = false;
+                
+                // Force immediate display update
+                updateGame3Display();
+                showPuzzle();
+                startTimer(3, 60);
+            } else {
+                showGame3Complete();
+            }
+        }
+
+        function showGame3Complete() {
+            stopTimer(3);
+            const totalTime = getElapsedTime(3);
+            
+            // Calculate final score with completion bonus
+            const completionBonus = 25;
+            const roundScore = gameState.game3.score; // Score from this round only
+            const finalRoundScore = roundScore + completionBonus;
+            
+            // Add to total score
+            gameState.totalScore += completionBonus;
+            gameState.stats.totalAllTimeScore += finalRoundScore;
+            
+            // Update best score and time
+            const isNewBest = finalRoundScore > gameState.game3.bestScore;
+            if (isNewBest) {
+                gameState.game3.bestScore = finalRoundScore;
+                gameState.game3.bestTime = totalTime;
+            }
+            updateMainPageBestScores();
+            
+            const feedback = document.getElementById('game3Feedback');
+            const content = document.getElementById('puzzleFeedbackContent');
+            
+            let badge = '';
+            if (finalRoundScore >= 70) {
+                badge = '📚 คัมภีร์ค้นหาข้อมูล';
+                addBadge('📚');
+            }
+            
+            playCompleteSound();
+            if (finalRoundScore >= 70) {
+                createConfetti();
+            }
+            
+            content.innerHTML = `
+                <div class="text-center score-popup">
+                    <div class="text-6xl mb-4">🏆</div>
+                    <h3 class="text-2xl font-bold text-green-600 mb-2">เกมจบแล้ว!</h3>
+                    <div class="bg-blue-50 rounded-lg p-4 mb-4">
+                        <div class="text-sm text-gray-600 mb-2">📊 สรุปคะแนนรอบนี้:</div>
+                        <div class="text-left text-sm mb-2">
+                            <div>• คะแนนจากการเรียง: ${roundScore} คะแนน</div>
+                            <div>• โบนัสจบเกม: ${completionBonus} คะแนน</div>
+                        </div>
+                        <div class="border-t border-blue-200 pt-2">
+                            <p class="text-lg font-bold text-blue-600">คะแนนรอบนี้: ${finalRoundScore} คะแนน</p>
+                            <p class="text-sm text-gray-600">เวลาที่ใช้: ${formatTime(totalTime)}</p>
+                        </div>
+                        ${isNewBest ? 
+                            '<div class="bg-yellow-50 border border-yellow-200 rounded p-2 mt-2"><span class="text-yellow-800 text-xs font-semibold">🌟 สถิติใหม่!</span></div>' : ''}
+                    </div>
+                    ${badge ? `<div class="bg-yellow-100 border border-yellow-400 rounded-lg p-3 mb-4">
+                        <p class="text-yellow-800 font-semibold">🎉 ได้รับรางวัล: ${badge}</p>
+                    </div>` : ''}
+                    <div class="flex space-x-3 justify-center">
+                        <button onclick="initGame3()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors">
+                            🔄 เล่นอีกครั้ง
+                        </button>
+                        <button onclick="backToMenu()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+                            กลับเมนูหลัก
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            feedback.classList.remove('hidden');
+            updateGame3Display();
+            updateTotalScore();
+            
+            // Auto return to menu after 5 seconds
+            setTimeout(() => {
+                backToMenu();
+            }, 5000);
+        }
+
+        function resetPuzzle() {
+            playClickSound();
+            if (!gameState.game3.isActive) return;
+            
+            showPuzzle(); // This will reset the puzzle to initial state
+        }
+
+        function updateGame3Display() {
+            const scoreElement = document.getElementById('game3Score');
+            const levelElement = document.getElementById('game3Level');
+            
+            if (scoreElement) scoreElement.textContent = gameState.game3.score;
+            if (levelElement) levelElement.textContent = gameState.game3.level;
+        }
+
+        function updateTotalScore() {
+            document.getElementById('totalScore').textContent = gameState.totalScore;
+            
+            // Check for special badges
+            if (gameState.totalScore >= 200 && !gameState.badges.includes('🧠')) {
+                addBadge('🧠');
+            }
+            
+            // Save data when score updates
+            saveGameData();
+        }
+
+        function updateMainPageBestScores() {
+            // Update Game 1
+            document.getElementById('game1MainBest').textContent = gameState.game1.bestScore;
+            document.getElementById('game1MainTime').textContent = gameState.game1.bestTime ? formatTime(gameState.game1.bestTime) : '-';
+            
+            // Update Game 2
+            document.getElementById('game2MainBest').textContent = gameState.game2.bestScore;
+            document.getElementById('game2MainTime').textContent = gameState.game2.bestTime ? formatTime(gameState.game2.bestTime) : '-';
+            
+            // Update Game 3
+            document.getElementById('game3MainBest').textContent = gameState.game3.bestScore;
+            document.getElementById('game3MainTime').textContent = gameState.game3.bestTime ? formatTime(gameState.game3.bestTime) : '-';
+            
+            // Update main page high score summary
+            updateMainPageStats();
+        }
+
+        function updateMainPageStats() {
+            // Update individual game high scores in the summary section
+            document.getElementById('mainHighScore1').textContent = gameState.game1.bestScore;
+            document.getElementById('mainHighTime1').textContent = gameState.game1.bestTime ? formatTime(gameState.game1.bestTime) : '-';
+            document.getElementById('mainPlayCount1').textContent = gameState.game1.playCount;
+            
+            document.getElementById('mainHighScore2').textContent = gameState.game2.bestScore;
+            document.getElementById('mainHighTime2').textContent = gameState.game2.bestTime ? formatTime(gameState.game2.bestTime) : '-';
+            document.getElementById('mainPlayCount2').textContent = gameState.game2.playCount;
+            
+            document.getElementById('mainHighScore3').textContent = gameState.game3.bestScore;
+            document.getElementById('mainHighTime3').textContent = gameState.game3.bestTime ? formatTime(gameState.game3.bestTime) : '-';
+            document.getElementById('mainPlayCount3').textContent = gameState.game3.playCount;
+            
+            // Update overall stats
+            const totalAllTimeScore = gameState.stats.totalAllTimeScore + gameState.totalScore;
+            document.getElementById('mainTotalScore').textContent = totalAllTimeScore;
+            document.getElementById('mainTotalBadges').textContent = gameState.badges.length;
+        }
+
+        function addBadge(badge) {
+            if (!gameState.badges.includes(badge)) {
+                gameState.badges.push(badge);
+                gameState.stats.totalBadges = gameState.badges.length;
+                
+                const badgesContainer = document.getElementById('badges');
+                const badgeElement = document.createElement('div');
+                badgeElement.className = 'badge bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-semibold';
+                badgeElement.textContent = badge;
+                badgesContainer.appendChild(badgeElement);
+                
+                // Play special sound for badge
+                setTimeout(() => playCompleteSound(), 500);
+                saveGameData();
+            }
+        }
+
+        function updateStatsDisplay() {
+            // Game 1 stats
+            document.getElementById('game1BestScore').textContent = gameState.game1.bestScore;
+            document.getElementById('game1BestTime').textContent = gameState.game1.bestTime ? formatTime(gameState.game1.bestTime) : '-';
+            document.getElementById('game1PlayCount').textContent = gameState.game1.playCount + ' ครั้ง';
+            
+            // Game 2 stats
+            document.getElementById('game2BestScore').textContent = gameState.game2.bestScore;
+            document.getElementById('game2BestTime').textContent = gameState.game2.bestTime ? formatTime(gameState.game2.bestTime) : '-';
+            document.getElementById('game2PlayCount').textContent = gameState.game2.playCount + ' ครั้ง';
+            
+            // Game 3 stats
+            document.getElementById('game3BestScore').textContent = gameState.game3.bestScore;
+            document.getElementById('game3BestTime').textContent = gameState.game3.bestTime ? formatTime(gameState.game3.bestTime) : '-';
+            document.getElementById('game3PlayCount').textContent = gameState.game3.playCount + ' ครั้ง';
+            
+            // Overall stats
+            document.getElementById('totalAllTimeScore').textContent = gameState.stats.totalAllTimeScore;
+            document.getElementById('totalBadges').textContent = gameState.badges.length + ' รางวัล';
+        }
+
+        // Data persistence
+        function saveGameData() {
+            try {
+                localStorage.setItem('cyberLearningGameState', JSON.stringify(gameState));
+            } catch (e) {
+                console.log('Could not save game data');
+            }
+        }
+
+        function loadGameData() {
+            try {
+                const saved = localStorage.getItem('cyberLearningGameState');
+                if (saved) {
+                    const savedState = JSON.parse(saved);
+                    // Merge saved data with current state, preserving structure
+                    gameState.game1.bestScore = savedState.game1?.bestScore || 0;
+                    gameState.game1.bestTime = savedState.game1?.bestTime || null;
+                    gameState.game1.playCount = savedState.game1?.playCount || 0;
+                    
+                    gameState.game2.bestScore = savedState.game2?.bestScore || 0;
+                    gameState.game2.bestTime = savedState.game2?.bestTime || null;
+                    gameState.game2.playCount = savedState.game2?.playCount || 0;
+                    
+                    gameState.game3.bestScore = savedState.game3?.bestScore || 0;
+                    gameState.game3.bestTime = savedState.game3?.bestTime || null;
+                    gameState.game3.playCount = savedState.game3?.playCount || 0;
+                    
+                    gameState.stats.totalAllTimeScore = savedState.stats?.totalAllTimeScore || 0;
+                    gameState.badges = savedState.badges || [];
+                    
+                    // Restore badges display
+                    gameState.badges.forEach(badge => {
+                        const badgesContainer = document.getElementById('badges');
+                        const badgeElement = document.createElement('div');
+                        badgeElement.className = 'badge bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-semibold';
+                        badgeElement.textContent = badge;
+                        badgesContainer.appendChild(badgeElement);
+                    });
+                }
+            } catch (e) {
+                console.log('Could not load game data');
+            }
+        }
+
+        // Initialize the game
+        updateTotalScore();
+        loadGameData();
+        updateMainPageBestScores();
+        updateMainPageStats();
+        
+        // Initialize all game displays
+        updateGame1Display();
+        updateGame2Display();
+        updateGame3Display();
+        
+        // Initialize TTS
+        initTTS();
+        
+        // Load voices when available
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => {
+                // Voices loaded, TTS ready
+                console.log('TTS voices loaded');
+            };
+        }
+        
+        // Save data periodically and on page unload
+        setInterval(saveGameData, 30000); // Save every 30 seconds
+        window.addEventListener('beforeunload', saveGameData);
+        window.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                saveGameData();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9768a006370b731c',t:'MTc1NjQzNDYxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
