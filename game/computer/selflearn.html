@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทเรียนคอมพิวเตอร์สำหรับเด็ก - รู้จักโลกคอมพิวเตอร์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.8s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.6s ease-out forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .wiggle {
+            animation: wiggle 0.5s ease-in-out;
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-3deg); }
+            75% { transform: rotate(3deg); }
+        }
+        
+        .zoom-in {
+            animation: zoomIn 0.5s ease-out;
+        }
+        
+        @keyframes zoomIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white shadow-lg rounded-b-3xl mx-4 mt-4 p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center float">
+                    <span class="text-2xl">🤖</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">น้องนวัต นักเทคโน</h1>
+                    <p class="text-gray-600">มาเรียนรู้เรื่องคอมพิวเตอร์กันเถอะ!</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="bg-yellow-100 px-4 py-2 rounded-full">
+                    <span class="text-lg font-semibold text-yellow-800" id="lesson-indicator">บทเรียนที่ 1</span>
+                </div>
+                <div class="mt-2 space-y-1">
+                    <button onclick="showLessonMenu()" class="text-blue-600 hover:text-blue-800 text-sm underline block">
+                        เลือกบทเรียน
+                    </button>
+                    <button onclick="stopSpeech()" class="text-red-600 hover:text-red-800 text-sm underline block">
+                        🔇 หยุดเสียงทั้งหมด
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Menu Modal -->
+    <div id="lesson-menu" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-3xl p-8 max-w-2xl mx-4 max-h-96 overflow-y-auto">
+            <h3 class="text-2xl font-bold text-center mb-6">เลือกบทเรียน 📚</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button onclick="goToLesson(1)" class="lesson-btn bg-blue-100 hover:bg-blue-200 p-4 rounded-xl text-left transition-colors duration-300">
+                    <div class="text-2xl mb-2">🖥️</div>
+                    <div class="font-semibold">บทที่ 1: คอมพิวเตอร์คืออะไร?</div>
+                </button>
+                <button onclick="goToLesson(2)" class="lesson-btn bg-green-100 hover:bg-green-200 p-4 rounded-xl text-left transition-colors duration-300">
+                    <div class="text-2xl mb-2">⌨️</div>
+                    <div class="font-semibold">บทที่ 2: รู้จักอุปกรณ์คอมพิวเตอร์</div>
+                </button>
+                <button onclick="goToLesson(3)" class="lesson-btn bg-purple-100 hover:bg-purple-200 p-4 rounded-xl text-left transition-colors duration-300">
+                    <div class="text-2xl mb-2">🔧</div>
+                    <div class="font-semibold">บทที่ 3: ฮาร์ดแวร์ vs ซอฟต์แวร์</div>
+                </button>
+                <button onclick="goToLesson(4)" class="lesson-btn bg-orange-100 hover:bg-orange-200 p-4 rounded-xl text-left transition-colors duration-300">
+                    <div class="text-2xl mb-2">⚡</div>
+                    <div class="font-semibold">บทที่ 4: เปิด-ปิดคอมให้ปลอดภัย</div>
+                </button>
+                <button onclick="goToLesson(5)" class="lesson-btn bg-pink-100 hover:bg-pink-200 p-4 rounded-xl text-left transition-colors duration-300">
+                    <div class="text-2xl mb-2">🪑</div>
+                    <div class="font-semibold">บทที่ 5: ท่านั่งที่ถูกต้อง</div>
+                </button>
+<!--
+                <button onclick="showFinalTest()" class="lesson-btn bg-yellow-100 hover:bg-yellow-200 p-4 rounded-xl text-left transition-colors duration-300">
+                    <div class="text-2xl mb-2">🏆</div>
+                    <div class="font-semibold">แบบทดสอบท้ายหน่วย</div>
+                </button>
+				-->
+            </div>
+            <button onclick="closeLessonMenu()" class="mt-6 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full w-full">
+                ปิด
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Lesson 1: What is Computer -->
+        <div id="lesson-1" class="lesson-content">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold text-white mb-4 bounce-in">คอมพิวเตอร์คืออะไร? 🖥️</h2>
+                <div class="bg-white rounded-full px-6 py-3 inline-block shadow-lg">
+                    <p class="text-lg text-gray-700">มาค้นหาคำตอบไปด้วยกัน!</p>
+                </div>
+            </div>
+
+            <div id="intro-section-1" class="bg-white rounded-3xl p-8 mb-8 shadow-xl">
+                <div class="flex items-center justify-center mb-6">
+                    <div class="w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-6xl float">
+                        🤖
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="bg-blue-100 rounded-2xl p-6 mb-6">
+                        <p class="text-xl text-gray-800 leading-relaxed">
+                            สวัสดีเพื่อนๆ! ผมชื่อ <span class="font-bold text-blue-600">น้องนวัต</span> 
+                            วันนี้เราจะมาเรียนรู้เรื่องคอมพิวเตอร์กันนะครับ 
+                            คอมพิวเตอร์เป็นเครื่องมือที่มหัศจรรย์มากเลย! 🌟
+                        </p>
+                        <div class="mt-4 flex justify-center">
+                            <button onclick="toggleSpeech('สวัสดีเพื่อนๆ! ผมชื่อน้องนวัต วันนี้เราจะมาเรียนรู้เรื่องคอมพิวเตอร์กันนะครับ คอมพิวเตอร์เป็นเครื่องมือที่มหัศจรรย์มากเลย! คอมพิวเตอร์ช่วยให้เราทำงานต่างๆ ได้ง่ายขึ้น เช่น เขียนงาน พิมพ์หนังสือ วาดภาพ ฟังเพลง ดูวิดีโอ เล่นเกม และเชื่อมต่อกับเพื่อนๆ ผ่านอินเทอร์เน็ต มาเริ่มเรียนรู้ไปด้วยกันเถอะ!')" 
+                                    class="speech-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center space-x-2">
+                                <span class="speech-icon">🔊</span>
+                                <span class="speech-text">ฟังเสียงบรรยาย</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="startLesson(1)" class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:from-green-500 hover:to-blue-600 transform hover:scale-105 transition-all duration-300 pulse-glow">
+                        เริ่มเรียนกันเลย! 🚀
+                    </button>
+                </div>
+            </div>
+
+            <div id="lesson-content-1" class="hidden">
+                <div class="bg-white rounded-3xl p-8 mb-8 shadow-xl slide-in">
+                    <h3 class="text-3xl font-bold text-center text-gray-800 mb-6">
+                        คอมพิวเตอร์คือ... 🤔
+                    </h3>
+                    <div class="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-6 mb-6">
+                        <p class="text-2xl text-center text-gray-800 font-semibold">
+                            เครื่องมือที่ช่วยให้เราทำงานได้ง่ายขึ้น! ✨
+                        </p>
+                        <div class="mt-4 flex justify-center">
+                            <button onclick="toggleSpeech('คอมพิวเตอร์คือเครื่องมือที่ช่วยให้เราทำงานได้ง่ายขึ้น คอมพิวเตอร์สามารถช่วยเราในหลายๆ เรื่อง เช่น เขียนงาน พิมพ์หนังสือ ทำการบ้าน เขียนเรื่องราว วาดภาพ ฟังเพลง ดูวิดีโอ สร้างสรรค์ผลงานศิลปะ เล่นเกมการศึกษา เกมสนุกๆ และเชื่อมต่อกับเพื่อนๆ ผ่านอินเทอร์เน็ต มาดูตัวอย่างการใช้งานคอมพิวเตอร์กันเถอะ')" 
+                                    class="speech-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center space-x-2">
+                                <span class="speech-icon">🔊</span>
+                                <span class="speech-text">ฟังเสียงบรรยาย</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-pink-100 rounded-2xl p-6 text-center hover:bg-pink-200 transition-colors duration-300 cursor-pointer" onclick="showActivity('writing')">
+                            <div class="text-6xl mb-4">📝</div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-2">เขียนงาน พิมพ์หนังสือ</h4>
+                            <p class="text-gray-600">ทำการบ้าน เขียนเรื่องราว</p>
+                        </div>
+                        
+                        <div class="bg-green-100 rounded-2xl p-6 text-center hover:bg-green-200 transition-colors duration-300 cursor-pointer" onclick="showActivity('creative')">
+                            <div class="text-6xl mb-4">🎨</div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-2">วาดภาพ ฟังเพลง ดูวิดีโอ</h4>
+                            <p class="text-gray-600">สร้างสรรค์ผลงานศิลปะ</p>
+                        </div>
+                        
+                        <div class="bg-blue-100 rounded-2xl p-6 text-center hover:bg-blue-200 transition-colors duration-300 cursor-pointer" onclick="showActivity('games')">
+                            <div class="text-6xl mb-4">🎮</div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-2">เล่นเกม</h4>
+                            <p class="text-gray-600">เกมการศึกษา เกมสนุกๆ</p>
+                        </div>
+                        
+                        <div class="bg-purple-100 rounded-2xl p-6 text-center hover:bg-purple-200 transition-colors duration-300 cursor-pointer" onclick="showActivity('internet')">
+                            <div class="text-6xl mb-4">🌐</div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-2">เชื่อมต่อกับเพื่อน</h4>
+                            <p class="text-gray-600">ผ่านอินเทอร์เน็ต</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lesson 2: Computer Parts -->
+        <div id="lesson-2" class="lesson-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold text-white mb-4 bounce-in">รู้จักอุปกรณ์คอมพิวเตอร์ ⌨️</h2>
+                <div class="bg-white rounded-full px-6 py-3 inline-block shadow-lg">
+                    <p class="text-lg text-gray-700">มาดูว่าคอมพิวเตอร์มีส่วนประกอบอะไรบ้าง!</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-8 mb-8 shadow-xl">
+                <div class="text-center mb-8">
+                    <div class="w-24 h-24 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 float">
+                        🤖
+                    </div>
+                    <p class="text-xl text-gray-800">มาทำความรู้จักกับเพื่อนๆ ของคอมพิวเตอร์กันเถอะ!</p>
+                    <div class="mt-4 flex justify-center">
+                        <button onclick="toggleSpeech('สวัสดีครับ! ตอนนี้เราจะมาเรียนรู้เรื่องอุปกรณ์คอมพิวเตอร์กันนะครับ คอมพิวเตอร์มีส่วนประกอบหลายอย่าง แต่ละอย่างมีหน้าที่ที่แตกต่างกัน มาทำความรู้จักกับเพื่อนๆ ของคอมพิวเตอร์กันเถอะ! มีหน้าจอที่แสดงภาพและวิดีโอ เมาส์ที่ใช้คลิกและเลือกสิ่งต่างๆ แป้นพิมพ์ที่ใช้พิมพ์ข้อความ ซีพียูที่เป็นสมองของคอมพิวเตอร์ ลำโพงที่ออกเสียงเพลงและเสียงต่างๆ และปุ่มเปิดปิดที่ใช้เปิดและปิดเครื่อง ลองคลิกดูแต่ละอุปกรณ์เพื่อเรียนรู้เพิ่มเติมนะครับ')" 
+                                class="speech-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center space-x-2">
+                            <span class="speech-icon">🔊</span>
+                            <span class="speech-text">ฟังเสียงบรรยาย</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="computer-part bg-blue-100 rounded-2xl p-6 text-center hover:bg-blue-200 transition-all duration-300 cursor-pointer" onclick="learnPart('monitor')">
+                        <div class="text-6xl mb-4">🖥️</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-2">หน้าจอ (Monitor)</h4>
+                        <p class="text-gray-600">แสดงผลภาพและวิดีโอ</p>
+                    </div>
+
+                    <div class="computer-part bg-green-100 rounded-2xl p-6 text-center hover:bg-green-200 transition-all duration-300 cursor-pointer" onclick="learnPart('mouse')">
+                        <div class="text-6xl mb-4">🖱️</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-2">เมาส์ (Mouse)</h4>
+                        <p class="text-gray-600">ใช้คลิกและเลือกสิ่งต่างๆ</p>
+                    </div>
+
+                    <div class="computer-part bg-purple-100 rounded-2xl p-6 text-center hover:bg-purple-200 transition-all duration-300 cursor-pointer" onclick="learnPart('keyboard')">
+                        <div class="text-6xl mb-4">⌨️</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-2">แป้นพิมพ์ (Keyboard)</h4>
+                        <p class="text-gray-600">ใช้พิมพ์ข้อความ</p>
+                    </div>
+
+                    <div class="computer-part bg-orange-100 rounded-2xl p-6 text-center hover:bg-orange-200 transition-all duration-300 cursor-pointer" onclick="learnPart('cpu')">
+                        <div class="text-6xl mb-4">🧠</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-2">ซีพียู (CPU)</h4>
+                        <p class="text-gray-600">สมองของคอมพิวเตอร์</p>
+                    </div>
+
+                    <div class="computer-part bg-pink-100 rounded-2xl p-6 text-center hover:bg-pink-200 transition-all duration-300 cursor-pointer" onclick="learnPart('speaker')">
+                        <div class="text-6xl mb-4">🔊</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-2">ลำโพง (Speaker)</h4>
+                        <p class="text-gray-600">ออกเสียงเพลงและเสียงต่างๆ</p>
+                    </div>
+
+                    <div class="computer-part bg-yellow-100 rounded-2xl p-6 text-center hover:bg-yellow-200 transition-all duration-300 cursor-pointer" onclick="learnPart('power')">
+                        <div class="text-6xl mb-4">🔌</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-2">ปุ่มเปิด-ปิด</h4>
+                        <p class="text-gray-600">ใช้เปิดและปิดเครื่อง</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="startPartQuiz()" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition-all duration-300">
+                        ทดสอบความรู้! 🧠
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lesson 3: Hardware vs Software -->
+        <div id="lesson-3" class="lesson-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold text-white mb-4 bounce-in">ฮาร์ดแวร์ vs ซอฟต์แวร์ 🔧</h2>
+                <div class="bg-white rounded-full px-6 py-3 inline-block shadow-lg">
+                    <p class="text-lg text-gray-700">เรียนรู้ความแตกต่างระหว่างของจับได้และของจับไม่ได้!</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-8 mb-8 shadow-xl">
+                <div class="text-center mb-6">
+                    <button onclick="toggleSpeech('สวัสดีครับ! ตอนนี้เราจะมาเรียนรู้ความแตกต่างระหว่างฮาร์ดแวร์และซอฟต์แวร์กันนะครับ ฮาร์ดแวร์คือส่วนประกอบของคอมพิวเตอร์ที่เราสามารถจับต้องได้ เช่น หน้าจอ แป้นพิมพ์ เมาส์ ส่วนซอฟต์แวร์คือโปรแกรมต่างๆ ที่เราจับไม่ได้ แต่ใช้งานได้ เช่น เกม โปรแกรมวาดรูป เว็บเบราว์เซอร์ มาดูตัวอย่างกันเถอะ')" 
+                            class="speech-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center space-x-2 mb-6">
+                        <span class="speech-icon">🔊</span>
+                        <span class="speech-text">ฟังเสียงบรรยาย</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Hardware Section -->
+                    <div class="bg-blue-50 rounded-2xl p-6">
+                        <div class="text-center mb-6">
+                            <div class="text-6xl mb-4">🔧</div>
+                            <h3 class="text-2xl font-bold text-blue-800">ฮาร์ดแวร์ (Hardware)</h3>
+                            <p class="text-blue-600 mt-2">ของที่จับต้องได้ 👋</p>
+                        </div>
+                        
+                        <div class="space-y-4" id="hardware-items">
+                            <div class="hardware-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-blue-100 transition-colors duration-300" onclick="selectItem('hardware', this)">
+                                <div class="text-3xl">🖥️</div>
+                                <div>
+                                    <div class="font-semibold">หน้าจอ</div>
+                                    <div class="text-sm text-gray-600">จับต้องได้</div>
+                                </div>
+                            </div>
+                            <div class="hardware-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-blue-100 transition-colors duration-300" onclick="selectItem('hardware', this)">
+                                <div class="text-3xl">⌨️</div>
+                                <div>
+                                    <div class="font-semibold">แป้นพิมพ์</div>
+                                    <div class="text-sm text-gray-600">จับต้องได้</div>
+                                </div>
+                            </div>
+                            <div class="hardware-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-blue-100 transition-colors duration-300" onclick="selectItem('hardware', this)">
+                                <div class="text-3xl">🖱️</div>
+                                <div>
+                                    <div class="font-semibold">เมาส์</div>
+                                    <div class="text-sm text-gray-600">จับต้องได้</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Software Section -->
+                    <div class="bg-green-50 rounded-2xl p-6">
+                        <div class="text-center mb-6">
+                            <div class="text-6xl mb-4">💻</div>
+                            <h3 class="text-2xl font-bold text-green-800">ซอฟต์แวร์ (Software)</h3>
+                            <p class="text-green-600 mt-2">โปรแกรมที่จับไม่ได้ 👻</p>
+                        </div>
+                        
+                        <div class="space-y-4" id="software-items">
+                            <div class="software-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-green-100 transition-colors duration-300" onclick="selectItem('software', this)">
+                                <div class="text-3xl">🎮</div>
+                                <div>
+                                    <div class="font-semibold">เกม</div>
+                                    <div class="text-sm text-gray-600">โปรแกรม</div>
+                                </div>
+                            </div>
+                            <div class="software-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-green-100 transition-colors duration-300" onclick="selectItem('software', this)">
+                                <div class="text-3xl">🎨</div>
+                                <div>
+                                    <div class="font-semibold">โปรแกรมวาดรูป</div>
+                                    <div class="text-sm text-gray-600">โปรแกรม</div>
+                                </div>
+                            </div>
+                            <div class="software-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-green-100 transition-colors duration-300" onclick="selectItem('software', this)">
+                                <div class="text-3xl">🌐</div>
+                                <div>
+                                    <div class="font-semibold">เว็บเบราว์เซอร์</div>
+                                    <div class="text-sm text-gray-600">โปรแกรม</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="startSortingGame()" class="bg-gradient-to-r from-blue-500 to-green-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:from-blue-600 hover:to-green-600 transform hover:scale-105 transition-all duration-300">
+                        เล่นเกมแยกประเภท! 🎯
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lesson 4: Safe Power On/Off -->
+        <div id="lesson-4" class="lesson-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold text-white mb-4 bounce-in">เปิด-ปิดคอมให้ปลอดภัย ⚡</h2>
+                <div class="bg-white rounded-full px-6 py-3 inline-block shadow-lg">
+                    <p class="text-lg text-gray-700">เรียนรู้วิธีเปิดปิดคอมพิวเตอร์อย่างถูกต้อง!</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-8 mb-8 shadow-xl">
+                <div class="text-center mb-6">
+                    <button onclick="toggleSpeech('สวัสดีครับ! ตอนนี้เราจะมาเรียนรู้วิธีเปิดและปิดคอมพิวเตอร์อย่างถูกต้องและปลอดภัยกันนะครับ การเปิดปิดเครื่องอย่างถูกวิธีเป็นสิ่งสำคัญมาก เพราะจะช่วยให้คอมพิวเตอร์ทำงานได้นานและไม่เสียหาย สำหรับการเปิดเครื่อง เราต้องเสียบปลั๊กไฟให้แน่นและปลอดภัย จากนั้นเปิดสวิตช์ไฟที่ปลั๊กหรือเครื่อง แล้วกดปุ่มพาวเวอร์เบาๆ ครั้งเดียว สำหรับการปิดเครื่อง เราต้องบันทึกงานทั้งหมดก่อน จากนั้นกดสตาร์ทเมนู และเลือกชัทดาวน์ รอให้เครื่องปิดเอง อย่าดึงปลั๊กออกทันทีหรือกดปุ่มพาวเวอร์ค้างนานนะครับ')" 
+                            class="speech-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center space-x-2 mb-6">
+                        <span class="speech-icon">🔊</span>
+                        <span class="speech-text">ฟังเสียงบรรยาย</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Power On Section -->
+                    <div class="bg-green-50 rounded-2xl p-6">
+                        <div class="text-center mb-6">
+                            <div class="text-6xl mb-4">🟢</div>
+                            <h3 class="text-2xl font-bold text-green-800">วิธีเปิดเครื่อง</h3>
+                        </div>
+                        
+                        <div class="space-y-4" id="power-on-steps">
+                            <div class="step-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-green-100 transition-colors duration-300" onclick="highlightStep(1)">
+                                <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
+                                <div>
+                                    <div class="font-semibold">เสียบปลั๊กไฟ</div>
+                                    <div class="text-sm text-gray-600">ให้แน่นและปลอดภัย 🔌</div>
+                                </div>
+                            </div>
+                            <div class="step-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-green-100 transition-colors duration-300" onclick="highlightStep(2)">
+                                <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold">2</div>
+                                <div>
+                                    <div class="font-semibold">เปิดสวิตช์ไฟ</div>
+                                    <div class="text-sm text-gray-600">ที่ปลั๊กหรือเครื่อง 🔘</div>
+                                </div>
+                            </div>
+                            <div class="step-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-green-100 transition-colors duration-300" onclick="highlightStep(3)">
+                                <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold">3</div>
+                                <div>
+                                    <div class="font-semibold">กดปุ่ม Power</div>
+                                    <div class="text-sm text-gray-600">กดเบาๆ ครั้งเดียว ⚡</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Power Off Section -->
+                    <div class="bg-red-50 rounded-2xl p-6">
+                        <div class="text-center mb-6">
+                            <div class="text-6xl mb-4">🔴</div>
+                            <h3 class="text-2xl font-bold text-red-800">วิธีปิดเครื่อง</h3>
+                        </div>
+                        
+                        <div class="space-y-4" id="power-off-steps">
+                            <div class="step-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-red-100 transition-colors duration-300" onclick="highlightStep(4)">
+                                <div class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
+                                <div>
+                                    <div class="font-semibold">บันทึกงานทั้งหมด</div>
+                                    <div class="text-sm text-gray-600">อย่าลืมเซฟไฟล์ 💾</div>
+                                </div>
+                            </div>
+                            <div class="step-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-red-100 transition-colors duration-300" onclick="highlightStep(5)">
+                                <div class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">2</div>
+                                <div>
+                                    <div class="font-semibold">กด Start Menu</div>
+                                    <div class="text-sm text-gray-600">หาปุ่ม Start 🏠</div>
+                                </div>
+                            </div>
+                            <div class="step-item bg-white rounded-xl p-4 flex items-center space-x-4 cursor-pointer hover:bg-red-100 transition-colors duration-300" onclick="highlightStep(6)">
+                                <div class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">3</div>
+                                <div>
+                                    <div class="font-semibold">เลือก Shut Down</div>
+                                    <div class="text-sm text-gray-600">รอให้ปิดเอง 😴</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-yellow-100 rounded-2xl p-6">
+                    <h4 class="text-xl font-bold text-yellow-800 mb-4 text-center">⚠️ ข้อควรระวัง</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white rounded-xl p-4">
+                            <div class="text-3xl mb-2">❌</div>
+                            <div class="font-semibold text-red-600">อย่าทำ!</div>
+                            <div class="text-sm">ดึงปลั๊กออกทันที</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4">
+                            <div class="text-3xl mb-2">❌</div>
+                            <div class="font-semibold text-red-600">อย่าทำ!</div>
+                            <div class="text-sm">กดปุ่ม Power ค้างนาน</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="startPowerSequence()" class="bg-gradient-to-r from-green-500 to-red-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:from-green-600 hover:to-red-600 transform hover:scale-105 transition-all duration-300">
+                        ฝึกเปิด-ปิดเครื่อง! 🎮
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lesson 5: Proper Sitting Posture -->
+        <div id="lesson-5" class="lesson-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold text-white mb-4 bounce-in">ท่านั่งที่ถูกต้อง 🪑</h2>
+                <div class="bg-white rounded-full px-6 py-3 inline-block shadow-lg">
+                    <p class="text-lg text-gray-700">เรียนรู้วิธีนั่งใช้คอมพิวเตอร์ให้สุขภาพดี!</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-8 mb-8 shadow-xl">
+                <div class="text-center mb-6">
+                    <button onclick="toggleSpeech('สวัสดีครับ! ตอนนี้เราจะมาเรียนรู้เรื่องท่านั่งที่ถูกต้องเมื่อใช้คอมพิวเตอร์กันนะครับ ท่านั่งที่ถูกต้องเป็นสิ่งสำคัญมากเพื่อสุขภาพของเรา ท่านั่งที่ถูกต้องคือ หลังตรง ไม่โค้งหลัง ไม่เอียง นั่งห่างจากจอประมาณหนึ่งฟุตหรือสามสิบเซนติเมตร เท้าแตะพื้นหรือวางบนที่พักเท้า มือวางสบายบนคีย์บอร์ดและเมาส์ ส่วนท่านั่งที่ผิดคือ นั่งชิดจอมากเกินไปจะทำให้ตาเสีย โค้งหลังเอียงตัวจะทำให้ปวดหลัง นั่งนานเกินไปโดยไม่พักสายตา และเท้าห้อยไม่มีที่พัก อย่าลืมพักยี่สิบนาทีทุกหนึ่งชั่วโมง พักสายตามองไกลบ้าง และยืดเส้นยืดสายเคลื่อนไหวร่างกายนะครับ')" 
+                            class="speech-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center space-x-2 mb-6">
+                        <span class="speech-icon">🔊</span>
+                        <span class="speech-text">ฟังเสียงบรรยาย</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Correct Posture -->
+                    <div class="bg-green-50 rounded-2xl p-6">
+                        <div class="text-center mb-6">
+                            <div class="text-6xl mb-4">✅</div>
+                            <h3 class="text-2xl font-bold text-green-800">ท่านั่งที่ถูกต้อง</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="posture-tip bg-white rounded-xl p-4 flex items-center space-x-4">
+                                <div class="text-3xl">🏃‍♂️</div>
+                                <div>
+                                    <div class="font-semibold">หลังตรง</div>
+                                    <div class="text-sm text-gray-600">ไม่โค้งหลัง ไม่เอียง</div>
+                                </div>
+                            </div>
+                            <div class="posture-tip bg-white rounded-xl p-4 flex items-center space-x-4">
+                                <div class="text-3xl">👀</div>
+                                <div>
+                                    <div class="font-semibold">ห่างจากจอ 1 ฟุต</div>
+                                    <div class="text-sm text-gray-600">ประมาณ 30 เซนติเมตร</div>
+                                </div>
+                            </div>
+                            <div class="posture-tip bg-white rounded-xl p-4 flex items-center space-x-4">
+                                <div class="text-3xl">🦵</div>
+                                <div>
+                                    <div class="font-semibold">เท้าแตะพื้น</div>
+                                    <div class="text-sm text-gray-600">หรือวางบนที่พักเท้า</div>
+                                </div>
+                            </div>
+                            <div class="posture-tip bg-white rounded-xl p-4 flex items-center space-x-4">
+                                <div class="text-3xl">🤲</div>
+                                <div>
+                                    <div class="font-semibold">มือวางสบาย</div>
+                                    <div class="text-sm text-gray-600">บนคีย์บอร์ดและเมาส์</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wrong Posture -->
+                    <div class="bg-red-50 rounded-2xl p-6">
+                        <div class="text-center mb-6">
+                            <div class="text-6xl mb-4">❌</div>
+                            <h3 class="text-2xl font-bold text-red-800">ท่านั่งที่ผิด</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="posture-wrong bg-white rounded-xl p-4 flex items-center space-x-4">
+                                <div class="text-3xl">😵</div>
+                                <div>
+                                    <div class="font-semibold">นั่งชิดจอมาก</div>
+                                    <div class="text-sm text-gray-600">ทำให้ตาเสีย</div>
+                                </div>
+                            </div>
+                            <div class="posture-wrong bg-white rounded-xl p-4 flex items-center space-x-4">
+                                <div class="text-3xl">🤕</div>
+                                <div>
+                                    <div class="font-semibold">โค้งหลัง เอียงตัว</div>
+                                    <div class="text-sm text-gray-600">ทำให้ปวดหลัง</div>
+                                </div>
+                            </div>
+                            <div class="posture-wrong bg-white rounded-xl p-4 flex items-center space-x-4">
+                                <div class="text-3xl">😴</div>
+                                <div>
+                                    <div class="font-semibold">นั่งนานเกินไป</div>
+                                    <div class="text-sm text-gray-600">ไม่พักสายตา</div>
+                                </div>
+                            </div>
+                            <div class="posture-wrong bg-white rounded-xl p-4 flex items-center space-x-4">
+                                <div class="text-3xl">🦵</div>
+                                <div>
+                                    <div class="font-semibold">เท้าห้อย</div>
+                                    <div class="text-sm text-gray-600">ไม่มีที่พัก</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-blue-100 rounded-2xl p-6">
+                    <h4 class="text-xl font-bold text-blue-800 mb-4 text-center">💡 เคล็ดลับสุขภาพ</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white rounded-xl p-4 text-center">
+                            <div class="text-3xl mb-2">⏰</div>
+                            <div class="font-semibold">พัก 20 นาที</div>
+                            <div class="text-sm">ทุกๆ 1 ชั่วโมง</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 text-center">
+                            <div class="text-3xl mb-2">👁️</div>
+                            <div class="font-semibold">พักสายตา</div>
+                            <div class="text-sm">มองไกลบ้าง</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 text-center">
+                            <div class="text-3xl mb-2">🤸‍♂️</div>
+                            <div class="font-semibold">ยืดเส้นยืดสาย</div>
+                            <div class="text-sm">เคลื่อนไหวร่างกาย</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="startPostureGame()" class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:from-green-600 hover:to-blue-600 transform hover:scale-105 transition-all duration-300">
+                        เกมท่านั่งถูกผิด! 🎯
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Test -->
+        <div id="final-test" class="lesson-content hidden">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold text-white mb-4 bounce-in">แบบทดสอบท้ายหน่วย 🏆</h2>
+                <div class="bg-white rounded-full px-6 py-3 inline-block shadow-lg">
+                    <p class="text-lg text-gray-700">มาทดสอบความรู้ที่เรียนมาทั้งหมดกัน!</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-8 mb-8 shadow-xl">
+                <div class="text-center mb-6">
+                    <button onclick="toggleSpeech('สวัสดีครับ! ตอนนี้เราจะมาทำแบบทดสอบท้ายหน่วยกันนะครับ แบบทดสอบนี้จะช่วยให้เราทราบว่าเราเข้าใจเนื้อหาที่เรียนมาแค่ไหน จะมีคำถามทั้งหมดห้าข้อ เกี่ยวกับคอมพิวเตอร์คืออะไร อุปกรณ์คอมพิวเตอร์ ฮาร์ดแวร์และซอฟต์แวร์ วิธีเปิดปิดเครื่องที่ถูกต้อง และท่านั่งที่ถูกต้อง ให้อ่านคำถามและตัวเลือกอย่างละเอียด แล้วเลือกคำตobที่ถูกต้องที่สุดนะครับ พร้อมแล้วเริ่มทำแบบทดสอบกันเลย!')" 
+                            class="speech-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center space-x-2 mb-6">
+                        <span class="speech-icon">🔊</span>
+                        <span class="speech-text">ฟังเสียงบรรยาย</span>
+                    </button>
+                </div>
+                <div id="final-quiz-container">
+                    <!-- Quiz questions will be generated here -->
+                </div>
+                
+                <div id="final-result" class="hidden text-center">
+                    <div class="text-8xl mb-4">🎉</div>
+                    <h3 class="text-3xl font-bold text-green-800 mb-4">ยินดีด้วย!</h3>
+                    <p class="text-xl text-gray-700 mb-6">คุณผ่านการทดสอบแล้ว!</p>
+                    <div class="bg-yellow-100 rounded-2xl p-6 mb-6">
+                        <p class="text-lg">คะแนนของคุณ: <span id="final-score" class="font-bold text-2xl text-blue-600"></span></p>
+                    </div>
+                    <button onclick="generateCertificate()" class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-8 py-4 rounded-full text-xl font-semibold hover:from-yellow-500 hover:to-orange-600 transform hover:scale-105 transition-all duration-300">
+                        รับใบประกาศนียบัตร! 📜
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Activity Section -->
+        <div id="activity-section" class="bg-white rounded-3xl p-8 mb-8 shadow-xl hidden">
+            <h3 class="text-3xl font-bold text-center text-gray-800 mb-6">
+                กิจกรรมสนุกๆ! 🎯
+            </h3>
+            <div id="activity-content" class="text-center">
+                <!-- Activity content will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex justify-between items-center mt-8">
+            <button id="prev-btn" onclick="previousLesson()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-full font-semibold transition-colors duration-300 hidden">
+                ← บทก่อนหน้า
+            </button>
+            <div class="flex-1"></div>
+            <button id="next-btn" onclick="nextLesson()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition-colors duration-300 hidden">
+                บทต่อไป →
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="bg-white rounded-full p-2 shadow-lg mt-8">
+            <div class="bg-gradient-to-r from-green-400 to-blue-500 h-4 rounded-full transition-all duration-500" id="progress-bar" style="width: 20%"></div>
+        </div>
+        <p class="text-center text-white mt-2 font-semibold" id="progress-text">ความคืบหน้า: บทเรียนที่ 1 จาก 5</p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow-lg rounded-t-3xl mx-4 mt-8 p-6">
+        <div class="text-center">
+            <div class="flex items-center justify-center space-x-2 mb-2">
+                <span class="text-2xl">💻</span>
+                <span class="text-gray-600 font-medium">©developed by Tle Narongphisit | CTTC19 @ CPD</span>
+                <span class="text-2xl">🎓</span>
+            </div>
+            <div class="text-sm text-gray-500">
+                ระบบการเรียนรู้คอมพิวเตอร์สำหรับเด็ก
+            </div>
+        </div>
+    </footer>
+
+    <!-- Certificate Modal -->
+    <div id="certificate-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-3xl p-8 max-w-2xl mx-4 text-center">
+            <div class="border-4 border-yellow-400 rounded-2xl p-8 bg-gradient-to-br from-yellow-50 to-orange-50">
+                <div class="text-6xl mb-4">🏆</div>
+                <h2 class="text-3xl font-bold text-yellow-800 mb-4">ใบประกาศนียบัตร</h2>
+                <p class="text-xl text-gray-700 mb-4">ขอแสดงความยินดีกับ</p>
+                <div class="bg-white rounded-xl p-4 mb-4">
+                    <input type="text" id="student-name" placeholder="พิมพ์ชื่อของคุณ" class="text-2xl font-bold text-center w-full border-b-2 border-yellow-400 focus:outline-none">
+                </div>
+                <p class="text-lg text-gray-700 mb-4">ที่ผ่านการเรียนรู้</p>
+                <p class="text-xl font-bold text-blue-800 mb-4">"รู้จักโลกคอมพิวเตอร์"</p>
+                <p class="text-gray-600 mb-6">ด้วยความเป็นเลิศ</p>
+                <div class="flex justify-center space-x-4">
+                    <button onclick="downloadCertificate()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition-colors duration-300">
+                        บันทึกใบประกาศ 💾
+                    </button>
+                    <button onclick="closeCertificate()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-full font-semibold transition-colors duration-300">
+                        ปิด
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLesson = 1;
+        let correctAnswers = 0;
+        let totalQuestions = 0;
+        let lessonProgress = {1: false, 2: false, 3: false, 4: false, 5: false};
+        let finalQuizAnswers = [];
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+        let isPlaying = false;
+
+        // Text-to-Speech Functions
+        function speakText(text, callback = null) {
+            // Stop any current speech
+            if (currentUtterance) {
+                speechSynthesis.cancel();
+            }
+            
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.lang = 'th-TH';
+            currentUtterance.rate = 0.8;
+            currentUtterance.pitch = 1.1;
+            currentUtterance.volume = 0.8;
+            
+            currentUtterance.onstart = function() {
+                isPlaying = true;
+                updateSpeechButton(true);
+            };
+            
+            currentUtterance.onend = function() {
+                isPlaying = false;
+                updateSpeechButton(false);
+                if (callback) callback();
+            };
+            
+            currentUtterance.onerror = function() {
+                isPlaying = false;
+                updateSpeechButton(false);
+            };
+            
+            speechSynthesis.speak(currentUtterance);
+        }
+
+        function stopSpeech() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+                isPlaying = false;
+                updateSpeechButton(false);
+            }
+        }
+
+        function toggleSpeech(text) {
+            if (isPlaying) {
+                stopSpeech();
+            } else {
+                speakText(text);
+            }
+        }
+
+        function updateSpeechButton(playing) {
+            const buttons = document.querySelectorAll('.speech-btn');
+            buttons.forEach(btn => {
+                const icon = btn.querySelector('.speech-icon');
+                const text = btn.querySelector('.speech-text');
+                if (playing) {
+                    icon.textContent = '⏸️';
+                    text.textContent = 'หยุดเสียง';
+                    btn.classList.add('bg-red-500', 'hover:bg-red-600');
+                    btn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                } else {
+                    icon.textContent = '🔊';
+                    text.textContent = 'ฟังเสียงบรรยาย';
+                    btn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                    btn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                }
+            });
+        }
+
+        function createSpeechButton(text, additionalClasses = '') {
+            return `
+                <button onclick="toggleSpeech('${text.replace(/'/g, "\\'")}'); event.stopPropagation();" 
+                        class="speech-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center space-x-2 ${additionalClasses}">
+                    <span class="speech-icon">🔊</span>
+                    <span class="speech-text">ฟังเสียงบรรยาย</span>
+                </button>
+            `;
+        }
+
+        // Lesson Management
+        function showLessonMenu() {
+            document.getElementById('lesson-menu').classList.remove('hidden');
+        }
+
+        function closeLessonMenu() {
+            document.getElementById('lesson-menu').classList.add('hidden');
+        }
+
+        function goToLesson(lessonNum) {
+            currentLesson = lessonNum;
+            showLesson(lessonNum);
+            closeLessonMenu();
+            updateProgress();
+            updateNavigation();
+        }
+
+        function showLesson(lessonNum) {
+            // Hide all lessons
+            document.querySelectorAll('.lesson-content').forEach(lesson => {
+                lesson.classList.add('hidden');
+            });
+            
+            // Show selected lesson
+            document.getElementById(`lesson-${lessonNum}`).classList.remove('hidden');
+            
+            // Update lesson indicator
+            document.getElementById('lesson-indicator').textContent = `บทเรียนที่ ${lessonNum}`;
+            
+            // Special case for final test
+            if (lessonNum === 'final') {
+                document.getElementById('final-test').classList.remove('hidden');
+                document.getElementById('lesson-indicator').textContent = 'แบบทดสอบท้ายหน่วย';
+                generateFinalQuiz();
+            }
+        }
+
+        function startLesson(lessonNum) {
+            document.getElementById(`intro-section-${lessonNum}`).style.display = 'none';
+            document.getElementById(`lesson-content-${lessonNum}`).classList.remove('hidden');
+            updateProgress();
+            
+            // Auto-play narration for lesson content
+            setTimeout(() => {
+                if (lessonNum === 1) {
+                    speakText('คอมพิวเตอร์คือเครื่องมือที่ช่วยให้เราทำงานได้ง่ายขึ้น คอมพิวเตอร์สามารถช่วยเราในหลายๆ เรื่อง เช่น เขียนงาน พิมพ์หนังสือ ทำการบ้าน เขียนเรื่องราว วาดภาพ ฟังเพลง ดูวิดีโอ สร้างสรรค์ผลงานศิลปะ เล่นเกมการศึกษา เกมสนุกๆ และเชื่อมต่อกับเพื่อนๆ ผ่านอินเทอร์เน็ต มาดูตัวอย่างการใช้งานคอมพิวเตอร์กันเถอะ');
+                }
+            }, 1000);
+        }
+
+        function nextLesson() {
+            if (currentLesson < 5) {
+                currentLesson++;
+                goToLesson(currentLesson);
+            } else {
+                showFinalTest();
+            }
+        }
+
+        function previousLesson() {
+            if (currentLesson > 1) {
+                currentLesson--;
+                goToLesson(currentLesson);
+            }
+        }
+
+        function showFinalTest() {
+            currentLesson = 'final';
+            showLesson('final');
+            updateNavigation();
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            if (currentLesson === 1) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+            
+            if (currentLesson === 5 || currentLesson === 'final') {
+                nextBtn.classList.add('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+            }
+        }
+
+        function updateProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            let percentage = 0;
+            let text = '';
+            
+            if (currentLesson === 'final') {
+                percentage = 100;
+                text = 'แบบทดสอบท้ายหน่วย';
+            } else {
+                percentage = (currentLesson / 5) * 100;
+                text = `ความคืบหน้า: บทเรียนที่ ${currentLesson} จาก 5`;
+            }
+            
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = text;
+        }
+
+        // Activity Functions
+        function showActivity(type) {
+            const activitySection = document.getElementById('activity-section');
+            const activityContent = document.getElementById('activity-content');
+            
+            let content = '';
+            
+            switch(type) {
+                case 'writing':
+                    content = `
+                        <div class="bg-pink-100 rounded-2xl p-6">
+                            <h4 class="text-2xl font-bold mb-4">✍️ ลองพิมพ์ข้อความ!</h4>
+                            <textarea class="w-full p-4 border-2 border-pink-300 rounded-xl text-lg" rows="4" placeholder="พิมพ์ข้อความที่คุณอยากเขียน..."></textarea>
+                            <p class="mt-4 text-gray-600">คอมพิวเตอร์ช่วยให้เราพิมพ์ข้อความได้เร็วและสวยงาม!</p>
+                        </div>
+                    `;
+                    break;
+                case 'creative':
+                    content = `
+                        <div class="bg-green-100 rounded-2xl p-6">
+                            <h4 class="text-2xl font-bold mb-4">🎨 วาดภาพดิจิทัล!</h4>
+                            <canvas id="drawingCanvas" width="400" height="200" class="border-4 border-green-300 rounded-xl bg-white mx-auto block cursor-crosshair"></canvas>
+                            <div class="mt-4 space-x-2">
+                                <button onclick="changeColor('red')" class="w-8 h-8 bg-red-500 rounded-full hover:scale-110 transition-transform"></button>
+                                <button onclick="changeColor('blue')" class="w-8 h-8 bg-blue-500 rounded-full hover:scale-110 transition-transform"></button>
+                                <button onclick="changeColor('green')" class="w-8 h-8 bg-green-500 rounded-full hover:scale-110 transition-transform"></button>
+                                <button onclick="changeColor('purple')" class="w-8 h-8 bg-purple-500 rounded-full hover:scale-110 transition-transform"></button>
+                                <button onclick="clearCanvas()" class="px-4 py-2 bg-gray-500 text-white rounded-full hover:bg-gray-600 transition-colors">ลบ</button>
+                            </div>
+                            <p class="mt-4 text-gray-600">คอมพิวเตอร์ช่วยให้เราวาดภาพสีสวยได้!</p>
+                        </div>
+                    `;
+                    break;
+                case 'games':
+                    content = `
+                        <div class="bg-blue-100 rounded-2xl p-6">
+                            <h4 class="text-2xl font-bold mb-4">🎮 เกมจับคู่อุปกรณ์คอมพิวเตอร์!</h4>
+                            <div class="grid grid-cols-4 gap-2 max-w-md mx-auto" id="memory-game">
+                                <!-- Game cards will be generated here -->
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-gray-600">คะแนน: <span id="game-score" class="font-bold">0</span></p>
+                            </div>
+                            <p class="mt-4 text-gray-600">คอมพิวเตอร์ทำให้เราเล่นเกมสนุกๆ ได้!</p>
+                        </div>
+                    `;
+                    break;
+                case 'internet':
+                    content = `
+                        <div class="bg-purple-100 rounded-2xl p-6">
+                            <h4 class="text-2xl font-bold mb-4">🌐 ส่งข้อความหาเพื่อน!</h4>
+                            <div class="bg-white rounded-xl p-4 max-w-md mx-auto max-h-64 overflow-y-auto" id="chat-box">
+                                <div class="mb-4">
+                                    <div class="bg-blue-500 text-white p-3 rounded-xl mb-2 max-w-xs">
+                                        สวัสดีครับ! วันนี้เรียนอะไรบ้าง?
+                                    </div>
+                                    <div class="bg-gray-200 p-3 rounded-xl max-w-xs ml-auto">
+                                        เรียนเรื่องคอมพิวเตอร์ค่ะ สนุกมาก!
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex mt-4 max-w-md mx-auto">
+                                <input type="text" id="chat-input" class="flex-1 p-3 border-2 border-purple-300 rounded-l-xl" placeholder="พิมพ์ข้อความ..." onkeypress="if(event.key==='Enter') sendMessage()">
+                                <button onclick="sendMessage()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 rounded-r-xl transition-colors">ส่ง</button>
+                            </div>
+                            <p class="mt-4 text-gray-600">คอมพิวเตอร์ช่วยให้เราคุยกับเพื่อนได้ทุกที่!</p>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            activityContent.innerHTML = content;
+            activitySection.classList.remove('hidden');
+            
+            // Initialize specific activities
+            if (type === 'creative') {
+                initDrawing();
+            } else if (type === 'games') {
+                initMemoryGame();
+            }
+        }
+
+        // Drawing Activity
+        function initDrawing() {
+            const canvas = document.getElementById('drawingCanvas');
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let currentColor = 'black';
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            function startDrawing(e) {
+                isDrawing = true;
+                draw(e);
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = currentColor;
+                
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            }
+
+            function stopDrawing() {
+                isDrawing = false;
+                ctx.beginPath();
+            }
+
+            window.changeColor = function(color) {
+                currentColor = color;
+            };
+
+            window.clearCanvas = function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            };
+        }
+
+        // Memory Game
+        function initMemoryGame() {
+            const gameContainer = document.getElementById('memory-game');
+            const emojis = ['🖥️', '🖱️', '⌨️', '📱', '🖥️', '🖱️', '⌨️', '📱'];
+            const shuffled = emojis.sort(() => Math.random() - 0.5);
+            
+            gameContainer.innerHTML = '';
+            
+            shuffled.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-blue-300 hover:bg-blue-400 w-16 h-16 rounded-xl flex items-center justify-center text-2xl cursor-pointer transition-all duration-300 transform hover:scale-105';
+                card.innerHTML = '❓';
+                card.onclick = () => flipCard(card, emoji);
+                gameContainer.appendChild(card);
+            });
+        }
+
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let gameScore = 0;
+
+        function flipCard(card, emoji) {
+            if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+                card.innerHTML = emoji;
+                card.classList.add('flipped', 'bg-yellow-300');
+                flippedCards.push({card, emoji});
+                
+                if (flippedCards.length === 2) {
+                    setTimeout(checkMatch, 1000);
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [first, second] = flippedCards;
+            
+            if (first.emoji === second.emoji) {
+                matchedPairs++;
+                gameScore += 10;
+                document.getElementById('game-score').textContent = gameScore;
+                
+                if (matchedPairs === 4) {
+                    setTimeout(() => {
+                        alert('🎉 เก่งมาก! คุณจับคู่ได้หมดแล้ว! คะแนน: ' + gameScore);
+                        lessonProgress[1] = true;
+                    }, 500);
+                }
+            } else {
+                first.card.innerHTML = '❓';
+                first.card.classList.remove('flipped', 'bg-yellow-300');
+                second.card.innerHTML = '❓';
+                second.card.classList.remove('flipped', 'bg-yellow-300');
+            }
+            
+            flippedCards = [];
+        }
+
+        // Chat Activity
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const chatBox = document.getElementById('chat-box');
+            const message = input.value.trim();
+            
+            if (message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'bg-green-200 p-3 rounded-xl max-w-xs ml-auto mb-2';
+                messageDiv.textContent = message;
+                chatBox.appendChild(messageDiv);
+                
+                input.value = '';
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+                // Auto reply
+                setTimeout(() => {
+                    const replies = [
+                        'เก่งมาก! เรียนรู้ได้เร็วจัง 👏',
+                        'คอมพิวเตอร์สนุกใช่ไหม? 😊',
+                        'มีคำถามอะไรถามได้นะ 🤔',
+                        'เรียนต่อไปเรื่องอะไรดี? 📚'
+                    ];
+                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                    
+                    const replyDiv = document.createElement('div');
+                    replyDiv.className = 'bg-blue-500 text-white p-3 rounded-xl max-w-xs mb-2';
+                    replyDiv.textContent = randomReply;
+                    chatBox.appendChild(replyDiv);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }, 1000);
+            }
+        }
+
+        // Lesson 2 Functions
+        function learnPart(partName) {
+            const parts = {
+                monitor: {
+                    title: 'หน้าจอ (Monitor)',
+                    description: 'หน้าจอคือส่วนที่แสดงภาพและข้อความให้เราเห็น เหมือนกับทีวี แต่เชื่อมต่อกับคอมพิวเตอร์',
+                    tips: ['ไม่ควรนั่งชิดจอเกินไป', 'ปรับความสว่างให้เหมาะสม', 'ทำความสะอาดด้วยผ้านุ่ม']
+                },
+                mouse: {
+                    title: 'เมาส์ (Mouse)',
+                    description: 'เมาส์ใช้สำหรับคลิก เลือก และเลื่อนสิ่งต่างๆ บนหน้าจอ มีปุ่มซ้าย ปุ่มขวา และล้อกลาง',
+                    tips: ['คลิกซ้าย = เลือก', 'คลิกขวา = เมนู', 'ล้อกลาง = เลื่อนหน้า']
+                },
+                keyboard: {
+                    title: 'แป้นพิมพ์ (Keyboard)',
+                    description: 'แป้นพิมพ์ใช้สำหรับพิมพ์ตัวอักษร ตัวเลข และสัญลักษณ์ต่างๆ มีปุ่มพิเศษหลายตัว',
+                    tips: ['Space = เว้นวรรค', 'Enter = ขึ้นบรรทัดใหม่', 'Backspace = ลบ']
+                },
+                cpu: {
+                    title: 'ซีพียู (CPU)',
+                    description: 'ซีพียูคือสมองของคอมพิวเตอร์ ทำหน้าที่คิดคำนวณและประมวลผลข้อมูลทั้งหมด',
+                    tips: ['อย่าปิดช่องระบายอากาศ', 'ไม่ควรเขย่าหรือกระแทก', 'ให้อากาศถ่ายเทได้ดี']
+                },
+                speaker: {
+                    title: 'ลำโพง (Speaker)',
+                    description: 'ลำโพงใช้สำหรับเล่นเสียงเพลง เสียงพูด และเสียงเอฟเฟกต์จากคอมพิวเตอร์',
+                    tips: ['ปรับระดับเสียงให้เหมาะสม', 'ไม่เปิดเสียงดังเกินไป', 'วางห่างจากน้ำ']
+                },
+                power: {
+                    title: 'ปุ่มเปิด-ปิด',
+                    description: 'ปุ่มเปิด-ปิดใช้สำหรับเปิดและปิดเครื่องคอมพิวเตอร์ ต้องใช้อย่างระมัดระวัง',
+                    tips: ['กดเบาๆ ครั้งเดียว', 'อย่ากดค้างนานโดยไม่จำเป็น', 'ปิดผ่าน Start Menu ก่อน']
+                }
+            };
+            
+            const part = parts[partName];
+            if (part) {
+                alert(`${part.title}\n\n${part.description}\n\nเคล็ดลับ:\n${part.tips.map(tip => `• ${tip}`).join('\n')}`);
+            }
+        }
+
+        function startPartQuiz() {
+            const questions = [
+                {
+                    question: 'อุปกรณ์ไหนที่ใช้แสดงภาพและข้อความ?',
+                    options: ['🖥️ หน้าจอ', '🖱️ เมาส์', '⌨️ แป้นพิมพ์', '🔊 ลำโพง'],
+                    correct: 0
+                },
+                {
+                    question: 'อุปกรณ์ไหนที่เรียกว่า "สมองของคอมพิวเตอร์"?',
+                    options: ['🖥️ หน้าจอ', '🧠 ซีพียู', '🖱️ เมาส์', '⌨️ แป้นพิมพ์'],
+                    correct: 1
+                },
+                {
+                    question: 'เมาส์ใช้ทำอะไร?',
+                    options: ['พิมพ์ข้อความ', 'เล่นเสียง', 'คลิกและเลือก', 'แสดงภาพ'],
+                    correct: 2
+                }
+            ];
+            
+            let currentQ = 0;
+            let score = 0;
+            
+            function showQuestion() {
+                if (currentQ < questions.length) {
+                    const q = questions[currentQ];
+                    const optionsHtml = q.options.map((option, index) => 
+                        `<button onclick="answerPartQuiz(${index})" class="block w-full bg-blue-100 hover:bg-blue-200 p-4 rounded-xl text-left mb-2 transition-colors duration-300">${option}</button>`
+                    ).join('');
+                    
+                    document.getElementById('activity-content').innerHTML = `
+                        <div class="bg-white rounded-2xl p-6">
+                            <h4 class="text-xl font-bold mb-4">คำถามที่ ${currentQ + 1} จาก ${questions.length}</h4>
+                            <p class="text-lg mb-6">${q.question}</p>
+                            <div class="max-w-md mx-auto">
+                                ${optionsHtml}
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-gray-600">คะแนน: ${score}/${questions.length}</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('activity-content').innerHTML = `
+                        <div class="bg-green-100 rounded-2xl p-6">
+                            <div class="text-6xl mb-4">🎉</div>
+                            <h4 class="text-2xl font-bold text-green-800 mb-4">เก่งมาก!</h4>
+                            <p class="text-lg">คะแนนของคุณ: ${score}/${questions.length}</p>
+                            <button onclick="document.getElementById('activity-section').classList.add('hidden')" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full">
+                                เสร็จแล้ว
+                            </button>
+                        </div>
+                    `;
+                    lessonProgress[2] = true;
+                }
+            }
+            
+            window.answerPartQuiz = function(selectedIndex) {
+                const q = questions[currentQ];
+                if (selectedIndex === q.correct) {
+                    score++;
+                }
+                currentQ++;
+                setTimeout(showQuestion, 1000);
+            };
+            
+            document.getElementById('activity-section').classList.remove('hidden');
+            showQuestion();
+        }
+
+        // Lesson 3 Functions
+        function selectItem(type, element) {
+            element.classList.add('wiggle');
+            setTimeout(() => element.classList.remove('wiggle'), 500);
+        }
+
+        function startSortingGame() {
+            const items = [
+                {name: 'หน้าจอ', emoji: '🖥️', type: 'hardware'},
+                {name: 'เกม', emoji: '🎮', type: 'software'},
+                {name: 'เมาส์', emoji: '🖱️', type: 'hardware'},
+                {name: 'โปรแกรมวาดรูป', emoji: '🎨', type: 'software'},
+                {name: 'แป้นพิมพ์', emoji: '⌨️', type: 'hardware'},
+                {name: 'เว็บเบราว์เซอร์', emoji: '🌐', type: 'software'}
+            ];
+            
+            let currentItem = 0;
+            let score = 0;
+            
+            function showSortingQuestion() {
+                if (currentItem < items.length) {
+                    const item = items[currentItem];
+                    document.getElementById('activity-content').innerHTML = `
+                        <div class="bg-white rounded-2xl p-6">
+                            <h4 class="text-2xl font-bold mb-6">จัดประเภทสิ่งนี้!</h4>
+                            <div class="text-8xl mb-4">${item.emoji}</div>
+                            <h5 class="text-2xl font-bold mb-6">${item.name}</h5>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
+                                <button onclick="sortAnswer('hardware')" class="bg-blue-200 hover:bg-blue-300 p-6 rounded-xl transition-colors duration-300">
+                                    <div class="text-4xl mb-2">🔧</div>
+                                    <div class="font-bold">ฮาร์ดแวร์</div>
+                                    <div class="text-sm">จับต้องได้</div>
+                                </button>
+                                <button onclick="sortAnswer('software')" class="bg-green-200 hover:bg-green-300 p-6 rounded-xl transition-colors duration-300">
+                                    <div class="text-4xl mb-2">💻</div>
+                                    <div class="font-bold">ซอฟต์แวร์</div>
+                                    <div class="text-sm">โปรแกรม</div>
+                                </button>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-gray-600">ข้อที่ ${currentItem + 1} จาก ${items.length} | คะแนน: ${score}</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('activity-content').innerHTML = `
+                        <div class="bg-yellow-100 rounded-2xl p-6">
+                            <div class="text-6xl mb-4">🏆</div>
+                            <h4 class="text-2xl font-bold text-yellow-800 mb-4">เยอะมาก!</h4>
+                            <p class="text-lg">คะแนนของคุณ: ${score}/${items.length}</p>
+                            <div class="mt-4">
+                                <p class="text-gray-700">
+                                    ${score === items.length ? 'สมบูรณ์แบบ! 🌟' : 
+                                      score >= items.length * 0.8 ? 'เก่งมาก! 👏' : 
+                                      'ลองใหม่อีกครั้งนะ! 💪'}
+                                </p>
+                            </div>
+                            <button onclick="document.getElementById('activity-section').classList.add('hidden')" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full">
+                                เสร็จแล้ว
+                            </button>
+                        </div>
+                    `;
+                    lessonProgress[3] = true;
+                }
+            }
+            
+            window.sortAnswer = function(selectedType) {
+                const item = items[currentItem];
+                if (selectedType === item.type) {
+                    score++;
+                }
+                currentItem++;
+                setTimeout(showSortingQuestion, 1000);
+            };
+            
+            document.getElementById('activity-section').classList.remove('hidden');
+            showSortingQuestion();
+        }
+
+        // Lesson 4 Functions
+        function highlightStep(stepNum) {
+            // Add visual feedback for step interaction
+            const steps = document.querySelectorAll('.step-item');
+            steps.forEach(step => step.classList.remove('bg-yellow-100'));
+            
+            if (stepNum <= 6) {
+                const targetStep = steps[stepNum - 1];
+                if (targetStep) {
+                    targetStep.classList.add('bg-yellow-100');
+                    targetStep.classList.add('zoom-in');
+                    setTimeout(() => targetStep.classList.remove('zoom-in'), 500);
+                }
+            }
+        }
+
+        function startPowerSequence() {
+            const sequences = [
+                {
+                    type: 'power-on',
+                    title: 'ฝึกเปิดเครื่อง',
+                    steps: [
+                        {text: 'เสียบปลั๊กไฟ', emoji: '🔌'},
+                        {text: 'เปิดสวิตช์ไฟ', emoji: '🔘'},
+                        {text: 'กดปุ่ม Power', emoji: '⚡'}
+                    ]
+                },
+                {
+                    type: 'power-off',
+                    title: 'ฝึกปิดเครื่อง',
+                    steps: [
+                        {text: 'บันทึกงานทั้งหมด', emoji: '💾'},
+                        {text: 'กด Start Menu', emoji: '🏠'},
+                        {text: 'เลือก Shut Down', emoji: '😴'}
+                    ]
+                }
+            ];
+            
+            let currentSequence = 0;
+            let currentStep = 0;
+            let score = 0;
+            
+            function showSequenceGame() {
+                if (currentSequence < sequences.length) {
+                    const seq = sequences[currentSequence];
+                    const stepsHtml = seq.steps.map((step, index) => {
+                        const isActive = index === currentStep;
+                        const isCompleted = index < currentStep;
+                        return `
+                            <button onclick="sequenceStep(${index})" 
+                                class="step-btn p-4 rounded-xl transition-all duration-300 ${
+                                    isCompleted ? 'bg-green-200 text-green-800' :
+                                    isActive ? 'bg-yellow-200 text-yellow-800 pulse-glow' :
+                                    'bg-gray-200 text-gray-600'
+                                }">
+                                <div class="text-3xl mb-2">${step.emoji}</div>
+                                <div class="font-semibold">${step.text}</div>
+                                ${isCompleted ? '<div class="text-sm">✅ เสร็จแล้ว</div>' : ''}
+                            </button>
+                        `;
+                    }).join('');
+                    
+                    document.getElementById('activity-content').innerHTML = `
+                        <div class="bg-white rounded-2xl p-6">
+                            <h4 class="text-2xl font-bold mb-6">${seq.title}</h4>
+                            <p class="text-lg mb-6">คลิกขั้นตอนตามลำดับที่ถูกต้อง</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                                ${stepsHtml}
+                            </div>
+                            <div class="mt-6">
+                                <p class="text-gray-600">ขั้นตอนที่ ${currentStep + 1} จาก ${seq.steps.length}</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('activity-content').innerHTML = `
+                        <div class="bg-green-100 rounded-2xl p-6">
+                            <div class="text-6xl mb-4">🎉</div>
+                            <h4 class="text-2xl font-bold text-green-800 mb-4">เก่งมาก!</h4>
+                            <p class="text-lg">คุณจำขั้นตอนการเปิด-ปิดเครื่องได้แล้ว!</p>
+                            <button onclick="document.getElementById('activity-section').classList.add('hidden')" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full">
+                                เสร็จแล้ว
+                            </button>
+                        </div>
+                    `;
+                    lessonProgress[4] = true;
+                }
+            }
+            
+            window.sequenceStep = function(stepIndex) {
+                if (stepIndex === currentStep) {
+                    currentStep++;
+                    score++;
+                    
+                    if (currentStep >= sequences[currentSequence].steps.length) {
+                        currentSequence++;
+                        currentStep = 0;
+                        setTimeout(showSequenceGame, 1500);
+                    } else {
+                        showSequenceGame();
+                    }
+                } else {
+                    // Wrong step - show feedback
+                    alert('ลองใหม่! คลิกขั้นตอนตามลำดับนะ 😊');
+                }
+            };
+            
+            document.getElementById('activity-section').classList.remove('hidden');
+            showSequenceGame();
+        }
+
+        // Lesson 5 Functions
+        function startPostureGame() {
+            const scenarios = [
+                {
+                    image: '🧍‍♂️',
+                    description: 'นั่งหลังตรง เท้าแตะพื้น',
+                    correct: true,
+                    feedback: 'ถูกต้อง! นี่คือท่านั่งที่ดี'
+                },
+                {
+                    image: '😵',
+                    description: 'นั่งชิดจอคอมพิวเตอร์มาก',
+                    correct: false,
+                    feedback: 'ผิด! นั่งชิดจอทำให้ตาเสีย'
+                },
+                {
+                    image: '🤕',
+                    description: 'โค้งหลัง เอียงตัวไปข้างหน้า',
+                    correct: false,
+                    feedback: 'ผิด! โค้งหลังทำให้ปวดหลัง'
+                },
+                {
+                    image: '👀',
+                    description: 'นั่งห่างจอประมาณ 1 ฟุต',
+                    correct: true,
+                    feedback: 'ถูกต้อง! ระยะที่เหมาะสม'
+                },
+                {
+                    image: '🦵',
+                    description: 'เท้าห้อย ไม่มีที่พัก',
+                    correct: false,
+                    feedback: 'ผิด! เท้าควรแตะพื้นหรือมีที่พัก'
+                }
+            ];
+            
+            let currentScenario = 0;
+            let score = 0;
+            
+            function showPostureQuestion() {
+                if (currentScenario < scenarios.length) {
+                    const scenario = scenarios[currentScenario];
+                    document.getElementById('activity-content').innerHTML = `
+                        <div class="bg-white rounded-2xl p-6">
+                            <h4 class="text-2xl font-bold mb-6">ท่านั่งนี้ถูกหรือผิด?</h4>
+                            <div class="text-8xl mb-4">${scenario.image}</div>
+                            <p class="text-lg mb-6">${scenario.description}</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
+                                <button onclick="postureAnswer(true)" class="bg-green-200 hover:bg-green-300 p-6 rounded-xl transition-colors duration-300">
+                                    <div class="text-4xl mb-2">✅</div>
+                                    <div class="font-bold">ถูกต้อง</div>
+                                </button>
+                                <button onclick="postureAnswer(false)" class="bg-red-200 hover:bg-red-300 p-6 rounded-xl transition-colors duration-300">
+                                    <div class="text-4xl mb-2">❌</div>
+                                    <div class="font-bold">ผิด</div>
+                                </button>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-gray-600">ข้อที่ ${currentScenario + 1} จาก ${scenarios.length} | คะแนน: ${score}</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('activity-content').innerHTML = `
+                        <div class="bg-blue-100 rounded-2xl p-6">
+                            <div class="text-6xl mb-4">🏆</div>
+                            <h4 class="text-2xl font-bold text-blue-800 mb-4">เยอะมาก!</h4>
+                            <p class="text-lg mb-4">คะแนนของคุณ: ${score}/${scenarios.length}</p>
+                            <div class="bg-white rounded-xl p-4 mb-4">
+                                <h5 class="font-bold mb-2">💡 จำไว้นะ:</h5>
+                                <ul class="text-left text-sm space-y-1">
+                                    <li>• หลังตรง เท้าแตะพื้น</li>
+                                    <li>• ห่างจอประมาณ 1 ฟุต</li>
+                                    <li>• พักสายตาทุก 20 นาที</li>
+                                    <li>• ยืดเส้นยืดสายบ้าง</li>
+                                </ul>
+                            </div>
+                            <button onclick="document.getElementById('activity-section').classList.add('hidden')" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full">
+                                เสร็จแล้ว
+                            </button>
+                        </div>
+                    `;
+                    lessonProgress[5] = true;
+                }
+            }
+            
+            window.postureAnswer = function(selectedAnswer) {
+                const scenario = scenarios[currentScenario];
+                const isCorrect = selectedAnswer === scenario.correct;
+                
+                if (isCorrect) {
+                    score++;
+                }
+                
+                // Show feedback
+                alert(scenario.feedback);
+                
+                currentScenario++;
+                setTimeout(showPostureQuestion, 1000);
+            };
+            
+            document.getElementById('activity-section').classList.remove('hidden');
+            showPostureQuestion();
+        }
+
+        // Final Test Functions
+        function generateFinalQuiz() {
+            const questions = [
+                {
+                    question: 'คอมพิวเตอร์คืออะไร?',
+                    options: [
+                        'เครื่องมือที่ช่วยให้เราทำงานได้ง่ายขึ้น',
+                        'เครื่องใช้ไฟฟ้าธรรมดา',
+                        'ของเล่นสำหรับเด็ก',
+                        'เครื่องทำอาหาร'
+                    ],
+                    correct: 0
+                },
+                {
+                    question: 'อุปกรณ์ไหนที่เรียกว่า "สมองของคอมพิวเตอร์"?',
+                    options: ['หน้าจอ', 'ซีพียู (CPU)', 'เมาส์', 'ลำโพง'],
+                    correct: 1
+                },
+                {
+                    question: 'ข้อไหนเป็นซอฟต์แวร์?',
+                    options: ['แป้นพิมพ์', 'หน้าจอ', 'โปรแกรมเกม', 'เมาส์'],
+                    correct: 2
+                },
+                {
+                    question: 'วิธีปิดคอมพิวเตอร์ที่ถูกต้องคือ?',
+                    options: [
+                        'ดึงปลั๊กออกทันที',
+                        'กดปุ่ม Power ค้างนาน',
+                        'กด Start แล้วเลือก Shut Down',
+                        'ปิดหน้าจอเฉยๆ'
+                    ],
+                    correct: 2
+                },
+                {
+                    question: 'ท่านั่งใช้คอมพิวเตอร์ที่ถูกต้องคือ?',
+                    options: [
+                        'นั่งชิดจอมากๆ',
+                        'โค้งหลัง เอียงตัว',
+                        'หลังตรง ห่างจอ 1 ฟุต',
+                        'นั่งยังไงก็ได้'
+                    ],
+                    correct: 2
+                }
+            ];
+            
+            finalQuizAnswers = new Array(questions.length).fill(-1);
+            let currentQuestion = 0;
+            
+            function showFinalQuestion() {
+                const container = document.getElementById('final-quiz-container');
+                
+                if (currentQuestion < questions.length) {
+                    const q = questions[currentQuestion];
+                    const optionsHtml = q.options.map((option, index) => 
+                        `<button onclick="answerFinalQuiz(${index})" class="block w-full bg-blue-100 hover:bg-blue-200 p-4 rounded-xl text-left mb-3 transition-colors duration-300 transform hover:scale-105">
+                            ${String.fromCharCode(65 + index)}. ${option}
+                        </button>`
+                    ).join('');
+                    
+                    container.innerHTML = `
+                        <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <h4 class="text-2xl font-bold text-gray-800">คำถามที่ ${currentQuestion + 1}</h4>
+                                <div class="bg-white px-4 py-2 rounded-full">
+                                    <span class="text-sm font-semibold">${currentQuestion + 1}/${questions.length}</span>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl p-6 mb-6">
+                                <p class="text-xl text-gray-800 font-semibold">${q.question}</p>
+                            </div>
+                            <div class="max-w-2xl mx-auto">
+                                ${optionsHtml}
+                            </div>
+                            <div class="mt-6 bg-white rounded-xl p-4">
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: ${((currentQuestion + 1) / questions.length) * 100}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    showFinalResult();
+                }
+            }
+            
+            window.answerFinalQuiz = function(selectedIndex) {
+                finalQuizAnswers[currentQuestion] = selectedIndex;
+                currentQuestion++;
+                setTimeout(showFinalQuestion, 500);
+            };
+            
+            function showFinalResult() {
+                let correctCount = 0;
+                questions.forEach((q, index) => {
+                    if (finalQuizAnswers[index] === q.correct) {
+                        correctCount++;
+                    }
+                });
+                
+                const percentage = Math.round((correctCount / questions.length) * 100);
+                document.getElementById('final-score').textContent = `${correctCount}/${questions.length} (${percentage}%)`;
+                
+                document.getElementById('final-quiz-container').classList.add('hidden');
+                document.getElementById('final-result').classList.remove('hidden');
+            }
+            
+            showFinalQuestion();
+        }
+
+        // Certificate Functions
+        function generateCertificate() {
+            document.getElementById('certificate-modal').classList.remove('hidden');
+        }
+
+        function closeCertificate() {
+            document.getElementById('certificate-modal').classList.add('hidden');
+        }
+
+        function downloadCertificate() {
+            const studentName = document.getElementById('student-name').value || 'นักเรียน';
+            alert(`🎉 ใบประกาศนียบัตรของ ${studentName} ได้รับการบันทึกแล้ว!\n\nขอแสดงความยินดีที่ผ่านการเรียนรู้ "รู้จักโลกคอมพิวเตอร์" เรียบร้อยแล้ว!`);
+            closeCertificate();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNavigation();
+            updateProgress();
+            
+            // Check speech synthesis support
+            if (!('speechSynthesis' in window)) {
+                console.warn('Speech synthesis not supported in this browser');
+                // Hide speech buttons if not supported
+                document.querySelectorAll('.speech-btn').forEach(btn => {
+                    btn.style.display = 'none';
+                });
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'976a3998f06b731c',t:'MTc1NjQ1MTM4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
