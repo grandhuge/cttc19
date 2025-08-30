@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เว็บบอร์ดสำรวจความคิดเห็น</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Noto Sans Thai', sans-serif; }
+        .like-animation {
+            animation: likeScale 0.3s ease-in-out;
+        }
+        @keyframes likeScale {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .comment-hover:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        .topic-hover:hover {
+            transform: translateY(-1px);
+            transition: all 0.3s ease;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex-1">
+                    <h1 class="text-3xl font-bold text-gray-800 text-center mb-2">🗣️ เว็บบอร์ดสำรวจความคิดเห็น</h1>
+                    <p class="text-gray-600 text-center">แบ่งปันความคิดเห็นและโหวตความคิดเห็นที่คุณชอบ</p>
+                </div>
+                <div class="flex flex-col items-end space-y-2">
+                    <button id="adminLoginBtn" onclick="showAdminLogin()" 
+                            class="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm">
+                        <span>🔐</span>
+                        <span>ผู้ดูแล</span>
+                    </button>
+                    <button id="adminLogoutBtn" onclick="adminLogout()" 
+                            class="hidden flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm">
+                        <span>🚪</span>
+                        <span>ออกจากระบบ</span>
+                    </button>
+                    <div id="adminStatus" class="hidden bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                        👨‍💼 ผู้ดูแลระบบ
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="text-center mb-4">
+                <div class="loading mx-auto mb-3"></div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">กำลังโหลดข้อมูล</h3>
+                <p id="loadingStatus" class="text-gray-600 mb-4">เริ่มต้นการโหลด...</p>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-3 overflow-hidden">
+                <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+            </div>
+            
+            <!-- Progress Percentage -->
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-500">ความคืบหน้า</span>
+                <span id="progressPercent" class="font-semibold text-blue-600">0%</span>
+            </div>
+            
+            <!-- Progress Steps -->
+            <div class="mt-4 space-y-2">
+                <div id="step1" class="flex items-center text-sm text-gray-500">
+                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 mr-3 flex items-center justify-center">
+                        <div class="w-2 h-2 rounded-full bg-gray-300 hidden"></div>
+                    </div>
+                    <span>โหลดข้อมูลหัวข้อ</span>
+                </div>
+                <div id="step2" class="flex items-center text-sm text-gray-500">
+                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 mr-3 flex items-center justify-center">
+                        <div class="w-2 h-2 rounded-full bg-gray-300 hidden"></div>
+                    </div>
+                    <span>โหลดความคิดเห็น</span>
+                </div>
+                <div id="step3" class="flex items-center text-sm text-gray-500">
+                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 mr-3 flex items-center justify-center">
+                        <div class="w-2 h-2 rounded-full bg-gray-300 hidden"></div>
+                    </div>
+                    <span>จัดเรียงข้อมูล</span>
+                </div>
+                <div id="step4" class="flex items-center text-sm text-gray-500">
+                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 mr-3 flex items-center justify-center">
+                        <div class="w-2 h-2 rounded-full bg-gray-300 hidden"></div>
+                    </div>
+                    <span>แสดงผลข้อมูล</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Topic Management -->
+        <div id="adminTopicPanel" class="hidden bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">📋 จัดการหัวข้อ</h2>
+                <button onclick="showAddTopicModal()" 
+                        class="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <span>➕</span>
+                    <span>เพิ่มหัวข้อใหม่</span>
+                </button>
+            </div>
+            <div id="adminTopicsList" class="space-y-4">
+                <!-- Admin topics list will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Topics List -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">📚 หัวข้อสนทนา</h2>
+            <div id="topicsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Topics will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Current Topic Display -->
+        <div id="currentTopicDisplay" class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 id="currentTopicTitle" class="text-2xl font-bold text-gray-800"></h2>
+                    <p id="currentTopicDescription" class="text-gray-600 mt-2"></p>
+                </div>
+                <button onclick="backToTopics()" 
+                        class="flex items-center space-x-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                    <span>⬅️</span>
+                    <span>กลับไปหัวข้อ</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Post Form -->
+        <div id="postForm" class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">💭 แสดงความคิดเห็นของคุณ</h2>
+            <div class="space-y-4">
+                <div>
+                    <input type="text" id="authorName" placeholder="ชื่อของคุณ" maxlength="50"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                    <div class="text-right text-sm text-gray-500 mt-1">
+                        <span id="nameCount">0</span>/50 ตัวอักษร
+                    </div>
+                </div>
+                <div>
+                    <textarea id="commentText" placeholder="เขียนความคิดเห็นของคุณที่นี่..." maxlength="1000"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none h-24 resize-none"></textarea>
+                    <div class="text-right text-sm text-gray-500 mt-1">
+                        <span id="commentCount">0</span>/1000 ตัวอักษร
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <button onclick="addComment()" id="submitBtn"
+                            class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
+                        📝 โพสต์ความคิดเห็น
+                    </button>
+                    <div class="text-sm text-gray-500">
+                        💡 เคล็ดลับ: กด Enter เพื่อไปช่องถัดไป, Ctrl+Enter เพื่อโพสต์
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sort Options -->
+        <div id="sortOptions" class="bg-white rounded-2xl shadow-lg p-4 mb-6">
+            <div class="flex flex-wrap gap-3 items-center">
+                <span class="text-gray-700 font-medium">เรียงตาม:</span>
+                <button onclick="sortComments('likes')" id="sortLikes"
+                        class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+                    🔥 ความนิยม
+                </button>
+                <button onclick="sortComments('time')" id="sortTime"
+                        class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">
+                    ⏰ เวลา
+                </button>
+            </div>
+        </div>
+
+        <!-- Comments Container -->
+        <div id="commentsContainer" class="space-y-6">
+            <!-- Comments will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">© developed by Tle Narongphisit | CTTC19 @ CPD</p>
+        </div>
+    </footer>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">🔐 เข้าสู่ระบบผู้ดูแล</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">ชื่อผู้ใช้</label>
+                    <input type="text" id="adminUsername" placeholder="กรอกชื่อผู้ใช้" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">รหัสผ่าน</label>
+                    <input type="password" id="adminPassword" placeholder="กรอกรหัสผ่าน"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                </div>
+                <div id="loginError" class="hidden bg-red-100 text-red-700 p-3 rounded-lg text-sm"></div>
+                <div class="flex space-x-3 pt-4">
+                    <button onclick="adminLogin()" 
+                            class="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition-colors font-medium">
+                        เข้าสู่ระบบ
+                    </button>
+                    <button onclick="hideAdminLogin()" 
+                            class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-xl hover:bg-gray-400 transition-colors font-medium">
+                        ยกเลิก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Topic Modal -->
+    <div id="topicModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-2xl">
+            <h2 id="topicModalTitle" class="text-2xl font-bold text-gray-800 mb-6 text-center">📝 เพิ่มหัวข้อใหม่</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">ชื่อหัวข้อ</label>
+                    <input type="text" id="topicTitle" placeholder="ใส่ชื่อหัวข้อ"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">คำอธิบาย</label>
+                    <textarea id="topicDescription" placeholder="อธิบายเกี่ยวกับหัวข้อนี้"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none h-24 resize-none"></textarea>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <input type="checkbox" id="topicVisible" checked class="w-4 h-4 text-blue-600 rounded">
+                    <label for="topicVisible" class="text-gray-700 font-medium">แสดงหัวข้อนี้ให้ผู้ใช้เห็น</label>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button onclick="saveTopic()" 
+                            class="flex-1 bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition-colors font-medium">
+                        บันทึก
+                    </button>
+                    <button onclick="hideTopicModal()" 
+                            class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-xl hover:bg-gray-400 transition-colors font-medium">
+                        ยกเลิก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Comment Modal -->
+    <div id="editCommentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-2xl">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">✏️ แก้ไขความคิดเห็น</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">ชื่อผู้เขียน</label>
+                    <input type="text" id="editAuthorName" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">ความคิดเห็น</label>
+                    <textarea id="editCommentText" 
+                              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none h-32 resize-none"></textarea>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button onclick="saveEditComment()" 
+                            class="flex-1 bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition-colors font-medium">
+                        บันทึก
+                    </button>
+                    <button onclick="hideEditModal()" 
+                            class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-xl hover:bg-gray-400 transition-colors font-medium">
+                        ยกเลิก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./systemscript.js">
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9774745540b945bd',t:'MTc1NjU1ODY1Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
