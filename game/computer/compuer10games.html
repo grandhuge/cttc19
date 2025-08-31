@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมทักษะคอมพิวเตอร์สำหรับนักเรียนประถม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Kanit', sans-serif; }
+        
+        .game-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .coin-animation {
+            animation: coinFloat 2s ease-out forwards;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        @keyframes coinFloat {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+        
+        .star-rating {
+            display: inline-flex;
+            gap: 2px;
+        }
+        
+        .star {
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+        }
+        
+        .achievement-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 2000;
+            animation: achievementShow 3s ease-out forwards;
+        }
+        
+        @keyframes achievementShow {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            10% { transform: translate(-50%, -50%) scale(1.1); }
+            20% { transform: translate(-50%, -50%) scale(1); }
+            90% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        }
+        
+        .combo-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            transform: scale(0);
+            animation: comboShow 0.5s ease-out forwards;
+        }
+        
+        @keyframes comboShow {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .difficulty-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .easy { background: #4CAF50; color: white; }
+        .medium { background: #FF9800; color: white; }
+        .hard { background: #F44336; color: white; }
+        .expert { background: #9C27B0; color: white; }
+        
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #ffd700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 1s ease-out forwards;
+        }
+        
+        @keyframes particleFloat {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-80px) scale(0); opacity: 0; }
+        }
+        
+        .level-card {
+            transition: all 0.3s ease;
+            transform: scale(1);
+        }
+        
+        .level-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .completed {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+        
+        .current {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            animation: pulse 2s infinite;
+        }
+        
+        .locked {
+            background: #9E9E9E;
+            opacity: 0.6;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 152, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+        }
+        
+        .draggable {
+            cursor: grab;
+            transition: transform 0.2s;
+        }
+        
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+        
+        .drop-zone {
+            border: 3px dashed #ccc;
+            transition: all 0.3s;
+        }
+        
+        .drop-zone.drag-over {
+            border-color: #4CAF50;
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+        
+        .typing-cursor {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .maze-cell {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+        }
+        
+        .maze-wall { background: #333; }
+        .maze-path { background: #fff; }
+        .maze-player { background: #4CAF50; border-radius: 50%; }
+        .maze-goal { background: #FF9800; border-radius: 50%; }
+        
+        .pattern-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .pattern-button.active {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+        
+        .sound-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sound-toggle:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- ปุ่มเปิด/ปิดเสียง -->
+        <div class="sound-toggle" onclick="toggleSound()" title="เปิด/ปิดเสียง">
+            <span id="soundIcon">🔊</span>
+        </div>
+        
+        <!-- หน้าหลัก -->
+        <div id="mainMenu" class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-4xl w-full">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl font-bold text-purple-600 mb-4">🎮 เกมทักษะคอมพิวเตอร์</h1>
+                    <p class="text-xl text-gray-600">สำหรับนักเรียนประถมศึกษา</p>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-yellow-100 rounded-lg text-center">
+                            <p class="text-lg">🏆 คะแนนรวม</p>
+                            <p class="text-2xl font-bold text-purple-600"><span id="totalHighScore">0</span></p>
+                        </div>
+                        <div class="p-4 bg-green-100 rounded-lg text-center">
+                            <p class="text-lg">🪙 เหรียญทอง</p>
+                            <p class="text-2xl font-bold text-yellow-600"><span id="totalCoins">0</span></p>
+                        </div>
+                        <div class="p-4 bg-blue-100 rounded-lg text-center">
+                            <p class="text-lg">⭐ ด่านผ่าน</p>
+                            <p class="text-2xl font-bold text-blue-600"><span id="levelsCompleted">0</span>/10</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+                    <div class="level-card bg-gradient-to-br from-blue-400 to-blue-600 text-white p-4 rounded-xl cursor-pointer current relative" onclick="startLevel(1)">
+                        <div class="difficulty-badge easy">ง่าย</div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🖱️</div>
+                            <div class="font-semibold">ด่าน 1</div>
+                            <div class="text-sm">คลิกเมาส์</div>
+                            <div class="text-xs mt-1">สูงสุด: <span id="score1">0</span></div>
+                            <div class="star-rating mt-1" id="stars1">
+                                <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-card bg-gradient-to-br from-green-400 to-green-600 text-white p-4 rounded-xl cursor-pointer locked relative" onclick="startLevel(2)">
+                        <div class="difficulty-badge easy">ง่าย</div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🎯</div>
+                            <div class="font-semibold">ด่าน 2</div>
+                            <div class="text-sm">เล็งเป้า</div>
+                            <div class="text-xs mt-1">สูงสุด: <span id="score2">0</span></div>
+                            <div class="star-rating mt-1" id="stars2">
+                                <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-card bg-gradient-to-br from-yellow-400 to-yellow-600 text-white p-4 rounded-xl cursor-pointer locked relative" onclick="startLevel(3)">
+                        <div class="difficulty-badge medium">ปานกลาง</div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🔤</div>
+                            <div class="font-semibold">ด่าน 3</div>
+                            <div class="text-sm">พิมพ์ดีด</div>
+                            <div class="text-xs mt-1">สูงสุด: <span id="score3">0</span></div>
+                            <div class="star-rating mt-1" id="stars3">
+                                <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-card bg-gradient-to-br from-red-400 to-red-600 text-white p-4 rounded-xl cursor-pointer locked relative" onclick="startLevel(4)">
+                        <div class="difficulty-badge medium">ปานกลาง</div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🧩</div>
+                            <div class="font-semibold">ด่าน 4</div>
+                            <div class="text-sm">ลากวาง</div>
+                            <div class="text-xs mt-1">สูงสุด: <span id="score4">0</span></div>
+                            <div class="star-rating mt-1" id="stars4">
+                                <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-card bg-gradient-to-br from-purple-400 to-purple-600 text-white p-4 rounded-xl cursor-pointer locked relative" onclick="startLevel(5)">
+                        <div class="difficulty-badge medium">ปานกลาง</div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🎨</div>
+                            <div class="font-semibold">ด่าน 5</div>
+                            <div class="text-sm">จับคู่สี</div>
+                            <div class="text-xs mt-1">สูงสุด: <span id="score5">0</span></div>
+                            <div class="star-rating mt-1" id="stars5">
+                                <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-card bg-gradient-to-br from-indigo-400 to-indigo-600 text-white p-4 rounded-xl cursor-pointer locked relative" onclick="startLevel(6)">
+                        <div class="difficulty-badge hard">ยาก</div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🧠</div>
+                            <div class="font-semibold">ด่าน 6</div>
+                            <div class="text-sm">จำลำดับ</div>
+                            <div class="text-xs mt-1">สูงสุด: <span id="score6">0</span></div>
+                            <div class="star-rating mt-1" id="stars6">
+                                <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-card bg-gradient-to-br from-pink-400 to-pink-600 text-white p-4 rounded-xl cursor-pointer locked relative" onclick="startLevel(7)">
+                        <div class="difficulty-badge hard">ยาก</div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">⌨️</div>
+                            <div class="font-semibold">ด่าน 7</div>
+                            <div class="text-sm">ปุ่มลัด</div>
+                            <div class="text-xs mt-1">สูงสุด: <span id="score7">0</span></div>
+                            <div class="star-rating mt-1" id="stars7">
+                                <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-card bg-gradient-to-br from-teal-400 to-teal-600 text-white p-4 rounded-xl cursor-pointer locked relative" onclick="startLevel(8)">
+                        <div class="difficulty-badge hard">ยาก</div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🗂️</div>
+                            <div class="font-semibold">ด่าน 8</div>
+                            <div class="text-sm">จัดไฟล์</div>
+                            <div class="text-xs mt-1">สูงสุด: <span id="score8">0</span></div>
+                            <div class="star-rating mt-1" id="stars8">
+                                <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-card bg-gradient-to-br from-orange-400 to-orange-600 text-white p-4 rounded-xl cursor-pointer locked relative" onclick="startLevel(9)">
+                        <div class="difficulty-badge expert">ผู้เชี่ยวชาญ</div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🚀</div>
+                            <div class="font-semibold">ด่าน 9</div>
+                            <div class="text-sm">เขาวงกต</div>
+                            <div class="text-xs mt-1">สูงสุด: <span id="score9">0</span></div>
+                            <div class="star-rating mt-1" id="stars9">
+                                <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="level-card bg-gradient-to-br from-gray-400 to-gray-600 text-white p-4 rounded-xl cursor-pointer locked relative" onclick="startLevel(10)">
+                        <div class="difficulty-badge expert">ผู้เชี่ยวชาญ</div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">👑</div>
+                            <div class="font-semibold">ด่าน 10</div>
+                            <div class="text-sm">ผสมผสาน</div>
+                            <div class="text-xs mt-1">สูงสุด: <span id="score10">0</span></div>
+                            <div class="star-rating mt-1" id="stars10">
+                                <span class="star">☆</span><span class="star">☆</span><span class="star">☆</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center space-x-4">
+                    <button onclick="showLeaderboard()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        🏆 กระดานคะแนน
+                    </button>
+                    <button onclick="resetAllScores()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        🔄 รีเซ็ตคะแนนทั้งหมด
+                    </button>
+                </div>
+                
+                <!-- Footer -->
+                <div class="mt-8 pt-6 border-t border-gray-200 text-center text-gray-600">
+                    <p class="text-sm">© developed by Tle Narongphisit | CTTC19 @ CPD</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้า Leaderboard -->
+        <div id="leaderboardScreen" class="hidden min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-4xl w-full">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl font-bold text-yellow-600 mb-4">🏆 กระดานคะแนน</h1>
+                    <p class="text-xl text-gray-600">ผู้ทำคะแนนสูงสุด 10 อันดับแรก</p>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="text-center mb-4">
+                        <input type="text" id="playerNameInput" placeholder="ใส่ชื่อของคุณ..." 
+                               class="px-4 py-2 border-2 border-purple-300 rounded-lg text-center text-lg w-64">
+                        <button onclick="savePlayerName()" class="ml-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg">
+                            บันทึกชื่อ
+                        </button>
+                    </div>
+                    <div class="text-center text-sm text-gray-500">
+                        ชื่อปัจจุบัน: <span id="currentPlayerName" class="font-semibold">ไม่ระบุชื่อ</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- คะแนนรวมทั้งหมด -->
+                    <div class="bg-gradient-to-br from-yellow-100 to-yellow-200 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-yellow-800 mb-4 text-center">🏆 คะแนนรวมสูงสุด</h3>
+                        <div id="totalScoreLeaderboard" class="space-y-2">
+                            <!-- รายการจะถูกใส่ที่นี่ -->
+                        </div>
+                    </div>
+                    
+                    <!-- เหรียญทองมากที่สุด -->
+                    <div class="bg-gradient-to-br from-orange-100 to-orange-200 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold text-orange-800 mb-4 text-center">🪙 เหรียญทองมากสุด</h3>
+                        <div id="coinsLeaderboard" class="space-y-2">
+                            <!-- รายการจะถูกใส่ที่นี่ -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- คะแนนแต่ละด่าน -->
+                <div class="mt-8">
+                    <h3 class="text-xl font-bold text-purple-800 mb-4 text-center">🎮 สถิติแต่ละด่าน</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg text-center" id="levelStats1">
+                            <div class="text-2xl mb-2">🖱️</div>
+                            <div class="font-semibold">ด่าน 1</div>
+                            <div class="text-sm text-blue-600">สูงสุด: <span id="levelBest1">0</span></div>
+                            <div class="text-xs text-gray-500">โดย: <span id="levelBestPlayer1">-</span></div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg text-center" id="levelStats2">
+                            <div class="text-2xl mb-2">🎯</div>
+                            <div class="font-semibold">ด่าน 2</div>
+                            <div class="text-sm text-green-600">สูงสุด: <span id="levelBest2">0</span></div>
+                            <div class="text-xs text-gray-500">โดย: <span id="levelBestPlayer2">-</span></div>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg text-center" id="levelStats3">
+                            <div class="text-2xl mb-2">🔤</div>
+                            <div class="font-semibold">ด่าน 3</div>
+                            <div class="text-sm text-yellow-600">สูงสุด: <span id="levelBest3">0</span></div>
+                            <div class="text-xs text-gray-500">โดย: <span id="levelBestPlayer3">-</span></div>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-lg text-center" id="levelStats4">
+                            <div class="text-2xl mb-2">🧩</div>
+                            <div class="font-semibold">ด่าน 4</div>
+                            <div class="text-sm text-red-600">สูงสุด: <span id="levelBest4">0</span></div>
+                            <div class="text-xs text-gray-500">โดย: <span id="levelBestPlayer4">-</span></div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg text-center" id="levelStats5">
+                            <div class="text-2xl mb-2">🎨</div>
+                            <div class="font-semibold">ด่าน 5</div>
+                            <div class="text-sm text-purple-600">สูงสุด: <span id="levelBest5">0</span></div>
+                            <div class="text-xs text-gray-500">โดย: <span id="levelBestPlayer5">-</span></div>
+                        </div>
+                        <div class="bg-indigo-50 p-4 rounded-lg text-center" id="levelStats6">
+                            <div class="text-2xl mb-2">🧠</div>
+                            <div class="font-semibold">ด่าน 6</div>
+                            <div class="text-sm text-indigo-600">สูงสุด: <span id="levelBest6">0</span></div>
+                            <div class="text-xs text-gray-500">โดย: <span id="levelBestPlayer6">-</span></div>
+                        </div>
+                        <div class="bg-pink-50 p-4 rounded-lg text-center" id="levelStats7">
+                            <div class="text-2xl mb-2">⌨️</div>
+                            <div class="font-semibold">ด่าน 7</div>
+                            <div class="text-sm text-pink-600">สูงสุด: <span id="levelBest7">0</span></div>
+                            <div class="text-xs text-gray-500">โดย: <span id="levelBestPlayer7">-</span></div>
+                        </div>
+                        <div class="bg-teal-50 p-4 rounded-lg text-center" id="levelStats8">
+                            <div class="text-2xl mb-2">🗂️</div>
+                            <div class="font-semibold">ด่าน 8</div>
+                            <div class="text-sm text-teal-600">สูงสุด: <span id="levelBest8">0</span></div>
+                            <div class="text-xs text-gray-500">โดย: <span id="levelBestPlayer8">-</span></div>
+                        </div>
+                        <div class="bg-orange-50 p-4 rounded-lg text-center" id="levelStats9">
+                            <div class="text-2xl mb-2">🚀</div>
+                            <div class="font-semibold">ด่าน 9</div>
+                            <div class="text-sm text-orange-600">สูงสุด: <span id="levelBest9">0</span></div>
+                            <div class="text-xs text-gray-500">โดย: <span id="levelBestPlayer9">-</span></div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg text-center" id="levelStats10">
+                            <div class="text-2xl mb-2">👑</div>
+                            <div class="font-semibold">ด่าน 10</div>
+                            <div class="text-sm text-gray-600">สูงสุด: <span id="levelBest10">0</span></div>
+                            <div class="text-xs text-gray-500">โดย: <span id="levelBestPlayer10">-</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8 space-x-4">
+                    <button onclick="backToMenuFromLeaderboard()" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        ← กลับหน้าหลัก
+                    </button>
+                    <button onclick="resetLeaderboard()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        🗑️ ล้าง Leaderboard
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าเกม -->
+        <div id="gameScreen" class="hidden min-h-screen p-4">
+            <div class="max-w-4xl mx-auto">
+                <!-- Header -->
+                <div class="bg-white rounded-xl shadow-lg p-4 mb-4 flex justify-between items-center relative">
+                    <button onclick="backToMenu()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        ← กลับ
+                    </button>
+                    <div class="text-center">
+                        <h2 id="levelTitle" class="text-2xl font-bold text-purple-600"></h2>
+                        <p id="levelDescription" class="text-gray-600"></p>
+                    </div>
+                    <div class="text-right">
+                        <div class="flex items-center gap-4">
+                            <div class="text-center">
+                                <div class="text-lg font-semibold">คะแนน</div>
+                                <div class="text-2xl font-bold text-purple-600"><span id="currentScore">0</span></div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-lg font-semibold">เหรียญ</div>
+                                <div class="text-2xl font-bold text-yellow-600">🪙 <span id="currentCoins">0</span></div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-lg font-semibold">เวลา</div>
+                                <div class="relative inline-block">
+                                    <svg class="progress-ring w-16 h-16" width="64" height="64">
+                                        <circle class="progress-ring-circle" stroke="#e5e7eb" stroke-width="4" fill="transparent" r="28" cx="32" cy="32"/>
+                                        <circle id="progressCircle" class="progress-ring-circle" stroke="#3b82f6" stroke-width="4" fill="transparent" r="28" cx="32" cy="32" stroke-dasharray="175.929" stroke-dashoffset="0"/>
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <span id="timeLeft" class="text-lg font-bold">60</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Area -->
+                <div id="gameArea" class="bg-white rounded-xl shadow-lg p-8 min-h-96">
+                    <!-- เนื้อหาเกมจะถูกใส่ที่นี่ -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLevel = 1;
+        let currentScore = 0;
+        let currentCoins = 0;
+        let timeLeft = 60;
+        let gameTimer = null;
+        let gameData = {};
+        let combo = 0;
+        let lastActionTime = 0;
+        let achievements = [];
+        let soundEnabled = true;
+        let playerName = 'ไม่ระบุชื่อ';
+
+        // ระบบเสียง
+        const sounds = {
+            click: () => playBeep(800, 100),
+            success: () => playBeep(1000, 200),
+            error: () => playBeep(300, 300),
+            coin: () => playBeep(1200, 150),
+            achievement: () => {
+                playBeep(800, 100);
+                setTimeout(() => playBeep(1000, 100), 100);
+                setTimeout(() => playBeep(1200, 200), 200);
+            },
+            levelComplete: () => {
+                playBeep(600, 150);
+                setTimeout(() => playBeep(800, 150), 150);
+                setTimeout(() => playBeep(1000, 300), 300);
+            },
+            combo: () => {
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => playBeep(1000 + (i * 200), 100), i * 50);
+                }
+            }
+        };
+
+        function playBeep(frequency, duration) {
+            if (!soundEnabled) return;
+            
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration / 1000);
+            } catch (e) {
+                // ไม่สามารถเล่นเสียงได้
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundIcon').textContent = soundEnabled ? '🔊' : '🔇';
+            localStorage.setItem('soundEnabled', soundEnabled);
+            
+            if (soundEnabled) {
+                sounds.click();
+            }
+        }
+
+        // โหลดคะแนนจาก localStorage
+        function loadScores() {
+            for (let i = 1; i <= 10; i++) {
+                const score = localStorage.getItem(`level${i}Score`) || 0;
+                document.getElementById(`score${i}`).textContent = score;
+                updateStarRating(i, score);
+            }
+            updateTotalHighScore();
+            updateTotalCoins();
+            updateLevelsCompleted();
+            updateLevelStates();
+            
+            // โหลดการตั้งค่าเสียง
+            const savedSoundSetting = localStorage.getItem('soundEnabled');
+            if (savedSoundSetting !== null) {
+                soundEnabled = savedSoundSetting === 'true';
+                document.getElementById('soundIcon').textContent = soundEnabled ? '🔊' : '🔇';
+            }
+            
+            // โหลดชื่อผู้เล่น
+            playerName = localStorage.getItem('playerName') || 'ไม่ระบุชื่อ';
+        }
+
+        // ระบบ Leaderboard
+        function showLeaderboard() {
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('leaderboardScreen').classList.remove('hidden');
+            
+            // อัพเดทชื่อผู้เล่นปัจจุบัน
+            document.getElementById('currentPlayerName').textContent = playerName;
+            document.getElementById('playerNameInput').value = playerName === 'ไม่ระบุชื่อ' ? '' : playerName;
+            
+            updateLeaderboards();
+            sounds.click();
+        }
+
+        function backToMenuFromLeaderboard() {
+            document.getElementById('leaderboardScreen').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+            sounds.click();
+        }
+
+        function savePlayerName() {
+            const nameInput = document.getElementById('playerNameInput');
+            const newName = nameInput.value.trim();
+            const currentName = playerName;
+            
+            if (!newName) {
+                sounds.error();
+                alert('กรุณาใส่ชื่อ');
+                return;
+            }
+            
+            if (newName.length > 20) {
+                sounds.error();
+                alert('ชื่อต้องไม่เกิน 20 ตัวอักษร');
+                return;
+            }
+            
+            // ตรวจสอบว่าเป็นการเปลี่ยนชื่อหรือไม่
+            if (currentName !== 'ไม่ระบุชื่อ' && newName !== currentName) {
+                const confirmMessage = `⚠️ การเปลี่ยนชื่อจะทำให้คะแนนทั้งหมดถูกรีเซ็ต!\n\nชื่อเดิม: "${currentName}"\nชื่อใหม่: "${newName}"\n\n🔄 คะแนนและเหรียญทั้งหมดจะถูกลบ\n📊 ข้อมูล Leaderboard จะยังคงอยู่\n\nคุณต้องการดำเนินการต่อหรือไม่?`;
+                
+                if (!confirm(confirmMessage)) {
+                    sounds.click();
+                    return;
+                }
+                
+                // รีเซ็ตคะแนนทั้งหมด
+                resetPlayerScores();
+                sounds.success();
+                
+                // แสดงข้อความแจ้งเตือน
+                showAchievement('เริ่มต้นใหม่!', `รีเซ็ตคะแนนสำหรับ ${newName}`);
+                
+                // แสดง alert เพิ่มเติม
+                setTimeout(() => {
+                    alert(`🎮 เริ่มต้นใหม่แล้ว!\n\nชื่อผู้เล่น: ${newName}\n✅ คะแนนทั้งหมดถูกรีเซ็ต\n🎯 พร้อมเริ่มเก็บคะแนนใหม่`);
+                }, 1000);
+            }
+            
+            // บันทึกชื่อใหม่
+            playerName = newName;
+            localStorage.setItem('playerName', playerName);
+            document.getElementById('currentPlayerName').textContent = playerName;
+            
+            if (currentName === 'ไม่ระบุชื่อ' || newName === currentName) {
+                sounds.success();
+                showAchievement('บันทึกชื่อแล้ว!', `ยินดีต้อนรับ ${playerName}`);
+            }
+            
+            // อัพเดท leaderboard และหน้าหลัก
+            updateLeaderboards();
+            loadScores();
+        }
+        
+        function resetPlayerScores() {
+            // รีเซ็ตคะแนนแต่ละด่าน
+            for (let i = 1; i <= 10; i++) {
+                localStorage.removeItem(`level${i}Score`);
+            }
+            
+            // รีเซ็ตเหรียญทั้งหมด
+            localStorage.removeItem('totalCoins');
+            
+            // อัพเดทหน้าจอทันที
+            loadScores();
+        }
+
+        function updateLeaderboards() {
+            updateTotalScoreLeaderboard();
+            updateCoinsLeaderboard();
+            updateLevelBestScores();
+        }
+
+        function updateTotalScoreLeaderboard() {
+            const leaderboard = getLeaderboardData('totalScore');
+            const container = document.getElementById('totalScoreLeaderboard');
+            
+            if (leaderboard.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-4">ยังไม่มีข้อมูล</div>';
+                return;
+            }
+            
+            container.innerHTML = leaderboard.map((entry, index) => {
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                const bgColor = index === 0 ? 'bg-yellow-50 border-yellow-200' : 
+                               index === 1 ? 'bg-gray-50 border-gray-200' : 
+                               index === 2 ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-100';
+                
+                return `
+                    <div class="flex justify-between items-center p-3 rounded-lg border-2 ${bgColor}">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg font-bold">${medal}</span>
+                            <span class="font-semibold">${entry.name}</span>
+                        </div>
+                        <div class="text-lg font-bold text-yellow-600">${entry.score}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateCoinsLeaderboard() {
+            const leaderboard = getLeaderboardData('coins');
+            const container = document.getElementById('coinsLeaderboard');
+            
+            if (leaderboard.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-4">ยังไม่มีข้อมูล</div>';
+                return;
+            }
+            
+            container.innerHTML = leaderboard.map((entry, index) => {
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                const bgColor = index === 0 ? 'bg-yellow-50 border-yellow-200' : 
+                               index === 1 ? 'bg-gray-50 border-gray-200' : 
+                               index === 2 ? 'bg-orange-50 border-orange-200' : 'bg-white border-gray-100';
+                
+                return `
+                    <div class="flex justify-between items-center p-3 rounded-lg border-2 ${bgColor}">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg font-bold">${medal}</span>
+                            <span class="font-semibold">${entry.name}</span>
+                        </div>
+                        <div class="text-lg font-bold text-orange-600">🪙 ${entry.score}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateLevelBestScores() {
+            for (let level = 1; level <= 10; level++) {
+                const bestScore = getBestScoreForLevel(level);
+                document.getElementById(`levelBest${level}`).textContent = bestScore.score;
+                document.getElementById(`levelBestPlayer${level}`).textContent = bestScore.name;
+            }
+        }
+
+        function getLeaderboardData(type) {
+            const entries = [];
+            
+            // รวบรวมข้อมูลจาก localStorage
+            const savedEntries = JSON.parse(localStorage.getItem('leaderboardEntries') || '[]');
+            
+            // เพิ่มข้อมูลผู้เล่นปัจจุบัน
+            let currentTotalScore = 0;
+            for (let i = 1; i <= 10; i++) {
+                currentTotalScore += parseInt(localStorage.getItem(`level${i}Score`) || 0);
+            }
+            const currentCoins = parseInt(localStorage.getItem('totalCoins') || 0);
+            
+            if (currentTotalScore > 0 || currentCoins > 0) {
+                const currentEntry = {
+                    name: playerName,
+                    totalScore: currentTotalScore,
+                    coins: currentCoins,
+                    timestamp: Date.now()
+                };
+                
+                // ตรวจสอบว่ามีข้อมูลผู้เล่นคนนี้แล้วหรือไม่
+                const existingIndex = savedEntries.findIndex(entry => entry.name === playerName);
+                if (existingIndex >= 0) {
+                    // อัพเดทข้อมูลเดิม
+                    savedEntries[existingIndex] = currentEntry;
+                } else {
+                    // เพิ่มข้อมูลใหม่
+                    savedEntries.push(currentEntry);
+                }
+                
+                // บันทึกกลับ localStorage
+                localStorage.setItem('leaderboardEntries', JSON.stringify(savedEntries));
+            }
+            
+            // เรียงลำดับและส่งคืน
+            if (type === 'totalScore') {
+                return savedEntries
+                    .sort((a, b) => b.totalScore - a.totalScore)
+                    .slice(0, 10)
+                    .map(entry => ({ name: entry.name, score: entry.totalScore }));
+            } else if (type === 'coins') {
+                return savedEntries
+                    .sort((a, b) => b.coins - a.coins)
+                    .slice(0, 10)
+                    .map(entry => ({ name: entry.name, score: entry.coins }));
+            }
+            
+            return [];
+        }
+
+        function getBestScoreForLevel(level) {
+            const levelScores = JSON.parse(localStorage.getItem(`level${level}Scores`) || '[]');
+            
+            // เพิ่มคะแนนปัจจุบันของผู้เล่น
+            const currentScore = parseInt(localStorage.getItem(`level${level}Score`) || 0);
+            if (currentScore > 0) {
+                const currentEntry = {
+                    name: playerName,
+                    score: currentScore,
+                    timestamp: Date.now()
+                };
+                
+                // ตรวจสอบว่ามีข้อมูลผู้เล่นคนนี้แล้วหรือไม่
+                const existingIndex = levelScores.findIndex(entry => entry.name === playerName);
+                if (existingIndex >= 0) {
+                    // อัพเดทถ้าคะแนนใหม่สูงกว่า
+                    if (currentScore > levelScores[existingIndex].score) {
+                        levelScores[existingIndex] = currentEntry;
+                    }
+                } else {
+                    // เพิ่มข้อมูลใหม่
+                    levelScores.push(currentEntry);
+                }
+                
+                // บันทึกกลับ localStorage
+                localStorage.setItem(`level${level}Scores`, JSON.stringify(levelScores));
+            }
+            
+            // หาคะแนนสูงสุด
+            if (levelScores.length === 0) {
+                return { name: '-', score: 0 };
+            }
+            
+            const best = levelScores.reduce((max, current) => 
+                current.score > max.score ? current : max
+            );
+            
+            return { name: best.name, score: best.score };
+        }
+
+        // อัพเดทดาว
+        function updateStarRating(level, score) {
+            const starsElement = document.getElementById(`stars${level}`);
+            if (!starsElement) return;
+            
+            let stars = 0;
+            if (score >= 50) stars = 1;
+            if (score >= 100) stars = 2;
+            if (score >= 200) stars = 3;
+            
+            const starSpans = starsElement.querySelectorAll('.star');
+            starSpans.forEach((star, index) => {
+                star.textContent = index < stars ? '★' : '☆';
+            });
+        }
+
+        // เพิ่มเหรียญ
+        function addCoins(amount, element = null) {
+            currentCoins += amount;
+            document.getElementById('currentCoins').textContent = currentCoins;
+            
+            // บันทึกเหรียญรวม
+            const totalCoins = parseInt(localStorage.getItem('totalCoins') || 0) + amount;
+            localStorage.setItem('totalCoins', totalCoins);
+            
+            // เอฟเฟกต์เหรียญ
+            if (element) {
+                createCoinEffect(element, amount);
+            }
+            
+            // เสียงเหรียญ
+            sounds.coin();
+        }
+
+        // สร้างเอฟเฟกต์เหรียญ
+        function createCoinEffect(element, amount) {
+            const rect = element.getBoundingClientRect();
+            const coin = document.createElement('div');
+            coin.className = 'coin-animation fixed text-2xl font-bold text-yellow-500';
+            coin.textContent = `+${amount}🪙`;
+            coin.style.left = rect.left + rect.width/2 + 'px';
+            coin.style.top = rect.top + 'px';
+            document.body.appendChild(coin);
+            
+            setTimeout(() => coin.remove(), 2000);
+        }
+
+        // สร้างเอฟเฟกต์อนุภาค
+        function createParticles(element) {
+            const rect = element.getBoundingClientRect();
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle fixed';
+                particle.style.left = (rect.left + rect.width/2 + (Math.random() - 0.5) * 50) + 'px';
+                particle.style.top = (rect.top + rect.height/2) + 'px';
+                document.body.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // ระบบคอมโบ
+        function updateCombo() {
+            const now = Date.now();
+            if (now - lastActionTime < 2000) {
+                combo++;
+                if (combo >= 5) {
+                    showComboIndicator();
+                    addCoins(combo, document.getElementById('currentScore'));
+                    sounds.combo();
+                }
+            } else {
+                combo = 1;
+            }
+            lastActionTime = now;
+        }
+
+        // แสดงตัวบ่งชี้คอมโบ
+        function showComboIndicator() {
+            const existing = document.querySelector('.combo-indicator');
+            if (existing) existing.remove();
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'combo-indicator';
+            indicator.textContent = `COMBO x${combo}!`;
+            document.getElementById('gameArea').appendChild(indicator);
+            
+            setTimeout(() => indicator.remove(), 2000);
+        }
+
+        // แสดงความสำเร็จ
+        function showAchievement(title, description) {
+            const popup = document.createElement('div');
+            popup.className = 'achievement-popup';
+            popup.innerHTML = `
+                <div class="text-center">
+                    <div class="text-4xl mb-2">🏆</div>
+                    <div class="text-xl font-bold text-purple-800">${title}</div>
+                    <div class="text-sm text-purple-600">${description}</div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            
+            sounds.achievement();
+            setTimeout(() => popup.remove(), 3000);
+        }
+
+        // อัพเดทคะแนนรวม
+        function updateTotalHighScore() {
+            let total = 0;
+            for (let i = 1; i <= 10; i++) {
+                total += parseInt(localStorage.getItem(`level${i}Score`) || 0);
+            }
+            document.getElementById('totalHighScore').textContent = total;
+        }
+
+        // อัพเดทเหรียญรวม
+        function updateTotalCoins() {
+            const total = localStorage.getItem('totalCoins') || 0;
+            document.getElementById('totalCoins').textContent = total;
+        }
+
+        // อัพเดทจำนวนด่านที่ผ่าน
+        function updateLevelsCompleted() {
+            let completed = 0;
+            for (let i = 1; i <= 10; i++) {
+                const score = parseInt(localStorage.getItem(`level${i}Score`) || 0);
+                if (score > 0) completed++;
+            }
+            document.getElementById('levelsCompleted').textContent = completed;
+        }
+
+        // อัพเดทสถานะด่าน
+        function updateLevelStates() {
+            const cards = document.querySelectorAll('.level-card');
+            let unlockedLevel = 1;
+            
+            // หาด่านสูงสุดที่ปลดล็อกแล้ว
+            for (let i = 1; i <= 10; i++) {
+                const score = parseInt(localStorage.getItem(`level${i}Score`) || 0);
+                if (score > 0) {
+                    unlockedLevel = Math.min(i + 1, 10);
+                }
+            }
+            
+            cards.forEach((card, index) => {
+                const level = index + 1;
+                card.classList.remove('completed', 'current', 'locked');
+                
+                if (level < unlockedLevel) {
+                    // ด่านที่ผ่านแล้ว
+                    card.classList.add('completed');
+                    card.onclick = () => startLevel(level);
+                } else if (level === unlockedLevel) {
+                    // ด่านปัจจุบันที่เล่นได้
+                    card.classList.add('current');
+                    card.onclick = () => startLevel(level);
+                } else {
+                    // ด่านที่ยังล็อกอยู่
+                    card.classList.add('locked');
+                    card.onclick = () => {
+                        sounds.error();
+                        alert(`ต้องผ่านด่าน ${level-1} ก่อน!`);
+                    };
+                }
+            });
+        }
+
+        // เริ่มเกม
+        function startLevel(level) {
+            // ตรวจสอบว่าด่านนี้ปลดล็อกแล้วหรือไม่
+            if (level > 1) {
+                const prevScore = parseInt(localStorage.getItem(`level${level-1}Score`) || 0);
+                if (prevScore === 0) {
+                    sounds.error();
+                    alert(`ต้องผ่านด่าน ${level-1} ก่อน!`);
+                    return;
+                }
+            }
+            
+            currentLevel = level;
+            currentScore = 0;
+            currentCoins = 0;
+            timeLeft = 60;
+            combo = 0;
+            lastActionTime = 0;
+            
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('currentScore').textContent = '0';
+            document.getElementById('currentCoins').textContent = '0';
+            
+            sounds.click();
+            setupLevel(level);
+            startTimer();
+        }
+
+        // ตั้งค่าด่าน
+        function setupLevel(level) {
+            const titles = [
+                '', 'ด่าน 1: ฝึกคลิกเมาส์', 'ด่าน 2: เล็งเป้าให้แม่น', 'ด่าน 3: ฝึกพิมพ์ดีด',
+                'ด่าน 4: ลากและวาง', 'ด่าน 5: จับคู่สี', 'ด่าน 6: จำลำดับ', 'ด่าน 7: ปุ่มลัด',
+                'ด่าน 8: จัดระเบียบไฟล์', 'ด่าน 9: เขาวงกต', 'ด่าน 10: ทักษะผสมผสาน'
+            ];
+            
+            const descriptions = [
+                '', 'คลิกปุ่มที่ปรากฏให้เร็วที่สุด', 'เล็งและคลิกเป้าที่เคลื่อนไหว', 'พิมพ์คำที่ปรากฏให้ถูกต้อง',
+                'ลากรูปภาพไปยังตำแหน่งที่ถูกต้อง', 'จับคู่สีให้ตรงกัน', 'จำลำดับสีและทำตาม', 'ใช้ปุ่มลัดตามคำสั่ง',
+                'จัดไฟล์ให้เข้าโฟลเดอร์ที่ถูกต้อง', 'นำตัวละครผ่านเขาวงกต', 'ใช้ทักษะทั้งหมดที่เรียนมา'
+            ];
+            
+            document.getElementById('levelTitle').textContent = titles[level];
+            document.getElementById('levelDescription').textContent = descriptions[level];
+            document.getElementById('currentScore').textContent = '0';
+            
+            // สร้างเกมตามด่าน
+            switch(level) {
+                case 1: setupClickGame(); break;
+                case 2: setupTargetGame(); break;
+                case 3: setupTypingGame(); break;
+                case 4: setupDragDropGame(); break;
+                case 5: setupColorMatchGame(); break;
+                case 6: setupSequenceGame(); break;
+                case 7: setupShortcutGame(); break;
+                case 8: setupFileOrganizerGame(); break;
+                case 9: setupMazeGame(); break;
+                case 10: setupFinalGame(); break;
+            }
+        }
+
+        // ด่าน 1: คลิกเมาส์
+        function setupClickGame() {
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="text-center">
+                    <div class="text-xl mb-4">คลิกปุ่มเมื่อปรากฏขึ้น!</div>
+                    <div id="clickTarget" class="w-32 h-32 bg-blue-500 hover:bg-blue-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold cursor-pointer transition-all transform hover:scale-110" onclick="clickHit()">
+                        คลิก!
+                    </div>
+                    <div class="mt-4 text-lg">คลิกแล้ว: <span id="clickCount">0</span> ครั้ง</div>
+                </div>
+            `;
+            
+            gameData.clickCount = 0;
+            moveClickTarget();
+        }
+
+        function moveClickTarget() {
+            const target = document.getElementById('clickTarget');
+            if (!target || timeLeft <= 0) return;
+            
+            const gameArea = document.getElementById('gameArea');
+            const maxX = Math.max(200, gameArea.offsetWidth - 150);
+            const maxY = Math.max(200, gameArea.offsetHeight - 200);
+            
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY + 50; // เว้นพื้นที่ด้านบน
+            
+            target.style.position = 'absolute';
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+        }
+
+        function clickHit() {
+            gameData.clickCount++;
+            currentScore += 10;
+            updateCombo();
+            addCoins(1, document.getElementById('clickTarget'));
+            createParticles(document.getElementById('clickTarget'));
+            sounds.success();
+            
+            document.getElementById('clickCount').textContent = gameData.clickCount;
+            document.getElementById('currentScore').textContent = currentScore;
+            moveClickTarget();
+            
+            // ความสำเร็จ
+            if (gameData.clickCount === 10) {
+                showAchievement('นักคลิก!', 'คลิกครบ 10 ครั้งแล้ว');
+            }
+        }
+
+        // ด่าน 2: เล็งเป้า
+        function setupTargetGame() {
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="relative h-96 bg-gradient-to-b from-blue-200 to-green-200 rounded-lg overflow-hidden">
+                    <div id="movingTarget" class="absolute w-16 h-16 bg-red-500 rounded-full cursor-pointer flex items-center justify-center text-white font-bold" onclick="targetHit()">
+                        🎯
+                    </div>
+                    <div class="absolute top-4 left-4 bg-white p-2 rounded">
+                        เป้าโดน: <span id="targetHits">0</span>
+                    </div>
+                </div>
+            `;
+            
+            gameData.targetHits = 0;
+            gameData.targetSpeed = 2;
+            gameData.targetDirection = { x: 1, y: 1 };
+            gameData.targetPosition = { x: 100, y: 100 };
+            
+            moveTarget();
+        }
+
+        function moveTarget() {
+            const target = document.getElementById('movingTarget');
+            if (!target || timeLeft <= 0) return;
+            
+            const gameArea = target.parentElement;
+            const maxX = gameArea.offsetWidth - 64;
+            const maxY = gameArea.offsetHeight - 64;
+            
+            gameData.targetPosition.x += gameData.targetDirection.x * gameData.targetSpeed;
+            gameData.targetPosition.y += gameData.targetDirection.y * gameData.targetSpeed;
+            
+            // ตรวจสอบขอบเขต
+            if (gameData.targetPosition.x <= 0) {
+                gameData.targetPosition.x = 0;
+                gameData.targetDirection.x *= -1;
+            }
+            if (gameData.targetPosition.x >= maxX) {
+                gameData.targetPosition.x = maxX;
+                gameData.targetDirection.x *= -1;
+            }
+            if (gameData.targetPosition.y <= 0) {
+                gameData.targetPosition.y = 0;
+                gameData.targetDirection.y *= -1;
+            }
+            if (gameData.targetPosition.y >= maxY) {
+                gameData.targetPosition.y = maxY;
+                gameData.targetDirection.y *= -1;
+            }
+            
+            target.style.left = gameData.targetPosition.x + 'px';
+            target.style.top = gameData.targetPosition.y + 'px';
+            
+            if (currentLevel === 2 && timeLeft > 0) {
+                setTimeout(moveTarget, 50);
+            }
+        }
+
+        function targetHit() {
+            gameData.targetHits++;
+            currentScore += 20;
+            gameData.targetSpeed += 0.5;
+            updateCombo();
+            addCoins(2, document.getElementById('movingTarget'));
+            createParticles(document.getElementById('movingTarget'));
+            sounds.success();
+            
+            document.getElementById('targetHits').textContent = gameData.targetHits;
+            document.getElementById('currentScore').textContent = currentScore;
+            
+            // ความสำเร็จ
+            if (gameData.targetHits === 5) {
+                showAchievement('นักเล็ง!', 'เล็งเป้าโดน 5 ครั้งแล้ว');
+            }
+        }
+
+        // ด่าน 3: พิมพ์ดีด
+        function setupTypingGame() {
+            const words = ['เมาส์', 'คีย์บอร์ด', 'จอภาพ', 'ลำโพง', 'ไมค์', 'เครื่องพิมพ์', 'สแกนเนอร์', 'เว็บแคม', 'ฮาร์ดดิสก์', 'แรม'];
+            const gameArea = document.getElementById('gameArea');
+            
+            gameArea.innerHTML = `
+                <div class="text-center">
+                    <div class="text-xl mb-4">พิมพ์คำที่ปรากฏ:</div>
+                    <div id="wordToType" class="text-4xl font-bold text-purple-600 mb-4">${words[0]}</div>
+                    <input type="text" id="typingInput" class="text-2xl p-4 border-2 border-purple-300 rounded-lg text-center w-64" placeholder="พิมพ์ที่นี่..." autocomplete="off">
+                    <div class="mt-4 text-lg">พิมพ์ถูก: <span id="typingScore">0</span> คำ</div>
+                </div>
+            `;
+            
+            gameData.words = words;
+            gameData.currentWordIndex = 0;
+            gameData.typingScore = 0;
+            
+            const input = document.getElementById('typingInput');
+            input.addEventListener('input', checkTyping);
+            input.focus();
+        }
+
+        function checkTyping() {
+            const input = document.getElementById('typingInput');
+            const currentWord = gameData.words[gameData.currentWordIndex];
+            
+            if (input.value === currentWord) {
+                gameData.typingScore++;
+                currentScore += 15;
+                updateCombo();
+                addCoins(2, input);
+                createParticles(input);
+                sounds.success();
+                
+                gameData.currentWordIndex = (gameData.currentWordIndex + 1) % gameData.words.length;
+                
+                document.getElementById('wordToType').textContent = gameData.words[gameData.currentWordIndex];
+                document.getElementById('typingScore').textContent = gameData.typingScore;
+                document.getElementById('currentScore').textContent = currentScore;
+                input.value = '';
+                
+                // ความสำเร็จ
+                if (gameData.typingScore === 10) {
+                    showAchievement('นักพิมพ์!', 'พิมพ์ถูก 10 คำแล้ว');
+                }
+            }
+        }
+
+        // ด่าน 4: ลากและวาง
+        function setupDragDropGame() {
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">อุปกรณ์คอมพิวเตอร์</h3>
+                        <div id="dragItems" class="grid grid-cols-2 gap-4">
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">หมวดหมู่</h3>
+                        <div class="space-y-4">
+                            <div class="drop-zone h-24 rounded-lg flex items-center justify-center text-lg font-semibold" data-accept="input">
+                                📥 อุปกรณ์นำเข้าข้อมูล
+                            </div>
+                            <div class="drop-zone h-24 rounded-lg flex items-center justify-center text-lg font-semibold" data-accept="output">
+                                📤 อุปกรณ์ส่งออกข้อมูล
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center text-lg">จับคู่ถูก: <span id="dragScore">0</span> คู่</div>
+            `;
+            
+            gameData.dragScore = 0;
+            gameData.dragDevices = [
+                { name: '🖱️ เมาส์', type: 'input', color: 'bg-blue-200' },
+                { name: '🖥️ จอภาพ', type: 'output', color: 'bg-green-200' },
+                { name: '⌨️ คีย์บอร์ด', type: 'input', color: 'bg-yellow-200' },
+                { name: '🔊 ลำโพง', type: 'output', color: 'bg-orange-200' },
+                { name: '🎤 ไมโครโฟน', type: 'input', color: 'bg-purple-200' },
+                { name: '🖨️ เครื่องพิมพ์', type: 'output', color: 'bg-pink-200' },
+                { name: '📷 เว็บแคม', type: 'input', color: 'bg-indigo-200' },
+                { name: '🎧 หูฟัง', type: 'output', color: 'bg-red-200' }
+            ];
+            generateDragItems();
+            setupDragAndDrop();
+        }
+
+        function generateDragItems() {
+            const container = document.getElementById('dragItems');
+            if (!container) return;
+            
+            // สุ่มเลือก 4 อุปกรณ์
+            const shuffled = [...gameData.dragDevices].sort(() => Math.random() - 0.5);
+            const selectedDevices = shuffled.slice(0, 4);
+            
+            container.innerHTML = selectedDevices.map((device, index) => `
+                <div class="draggable ${device.color} p-4 rounded-lg text-center cursor-grab" 
+                     draggable="true" 
+                     data-type="${device.type}" 
+                     data-id="drag-${index}">
+                    ${device.name}
+                </div>
+            `).join('');
+        }
+
+        function setupDragAndDrop() {
+            const draggables = document.querySelectorAll('.draggable');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            draggables.forEach(item => {
+                item.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text/plain', e.target.dataset.type);
+                    e.dataTransfer.setData('element-id', e.target.id || e.target.textContent);
+                    gameData.draggedElement = e.target;
+                    sounds.click();
+                });
+            });
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    
+                    const draggedType = e.dataTransfer.getData('text/plain');
+                    const acceptType = zone.dataset.accept;
+                    
+                    if (draggedType === acceptType && gameData.draggedElement) {
+                        // อัพเดทคะแนนตามด่าน
+                        if (currentLevel === 4) {
+                            gameData.dragScore = (gameData.dragScore || 0) + 1;
+                            document.getElementById('dragScore').textContent = gameData.dragScore;
+                        } else if (currentLevel === 8) {
+                            gameData.fileScore = (gameData.fileScore || 0) + 1;
+                            document.getElementById('fileScore').textContent = gameData.fileScore;
+                        } else if (currentLevel === 10) {
+                            gameData.finalTasks.drag = true;
+                            updateFinalProgress();
+                        }
+                        
+                        currentScore += 25;
+                        updateCombo();
+                        addCoins(3, gameData.draggedElement);
+                        createParticles(gameData.draggedElement);
+                        sounds.success();
+                        document.getElementById('currentScore').textContent = currentScore;
+                        
+                        // ซ่อน element ที่ลาก
+                        gameData.draggedElement.style.opacity = '0.3';
+                        gameData.draggedElement.draggable = false;
+                        gameData.draggedElement = null;
+                        
+                        // ตรวจสอบว่าครบทุกอันแล้วหรือไม่
+                        const remainingItems = document.querySelectorAll('.draggable[draggable="true"]');
+                        if (remainingItems.length === 0) {
+                            // สร้างรอบใหม่
+                            setTimeout(() => {
+                                if (currentLevel === 4) {
+                                    generateDragItems();
+                                    setupDragAndDrop();
+                                } else if (currentLevel === 8) {
+                                    generateFileItems();
+                                    setupDragAndDrop();
+                                }
+                            }, 500);
+                        }
+                        
+                        // ความสำเร็จ
+                        if ((gameData.dragScore >= 4 && currentLevel === 4) || 
+                            (gameData.fileScore >= 4 && currentLevel === 8)) {
+                            showAchievement('นักจัดระเบียบ!', 'จัดไฟล์ครบทุกอัน');
+                        }
+                    } else {
+                        sounds.error();
+                    }
+                });
+            });
+        }
+
+        // ด่าน 5: จับคู่สี
+        function setupColorMatchGame() {
+            const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+            const gameArea = document.getElementById('gameArea');
+            
+            gameArea.innerHTML = `
+                <div class="text-center mb-4">
+                    <div class="text-xl mb-4">จับคู่สีให้ตรงกัน</div>
+                    <div id="targetColor" class="w-32 h-32 mx-auto rounded-lg mb-4 border-4 border-gray-300"></div>
+                    <div class="grid grid-cols-3 gap-4 max-w-md mx-auto">
+                        ${colors.map(color => `
+                            <div class="w-20 h-20 rounded-lg cursor-pointer border-2 border-gray-300 hover:border-gray-500 transition-all" 
+                                 style="background-color: ${color}" 
+                                 onclick="selectColor('${color}')"></div>
+                        `).join('')}
+                    </div>
+                    <div class="mt-4 text-lg">จับคู่ถูก: <span id="colorScore">0</span> ครั้ง</div>
+                </div>
+            `;
+            
+            gameData.colorScore = 0;
+            gameData.targetColor = colors[Math.floor(Math.random() * colors.length)];
+            document.getElementById('targetColor').style.backgroundColor = gameData.targetColor;
+        }
+
+        function selectColor(color) {
+            if (color === gameData.targetColor) {
+                gameData.colorScore = (gameData.colorScore || 0) + 1;
+                currentScore += 20;
+                updateCombo();
+                addCoins(2, event.target);
+                createParticles(event.target);
+                sounds.success();
+                
+                document.getElementById('colorScore').textContent = gameData.colorScore;
+                document.getElementById('currentScore').textContent = currentScore;
+                
+                // สุ่มสีใหม่
+                const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+                gameData.targetColor = colors[Math.floor(Math.random() * colors.length)];
+                document.getElementById('targetColor').style.backgroundColor = gameData.targetColor;
+                
+                // ความสำเร็จ
+                if (gameData.colorScore === 15) {
+                    showAchievement('นักจับคู่สี!', 'จับคู่สีได้ 15 ครั้งแล้ว');
+                }
+            } else {
+                sounds.error();
+            }
+        }
+
+        // ด่าน 6: จำลำดับ
+        function setupSequenceGame() {
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="text-center">
+                    <div class="text-xl mb-4">จำลำดับสีและทำตาม</div>
+                    <div class="grid grid-cols-2 gap-4 max-w-md mx-auto mb-4">
+                        <button class="pattern-button bg-red-500" data-color="red" onclick="playerInput('red')"></button>
+                        <button class="pattern-button bg-blue-500" data-color="blue" onclick="playerInput('blue')"></button>
+                        <button class="pattern-button bg-green-500" data-color="green" onclick="playerInput('green')"></button>
+                        <button class="pattern-button bg-yellow-500" data-color="yellow" onclick="playerInput('yellow')"></button>
+                    </div>
+                    <button id="startSequence" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold" onclick="startSequence()">
+                        เริ่มลำดับใหม่
+                    </button>
+                    <div class="mt-4 text-lg">ระดับ: <span id="sequenceLevel">1</span></div>
+                </div>
+            `;
+            
+            gameData.sequence = [];
+            gameData.playerSequence = [];
+            gameData.sequenceLevel = 1;
+            gameData.isPlaying = false;
+        }
+
+        function startSequence() {
+            const colors = ['red', 'blue', 'green', 'yellow'];
+            gameData.sequence.push(colors[Math.floor(Math.random() * colors.length)]);
+            gameData.playerSequence = [];
+            gameData.isPlaying = true;
+            
+            document.getElementById('startSequence').disabled = true;
+            sounds.click();
+            playSequence();
+        }
+
+        function playSequence() {
+            gameData.sequence.forEach((color, index) => {
+                setTimeout(() => {
+                    const button = document.querySelector(`[data-color="${color}"]`);
+                    button.classList.add('active');
+                    sounds.click();
+                    setTimeout(() => {
+                        button.classList.remove('active');
+                        if (index === gameData.sequence.length - 1) {
+                            document.getElementById('startSequence').disabled = false;
+                        }
+                    }, 300);
+                }, (index + 1) * 600);
+            });
+        }
+
+        function playerInput(color) {
+            if (!gameData.isPlaying) return;
+            
+            gameData.playerSequence.push(color);
+            sounds.click();
+            
+            // ตรวจสอบความถูกต้อง
+            const currentIndex = gameData.playerSequence.length - 1;
+            if (gameData.playerSequence[currentIndex] !== gameData.sequence[currentIndex]) {
+                // ผิด - แสดง reaction และเริ่มใหม่
+                const button = event.target;
+                button.style.backgroundColor = '#ff4444';
+                button.style.transform = 'scale(0.8)';
+                sounds.error();
+                
+                // แสดงข้อความผิด
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white px-6 py-4 rounded-lg text-xl font-bold z-50';
+                errorMsg.textContent = '❌ ผิด! เริ่มใหม่';
+                document.body.appendChild(errorMsg);
+                
+                setTimeout(() => {
+                    button.style.backgroundColor = '';
+                    button.style.transform = '';
+                    errorMsg.remove();
+                }, 1000);
+                
+                gameData.sequence = [];
+                gameData.sequenceLevel = 1;
+                gameData.isPlaying = false;
+                document.getElementById('sequenceLevel').textContent = gameData.sequenceLevel;
+                return;
+            } else {
+                // ถูก - แสดง reaction เชิงบวก
+                const button = event.target;
+                button.style.backgroundColor = '#44ff44';
+                button.style.transform = 'scale(1.1)';
+                
+                setTimeout(() => {
+                    button.style.backgroundColor = '';
+                    button.style.transform = '';
+                }, 200);
+            }
+            
+            // ถ้าทำครบลำดับ
+            if (gameData.playerSequence.length === gameData.sequence.length) {
+                gameData.sequenceLevel++;
+                currentScore += gameData.sequenceLevel * 10;
+                updateCombo();
+                addCoins(gameData.sequenceLevel, event.target);
+                sounds.success();
+                
+                // แสดงข้อความสำเร็จ
+                const successMsg = document.createElement('div');
+                successMsg.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white px-6 py-4 rounded-lg text-xl font-bold z-50';
+                successMsg.textContent = `✅ เก่ง! ระดับ ${gameData.sequenceLevel}`;
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => successMsg.remove(), 1500);
+                
+                document.getElementById('sequenceLevel').textContent = gameData.sequenceLevel;
+                document.getElementById('currentScore').textContent = currentScore;
+                gameData.isPlaying = false;
+                
+                // ความสำเร็จ
+                if (gameData.sequenceLevel === 8) {
+                    showAchievement('นักจำ!', 'จำลำดับได้ถึงระดับ 8');
+                }
+            }
+        }
+
+        // ด่าน 7: ปุ่มลัด
+        function setupShortcutGame() {
+            const shortcuts = [
+                { key: 'Ctrl+C', action: 'คัดลอก', code: 'KeyC' },
+                { key: 'Ctrl+V', action: 'วาง', code: 'KeyV' },
+                { key: 'Ctrl+Z', action: 'ยกเลิก', code: 'KeyZ' },
+                { key: 'Ctrl+S', action: 'บันทึก', code: 'KeyS' }
+            ];
+            
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="text-center">
+                    <div class="text-xl mb-4">กดปุ่มลัดตามคำสั่ง</div>
+                    <div id="shortcutCommand" class="text-3xl font-bold text-purple-600 mb-4"></div>
+                    <div class="text-lg mb-4">กด: <span id="shortcutKey" class="font-mono bg-gray-200 px-2 py-1 rounded"></span></div>
+                    <div class="text-lg">ทำถูก: <span id="shortcutScore">0</span> ครั้ง</div>
+                </div>
+            `;
+            
+            gameData.shortcuts = shortcuts;
+            gameData.currentShortcut = shortcuts[0];
+            gameData.shortcutScore = 0;
+            gameData.ctrlPressed = false;
+            
+            updateShortcutDisplay();
+            setupShortcutListeners();
+        }
+
+        function updateShortcutDisplay() {
+            document.getElementById('shortcutCommand').textContent = gameData.currentShortcut.action;
+            document.getElementById('shortcutKey').textContent = gameData.currentShortcut.key;
+        }
+
+        function setupShortcutListeners() {
+            document.addEventListener('keydown', handleShortcut);
+            document.addEventListener('keyup', handleShortcutKeyUp);
+        }
+
+        function handleShortcutKeyUp(e) {
+            if (e.key === 'Control') gameData.ctrlPressed = false;
+        }
+
+        function handleShortcut(e) {
+            if (currentLevel !== 7) return;
+            
+            if (e.key === 'Control') {
+                gameData.ctrlPressed = true;
+                return;
+            }
+            
+            if (gameData.ctrlPressed && e.code === gameData.currentShortcut.code) {
+                e.preventDefault();
+                gameData.shortcutScore = (gameData.shortcutScore || 0) + 1;
+                currentScore += 15;
+                updateCombo();
+                addCoins(2, document.getElementById('shortcutKey'));
+                sounds.success();
+                
+                document.getElementById('shortcutScore').textContent = gameData.shortcutScore;
+                document.getElementById('currentScore').textContent = currentScore;
+                
+                // สุ่มคำสั่งใหม่
+                gameData.currentShortcut = gameData.shortcuts[Math.floor(Math.random() * gameData.shortcuts.length)];
+                updateShortcutDisplay();
+                
+                // ความสำเร็จ
+                if (gameData.shortcutScore === 10) {
+                    showAchievement('นักปุ่มลัด!', 'ใช้ปุ่มลัดได้ 10 ครั้งแล้ว');
+                }
+            }
+        }
+
+        // ด่าน 8: จัดไฟล์
+        function setupFileOrganizerGame() {
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">ไฟล์</h3>
+                        <div id="fileItems" class="space-y-2">
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">โฟลเดอร์</h3>
+                        <div class="space-y-4">
+                            <div class="drop-zone h-20 bg-blue-50 rounded-lg flex items-center justify-center" data-accept="document">
+                                📁 เอกสาร
+                            </div>
+                            <div class="drop-zone h-20 bg-green-50 rounded-lg flex items-center justify-center" data-accept="image">
+                                📁 รูปภาพ
+                            </div>
+                            <div class="drop-zone h-20 bg-red-50 rounded-lg flex items-center justify-center" data-accept="video">
+                                📁 วิดีโอ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center text-lg">จัดไฟล์ถูก: <span id="fileScore">0</span> ไฟล์</div>
+            `;
+            
+            gameData.fileScore = 0;
+            gameData.fileTypes = {
+                document: { 
+                    extensions: ['.docx', '.pdf', '.txt', '.pptx', '.xlsx'], 
+                    names: ['รายงาน', 'เอกสาร', 'บทความ', 'งานนำเสนอ', 'ตาราง'],
+                    icon: '📄',
+                    color: 'bg-blue-100'
+                },
+                image: { 
+                    extensions: ['.jpg', '.png', '.gif', '.bmp', '.svg'], 
+                    names: ['รูปภาพ', 'ภาพถ่าย', 'โลโก้', 'ไอคอน', 'แบนเนอร์'],
+                    icon: '🖼️',
+                    color: 'bg-green-100'
+                },
+                video: { 
+                    extensions: ['.mp4', '.avi', '.mov', '.wmv', '.mkv'], 
+                    names: ['วิดีโอ', 'หนัง', 'คลิป', 'การบันทึก', 'แอนิเมชัน'],
+                    icon: '🎥',
+                    color: 'bg-red-100'
+                }
+            };
+            generateFileItems();
+            setupDragAndDrop();
+        }
+
+        function generateFileItems() {
+            const container = document.getElementById('fileItems');
+            if (!container) return;
+            
+            const types = Object.keys(gameData.fileTypes);
+            const files = [];
+            
+            // สร้างไฟล์ 4 ไฟล์แบบสุ่ม
+            for (let i = 0; i < 4; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                const typeData = gameData.fileTypes[type];
+                const name = typeData.names[Math.floor(Math.random() * typeData.names.length)];
+                const ext = typeData.extensions[Math.floor(Math.random() * typeData.extensions.length)];
+                
+                files.push({
+                    name: `${typeData.icon} ${name}${ext}`,
+                    type: type,
+                    color: typeData.color
+                });
+            }
+            
+            container.innerHTML = files.map((file, index) => `
+                <div class="draggable ${file.color} p-3 rounded cursor-grab" 
+                     draggable="true" 
+                     data-type="${file.type}" 
+                     data-id="file-${index}">
+                    ${file.name}
+                </div>
+            `).join('');
+        }
+
+        // ด่าน 9: เขาวงกต
+        function setupMazeGame() {
+            gameData.mazeLevel = 1;
+            gameData.mazeScore = 0;
+            generateNewMaze();
+        }
+
+        function generateNewMaze() {
+            // สร้างเขาวงกตแบบสุ่ม
+            const mazeTemplates = [
+                // เขาวงกต 1
+                [
+                    [1,1,1,1,1,1,1,1,1,1],
+                    [1,0,0,0,1,0,0,0,0,1],
+                    [1,0,1,0,1,0,1,1,0,1],
+                    [1,0,1,0,0,0,0,1,0,1],
+                    [1,0,1,1,1,1,0,1,0,1],
+                    [1,0,0,0,0,0,0,1,0,1],
+                    [1,1,1,0,1,1,1,1,0,1],
+                    [1,0,0,0,0,0,0,0,0,1],
+                    [1,0,1,1,1,1,1,1,2,1],
+                    [1,1,1,1,1,1,1,1,1,1]
+                ],
+                // เขาวงกต 2
+                [
+                    [1,1,1,1,1,1,1,1,1,1],
+                    [1,0,0,0,0,0,0,0,0,1],
+                    [1,0,1,1,1,1,1,1,0,1],
+                    [1,0,0,0,0,0,0,1,0,1],
+                    [1,1,1,1,0,1,0,1,0,1],
+                    [1,0,0,0,0,1,0,0,0,1],
+                    [1,0,1,1,1,1,1,1,1,1],
+                    [1,0,0,0,0,0,0,0,0,1],
+                    [1,1,1,1,1,1,1,1,2,1],
+                    [1,1,1,1,1,1,1,1,1,1]
+                ],
+                // เขาวงกต 3
+                [
+                    [1,1,1,1,1,1,1,1,1,1],
+                    [1,0,1,0,0,0,1,0,0,1],
+                    [1,0,1,0,1,0,1,0,1,1],
+                    [1,0,0,0,1,0,0,0,0,1],
+                    [1,1,1,0,1,1,1,1,0,1],
+                    [1,0,0,0,0,0,0,1,0,1],
+                    [1,0,1,1,1,1,0,1,0,1],
+                    [1,0,0,0,0,0,0,0,0,1],
+                    [1,1,1,1,1,1,1,1,2,1],
+                    [1,1,1,1,1,1,1,1,1,1]
+                ]
+            ];
+            
+            const maze = mazeTemplates[Math.floor(Math.random() * mazeTemplates.length)];
+            
+            const gameArea = document.getElementById('gameArea');
+            let mazeHTML = `
+                <div class="text-center mb-4">
+                    <div class="text-lg">เขาวงกตที่ ${gameData.mazeLevel} | ผ่านแล้ว: ${gameData.mazeScore} ครั้ง</div>
+                </div>
+                <div class="inline-block border-2 border-gray-800">
+            `;
+            
+            maze.forEach((row, y) => {
+                mazeHTML += '<div class="flex">';
+                row.forEach((cell, x) => {
+                    let cellClass = 'maze-cell ';
+                    if (cell === 1) cellClass += 'maze-wall';
+                    else if (cell === 0) cellClass += 'maze-path';
+                    else if (cell === 2) cellClass += 'maze-goal';
+                    
+                    mazeHTML += `<div class="${cellClass}" data-x="${x}" data-y="${y}"></div>`;
+                });
+                mazeHTML += '</div>';
+            });
+            
+            mazeHTML += '</div>';
+            mazeHTML += '<div class="mt-4 text-center"><div class="text-lg">ใช้ปุ่มลูกศร WASD หรือ ←↑↓→ เพื่อเคลื่อนที่</div></div>';
+            
+            gameArea.innerHTML = mazeHTML;
+            
+            gameData.maze = maze;
+            gameData.playerPos = { x: 1, y: 1 };
+            
+            // หาตำแหน่งเป้าหมาย
+            for (let y = 0; y < maze.length; y++) {
+                for (let x = 0; x < maze[y].length; x++) {
+                    if (maze[y][x] === 2) {
+                        gameData.goalPos = { x, y };
+                        break;
+                    }
+                }
+            }
+            
+            updateMazeDisplay();
+            setupMazeControls();
+        }
+
+        function updateMazeDisplay() {
+            // ล้างตำแหน่งเก่า
+            document.querySelectorAll('.maze-player').forEach(cell => {
+                cell.classList.remove('maze-player');
+                cell.classList.add('maze-path');
+            });
+            
+            // วางตำแหน่งใหม่
+            const playerCell = document.querySelector(`[data-x="${gameData.playerPos.x}"][data-y="${gameData.playerPos.y}"]`);
+            if (playerCell) {
+                playerCell.classList.remove('maze-path');
+                playerCell.classList.add('maze-player');
+            }
+        }
+
+        function setupMazeControls() {
+            document.addEventListener('keydown', handleMazeMovement);
+        }
+
+        function handleMazeMovement(e) {
+            if (currentLevel !== 9) return;
+            
+            let newX = gameData.playerPos.x;
+            let newY = gameData.playerPos.y;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    newY--;
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    newY++;
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    newX--;
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    newX++;
+                    break;
+                default:
+                    return;
+            }
+            
+            // ตรวจสอบว่าเดินได้หรือไม่
+            if (gameData.maze[newY] && gameData.maze[newY][newX] !== 1) {
+                gameData.playerPos.x = newX;
+                gameData.playerPos.y = newY;
+                updateMazeDisplay();
+                sounds.click();
+                
+                // ตรวจสอบว่าถึงเป้าหมายหรือไม่
+                if (newX === gameData.goalPos.x && newY === gameData.goalPos.y) {
+                    gameData.mazeScore++;
+                    gameData.mazeLevel++;
+                    currentScore += 50 + (gameData.mazeLevel * 10);
+                    updateCombo();
+                    addCoins(5 + gameData.mazeLevel, document.querySelector('.maze-goal'));
+                    sounds.levelComplete();
+                    
+                    document.getElementById('currentScore').textContent = currentScore;
+                    
+                    // แสดงข้อความสำเร็จ
+                    const successMsg = document.createElement('div');
+                    successMsg.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white px-6 py-4 rounded-lg text-xl font-bold z-50';
+                    successMsg.textContent = `🎉 ผ่านเขาวงกตแล้ว! ด่าน ${gameData.mazeLevel}`;
+                    document.body.appendChild(successMsg);
+                    
+                    setTimeout(() => {
+                        successMsg.remove();
+                        generateNewMaze(); // สร้างเขาวงกตใหม่
+                    }, 1500);
+                    
+                    // ความสำเร็จ
+                    if (gameData.mazeScore === 3) {
+                        showAchievement('นักสำรวจ!', 'ผ่านเขาวงกต 3 ครั้งแล้ว');
+                    }
+                }
+            } else {
+                sounds.error();
+            }
+        }
+
+        // ด่าน 10: ทักษะผสมผสาน
+        function setupFinalGame() {
+            const gameArea = document.getElementById('gameArea');
+            gameArea.innerHTML = `
+                <div class="text-center">
+                    <div class="text-xl mb-4">ด่านสุดท้าย: ใช้ทักษะทั้งหมด!</div>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <div class="bg-blue-100 p-4 rounded-lg mb-4">
+                                <h4 class="font-bold mb-2">งาน 1: คลิกเป้า</h4>
+                                <div id="finalTarget" class="w-16 h-16 bg-red-500 rounded-full mx-auto cursor-pointer" onclick="finalTargetHit()">🎯</div>
+                            </div>
+                            <div class="bg-green-100 p-4 rounded-lg">
+                                <h4 class="font-bold mb-2">งาน 2: พิมพ์คำ</h4>
+                                <div id="finalWord" class="text-xl font-bold mb-2">HELLO</div>
+                                <input type="text" id="finalTyping" class="w-full p-2 border rounded" placeholder="พิมพ์ที่นี่">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="bg-yellow-100 p-4 rounded-lg mb-4">
+                                <h4 class="font-bold mb-2">งาน 3: ลากและวาง</h4>
+                                <div class="draggable bg-purple-200 p-2 rounded mb-2 cursor-grab" draggable="true" data-type="final">📦 กล่อง</div>
+                                <div class="drop-zone h-16 border-2 border-dashed border-gray-400 rounded flex items-center justify-center" data-accept="final">วางที่นี่</div>
+                            </div>
+                            <div class="bg-red-100 p-4 rounded-lg">
+                                <h4 class="font-bold mb-2">งาน 4: จับคู่สี</h4>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="w-12 h-12 bg-blue-500 rounded cursor-pointer" onclick="finalColorMatch('blue')"></div>
+                                    <div class="w-12 h-12 bg-red-500 rounded cursor-pointer" onclick="finalColorMatch('red')"></div>
+                                </div>
+                                <div id="finalColorTarget" class="w-8 h-8 bg-blue-500 rounded mx-auto mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-lg">งานเสร็จ: <span id="finalTasksComplete">0</span>/4</div>
+                </div>
+            `;
+            
+            gameData.finalTasks = {
+                target: false,
+                typing: false,
+                drag: false,
+                color: false
+            };
+            gameData.finalTargetColor = 'blue';
+            
+            setupDragAndDrop();
+            setupFinalTyping();
+        }
+
+        function setupFinalTyping() {
+            const input = document.getElementById('finalTyping');
+            input.addEventListener('input', () => {
+                if (input.value.toLowerCase() === 'hello') {
+                    gameData.finalTasks.typing = true;
+                    updateFinalProgress();
+                    input.disabled = true;
+                    input.style.backgroundColor = '#d4edda';
+                    sounds.success();
+                }
+            });
+        }
+
+        function finalTargetHit() {
+            gameData.finalTasks.target = true;
+            updateFinalProgress();
+            document.getElementById('finalTarget').onclick = null;
+            document.getElementById('finalTarget').style.backgroundColor = '#28a745';
+            sounds.success();
+        }
+
+        function finalColorMatch(color) {
+            if (color === gameData.finalTargetColor) {
+                gameData.finalTasks.color = true;
+                currentScore += 50;
+                addCoins(5, event.target);
+                document.getElementById('currentScore').textContent = currentScore;
+                updateFinalProgress();
+                sounds.success();
+                
+                // ปิดการคลิก
+                document.querySelectorAll('[onclick*="finalColorMatch"]').forEach(btn => {
+                    btn.onclick = null;
+                    btn.style.opacity = '0.5';
+                });
+            } else {
+                sounds.error();
+            }
+        }
+
+        function updateFinalProgress() {
+            const completed = Object.values(gameData.finalTasks).filter(task => task).length;
+            document.getElementById('finalTasksComplete').textContent = completed;
+            
+            if (completed === 4) {
+                currentScore += 200;
+                addCoins(20, document.getElementById('finalTasksComplete'));
+                document.getElementById('currentScore').textContent = currentScore;
+                showAchievement('ปรมาจารย์!', 'ผ่านทุกด่านแล้ว!');
+                sounds.levelComplete();
+                
+                setTimeout(() => {
+                    alert('🎉 ยินดีด้วย! คุณผ่านทุกด่านแล้ว! 🎉');
+                }, 1000);
+            }
+        }
+
+        // ระบบจับเวลา
+        function startTimer() {
+            const totalTime = 60;
+            const circumference = 2 * Math.PI * 28; // r = 28
+            
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timeLeft').textContent = timeLeft;
+                
+                // อัพเดทวงกลมความคืบหน้า
+                const progress = (totalTime - timeLeft) / totalTime;
+                const offset = circumference * progress;
+                document.getElementById('progressCircle').style.strokeDashoffset = offset;
+                
+                // เปลี่ยนสีเมื่อเวลาใกล้หมด
+                const circle = document.getElementById('progressCircle');
+                if (timeLeft <= 10) {
+                    circle.style.stroke = '#ef4444'; // สีแดง
+                    if (timeLeft <= 5) {
+                        sounds.click(); // เสียงเตือน
+                    }
+                } else if (timeLeft <= 20) {
+                    circle.style.stroke = '#f59e0b'; // สีเหลือง
+                } else {
+                    circle.style.stroke = '#3b82f6'; // สีน้ำเงิน
+                }
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // จบเกม
+        function endGame() {
+            clearInterval(gameTimer);
+            
+            // บันทึกคะแนน
+            const currentHighScore = parseInt(localStorage.getItem(`level${currentLevel}Score`) || 0);
+            let message = `เกมจบ!\nคะแนน: ${currentScore}\nเหรียญที่ได้: ${currentCoins}`;
+            
+            if (currentScore > currentHighScore) {
+                localStorage.setItem(`level${currentLevel}Score`, currentScore);
+                message = `🎉 สถิติใหม่!\nคะแนน: ${currentScore}\nเหรียญที่ได้: ${currentCoins}`;
+                sounds.levelComplete();
+                
+                // ความสำเร็จสำหรับสถิติใหม่
+                showAchievement('สถิติใหม่!', `ทำลายสถิติด่าน ${currentLevel}`);
+            }
+            
+            // ตรวจสอบความสำเร็จพิเศษ
+            if (currentScore >= 300) {
+                showAchievement('ปรมาจารย์!', 'ได้คะแนนเกิน 300');
+            } else if (currentScore >= 200) {
+                showAchievement('ผู้เชี่ยวชาญ!', 'ได้คะแนนเกิน 200');
+            } else if (currentScore >= 100) {
+                showAchievement('นักเรียนดี!', 'ได้คะแนนเกิน 100');
+            }
+            
+            setTimeout(() => {
+                alert(message);
+                backToMenu();
+            }, 1000);
+        }
+
+        // กลับหน้าหลัก
+        function backToMenu() {
+            clearInterval(gameTimer);
+            gameTimer = null;
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+            
+            // ล้าง event listeners
+            document.removeEventListener('keydown', handleShortcut);
+            document.removeEventListener('keydown', handleMazeMovement);
+            document.removeEventListener('keyup', handleShortcutKeyUp);
+            
+            // รีเซ็ตตัวแปรเกม
+            gameData = {};
+            currentScore = 0;
+            currentCoins = 0;
+            combo = 0;
+            
+            sounds.click();
+            loadScores();
+        }
+
+        // รีเซ็ตคะแนน
+        function resetAllScores() {
+            if (confirm('คุณต้องการรีเซ็ตคะแนนและเหรียญทั้งหมดหรือไม่?\n\n⚠️ หมายเหตุ: การรีเซ็ตจะไม่ลบข้อมูล Leaderboard')) {
+                for (let i = 1; i <= 10; i++) {
+                    localStorage.removeItem(`level${i}Score`);
+                }
+                localStorage.removeItem('totalCoins');
+                sounds.click();
+                loadScores();
+                showAchievement('เริ่มใหม่!', 'รีเซ็ตคะแนนส่วนตัวแล้ว');
+            }
+        }
+
+        function resetLeaderboard() {
+            const password = prompt('🔒 ใส่รหัสผ่านเพื่อล้าง Leaderboard:\n\n(สำหรับผู้ดูแลระบบเท่านั้น)');
+            
+            if (password === null) {
+                // ผู้ใช้กด Cancel
+                return;
+            }
+            
+            if (password !== 'cttc19') {
+                sounds.error();
+                alert('❌ รหัสผ่านไม่ถูกต้อง!\n\nกรุณาติดต่อผู้ดูแลระบบ');
+                return;
+            }
+            
+            if (confirm('✅ รหัสผ่านถูกต้อง!\n\nคุณต้องการลบข้อมูล Leaderboard ทั้งหมดหรือไม่?\n\n⚠️ คำเตือน: การกระทำนี้ไม่สามารถย้อนกลับได้!')) {
+                // ลบข้อมูล leaderboard
+                localStorage.removeItem('leaderboardEntries');
+                for (let i = 1; i <= 10; i++) {
+                    localStorage.removeItem(`level${i}Scores`);
+                }
+                
+                sounds.success();
+                updateLeaderboards();
+                showAchievement('ล้างข้อมูลแล้ว!', 'ลบ Leaderboard ทั้งหมดแล้ว');
+            }
+        }
+
+        // ป้องกันข้อผิดพลาด
+        window.addEventListener('error', function(e) {
+            console.log('Error caught:', e.error);
+        });
+
+        // เริ่มต้น
+        window.onload = function() {
+            loadScores();
+            
+            // ป้องกันการรีเฟรชหน้าขณะเล่นเกม
+            window.addEventListener('beforeunload', function(e) {
+                if (gameTimer) {
+                    e.preventDefault();
+                    e.returnValue = 'คุณกำลังเล่นเกมอยู่ ต้องการออกจริงหรือ?';
+                }
+            });
+        };
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'977c4800f6c85805',t:'MTc1NjY0MDcyMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

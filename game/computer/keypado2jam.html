@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมฝึกพิมพ์ดีด - Typing Rhythm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        .falling-letter {
+            animation: fall linear;
+            position: absolute;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes fall {
+            from {
+                top: -50px;
+            }
+            to {
+                top: 100vh;
+            }
+        }
+        
+        .hit-effect {
+            animation: hitPulse 0.3s ease-out;
+        }
+        
+        @keyframes hitPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .game-lane {
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .hit-zone {
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen text-white overflow-hidden">
+    <!-- Game Header -->
+    <div class="flex justify-between items-center p-4 bg-black bg-opacity-30">
+        <div class="flex items-center space-x-6">
+            <h1 class="text-2xl font-bold text-yellow-300">🎵 เกมฝึกพิมพ์ดีด</h1>
+            <div class="text-lg">คะแนน: <span id="score" class="text-green-400 font-bold">0</span></div>
+            <div class="text-lg">ชีวิต: <span id="lives" class="text-red-400 font-bold">❤️❤️❤️</span></div>
+            <div class="text-lg">คอมโบ: <span id="combo" class="text-orange-400 font-bold">0</span></div>
+
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="text-lg">เวลา: <span id="timer" class="text-blue-400 font-bold">60</span>s</div>
+            <button id="pauseBtn" class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg font-semibold text-black transition-colors">
+                ⏸️ หยุด
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Area -->
+    <div class="relative h-screen">
+        <!-- Game Lanes Container -->
+        <div class="absolute inset-0 pt-4" id="gameLanesContainer">
+            <!-- Top Row (QWERTY) -->
+            <div class="flex justify-center mb-2" id="topRow" style="display: none;">
+                <!-- Top row lanes will be generated here -->
+            </div>
+            
+            <!-- Home Row (ASDF) -->
+            <div class="flex justify-center mb-2" id="homeRow">
+                <!-- Home row lanes will be generated here -->
+            </div>
+            
+            <!-- Bottom Row (ZXCV) -->
+            <div class="flex justify-center mb-2" id="bottomRow" style="display: none;">
+                <!-- Bottom row lanes will be generated here -->
+            </div>
+        </div>
+
+        <!-- Hit Zone -->
+        <div class="hit-zone absolute bottom-16 left-0 right-0 h-12 opacity-80"></div>
+    </div>
+
+    <!-- Pause Screen -->
+    <div id="pauseScreen" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl text-center">
+            <h2 class="text-4xl font-bold mb-4 text-yellow-300">⏸️ หยุดชั่วคราว</h2>
+            <p class="text-xl text-gray-300 mb-6">กดปุ่ม "เล่นต่อ" เพื่อดำเนินเกมต่อ</p>
+            <button id="resumeBtn" class="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg font-semibold text-white transition-colors">
+                ▶️ เล่นต่อ
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden">
+        <div class="bg-gradient-to-br from-purple-800 to-blue-800 p-8 rounded-2xl text-center max-w-md">
+            <h2 class="text-3xl font-bold mb-4 text-yellow-300">🎉 เกมจบแล้ว!</h2>
+            <div class="text-xl mb-6">
+                <p>คะแนนสุดท้าย: <span id="finalScore" class="text-green-400 font-bold">0</span></p>
+                <p>ความแม่นยำ: <span id="accuracy" class="text-blue-400 font-bold">0%</span></p>
+            </div>
+            <button id="restartBtn" class="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg font-semibold text-white transition-colors">
+                🔄 เล่นใหม่
+            </button>
+        </div>
+    </div>
+
+    <!-- Name Entry Form -->
+    <div id="nameEntryScreen" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden">
+        <div class="bg-gradient-to-br from-yellow-600 to-orange-600 p-8 rounded-2xl text-center max-w-md w-full mx-4">
+            <h2 class="text-3xl font-bold mb-4 text-white">🏆 คะแนนสูง!</h2>
+            <div class="text-xl mb-6 text-yellow-100">
+                <p>คะแนนของคุณ: <span id="nameEntryScore" class="text-white font-bold">0</span></p>
+                <p>เข้าอันดับ <span id="nameEntryRank" class="text-white font-bold">10</span> อันดับแรก!</p>
+            </div>
+            
+            <form id="nameEntryForm" class="space-y-4">
+                <div class="text-left">
+                    <label for="playerName" class="block text-white font-semibold mb-2">กรุณาใส่ชื่อของคุณ:</label>
+                    <input 
+                        type="text" 
+                        id="playerName" 
+                        name="playerName"
+                        maxlength="20"
+                        placeholder="ใส่ชื่อของคุณ..."
+                        class="w-full px-4 py-3 rounded-lg text-gray-800 font-semibold text-lg focus:outline-none focus:ring-4 focus:ring-yellow-300 border-2 border-yellow-300"
+                        required
+                    >
+                    <div class="text-sm text-yellow-100 mt-1">สูงสุด 20 ตัวอักษร</div>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button 
+                        type="submit" 
+                        class="flex-1 bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg font-semibold text-white transition-colors"
+                    >
+                        💾 บันทึกคะแนน
+                    </button>
+                    <button 
+                        type="button" 
+                        id="skipNameEntry"
+                        class="flex-1 bg-gray-500 hover:bg-gray-600 px-6 py-3 rounded-lg font-semibold text-white transition-colors"
+                    >
+                        ⏭️ ข้าม
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leaderboard Screen -->
+    <div id="leaderboardScreen" class="fixed inset-0 bg-gradient-to-br from-purple-900 to-blue-900 flex items-center justify-center hidden">
+        <div class="text-center max-w-4xl w-full mx-4">
+            <h1 class="text-4xl font-bold mb-6 text-yellow-300">🏆 กระดานคะแนน</h1>
+            
+            <!-- Difficulty Tabs -->
+            <div class="flex justify-center mb-6 space-x-4">
+                <button id="leaderEasyTab" class="leaderboard-tab bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors border-2 border-green-400">
+                    🟢 ง่าย
+                </button>
+                <button id="leaderMediumTab" class="leaderboard-tab bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors border-2 border-transparent">
+                    🟡 ปานกลาง
+                </button>
+                <button id="leaderHardTab" class="leaderboard-tab bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors border-2 border-transparent">
+                    🔴 ยาก
+                </button>
+            </div>
+            
+            <!-- Leaderboard Content -->
+            <div class="bg-black bg-opacity-30 rounded-2xl p-6 mb-6">
+                <div class="grid grid-cols-2 gap-8">
+                    <!-- English Leaderboard -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-blue-300">🇺🇸 English</h3>
+                        <div id="englishLeaderboard" class="space-y-2">
+                            <!-- Leaderboard entries will be generated here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Thai Leaderboard -->
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-green-300">🇹🇭 ไทย</h3>
+                        <div id="thaiLeaderboard" class="space-y-2">
+                            <!-- Leaderboard entries will be generated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="backToMenuBtn" class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-lg font-semibold text-white transition-colors">
+                ← กลับเมนูหลัก
+            </button>
+        </div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="startScreen" class="fixed inset-0 bg-gradient-to-br from-purple-900 to-blue-900 flex items-center justify-center">
+        <div class="text-center">
+            <h1 class="text-5xl font-bold mb-6 text-yellow-300">🎵 เกมฝึกพิมพ์ดีด</h1>
+            
+            <!-- Language Selection -->
+            <div class="mb-6 p-6 bg-black bg-opacity-30 rounded-2xl">
+                <h2 class="text-2xl font-bold mb-4 text-white">เลือกภาษาแป้นพิมพ์</h2>
+                <div class="flex justify-center space-x-4">
+                    <button id="englishBtn" class="language-btn bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-xl text-xl font-semibold text-white transition-colors border-2 border-blue-400">
+                        🇺🇸 English<br>
+                        <span class="text-sm opacity-80">A S D F J K L ;</span>
+                    </button>
+                    <button id="thaiBtn" class="language-btn bg-gray-600 hover:bg-gray-700 px-6 py-4 rounded-xl text-xl font-semibold text-white transition-colors border-2 border-transparent">
+                        🇹🇭 ไทย<br>
+                        <span class="text-sm opacity-80">ฟ ห ก ด ่ า ส ว</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Difficulty Selection -->
+            <div class="mb-8 p-6 bg-black bg-opacity-30 rounded-2xl">
+                <h2 class="text-2xl font-bold mb-4 text-white">เลือกระดับความยาก</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button id="easyBtn" class="difficulty-btn bg-green-600 hover:bg-green-700 px-4 py-4 rounded-xl text-lg font-semibold text-white transition-colors border-2 border-green-400">
+                        🟢 ง่าย<br>
+                        <span class="text-sm opacity-80">แถวหลัก (Home Row)</span><br>
+                        <span class="text-xs opacity-60" id="easyKeys">A S D F J K L ;</span>
+                    </button>
+                    <button id="mediumBtn" class="difficulty-btn bg-gray-600 hover:bg-gray-700 px-4 py-4 rounded-xl text-lg font-semibold text-white transition-colors border-2 border-transparent">
+                        🟡 ปานกลาง<br>
+                        <span class="text-sm opacity-80">2 แถว</span><br>
+                        <span class="text-xs opacity-60" id="mediumKeys">+ Q W E R T Y U I O P</span>
+                    </button>
+                    <button id="hardBtn" class="difficulty-btn bg-gray-600 hover:bg-gray-700 px-4 py-4 rounded-xl text-lg font-semibold text-white transition-colors border-2 border-transparent">
+                        🔴 ยาก<br>
+                        <span class="text-sm opacity-80">3 แถว</span><br>
+                        <span class="text-xs opacity-60" id="hardKeys">+ Z X C V B N M , .</span>
+                    </button>
+                </div>
+            </div>
+            
+            <p id="instructions" class="text-xl mb-4 text-gray-300">กดปุ่ม A S D F J K L ; เมื่อตัวอักษรตกลงมาถึงเส้นสีทอง!</p>
+            <p class="text-lg mb-8 text-blue-300">💡 เลือกภาษาแป้นพิมพ์ด้านบนแล้วกดเริ่มเกม</p>
+            <div class="flex justify-center space-x-4">
+                <button id="startBtn" class="bg-green-500 hover:bg-green-600 px-8 py-4 rounded-lg text-2xl font-semibold text-white transition-colors">
+                    🚀 เริ่มเกม
+                </button>
+                <button id="leaderboardBtn" class="bg-yellow-500 hover:bg-yellow-600 px-8 py-4 rounded-lg text-2xl font-semibold text-white transition-colors">
+                    🏆 กระดานคะแนน
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="fixed bottom-0 left-0 right-0 bg-black bg-opacity-50 text-center py-2 text-sm text-gray-400">
+        © developed by Tle Narongphisit | CTTC19 @ CPD
+    </div>
+
+    <script>
+        class TypingGame {
+            constructor() {
+                this.score = 0;
+                this.lives = 3;
+                this.timeLeft = 60;
+                this.gameRunning = false;
+                this.isPaused = false;
+                this.currentLanguage = 'english';
+                this.currentDifficulty = 'easy';
+                
+                this.keyLayouts = {
+                    english: {
+                        easy: ['A', 'S', 'D', 'F', 'J', 'K', 'L', ';'],
+                        medium: ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'J', 'K', 'L', ';'],
+                        hard: ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'J', 'K', 'L', ';', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.']
+                    },
+                    thai: {
+                        easy: ['ฟ', 'ห', 'ก', 'ด', '่', 'า', 'ส', 'ว'],
+                        medium: ['ๆ', 'ไ', 'ำ', 'พ', 'ะ', 'ั', 'ี', 'ร', 'น', 'ย', 'ฟ', 'ห', 'ก', 'ด', '่', 'า', 'ส', 'ว'],
+                        hard: ['ๆ', 'ไ', 'ำ', 'พ', 'ะ', 'ั', 'ี', 'ร', 'น', 'ย', 'ฟ', 'ห', 'ก', 'ด', '่', 'า', 'ส', 'ว', 'ผ', 'ป', 'แ', 'อ', 'ิ', 'ื', 'ท', 'ม', 'ใ']
+                    }
+                };
+                
+                this.fingerHints = {
+                    english: {
+                        'Q': 'นิ้วก้อย ซ้าย', 'W': 'นิ้วนาง ซ้าย', 'E': 'นิ้วกลาง ซ้าย', 'R': 'นิ้วชี้ ซ้าย', 'T': 'นิ้วชี้ ซ้าย',
+                        'Y': 'นิ้วชี้ ขวา', 'U': 'นิ้วชี้ ขวา', 'I': 'นิ้วกลาง ขวา', 'O': 'นิ้วนาง ขวา', 'P': 'นิ้วก้อย ขวา',
+                        'A': 'นิ้วก้อย ซ้าย', 'S': 'นิ้วนาง ซ้าย', 'D': 'นิ้วกลาง ซ้าย', 'F': 'นิ้วชี้ ซ้าย',
+                        'J': 'นิ้วชี้ ขวา', 'K': 'นิ้วกลาง ขวา', 'L': 'นิ้วนาง ขวา', ';': 'นิ้วก้อย ขวา',
+                        'Z': 'นิ้วก้อย ซ้าย', 'X': 'นิ้วนาง ซ้าย', 'C': 'นิ้วกลาง ซ้าย', 'V': 'นิ้วชี้ ซ้าย', 'B': 'นิ้วชี้ ซ้าย',
+                        'N': 'นิ้วชี้ ขวา', 'M': 'นิ้วชี้ ขวา', ',': 'นิ้วกลาง ขวา', '.': 'นิ้วนาง ขวา'
+                    },
+                    thai: {
+                        'ๆ': 'นิ้วก้อย ซ้าย', 'ไ': 'นิ้วนาง ซ้าย', 'ำ': 'นิ้วกลาง ซ้าย', 'พ': 'นิ้วชี้ ซ้าย', 'ะ': 'นิ้วชี้ ซ้าย',
+                        'ั': 'นิ้วชี้ ขวา', 'ี': 'นิ้วชี้ ขวา', 'ร': 'นิ้วกลาง ขวา', 'น': 'นิ้วนาง ขวา', 'ย': 'นิ้วก้อย ขวา',
+                        'ฟ': 'นิ้วก้อย ซ้าย', 'ห': 'นิ้วนาง ซ้าย', 'ก': 'นิ้วกลาง ซ้าย', 'ด': 'นิ้วชี้ ซ้าย',
+                        '่': 'นิ้วชี้ ขวา', 'า': 'นิ้วกลาง ขวา', 'ส': 'นิ้วนาง ขวา', 'ว': 'นิ้วก้อย ขวา',
+                        'ผ': 'นิ้วก้อย ซ้าย', 'ป': 'นิ้วนาง ซ้าย', 'แ': 'นิ้วกลาง ซ้าย', 'อ': 'นิ้วชี้ ซ้าย', 'ิ': 'นิ้วชี้ ซ้าย',
+                        'ื': 'นิ้วชี้ ขวา', 'ท': 'นิ้วชี้ ขวา', 'ม': 'นิ้วกลาง ขวา', 'ใ': 'นิ้วนาง ขวา'
+                    }
+                };
+                
+                this.letters = this.keyLayouts[this.currentLanguage][this.currentDifficulty];
+                this.lanes = [];
+                this.fallingLetters = [];
+                this.hitCount = 0;
+                this.totalLetters = 0;
+                this.gameSpeed = 3000; // milliseconds
+                this.combo = 0;
+                this.maxCombo = 0;
+                this.currentLeaderboardDifficulty = 'easy';
+                
+                this.initializeGame();
+                this.initializeLeaderboard();
+            }
+            
+            initializeGame() {
+                document.getElementById('startBtn').addEventListener('click', () => this.startGame());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
+                document.getElementById('resumeBtn').addEventListener('click', () => this.togglePause());
+                document.getElementById('restartBtn').addEventListener('click', () => this.restartGame());
+                document.getElementById('englishBtn').addEventListener('click', () => this.selectLanguage('english'));
+                document.getElementById('thaiBtn').addEventListener('click', () => this.selectLanguage('thai'));
+                document.getElementById('easyBtn').addEventListener('click', () => this.selectDifficulty('easy'));
+                document.getElementById('mediumBtn').addEventListener('click', () => this.selectDifficulty('medium'));
+                document.getElementById('hardBtn').addEventListener('click', () => this.selectDifficulty('hard'));
+                document.getElementById('leaderboardBtn').addEventListener('click', () => this.showLeaderboard());
+                document.getElementById('backToMenuBtn').addEventListener('click', () => this.backToMenu());
+                document.getElementById('leaderEasyTab').addEventListener('click', () => this.selectLeaderboardDifficulty('easy'));
+                document.getElementById('leaderMediumTab').addEventListener('click', () => this.selectLeaderboardDifficulty('medium'));
+                document.getElementById('leaderHardTab').addEventListener('click', () => this.selectLeaderboardDifficulty('hard'));
+                document.getElementById('nameEntryForm').addEventListener('submit', (e) => this.handleNameSubmit(e));
+                document.getElementById('skipNameEntry').addEventListener('click', () => this.skipNameEntry());
+                
+                document.addEventListener('keydown', (e) => this.handleKeyPress(e));
+                
+                // Initialize with default settings
+                this.updateKeyDisplay();
+                this.generateGameLanes();
+            }
+            
+            selectLanguage(language) {
+                this.currentLanguage = language;
+                this.letters = this.keyLayouts[language][this.currentDifficulty];
+                this.updateKeyDisplay();
+                this.updateInstructions();
+                this.updateLanguageButtons();
+                this.generateGameLanes();
+            }
+            
+            selectDifficulty(difficulty) {
+                this.currentDifficulty = difficulty;
+                this.letters = this.keyLayouts[this.currentLanguage][difficulty];
+                this.updateKeyDisplay();
+                this.updateInstructions();
+                this.updateDifficultyButtons();
+                this.generateGameLanes();
+            }
+            
+            updateLanguageButtons() {
+                const englishBtn = document.getElementById('englishBtn');
+                const thaiBtn = document.getElementById('thaiBtn');
+                
+                if (this.currentLanguage === 'english') {
+                    englishBtn.className = 'language-btn bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-xl text-xl font-semibold text-white transition-colors border-2 border-blue-400';
+                    thaiBtn.className = 'language-btn bg-gray-600 hover:bg-gray-700 px-6 py-4 rounded-xl text-xl font-semibold text-white transition-colors border-2 border-transparent';
+                } else {
+                    englishBtn.className = 'language-btn bg-gray-600 hover:bg-gray-700 px-6 py-4 rounded-xl text-xl font-semibold text-white transition-colors border-2 border-transparent';
+                    thaiBtn.className = 'language-btn bg-green-600 hover:bg-green-700 px-6 py-4 rounded-xl text-xl font-semibold text-white transition-colors border-2 border-green-400';
+                }
+            }
+            
+            updateDifficultyButtons() {
+                const easyBtn = document.getElementById('easyBtn');
+                const mediumBtn = document.getElementById('mediumBtn');
+                const hardBtn = document.getElementById('hardBtn');
+                
+                // Reset all buttons
+                easyBtn.className = 'difficulty-btn bg-gray-600 hover:bg-gray-700 px-4 py-4 rounded-xl text-lg font-semibold text-white transition-colors border-2 border-transparent';
+                mediumBtn.className = 'difficulty-btn bg-gray-600 hover:bg-gray-700 px-4 py-4 rounded-xl text-lg font-semibold text-white transition-colors border-2 border-transparent';
+                hardBtn.className = 'difficulty-btn bg-gray-600 hover:bg-gray-700 px-4 py-4 rounded-xl text-lg font-semibold text-white transition-colors border-2 border-transparent';
+                
+                // Highlight selected difficulty
+                if (this.currentDifficulty === 'easy') {
+                    easyBtn.className = 'difficulty-btn bg-green-600 hover:bg-green-700 px-4 py-4 rounded-xl text-lg font-semibold text-white transition-colors border-2 border-green-400';
+                } else if (this.currentDifficulty === 'medium') {
+                    mediumBtn.className = 'difficulty-btn bg-yellow-600 hover:bg-yellow-700 px-4 py-4 rounded-xl text-lg font-semibold text-white transition-colors border-2 border-yellow-400';
+                } else if (this.currentDifficulty === 'hard') {
+                    hardBtn.className = 'difficulty-btn bg-red-600 hover:bg-red-700 px-4 py-4 rounded-xl text-lg font-semibold text-white transition-colors border-2 border-red-400';
+                }
+            }
+            
+            generateGameLanes() {
+                // Clear all rows
+                const topRow = document.getElementById('topRow');
+                const homeRow = document.getElementById('homeRow');
+                const bottomRow = document.getElementById('bottomRow');
+                
+                topRow.innerHTML = '';
+                homeRow.innerHTML = '';
+                bottomRow.innerHTML = '';
+                
+                // Hide all rows initially
+                topRow.style.display = 'none';
+                homeRow.style.display = 'flex';
+                bottomRow.style.display = 'none';
+                
+                const colors = ['text-blue-400', 'text-green-400', 'text-yellow-400', 'text-red-400', 'text-purple-400', 'text-pink-400', 'text-indigo-400', 'text-cyan-400', 'text-orange-400', 'text-teal-400'];
+                const bgColors = ['text-blue-300', 'text-green-300', 'text-yellow-300', 'text-red-300', 'text-purple-300', 'text-pink-300', 'text-indigo-300', 'text-cyan-300', 'text-orange-300', 'text-teal-300'];
+                
+                // Define keyboard layout
+                const keyboardLayout = {
+                    english: {
+                        top: ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+                        home: ['A', 'S', 'D', 'F', 'J', 'K', 'L', ';'],
+                        bottom: ['Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.']
+                    },
+                    thai: {
+                        top: ['ๆ', 'ไ', 'ำ', 'พ', 'ะ', 'ั', 'ี', 'ร', 'น', 'ย'],
+                        home: ['ฟ', 'ห', 'ก', 'ด', '่', 'า', 'ส', 'ว'],
+                        bottom: ['ผ', 'ป', 'แ', 'อ', 'ิ', 'ื', 'ท', 'ม', 'ใ']
+                    }
+                };
+                
+                const layout = keyboardLayout[this.currentLanguage];
+                let laneIndex = 0;
+                
+                // Generate lanes based on difficulty
+                if (this.currentDifficulty === 'medium' || this.currentDifficulty === 'hard') {
+                    topRow.style.display = 'flex';
+                    layout.top.forEach((letter, index) => {
+                        if (this.letters.includes(letter)) {
+                            this.createLane(letter, laneIndex, topRow, bgColors[laneIndex % bgColors.length]);
+                            laneIndex++;
+                        }
+                    });
+                }
+                
+                // Home row (always visible)
+                layout.home.forEach((letter, index) => {
+                    if (this.letters.includes(letter)) {
+                        this.createLane(letter, laneIndex, homeRow, bgColors[laneIndex % bgColors.length]);
+                        laneIndex++;
+                    }
+                });
+                
+                if (this.currentDifficulty === 'hard') {
+                    bottomRow.style.display = 'flex';
+                    layout.bottom.forEach((letter, index) => {
+                        if (this.letters.includes(letter)) {
+                            this.createLane(letter, laneIndex, bottomRow, bgColors[laneIndex % bgColors.length]);
+                            laneIndex++;
+                        }
+                    });
+                }
+                
+                // Update lanes reference
+                this.lanes = document.querySelectorAll('.game-lane');
+            }
+            
+            createLane(letter, laneIndex, container, color) {
+                const lane = document.createElement('div');
+                lane.className = 'game-lane w-20 h-full relative mx-1';
+                lane.dataset.lane = laneIndex;
+                
+                const keyElement = document.createElement('div');
+                keyElement.className = `absolute bottom-20 left-1/2 transform -translate-x-1/2 text-3xl font-bold ${color}`;
+                keyElement.id = `key${laneIndex}`;
+                keyElement.textContent = letter;
+                
+                const fingerElement = document.createElement('div');
+                fingerElement.className = `absolute bottom-8 left-1/2 transform -translate-x-1/2 text-xs opacity-70 text-center w-full`;
+                fingerElement.style.color = color.replace('text-', '').replace('-300', '');
+                fingerElement.id = `finger${laneIndex}`;
+                fingerElement.textContent = this.fingerHints[this.currentLanguage][letter] || 'ไม่ระบุ';
+                
+                lane.appendChild(keyElement);
+                lane.appendChild(fingerElement);
+                container.appendChild(lane);
+            }
+            
+            updateKeyDisplay() {
+                // Update difficulty key previews
+                const easyKeys = document.getElementById('easyKeys');
+                const mediumKeys = document.getElementById('mediumKeys');
+                const hardKeys = document.getElementById('hardKeys');
+                
+                if (this.currentLanguage === 'english') {
+                    easyKeys.textContent = 'A S D F J K L ;';
+                    mediumKeys.textContent = '+ Q W E R T Y U I O P';
+                    hardKeys.textContent = '+ Z X C V B N M , .';
+                } else {
+                    easyKeys.textContent = 'ฟ ห ก ด ่ า ส ว';
+                    mediumKeys.textContent = '+ ๆ ไ ำ พ ะ ั ี ร น ย';
+                    hardKeys.textContent = '+ ผ ป แ อ ิ ื ท ม ใ';
+                }
+            }
+            
+            updateInstructions() {
+                const instructions = document.getElementById('instructions');
+                const difficultyText = {
+                    easy: 'แถวหลัก',
+                    medium: '2 แถว',
+                    hard: '3 แถว'
+                };
+                
+                if (this.currentLanguage === 'english') {
+                    if (this.currentDifficulty === 'easy') {
+                        instructions.textContent = 'กดปุ่ม A S D F J K L ; เมื่อตัวอักษรตกลงมาถึงเส้นสีทอง!';
+                    } else {
+                        instructions.textContent = `กดปุ่มตัวอักษรภาษาอังกฤษ (${difficultyText[this.currentDifficulty]}) เมื่อตกลงมาถึงเส้นสีทอง!`;
+                    }
+                } else {
+                    if (this.currentDifficulty === 'easy') {
+                        instructions.textContent = 'กดปุ่ม ฟ ห ก ด ่ า ส ว เมื่อตัวอักษรตกลงมาถึงเส้นสีทอง!';
+                    } else {
+                        instructions.textContent = `กดปุ่มตัวอักษรภาษาไทย (${difficultyText[this.currentDifficulty]}) เมื่อตกลงมาถึงเส้นสีทอง!`;
+                    }
+                }
+            }
+            
+            startGame() {
+                document.getElementById('startScreen').classList.add('hidden');
+                this.gameRunning = true;
+                this.isPaused = false;
+                this.startTimer();
+                this.spawnLetters();
+            }
+            
+            startTimer() {
+                this.timerInterval = setInterval(() => {
+                    if (!this.isPaused && this.gameRunning) {
+                        this.timeLeft--;
+                        document.getElementById('timer').textContent = this.timeLeft;
+                        
+                        if (this.timeLeft <= 0) {
+                            this.endGame();
+                        }
+                    }
+                }, 1000);
+            }
+            
+            spawnLetters() {
+                if (!this.gameRunning || this.isPaused) return;
+                
+                const randomLane = Math.floor(Math.random() * this.letters.length);
+                const letter = this.letters[randomLane];
+                this.createFallingLetter(letter, randomLane);
+                
+                // Adjust spawn rate based on difficulty
+                let baseSpeed = this.gameSpeed;
+                if (this.currentDifficulty === 'medium') {
+                    baseSpeed = this.gameSpeed * 0.8; // Slightly faster
+                } else if (this.currentDifficulty === 'hard') {
+                    baseSpeed = this.gameSpeed * 0.6; // Much faster
+                }
+                
+                // Increase difficulty over time - more gradual progression
+                const difficulty = Math.max(600, baseSpeed - (this.score * 3));
+                
+                setTimeout(() => this.spawnLetters(), difficulty);
+            }
+            
+            createFallingLetter(letter, laneIndex) {
+                const letterElement = document.createElement('div');
+                letterElement.className = 'falling-letter text-4xl font-bold text-white';
+                letterElement.textContent = letter;
+                letterElement.dataset.letter = letter;
+                letterElement.dataset.lane = laneIndex;
+                
+                const lane = this.lanes[laneIndex];
+                const laneRect = lane.getBoundingClientRect();
+                letterElement.style.left = `${laneRect.left + laneRect.width/2 - 20}px`;
+                letterElement.style.animationDuration = '4s';
+                
+                // Add color based on lane
+                const colors = ['text-blue-400', 'text-green-400', 'text-yellow-400', 'text-red-400', 'text-purple-400', 'text-pink-400', 'text-indigo-400', 'text-cyan-400'];
+                letterElement.classList.add(colors[laneIndex]);
+                
+                document.body.appendChild(letterElement);
+                this.fallingLetters.push(letterElement);
+                this.totalLetters++;
+                
+                // Remove letter after animation
+                setTimeout(() => {
+                    if (letterElement.parentNode && this.gameRunning) {
+                        letterElement.remove();
+                        this.fallingLetters = this.fallingLetters.filter(l => l !== letterElement);
+                        this.loseLife();
+                    }
+                }, 4000);
+            }
+            
+            handleKeyPress(event) {
+                if (!this.gameRunning || this.isPaused) return;
+                
+                let key = event.key;
+                
+                // Handle both English and Thai input
+                if (this.currentLanguage === 'english') {
+                    // Convert to uppercase for English
+                    key = key.toUpperCase();
+                } else {
+                    // For Thai, we need to map physical keys to Thai characters
+                    const keyMap = {
+                        // Home row
+                        'a': 'ฟ', 'A': 'ฟ', 's': 'ห', 'S': 'ห', 'd': 'ก', 'D': 'ก', 'f': 'ด', 'F': 'ด',
+                        'j': '่', 'J': '่', 'k': 'า', 'K': 'า', 'l': 'ส', 'L': 'ส', ';': 'ว', ':': 'ว',
+                        // Top row
+                        'q': 'ๆ', 'Q': 'ๆ', 'w': 'ไ', 'W': 'ไ', 'e': 'ำ', 'E': 'ำ', 'r': 'พ', 'R': 'พ', 't': 'ะ', 'T': 'ะ',
+                        'y': 'ั', 'Y': 'ั', 'u': 'ี', 'U': 'ี', 'i': 'ร', 'I': 'ร', 'o': 'น', 'O': 'น', 'p': 'ย', 'P': 'ย',
+                        // Bottom row
+                        'z': 'ผ', 'Z': 'ผ', 'x': 'ป', 'X': 'ป', 'c': 'แ', 'C': 'แ', 'v': 'อ', 'V': 'อ', 'b': 'ิ', 'B': 'ิ',
+                        'n': 'ื', 'N': 'ื', 'm': 'ท', 'M': 'ท', ',': 'ม', '<': 'ม', '.': 'ใ', '>': 'ใ'
+                    };
+                    
+                    // Check if it's a direct Thai character or needs mapping
+                    if (this.letters.includes(key)) {
+                        // Direct Thai input
+                    } else if (keyMap[key]) {
+                        // Map English key to Thai character
+                        key = keyMap[key];
+                    } else {
+                        return; // Invalid key
+                    }
+                }
+                
+                if (!this.letters.includes(key)) return;
+                
+                const laneIndex = this.letters.indexOf(key);
+                const hitZone = document.querySelector('.hit-zone');
+                const hitZoneRect = hitZone.getBoundingClientRect();
+                
+                // Find letters in the hit zone
+                const lettersInHitZone = this.fallingLetters.filter(letter => {
+                    const letterRect = letter.getBoundingClientRect();
+                    const letterLane = parseInt(letter.dataset.lane);
+                    
+                    return letterLane === laneIndex && 
+                           letterRect.bottom >= hitZoneRect.top && 
+                           letterRect.top <= hitZoneRect.bottom;
+                });
+                
+                if (lettersInHitZone.length > 0) {
+                    // Hit the closest letter
+                    const closestLetter = lettersInHitZone[0];
+                    this.hitLetter(closestLetter, laneIndex);
+                }
+            }
+            
+            hitLetter(letterElement, laneIndex) {
+                // Visual feedback
+                const lane = this.lanes[laneIndex];
+                lane.classList.add('hit-effect');
+                setTimeout(() => lane.classList.remove('hit-effect'), 300);
+                
+                // Highlight finger hint
+                const fingerHint = document.getElementById(`finger${laneIndex}`);
+                fingerHint.style.transform = 'scale(1.2)';
+                fingerHint.style.opacity = '1';
+                fingerHint.style.fontWeight = 'bold';
+                setTimeout(() => {
+                    fingerHint.style.transform = 'scale(1)';
+                    fingerHint.style.opacity = '0.7';
+                    fingerHint.style.fontWeight = 'normal';
+                }, 300);
+                
+                // Remove letter and update score
+                letterElement.remove();
+                this.fallingLetters = this.fallingLetters.filter(l => l !== letterElement);
+                
+                // Update combo and score
+                this.combo++;
+                this.maxCombo = Math.max(this.maxCombo, this.combo);
+                
+                // Bonus points for combo
+                const basePoints = 10;
+                const comboBonus = Math.floor(this.combo / 5) * 5;
+                const points = basePoints + comboBonus;
+                
+                this.score += points;
+                this.hitCount++;
+                
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('combo').textContent = this.combo;
+                
+                // Create hit effect and sound feedback
+                this.createHitEffect(letterElement);
+                this.playHitSound();
+            }
+            
+            createHitEffect(letterElement) {
+                const effect = document.createElement('div');
+                effect.className = 'absolute text-2xl font-bold text-yellow-300 pointer-events-none';
+                effect.textContent = '+10';
+                effect.style.left = letterElement.style.left;
+                effect.style.top = '70vh';
+                effect.style.animation = 'hitPulse 0.5s ease-out';
+                
+                document.body.appendChild(effect);
+                setTimeout(() => effect.remove(), 500);
+            }
+            
+            playHitSound() {
+                // Visual sound feedback since audio is not supported
+                const soundEffect = document.createElement('div');
+                soundEffect.className = 'fixed top-4 right-4 text-2xl pointer-events-none';
+                soundEffect.textContent = '🎵';
+                soundEffect.style.animation = 'hitPulse 0.3s ease-out';
+                document.body.appendChild(soundEffect);
+                setTimeout(() => soundEffect.remove(), 300);
+            }
+            
+            loseLife() {
+                this.lives--;
+                this.combo = 0; // Reset combo on miss
+                document.getElementById('combo').textContent = this.combo;
+                
+                const heartsDisplay = '❤️'.repeat(this.lives) + '💔'.repeat(3 - this.lives);
+                document.getElementById('lives').textContent = heartsDisplay;
+                
+                if (this.lives <= 0) {
+                    this.endGame();
+                }
+            }
+            
+            togglePause() {
+                this.isPaused = !this.isPaused;
+                const pauseBtn = document.getElementById('pauseBtn');
+                const pauseScreen = document.getElementById('pauseScreen');
+                
+                if (this.isPaused) {
+                    pauseBtn.textContent = '▶️ เล่นต่อ';
+                    pauseScreen.classList.remove('hidden');
+                } else {
+                    pauseBtn.textContent = '⏸️ หยุด';
+                    pauseScreen.classList.add('hidden');
+                }
+            }
+            
+            endGame() {
+                this.gameRunning = false;
+                clearInterval(this.timerInterval);
+                
+                // Clean up falling letters
+                this.fallingLetters.forEach(letter => letter.remove());
+                this.fallingLetters = [];
+                
+                // Calculate final stats
+                const accuracy = this.totalLetters > 0 ? Math.round((this.hitCount / this.totalLetters) * 100) : 0;
+                
+                // Store current game stats for potential leaderboard entry
+                this.currentGameStats = {
+                    score: this.score,
+                    accuracy: accuracy,
+                    maxCombo: this.maxCombo
+                };
+                
+                // Check if score qualifies for leaderboard
+                const leaderboard = JSON.parse(localStorage.getItem('typingGameLeaderboard'));
+                const currentScores = leaderboard[this.currentLanguage][this.currentDifficulty];
+                const qualifiesForLeaderboard = currentScores.length < 10 || this.score > (currentScores[currentScores.length - 1]?.score || 0);
+                
+                if (qualifiesForLeaderboard && this.score > 0) {
+                    this.showNameEntryForm();
+                } else {
+                    this.showGameOverScreen();
+                }
+            }
+            
+            restartGame() {
+                // Reset game state
+                this.score = 0;
+                this.lives = 3;
+                this.timeLeft = 60;
+                this.hitCount = 0;
+                this.totalLetters = 0;
+                this.gameRunning = false;
+                this.isPaused = false;
+                this.combo = 0;
+                this.maxCombo = 0;
+                
+                // Update UI
+                document.getElementById('score').textContent = '0';
+                document.getElementById('lives').textContent = '❤️❤️❤️';
+                document.getElementById('timer').textContent = '60';
+                document.getElementById('combo').textContent = '0';
+                document.getElementById('pauseBtn').textContent = '⏸️ หยุด';
+                
+                // Hide game over screen and show start screen
+                document.getElementById('gameOverScreen').classList.add('hidden');
+                document.getElementById('startScreen').classList.remove('hidden');
+            }
+            
+            initializeLeaderboard() {
+                // Initialize leaderboard data if not exists
+                if (!localStorage.getItem('typingGameLeaderboard')) {
+                    const emptyLeaderboard = {
+                        english: { easy: [], medium: [], hard: [] },
+                        thai: { easy: [], medium: [], hard: [] }
+                    };
+                    localStorage.setItem('typingGameLeaderboard', JSON.stringify(emptyLeaderboard));
+                }
+            }
+            
+            saveScore(playerName, score, accuracy, maxCombo) {
+                const leaderboard = JSON.parse(localStorage.getItem('typingGameLeaderboard'));
+                const entry = {
+                    name: playerName,
+                    score: score,
+                    accuracy: accuracy,
+                    maxCombo: maxCombo,
+                    date: new Date().toLocaleDateString('th-TH')
+                };
+                
+                leaderboard[this.currentLanguage][this.currentDifficulty].push(entry);
+                leaderboard[this.currentLanguage][this.currentDifficulty].sort((a, b) => b.score - a.score);
+                leaderboard[this.currentLanguage][this.currentDifficulty] = leaderboard[this.currentLanguage][this.currentDifficulty].slice(0, 10);
+                
+                localStorage.setItem('typingGameLeaderboard', JSON.stringify(leaderboard));
+            }
+            
+            showLeaderboard() {
+                document.getElementById('startScreen').classList.add('hidden');
+                document.getElementById('leaderboardScreen').classList.remove('hidden');
+                this.updateLeaderboardDisplay();
+            }
+            
+            backToMenu() {
+                document.getElementById('leaderboardScreen').classList.add('hidden');
+                document.getElementById('startScreen').classList.remove('hidden');
+            }
+            
+            selectLeaderboardDifficulty(difficulty) {
+                this.currentLeaderboardDifficulty = difficulty;
+                this.updateLeaderboardTabs();
+                this.updateLeaderboardDisplay();
+            }
+            
+            updateLeaderboardTabs() {
+                const easyTab = document.getElementById('leaderEasyTab');
+                const mediumTab = document.getElementById('leaderMediumTab');
+                const hardTab = document.getElementById('leaderHardTab');
+                
+                // Reset all tabs
+                easyTab.className = 'leaderboard-tab bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors border-2 border-transparent';
+                mediumTab.className = 'leaderboard-tab bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors border-2 border-transparent';
+                hardTab.className = 'leaderboard-tab bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors border-2 border-transparent';
+                
+                // Highlight selected tab
+                if (this.currentLeaderboardDifficulty === 'easy') {
+                    easyTab.className = 'leaderboard-tab bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors border-2 border-green-400';
+                } else if (this.currentLeaderboardDifficulty === 'medium') {
+                    mediumTab.className = 'leaderboard-tab bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors border-2 border-yellow-400';
+                } else if (this.currentLeaderboardDifficulty === 'hard') {
+                    hardTab.className = 'leaderboard-tab bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors border-2 border-red-400';
+                }
+            }
+            
+            updateLeaderboardDisplay() {
+                const leaderboard = JSON.parse(localStorage.getItem('typingGameLeaderboard'));
+                const englishContainer = document.getElementById('englishLeaderboard');
+                const thaiContainer = document.getElementById('thaiLeaderboard');
+                
+                // Update English leaderboard
+                const englishScores = leaderboard.english[this.currentLeaderboardDifficulty];
+                englishContainer.innerHTML = this.generateLeaderboardHTML(englishScores);
+                
+                // Update Thai leaderboard
+                const thaiScores = leaderboard.thai[this.currentLeaderboardDifficulty];
+                thaiContainer.innerHTML = this.generateLeaderboardHTML(thaiScores);
+            }
+            
+            generateLeaderboardHTML(scores) {
+                if (scores.length === 0) {
+                    return '<div class="text-gray-400 text-center py-4">ยังไม่มีคะแนน</div>';
+                }
+                
+                return scores.map((entry, index) => {
+                    const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                    return `
+                        <div class="flex justify-between items-center bg-gray-700 bg-opacity-50 rounded-lg p-3">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg font-bold">${rankEmoji}</span>
+                                <div>
+                                    <div class="font-semibold">${entry.name}</div>
+                                    <div class="text-xs text-gray-400">${entry.date}</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-green-400">${entry.score}</div>
+                                <div class="text-xs text-gray-400">${entry.accuracy}% | ${entry.maxCombo} คอมโบ</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            showNameEntryForm() {
+                // Calculate rank position
+                const leaderboard = JSON.parse(localStorage.getItem('typingGameLeaderboard'));
+                const currentScores = leaderboard[this.currentLanguage][this.currentDifficulty];
+                let rank = currentScores.length + 1;
+                
+                // Find where this score would be inserted
+                for (let i = 0; i < currentScores.length; i++) {
+                    if (this.score > currentScores[i].score) {
+                        rank = i + 1;
+                        break;
+                    }
+                }
+                
+                // Update form display
+                document.getElementById('nameEntryScore').textContent = this.score;
+                document.getElementById('nameEntryRank').textContent = rank;
+                document.getElementById('playerName').value = '';
+                document.getElementById('nameEntryScreen').classList.remove('hidden');
+                
+                // Focus on input field
+                setTimeout(() => {
+                    document.getElementById('playerName').focus();
+                }, 100);
+            }
+            
+            showGameOverScreen() {
+                document.getElementById('finalScore').textContent = this.score;
+                document.getElementById('accuracy').textContent = `${this.currentGameStats.accuracy}% | สูงสุด: ${this.currentGameStats.maxCombo} คอมโบ`;
+                document.getElementById('gameOverScreen').classList.remove('hidden');
+            }
+            
+            handleNameSubmit(event) {
+                event.preventDefault();
+                const playerName = document.getElementById('playerName').value.trim();
+                
+                if (playerName === '') {
+                    alert('กรุณาใส่ชื่อของคุณ');
+                    return;
+                }
+                
+                // Save score with entered name
+                this.saveScore(playerName, this.currentGameStats.score, this.currentGameStats.accuracy, this.currentGameStats.maxCombo);
+                
+                // Hide name entry form and show game over screen
+                document.getElementById('nameEntryScreen').classList.add('hidden');
+                this.showGameOverScreen();
+            }
+            
+            skipNameEntry() {
+                // Save score with default name
+                this.saveScore('ผู้เล่นไม่ระบุชื่อ', this.currentGameStats.score, this.currentGameStats.accuracy, this.currentGameStats.maxCombo);
+                
+                // Hide name entry form and show game over screen
+                document.getElementById('nameEntryScreen').classList.add('hidden');
+                this.showGameOverScreen();
+            }
+        }
+        
+        // Initialize game when page loads
+        window.addEventListener('load', () => {
+            new TypingGame();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'977c4e9ea54e5805',t:'MTc1NjY0MDk5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
