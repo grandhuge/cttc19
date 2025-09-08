@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเลือกตั้งกรรมการสหกรณ์</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:#333}.container{max-width:1200px;margin:0 auto;padding:0 20px}.btn{display:inline-block;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;text-decoration:none;transition:all 0.3s ease;text-align:center}.btn-primary{background:#4f46e5;color:white}.btn-primary:hover{background:#4338ca}.btn-success{background:#059669;color:white}.btn-success:hover{background:#047857}.btn-danger{background:#dc2626;color:white}.btn-danger:hover{background:#b91c1c}.btn-secondary{background:#6b7280;color:white}.btn-secondary:hover{background:#4b5563}.card{background:white;border-radius:12px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);padding:24px;margin-bottom:24px}.header{background:white;box-shadow:0 2px 4px rgba(0,0,0,0.1);padding:16px 0}.header-content{display:flex;justify-content:space-between;align-items:center}.logo{display:flex;align-items:center;gap:12px}.logo-icon{width:48px;height:48px;background:#4f46e5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:white}.title{font-size:24px;font-weight:700;color:#1f2937}.subtitle{font-size:14px;color:#6b7280}.status{padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600}.status-open{background:#d1fae5;color:#065f46}.status-closed{background:#fee2e2;color:#991b1b}.main{padding:32px 0}.grid{display:grid;gap:24px}.grid-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}.grid-4{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}.form-group{margin-bottom:16px}.label{display:block;margin-bottom:8px;font-weight:600;color:#374151}.input{width:100%;padding:12px;border:2px solid #d1d5db;border-radius:8px;font-size:14px;transition:border-color 0.3s ease}.input:focus{outline:none;border-color:#4f46e5}.select{width:100%;padding:12px;border:2px solid #d1d5db;border-radius:8px;font-size:14px;background:white}.candidate-card{border:2px solid #e5e7eb;border-radius:12px;padding:16px;cursor:pointer;transition:all 0.3s ease}.candidate-card:hover{border-color:#4f46e5;background:#f8fafc}.candidate-card.selected{border-color:#4f46e5;background:#eff6ff}.candidate-info{display:flex;align-items:center;gap:16px}.candidate-number{width:40px;height:40px;background:#4f46e5;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}.candidate-avatar{width:60px;height:60px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:24px}.candidate-details h4{font-size:16px;font-weight:600;margin-bottom:4px}.candidate-details p{font-size:12px;color:#6b7280}.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000}.modal.show{display:flex}.modal-content{background:white;border-radius:12px;padding:32px;width:90%;max-width:500px;max-height:90vh;overflow-y:auto}.modal-header{text-align:center;margin-bottom:24px}.modal-title{font-size:24px;font-weight:700;color:#1f2937}.modal-body{margin-bottom:24px}.modal-footer{display:flex;gap:12px}.tab-nav{display:flex;background:white;border-radius:12px;overflow:hidden;margin-bottom:24px}.tab-btn{flex:1;padding:16px;border:none;background:transparent;cursor:pointer;font-weight:600;color:#6b7280;transition:all 0.3s ease}.tab-btn.active{background:#4f46e5;color:white}.tab-content{display:none}.tab-content.active{display:block}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px;text-align:left;border-bottom:1px solid #e5e7eb}.table th{background:#f9fafb;font-weight:600;color:#374151}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}.stat-card{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}.stat-value{font-size:32px;font-weight:700;margin-bottom:4px}.stat-label{font-size:14px;color:#6b7280}.alert{position:fixed;top:20px;right:20px;padding:16px;border-radius:8px;color:white;font-weight:600;z-index:1001;animation:slideIn 0.3s ease}.alert-success{background:#059669}.alert-error{background:#dc2626}.alert-warning{background:#d97706}.alert-info{background:#0284c7}@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}.fade-in{animation:fadeIn 0.5s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}.checkbox{width:20px;height:20px;margin-right:8px}.radio{width:20px;height:20px;margin-right:8px}.hidden{display:none!important}.text-center{text-align:center}.text-right{text-align:right}.mb-4{margin-bottom:16px}.mb-6{margin-bottom:24px}.mt-4{margin-top:16px}.p-4{padding:16px}.bg-yellow{background:#fef3c7}.bg-green{background:#d1fae5}.border-yellow{border-color:#f59e0b}.border-green{border-color:#059669}.text-yellow{color:#d97706}.text-green{color:#059669}.text-red{color:#dc2626}.text-blue{color:#2563eb}.font-bold{font-weight:700}.text-sm{font-size:12px}.text-lg{font-size:18px}.text-xl{font-size:20px}.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.space-x-2>*+*{margin-left:8px}.space-y-2>*+*{margin-top:8px}.w-full{width:100%}.chart-container{position:relative;height:300px;margin-top:20px}@media (max-width:768px){.grid-4{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}.header-content{flex-direction:column;gap:16px}.modal-content{padding:20px}.candidate-info{flex-direction:column;text-align:center}}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🗳️</div>
+                    <div>
+                        <h1 class="title">ระบบเลือกตั้งกรรมการสหกรณ์</h1>
+                        <p class="subtitle">Cooperative Committee Election System</p>
+                    </div>
+                </div>
+                <nav>
+                    <div class="flex items-center space-x-2">
+                        <div id="electionStatus" class="status status-closed">ระบบปิด</div>
+                        <button id="loginBtn" class="btn btn-primary">เข้าสู่ระบบ</button>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Voter Interface -->
+            <section id="voterInterface" class="fade-in">
+                <div class="card" style="max-width:600px;margin:0 auto">
+                    <header class="text-center mb-6">
+                        <h2 class="text-xl font-bold mb-4">ลงคะแนนเสียงเลือกตั้ง</h2>
+                        <p>กรุณายืนยันตัวตนเพื่อเข้าสู่ระบบลงคะแนน</p>
+                    </header>
+
+                    <form id="authForm">
+                        <div class="form-group">
+                            <label class="label" for="memberNumber">หมายเลขสมาชิก</label>
+                            <input type="text" id="memberNumber" class="input" placeholder="กรอกหมายเลขสมาชิก" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="label" for="nationalId">เลขบัตรประจำตัวประชาชน</label>
+                            <input type="password" id="nationalId" class="input" placeholder="กรอกเลขบัตรประจำตัวประชาชน 13 หลัก" maxlength="13" required>
+                        </div>
+                        <button type="submit" id="verifyBtn" class="btn btn-primary w-full">ยืนยันตัวตน</button>
+                    </form>
+
+                    <div id="votingForm" class="hidden">
+                        <header class="text-center mb-6">
+                            <h3 class="text-lg font-bold mb-4">เลือกกรรมการสหกรณ์</h3>
+                            <p>เลือกประธานกรรมการ 1 คน และกรรมการอื่น ๆ ตามจำนวนที่กำหนด</p>
+                        </header>
+
+                        <section class="bg-yellow border-yellow p-4 mb-6" style="border-radius:12px;border:2px solid">
+                            <h4 class="font-bold mb-4 flex items-center">
+                                <span class="candidate-number" style="margin-right:12px">1</span>
+                                <div>
+                                    <div>เลือกประธานกรรมการ</div>
+                                    <div class="text-sm" style="font-weight:normal;color:#6b7280">เลือกได้ 1 คน หรือเลือกงดออกเสียง</div>
+                                </div>
+                            </h4>
+                            <div id="presidentCandidates" class="space-y-2"></div>
+                            <div class="mt-4 p-4" style="background:white;border-radius:8px">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="abstainPresident" class="checkbox">
+                                    <span>🚫 งดออกเสียงเลือกประธานกรรมการ</span>
+                                </label>
+                            </div>
+                        </section>
+
+                        <section class="bg-green border-green p-4 mb-6" style="border-radius:12px;border:2px solid">
+                            <h4 class="font-bold mb-4 flex items-center">
+                                <span class="candidate-number" style="margin-right:12px">2</span>
+                                <div>
+                                    <div>เลือกกรรมการ</div>
+                                    <div class="text-sm" style="font-weight:normal;color:#6b7280">เลือกได้สูงสุด <span id="maxCommitteeCount" class="font-bold text-green">3</span> คน หรือเลือกงดออกเสียง</div>
+                                </div>
+                            </h4>
+                            <div id="committeeCandidates" class="space-y-2"></div>
+                            <div class="mt-4 p-4" style="background:white;border-radius:8px">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="abstainCommittee" class="checkbox">
+                                    <span>🚫 งดออกเสียงเลือกกรรมการ</span>
+                                </label>
+                            </div>
+                        </section>
+
+                        <div class="text-center">
+                            <h4 class="font-bold mb-4">🗳️ ยืนยันการลงคะแนน</h4>
+                            <p class="text-sm mb-4">กรุณาตรวจสอบการเลือกของคุณก่อนส่งคะแนน</p>
+                            <button id="submitVoteBtn" class="btn btn-success w-full">✅ ส่งคะแนนเสียง</button>
+                        </div>
+                    </div>
+
+                    <div id="voteSuccess" class="hidden text-center">
+                        <div style="font-size:64px;margin-bottom:16px">✅</div>
+                        <h3 class="text-xl font-bold text-green mb-4">ลงคะแนนเสียงสำเร็จ!</h3>
+                        <p class="mb-4">ขอบคุณสำหรับการใช้สิทธิเลือกตั้ง</p>
+                        <div class="bg-green p-4" style="border-radius:8px;display:inline-block">
+                            <p class="text-sm text-green">
+                                🎉 คะแนนของคุณได้รับการบันทึกเรียบร้อยแล้ว<br>
+                                ระบบจะกลับสู่หน้าหลักในอีกสักครู่
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Interface -->
+            <section id="adminInterface" class="hidden fade-in">
+                <nav class="tab-nav">
+                    <button class="tab-btn active" data-tab="dashboard">แดชบอร์ด</button>
+                    <button class="tab-btn" data-tab="candidates">จัดการผู้สมัคร</button>
+                    <button class="tab-btn" data-tab="voters">จัดการผู้มีสิทธิ์</button>
+                    <button class="tab-btn" data-tab="results">ผลคะแนน</button>
+                    <button class="tab-btn" data-tab="settings">ตั้งค่า</button>
+                </nav>
+
+                <!-- Dashboard Tab -->
+                <div id="dashboardTab" class="tab-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value text-blue" id="totalCandidates">0</div>
+                            <div class="stat-label">ผู้สมัครทั้งหมด</div>
+                            <div class="text-sm mt-4">
+                                ประธาน: <span id="presidentCandidatesCount">0</span> | 
+                                กรรมการ: <span id="committeeCandidatesCount">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value text-green" id="totalVoters">0</div>
+                            <div class="stat-label">ผู้มีสิทธิ์ทั้งหมด</div>
+                            <div class="text-sm mt-4">
+                                ยังไม่ลงคะแนน: <span id="remainingVoters">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" style="color:#7c3aed" id="votedCount">0</div>
+                            <div class="stat-label">ลงคะแนนแล้ว</div>
+                            <div class="text-sm mt-4">
+                                คะแนนรวม: <span id="totalVotesCount">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" style="color:#ea580c" id="turnoutRate">0%</div>
+                            <div class="stat-label">อัตราการลงคะแนน</div>
+                            <div class="text-sm mt-4">
+                                งดออกเสียง: <span id="abstainCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-2">
+                        <div class="card">
+                            <h4 class="font-bold mb-4 flex items-center">
+                                <span style="margin-right:12px">⚙️</span>
+                                สถานะระบบ
+                            </h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>สถานะการเลือกตั้ง:</span>
+                                    <span id="dashboardElectionStatus" class="status">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>จำนวนกรรมการสูงสุด:</span>
+                                    <span class="font-bold text-blue" id="dashboardMaxCommittee">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>เวลาอัปเดตล่าสุด:</span>
+                                    <span class="text-sm" id="lastUpdateTime">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h4 class="font-bold mb-4 flex items-center">
+                                <span style="margin-right:12px">🏆</span>
+                                ผู้นำคะแนน
+                            </h4>
+                            <div id="topCandidates" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4 class="font-bold mb-4 flex items-center">
+                            <span style="margin-right:12px">⚡</span>
+                            การดำเนินการด่วน
+                        </h4>
+                        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+                            <button onclick="exportResults()" class="btn btn-primary">📊 ส่งออกผลคะแนน</button>
+                            <button onclick="showTab('candidates')" class="btn btn-success">👥 จัดการผู้สมัคร</button>
+                            <button onclick="showTab('voters')" class="btn" style="background:#7c3aed;color:white">🗳️ จัดการผู้มีสิทธิ์</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Candidates Tab -->
+                <div id="candidatesTab" class="tab-content">
+                    <div class="card">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold">จัดการผู้สมัครกรรมการ</h3>
+                            <button id="addCandidateBtn" class="btn btn-primary">เพิ่มผู้สมัคร</button>
+                        </div>
+                        <div style="overflow-x:auto">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>หมายเลข</th>
+                                        <th>รูปภาพ</th>
+                                        <th>ชื่อ-นามสกุล</th>
+                                        <th>ตำแหน่ง</th>
+                                        <th>การจัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="candidatesTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voters Tab -->
+                <div id="votersTab" class="tab-content">
+                    <div class="card">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold">จัดการผู้มีสิทธิ์ลงคะแนน</h3>
+                            <button id="addVoterBtn" class="btn btn-success">เพิ่มผู้มีสิทธิ์</button>
+                        </div>
+                        <div style="overflow-x:auto">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>หมายเลขสมาชิก</th>
+                                        <th>ชื่อ</th>
+                                        <th>สถานะ</th>
+                                        <th>การจัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="votersTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Tab -->
+                <div id="resultsTab" class="tab-content">
+                    <div class="card">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold">ผลคะแนนเลือกตั้ง</h3>
+                            <button onclick="exportResults()" class="btn btn-success">📊 ส่งออกผลคะแนน</button>
+                        </div>
+                        
+                        <div class="grid grid-2">
+                            <div>
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-bold">ตารางผลคะแนน</h4>
+                                    <div class="flex items-center space-x-2">
+                                        <label class="text-sm">กรองตำแหน่ง:</label>
+                                        <select id="positionFilter" class="select" style="width:auto">
+                                            <option value="all">ทั้งหมด</option>
+                                            <option value="president">ประธานกรรมการ</option>
+                                            <option value="committee">กรรมการ</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="overflow-x:auto">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>อันดับ</th>
+                                                <th style="cursor:pointer" onclick="sortResults('name')">ชื่อผู้สมัคร ↕️</th>
+                                                <th>ตำแหน่ง</th>
+                                                <th style="cursor:pointer" onclick="sortResults('votes')">คะแนน ↕️</th>
+                                                <th>สถานะ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="resultsTable"></tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="bg-yellow border-yellow p-4 mt-4" style="border-radius:12px;border:2px solid">
+                                    <h5 class="font-bold mb-4 flex items-center">
+                                        <span style="margin-right:8px">🏆</span>
+                                        ผู้ได้รับเลือก
+                                    </h5>
+                                    <div id="winnerSummary" class="space-y-2"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold mb-4">กราฟแสดงผล</h4>
+                                <div class="chart-container">
+                                    <canvas id="resultsChart"></canvas>
+                                </div>
+                                
+                                <div style="background:#f9fafb;padding:16px;border-radius:8px;margin-top:16px">
+                                    <h5 class="font-bold mb-4">สถิติการลงคะแนน</h5>
+                                    <div class="grid grid-2 text-sm">
+                                        <div>
+                                            <span>คะแนนรวมประธาน:</span>
+                                            <span class="font-bold text-yellow" id="totalPresidentVotes">0</span>
+                                        </div>
+                                        <div>
+                                            <span>คะแนนรวมกรรมการ:</span>
+                                            <span class="font-bold text-blue" id="totalCommitteeVotes">0</span>
+                                        </div>
+                                        <div>
+                                            <span>งดออกเสียงประธาน:</span>
+                                            <span class="font-bold text-red" id="abstainPresidentVotes">0</span>
+                                        </div>
+                                        <div>
+                                            <span>งดออกเสียงกรรมการ:</span>
+                                            <span class="font-bold text-red" id="abstainCommitteeVotes">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settingsTab" class="tab-content">
+                    <div class="card">
+                        <h3 class="text-xl font-bold mb-6">ตั้งค่าระบบ</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center p-4" style="background:#f9fafb;border-radius:8px">
+                                <div>
+                                    <h4 class="font-bold">สถานะระบบเลือกตั้ง</h4>
+                                    <p class="text-sm">เปิด/ปิดระบบให้ผู้มีสิทธิ์ลงคะแนน</p>
+                                </div>
+                                <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer">
+                                    <input type="checkbox" id="electionToggle" style="opacity:0;width:0;height:0">
+                                    <span style="position:relative;width:44px;height:24px;background:#ccc;border-radius:24px;transition:0.4s" class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="p-4" style="background:#f9fafb;border-radius:8px">
+                                <label class="label">จำนวนกรรมการสูงสุดที่เลือกได้</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="number" id="maxCommitteeInput" min="1" max="10" value="3" class="input" style="width:120px">
+                                    <button id="updateMaxCommittee" class="btn btn-primary">อัปเดต</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer style="background:#1f2937;color:white;padding:24px 0;margin-top:48px">
+        <div class="container text-center">
+            <p class="text-sm">© developed by Tle Narongphisit | CTTC19 @ CPD</p>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">เข้าสู่ระบบผู้ดูแล</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="label" for="adminUsername">ชื่อผู้ใช้</label>
+                    <input type="text" id="adminUsername" class="input">
+                </div>
+                <div class="form-group">
+                    <label class="label" for="adminPassword">รหัสผ่าน</label>
+                    <input type="password" id="adminPassword" class="input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="adminLoginBtn" class="btn btn-primary">เข้าสู่ระบบ</button>
+                <button id="cancelLoginBtn" class="btn btn-secondary">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Candidate Modal -->
+    <div id="candidateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="candidateModalTitle" class="modal-title">เพิ่มผู้สมัคร</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="label" for="candidateNumber">หมายเลขผู้สมัคร *</label>
+                    <input type="number" id="candidateNumber" min="1" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label class="label" for="candidateName">ชื่อ-นามสกุล *</label>
+                    <input type="text" id="candidateName" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label class="label" for="candidatePosition">ตำแหน่ง *</label>
+                    <select id="candidatePosition" class="select" required>
+                        <option value="">เลือกตำแหน่ง</option>
+                        <option value="president">ประธานกรรมการ</option>
+                        <option value="committee">กรรมการ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="label" for="candidateImage">URL รูปภาพ (ไม่บังคับ)</label>
+                    <input type="url" id="candidateImage" class="input" placeholder="https://example.com/image.jpg">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveCandidateBtn" class="btn btn-primary">บันทึก</button>
+                <button id="cancelCandidateBtn" class="btn btn-secondary">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voter Modal -->
+    <div id="voterModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="voterModalTitle" class="modal-title">เพิ่มผู้มีสิทธิ์</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="label" for="voterMemberNumber">หมายเลขสมาชิก *</label>
+                    <input type="text" id="voterMemberNumber" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label class="label" for="voterNationalId">เลขบัตรประจำตัวประชาชน *</label>
+                    <input type="text" id="voterNationalId" class="input" maxlength="13" required>
+                </div>
+                <div class="form-group">
+                    <label class="label" for="voterName">ชื่อ (ไม่บังคับ)</label>
+                    <input type="text" id="voterName" class="input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveVoterBtn" class="btn btn-success">บันทึก</button>
+                <button id="cancelVoterBtn" class="btn btn-secondary">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vote Confirmation Modal -->
+    <div id="voteConfirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div style="font-size:48px;margin-bottom:16px">🗳️</div>
+                <h3 class="modal-title">ยืนยันการลงคะแนนเสียง</h3>
+                <p>กรุณาตรวจสอบการเลือกของคุณก่อนส่งคะแนน</p>
+            </div>
+            <div class="modal-body">
+                <div class="bg-yellow border-yellow p-4 mb-4" style="border-radius:12px;border:2px solid">
+                    <h4 class="font-bold mb-4 flex items-center">
+                        <span class="candidate-number" style="margin-right:12px">1</span>
+                        ประธานกรรมการ
+                    </h4>
+                    <div id="confirmPresidentSelection"></div>
+                </div>
+
+                <div class="bg-green border-green p-4" style="border-radius:12px;border:2px solid">
+                    <h4 class="font-bold mb-4 flex items-center">
+                        <span class="candidate-number" style="margin-right:12px">2</span>
+                        กรรมการ
+                    </h4>
+                    <div id="confirmCommitteeSelection"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmVoteBtn" class="btn btn-success">✅ ยืนยันส่งคะแนน</button>
+                <button id="cancelVoteBtn" class="btn btn-secondary">❌ ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div style="font-size:48px;margin-bottom:16px;color:#dc2626">⚠️</div>
+                <h3 class="modal-title text-red">ยืนยันการลบข้อมูล</h3>
+                <p id="deleteConfirmationMessage">คุณแน่ใจหรือไม่ที่จะลบข้อมูลนี้?</p>
+            </div>
+            <div class="modal-body">
+                <div class="p-4" style="background:#fee2e2;border-radius:12px;border:2px solid #dc2626">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <span style="font-size:24px">🗑️</span>
+                        <div class="font-bold text-red">ข้อมูลที่จะถูกลบ</div>
+                    </div>
+                    <div id="deleteConfirmationDetails" class="text-sm" style="color:#7f1d1d"></div>
+                </div>
+                <div class="mt-4 p-4" style="background:#fef3c7;border-radius:8px;border:1px solid #f59e0b">
+                    <div class="flex items-center space-x-2">
+                        <span style="font-size:20px">⚠️</span>
+                        <div class="text-sm font-bold" style="color:#92400e">การดำเนินการนี้ไม่สามารถยกเลิกได้</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmDeleteBtn" class="btn btn-danger">🗑️ ยืนยันลบ</button>
+                <button id="cancelDeleteBtn" class="btn btn-secondary">❌ ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="./systemscript.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97bbb522c1297328',t:'MTc1NzMwNTc5Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
