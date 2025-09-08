@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Presentation System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Kanit', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-shadow { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .pulse-animation { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .word-cloud-item {
+            display: inline-block;
+            margin: 5px;
+            padding: 8px 16px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px;
+            font-weight: 500;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .connected { background: #10B981; color: white; }
+        .disconnected { background: #EF4444; color: white; }
+        
+        /* Fullscreen styles */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            z-index: 9999;
+            display: none;
+            overflow: auto;
+        }
+        .fullscreen-overlay.active {
+            display: block;
+        }
+        .fullscreen-content {
+            padding: 2rem;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .fullscreen-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .fullscreen-results {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status disconnected">
+        <i class="fas fa-circle mr-1"></i>
+        <span id="statusText">กำลังเชื่อมต่อ...</span>
+    </div>
+
+    <!-- Notification System -->
+    <div id="notification" class="notification bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+        <span id="notificationText"></span>
+    </div>
+
+    <!-- Fullscreen Results Overlay -->
+    <div id="fullscreenOverlay" class="fullscreen-overlay">
+        <div class="fullscreen-content">
+            <div class="fullscreen-header">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-3xl font-bold text-gray-900">ผลลัพธ์แบบเรียลไทม์</h1>
+                    <span id="fullscreenRoomCode" class="text-lg text-gray-600 font-mono"></span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="fullscreenTimer" class="text-4xl font-bold text-blue-500"></div>
+                    <button onclick="exitFullscreen()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg text-lg">
+                        <i class="fas fa-times mr-2"></i>ออกจากเต็มจอ
+                    </button>
+                </div>
+            </div>
+            <div class="fullscreen-results">
+                <div id="fullscreenResultsContainer" class="text-center">
+                    <p class="text-gray-500">ไม่มีคำถามที่กำลังดำเนินการ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="app" class="min-h-screen pb-16">
+        <!-- Home Screen -->
+        <div id="homeScreen" class="min-h-screen gradient-bg flex items-center justify-center p-4">
+            <div class="max-w-4xl w-full">
+                <div class="text-center mb-12">
+                    <h1 class="text-5xl font-bold text-white mb-4">
+                        <i class="fas fa-presentation mr-4"></i>
+                        Interactive Presentation
+                    </h1>
+                    <p class="text-xl text-white opacity-90">ระบบนำเสนอแบบโต้ตอบเรียลไทม์</p>
+                    <div id="connectionHelp" class="mt-4 bg-white bg-opacity-20 rounded-lg p-4 text-white text-sm hidden">
+                        <h3 class="font-semibold mb-2">💡 วิธีแก้ไขปัญหาการเชื่อมต่อ:</h3>
+                        <ul class="text-left space-y-1">
+                            <li>• ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต</li>
+                            <li>• เปิด Firebase Realtime Database ใน Console</li>
+                            <li>• ตั้งค่า Database Rules เป็น Public (สำหรับทดสอบ)</li>
+                            <li>• ตรวจสอบ databaseURL ในการตั้งค่า</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Presenter Card -->
+                    <div class="bg-white rounded-2xl p-8 card-shadow text-center">
+                        <div class="text-6xl text-blue-500 mb-6">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">ผู้นำเสนอ</h2>
+                        <p class="text-gray-600 mb-6">สร้างและจัดการการนำเสนอแบบโต้ตอบ</p>
+                        <button onclick="showPresenterLogin()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                            เริ่มต้นการนำเสนอ
+                        </button>
+                    </div>
+
+                    <!-- Participant Card -->
+                    <div class="bg-white rounded-2xl p-8 card-shadow text-center">
+                        <div class="text-6xl text-green-500 mb-6">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">ผู้เข้าร่วม</h2>
+                        <p class="text-gray-600 mb-6">เข้าร่วมการนำเสนอด้วยรหัสห้อง</p>
+                        <div class="mb-4">
+                            <input type="text" id="roomCodeInput" placeholder="ใส่รหัสห้อง 6 หลัก" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-xl font-mono tracking-widest" 
+                                   maxlength="6" style="text-transform: uppercase;">
+                        </div>
+                        <button onclick="joinRoom()" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                            เข้าร่วม
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Presenter Dashboard -->
+        <div id="presenterDashboard" class="hidden min-h-screen bg-gray-100">
+            <nav class="bg-white shadow-sm border-b">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-16">
+                        <div class="flex items-center">
+                            <h1 class="text-xl font-bold text-gray-900">แดชบอร์ดผู้นำเสนอ</h1>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-sm text-gray-600">รหัสห้อง: <span id="currentRoomCode" class="font-mono font-bold text-lg text-blue-600"></span></span>
+                            <span class="text-sm text-gray-600">ผู้เข้าร่วม: <span id="participantCount" class="font-bold text-green-600">0</span></span>
+                            <button onclick="goHome()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
+                                <i class="fas fa-home mr-2"></i>หน้าหลัก
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
+                <div class="grid lg:grid-cols-3 gap-4 lg:gap-8">
+                    <!-- Question Creation Panel -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-xl shadow-sm p-6">
+                            <h2 class="text-xl font-bold text-gray-900 mb-6">สร้างคำถาม</h2>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">ประเภทคำถาม</label>
+                                <select id="questionType" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                    <option value="multiple-choice">เลือกตอบ</option>
+                                    <option value="open-text">คำถามปลายเปิด</option>
+                                    <option value="word-cloud">Word Cloud</option>
+                                    <option value="rating">ให้คะแนน</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">คำถาม</label>
+                                <textarea id="questionText" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="ใส่คำถามของคุณ..."></textarea>
+                            </div>
+
+                            <div id="optionsContainer" class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">ตัวเลือก</label>
+                                <div id="optionsList">
+                                    <input type="text" class="option-input w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" placeholder="ตัวเลือก 1">
+                                    <input type="text" class="option-input w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" placeholder="ตัวเลือก 2">
+                                </div>
+                                <button onclick="addOption()" class="text-blue-500 hover:text-blue-600 text-sm">
+                                    <i class="fas fa-plus mr-1"></i>เพิ่มตัวเลือก
+                                </button>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    เวลา (วินาที)
+                                    <span class="text-xs text-gray-500 ml-1">(10-300 วินาที)</span>
+                                </label>
+                                <input type="number" id="questionTimer" value="60" min="10" max="300" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            
+                            <div class="mb-6 text-xs text-gray-500 bg-blue-50 p-3 rounded-lg">
+                                <p><strong>คีย์บอร์ดลัด:</strong></p>
+                                <p>• Ctrl + Enter: เริ่มคำถาม</p>
+                                <p>• Escape: หยุดคำถาม</p>
+                                <p>• F: เต็มจอผลลัพธ์</p>
+                            </div>
+
+                            <button id="questionControlBtn" onclick="startQuestion()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                                <i class="fas fa-play mr-2"></i>เริ่มคำถาม
+                            </button>
+                            
+                            <button id="stopQuestionBtn" onclick="stopQuestion()" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 mt-3 hidden">
+                                <i class="fas fa-stop mr-2"></i>หยุดคำถาม
+                            </button>
+                            
+                            <button id="exportBtn" onclick="exportResults()" class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 mt-3 hidden">
+                                <i class="fas fa-download mr-2"></i>ส่งออกผลลัพธ์
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Live Results Panel -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-xl shadow-sm p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold text-gray-900">ผลลัพธ์แบบเรียลไทม์</h2>
+                                <div class="flex items-center space-x-4">
+                                    <div id="presenterTimer" class="text-2xl font-bold text-red-500"></div>
+                                    <button id="fullscreenBtn" onclick="enterFullscreen()" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg hidden">
+                                        <i class="fas fa-expand mr-2"></i>เต็มจอ
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="resultsContainer" class="text-center text-gray-500 py-12">
+                                <i class="fas fa-chart-bar text-6xl mb-4 opacity-50"></i>
+                                <p>เริ่มคำถามเพื่อดูผลลัพธ์</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participant Interface -->
+        <div id="participantInterface" class="hidden min-h-screen bg-gray-100">
+            <nav class="bg-white shadow-sm border-b">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-16">
+                        <div class="flex items-center">
+                            <h1 class="text-xl font-bold text-gray-900">ห้อง: <span id="participantRoomCode" class="font-mono text-blue-600"></span></h1>
+                        </div>
+                        <button onclick="goHome()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-sign-out-alt mr-2"></i>ออก
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div id="participantContent" class="bg-white rounded-xl shadow-sm p-8 text-center">
+                    <div class="text-6xl text-green-500 mb-6">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">เข้าร่วมสำเร็จ!</h2>
+                    <p class="text-gray-600">รอการเริ่มต้นคำถามจากผู้นำเสนอ...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4 text-center text-sm">
+        <p>© developed by Tle Narongphisit | CTTC19 @ CPD</p>
+    </footer>
+
+    <script src="./systemscript.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97bb9f7aa14e7322',t:'MTc1NzMwNDkwOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
