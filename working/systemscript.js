@@ -410,7 +410,7 @@
                     </div>
                 </div>
                 <button onclick="this.closest('.popup-overlay').remove()" style="
-                    background: linear-gradient(45deg, #667eea, #764ba2);
+                    background: linear-gradient(45deg, #88d8a3, #a8e6cf);
                     color: white;
                     border: none;
                     padding: 12px 30px;
@@ -861,7 +861,7 @@
                     <td>${employee.position}<br><small style="color: #666;">เวลาทำงาน: ${scheduleText}</small></td>
                     <td>${status}</td>
                     <td>
-                        <button class="btn" onclick="editEmployee('${employee.id}')" style="background: linear-gradient(45deg, #2196F3, #1976D2); margin-right: 5px;">✏️ แก้ไข</button>
+                        <button class="btn" onclick="editEmployee('${employee.id}')" style="background: linear-gradient(45deg, #88d8a3, #a8e6cf); margin-right: 5px;">✏️ แก้ไข</button>
                         <button class="btn btn-danger" onclick="deleteEmployee('${employee.id}')">🗑️ ลบ</button>
                     </td>
                 `;
