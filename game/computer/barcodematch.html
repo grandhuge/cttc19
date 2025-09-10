@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>เกมจับคู่อุปกรณ์คอมพิวเตอร์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@zxing/library@latest"></script>
@@ -49,10 +49,11 @@
             <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex items-center space-x-4">
-                        <div class="text-lg font-semibold">คำถามที่: <span id="currentQuestion" class="text-indigo-600">1</span>/<span id="totalQuestions" class="text-indigo-600">5</span></div>
+                        <div class="text-lg font-semibold">คำถามที่: <span id="currentQuestion" class="text-indigo-600">1</span>/<span id="totalQuestions" class="text-indigo-600">10</span></div>
                         <div class="text-lg font-semibold">เวลา: <span id="timer" class="text-red-500">00:00</span></div>
                     </div>
                     <div class="flex space-x-2">
+                        <button id="testCameraBtn" onclick="testCamera()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium">ทดสอบกล้อง</button>
                         <button id="startGameBtn" onclick="startGame()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium">เริ่มเกม</button>
                         <button id="resetGameBtn" onclick="resetGame()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium" style="display: none;">เริ่มใหม่</button>
                     </div>
@@ -72,7 +73,7 @@
                     </div>
                     <div id="playerNameInput" class="mt-4" style="display: none;">
                         <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อผู้เล่น:</label>
-                        <input type="text" id="playerName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="กรอกชื่อของคุณ">
+                        <input type="text" id="playerName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="กรอกชื่อของคุณ" onkeypress="if(event.key==='Enter') startGame()">
                     </div>
                 </div>
 
@@ -84,7 +85,13 @@
                         <div id="scannerPlaceholder" class="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
                             <div class="text-center">
                                 <div class="text-4xl mb-2">📷</div>
-                                <p class="text-gray-500">กดเริ่มเกมเพื่อเปิดกล้อง</p>
+                                <p class="text-gray-500">กดทดสอบกล้องหรือเริ่มเกม</p>
+                            </div>
+                        </div>
+                        <div id="cameraStatus" class="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center" style="display: none;">
+                            <div class="text-center">
+                                <div id="cameraStatusIcon" class="text-4xl mb-2">⏳</div>
+                                <p id="cameraStatusText" class="text-gray-600">กำลังตรวจสอบกล้อง...</p>
                             </div>
                         </div>
                         <div id="scannerOverlay" class="scanner-overlay" style="display: none;">
@@ -100,7 +107,7 @@
                     </div>
                     <button id="manualInputBtn" onclick="toggleManualInput()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg font-medium mt-4" style="display: none;">ป้อนบาร์โค้ดด้วยตนเอง</button>
                     <div id="manualInput" class="mt-4" style="display: none;">
-                        <input type="text" id="manualBarcode" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="ป้อนรหัสบาร์โค้ด">
+                        <input type="text" id="manualBarcode" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="ป้อนรหัสบาร์โค้ด" onkeypress="if(event.key==='Enter') checkManualBarcode()">
                         <button onclick="checkManualBarcode()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-lg font-medium mt-2">ตรวจสอบ</button>
                     </div>
                 </div>
@@ -152,7 +159,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนคำถามต่อรอบ:</label>
-                            <input type="number" id="questionsPerRound" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" value="5" min="1" max="15">
+                            <input type="number" id="questionsPerRound" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" value="10" min="1" max="15">
                         </div>
                         <div class="flex items-end">
                             <button onclick="saveGameSettings()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium">บันทึกการตั้งค่า</button>
@@ -224,7 +231,7 @@
             timer: null,
             questions: [],
             timeLimit: 10 * 60, // 10 minutes in seconds
-            questionsPerRound: 5
+            questionsPerRound: 10
         };
 
         // Default equipment data
@@ -249,6 +256,82 @@
         // Scanner
         let codeReader = null;
         let isScanning = false;
+        let cameraPermissionGranted = false;
+        let cameraTestStream = null;
+
+        // Sound effects
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            if (type === 'success') {
+                // Success sound - ascending notes
+                const frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5
+                frequencies.forEach((freq, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.1);
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + index * 0.1);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * 0.1 + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime + index * 0.1);
+                    oscillator.stop(audioContext.currentTime + index * 0.1 + 0.3);
+                });
+            } else if (type === 'error') {
+                // Error sound - descending buzz
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.5);
+                oscillator.type = 'sawtooth';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } else if (type === 'complete') {
+                // Game complete sound - victory fanfare
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.15);
+                    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime + index * 0.15);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * 0.15 + 0.4);
+                    
+                    oscillator.start(audioContext.currentTime + index * 0.15);
+                    oscillator.stop(audioContext.currentTime + index * 0.15 + 0.4);
+                });
+            } else if (type === 'start') {
+                // Start game sound - upward sweep
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(440, audioContext.currentTime + 0.3);
+                
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.3);
+            }
+        }
 
         // Load data from localStorage
         function loadData() {
@@ -290,34 +373,181 @@
             }
         }
 
+        // Camera test function
+        async function testCamera() {
+            const testBtn = document.getElementById('testCameraBtn');
+            const statusDiv = document.getElementById('cameraStatus');
+            const statusIcon = document.getElementById('cameraStatusIcon');
+            const statusText = document.getElementById('cameraStatusText');
+            const placeholderDiv = document.getElementById('scannerPlaceholder');
+            
+            // Show loading state
+            testBtn.textContent = 'กำลังทดสอบ...';
+            testBtn.disabled = true;
+            placeholderDiv.style.display = 'none';
+            statusDiv.style.display = 'flex';
+            statusIcon.textContent = '⏳';
+            statusText.textContent = 'กำลังขออนุญาตใช้กล้อง...';
+            
+            try {
+                // Request camera permission
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                
+                cameraTestStream = stream;
+                cameraPermissionGranted = true;
+                
+                // Show success status
+                statusIcon.textContent = '✅';
+                statusText.textContent = 'กล้องพร้อมใช้งาน! คุณสามารถเริ่มเกมได้';
+                statusDiv.className = 'w-full h-full bg-green-50 rounded-lg flex items-center justify-center border-2 border-green-200';
+                
+                // Show camera preview for 3 seconds
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                video.style.display = 'block';
+                statusDiv.style.display = 'none';
+                
+                setTimeout(() => {
+                    // Stop test stream
+                    if (cameraTestStream) {
+                        cameraTestStream.getTracks().forEach(track => track.stop());
+                        cameraTestStream = null;
+                    }
+                    
+                    // Reset display
+                    video.style.display = 'none';
+                    video.srcObject = null;
+                    statusDiv.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        statusDiv.style.display = 'none';
+                        placeholderDiv.style.display = 'flex';
+                        placeholderDiv.innerHTML = `
+                            <div class="text-center">
+                                <div class="text-4xl mb-2">✅</div>
+                                <p class="text-green-600 font-medium">กล้องพร้อมใช้งาน</p>
+                                <p class="text-gray-500 text-sm mt-1">คุณสามารถเริ่มเกมได้เลย</p>
+                            </div>
+                        `;
+                    }, 1000);
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Camera access error:', error);
+                cameraPermissionGranted = false;
+                
+                // Show error status
+                statusIcon.textContent = '❌';
+                let errorMessage = 'ไม่สามารถเข้าถึงกล้องได้';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage = 'กรุณาอนุญาตให้เข้าถึงกล้อง';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage = 'ไม่พบกล้องในอุปกรณ์';
+                } else if (error.name === 'NotSupportedError') {
+                    errorMessage = 'เบราว์เซอร์ไม่รองรับกล้อง';
+                }
+                
+                statusText.textContent = errorMessage + ' - ใช้การป้อนบาร์โค้ดด้วยตนเองแทน';
+                statusDiv.className = 'w-full h-full bg-red-50 rounded-lg flex items-center justify-center border-2 border-red-200';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                    placeholderDiv.style.display = 'flex';
+                    placeholderDiv.innerHTML = `
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">❌</div>
+                            <p class="text-red-600 font-medium">กล้องไม่พร้อมใช้งาน</p>
+                            <p class="text-gray-500 text-sm mt-1">ใช้การป้อนบาร์โค้ดด้วยตนเอง</p>
+                        </div>
+                    `;
+                }, 3000);
+            } finally {
+                // Reset button
+                testBtn.textContent = 'ทดสอบกล้อง';
+                testBtn.disabled = false;
+            }
+        }
+
         // Game functions
-        function startGame() {
+        async function startGame() {
             const playerName = document.getElementById('playerName').value.trim();
             if (!playerName) {
                 document.getElementById('playerNameInput').style.display = 'block';
+                document.getElementById('playerName').focus();
                 return;
             }
 
-            gameState.isPlaying = true;
-            gameState.currentQuestionIndex = 0;
-            gameState.startTime = Date.now();
-            gameState.questions = [...equipmentData].sort(() => Math.random() - 0.5).slice(0, gameState.questionsPerRound);
+            // Show loading state
+            const startBtn = document.getElementById('startGameBtn');
+            startBtn.textContent = 'กำลังเริ่มเกม...';
+            startBtn.disabled = true;
 
-            document.getElementById('startGameBtn').style.display = 'none';
-            document.getElementById('resetGameBtn').style.display = 'inline-block';
-            document.getElementById('manualInputBtn').style.display = 'block';
-            document.getElementById('playerNameInput').style.display = 'none';
+            // Check camera permission if not already granted
+            if (!cameraPermissionGranted) {
+                try {
+                    startBtn.textContent = 'กำลังขออนุญาตกล้อง...';
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'environment',
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        } 
+                    });
+                    
+                    // Stop the test stream immediately
+                    stream.getTracks().forEach(track => track.stop());
+                    cameraPermissionGranted = true;
+                    
+                } catch (error) {
+                    console.warn('Camera permission denied, will use manual input:', error);
+                    cameraPermissionGranted = false;
+                    
+                    // Show warning but continue with game
+                    if (error.name === 'NotAllowedError') {
+                        alert('ไม่สามารถเข้าถึงกล้องได้ เกมจะใช้การป้อนบาร์โค้ดด้วยตนเองแทน\n\nหากต้องการใช้กล้อง กรุณาอนุญาตการเข้าถึงกล้องและรีเฟรชหน้าเว็บ');
+                    }
+                }
+            }
 
-            updateGameDisplay();
-            startTimer();
-            startScanner();
-            showNextQuestion();
+            // Play start game sound
+            playSound('start');
+
+            setTimeout(() => {
+                gameState.isPlaying = true;
+                gameState.currentQuestionIndex = 0;
+                gameState.startTime = Date.now();
+                gameState.questions = [...equipmentData].sort(() => Math.random() - 0.5).slice(0, gameState.questionsPerRound);
+                isProcessingAnswer = false; // Reset processing flag
+
+                document.getElementById('startGameBtn').style.display = 'none';
+                document.getElementById('testCameraBtn').style.display = 'none';
+                document.getElementById('resetGameBtn').style.display = 'inline-block';
+                document.getElementById('manualInputBtn').style.display = 'block';
+                document.getElementById('playerNameInput').style.display = 'none';
+
+                // Reset button state
+                startBtn.textContent = 'เริ่มเกม';
+                startBtn.disabled = false;
+
+                updateGameDisplay();
+                startTimer();
+                startScanner();
+                showNextQuestion();
+            }, 500);
         }
 
         function resetGame() {
             gameState.isPlaying = false;
             gameState.currentQuestionIndex = 0;
             gameState.startTime = null;
+            isProcessingAnswer = false; // Reset processing flag
             
             if (gameState.timer) {
                 clearInterval(gameState.timer);
@@ -325,6 +555,7 @@
             }
 
             document.getElementById('startGameBtn').style.display = 'inline-block';
+            document.getElementById('testCameraBtn').style.display = 'inline-block';
             document.getElementById('resetGameBtn').style.display = 'none';
             document.getElementById('manualInputBtn').style.display = 'none';
             document.getElementById('playerNameInput').style.display = 'none';
@@ -337,6 +568,28 @@
             document.getElementById('currentQuestion').textContent = '1';
             document.getElementById('playerName').value = '';
 
+            // Reset question card style
+            document.getElementById('questionCard').className = 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 text-center';
+
+            // Reset scanner placeholder based on camera status
+            const placeholderDiv = document.getElementById('scannerPlaceholder');
+            if (cameraPermissionGranted) {
+                placeholderDiv.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-4xl mb-2">✅</div>
+                        <p class="text-green-600 font-medium">กล้องพร้อมใช้งาน</p>
+                        <p class="text-gray-500 text-sm mt-1">คุณสามารถเริ่มเกมได้เลย</p>
+                    </div>
+                `;
+            } else {
+                placeholderDiv.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-4xl mb-2">📷</div>
+                        <p class="text-gray-500">กดทดสอบกล้องหรือเริ่มเกม</p>
+                    </div>
+                `;
+            }
+
             stopScanner();
         }
 
@@ -347,16 +600,37 @@
             }
 
             const question = gameState.questions[gameState.currentQuestionIndex];
-            document.getElementById('questionText').textContent = question.hint;
-            document.getElementById('questionCard').className = 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 text-center fade-in';
+            const questionCard = document.getElementById('questionCard');
             
+            // Update display immediately to show correct question number
             updateGameDisplay();
             
-            // Hide previous result and show scanning status
-            document.getElementById('manualInput').style.display = 'none';
-            if (isScanning) {
-                showScanningStatus();
+            // Show transition message first (only for questions after the first one)
+            if (gameState.currentQuestionIndex > 0) {
+                questionCard.className = 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 text-center bounce-in border-2 border-blue-300';
+                document.getElementById('questionText').innerHTML = `
+                    <div class="text-blue-600 font-bold text-xl mb-2">📝 คำถามถัดไป</div>
+                    <div class="text-blue-700">กำลังเตรียมคำใบ้...</div>
+                `;
+                
+                setTimeout(() => {
+                    document.getElementById('questionText').textContent = question.hint;
+                    questionCard.className = 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 text-center fade-in';
+                    if (isScanning) {
+                        showScanningStatus();
+                    }
+                }, 1500);
+            } else {
+                document.getElementById('questionText').textContent = question.hint;
+                questionCard.className = 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 text-center fade-in';
+                if (isScanning) {
+                    showScanningStatus();
+                }
             }
+            
+            // Hide previous result and manual input
+            document.getElementById('manualInput').style.display = 'none';
+            document.getElementById('scanResult').style.display = 'none';
         }
 
         function updateGameDisplay() {
@@ -386,6 +660,7 @@
 
         function completeGame(timeUp = false) {
             gameState.isPlaying = false;
+            isProcessingAnswer = false; // Reset processing flag
             
             if (gameState.timer) {
                 clearInterval(gameState.timer);
@@ -395,6 +670,9 @@
             stopScanner();
             
             if (!timeUp) {
+                // Play completion sound
+                playSound('complete');
+                
                 const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
                 const playerName = document.getElementById('playerName').value.trim();
                 
@@ -420,11 +698,18 @@
 
         // Scanner functions
         function startScanner() {
+            // If camera permission not granted, show manual input immediately
+            if (!cameraPermissionGranted) {
+                document.getElementById('manualInputBtn').click();
+                return;
+            }
+            
             if (!codeReader) {
                 codeReader = new ZXing.BrowserMultiFormatReader();
             }
             
             document.getElementById('scannerPlaceholder').style.display = 'none';
+            document.getElementById('cameraStatus').style.display = 'none';
             document.getElementById('video').style.display = 'block';
             document.getElementById('scannerOverlay').style.display = 'block';
             
@@ -438,6 +723,18 @@
                     // Show scanning status when no barcode is detected
                     showScanningStatus();
                 }
+            }).catch(error => {
+                console.error('Camera error:', error);
+                cameraPermissionGranted = false;
+                
+                // Show manual input if camera fails
+                document.getElementById('manualInputBtn').click();
+                
+                let errorMessage = 'ไม่สามารถเข้าถึงกล้องได้';
+                if (error.name === 'NotAllowedError') {
+                    errorMessage = 'กรุณาอนุญาตให้เข้าถึงกล้อง';
+                }
+                alert(errorMessage + ' กรุณาใช้การป้อนบาร์โค้ดด้วยตนเอง');
             });
             
             isScanning = true;
@@ -462,7 +759,14 @@
                 isScanning = false;
             }
             
+            // Stop any test stream
+            if (cameraTestStream) {
+                cameraTestStream.getTracks().forEach(track => track.stop());
+                cameraTestStream = null;
+            }
+            
             document.getElementById('scannerPlaceholder').style.display = 'flex';
+            document.getElementById('cameraStatus').style.display = 'none';
             document.getElementById('video').style.display = 'none';
             document.getElementById('scannerOverlay').style.display = 'none';
         }
@@ -480,29 +784,70 @@
             }
         }
 
+        // Add flag to prevent multiple scans during transition
+        let isProcessingAnswer = false;
+
         function checkBarcode(scannedCode) {
-            if (!gameState.isPlaying) return;
+            if (!gameState.isPlaying || isProcessingAnswer) return;
             
             const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
             const isCorrect = currentQuestion.barcode === scannedCode;
             
+            // Set processing flag to prevent multiple scans
+            isProcessingAnswer = true;
+            
             const resultDiv = document.getElementById('scanResult');
             const resultIcon = document.getElementById('resultIcon');
             const resultText = document.getElementById('resultText');
+            const questionCard = document.getElementById('questionCard');
             
             if (isCorrect) {
+                // Play success sound
+                playSound('success');
+                
+                // Show success result
                 resultIcon.textContent = '✅';
                 resultText.textContent = 'ถูกต้อง! ' + currentQuestion.name;
                 resultText.className = 'text-lg font-semibold text-green-600';
                 
+                // Update question card to show success
+                questionCard.className = 'bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-6 text-center bounce-in border-2 border-green-300';
+                document.getElementById('questionText').innerHTML = `
+                    <div class="text-green-600 font-bold text-xl mb-2">✅ ถูกต้อง!</div>
+                    <div class="text-green-700">${currentQuestion.name}</div>
+                `;
+                
                 setTimeout(() => {
                     gameState.currentQuestionIndex++;
+                    isProcessingAnswer = false; // Reset flag before showing next question
                     showNextQuestion();
-                }, 2000);
+                }, 3000); // Reduced from 5000 to 3000ms
             } else {
+                // Play error sound
+                playSound('error');
+                
+                // Show error result
                 resultIcon.textContent = '❌';
                 resultText.textContent = 'ผิด! ลองใหม่อีกครั้ง';
                 resultText.className = 'text-lg font-semibold text-red-600';
+                
+                // Update question card to show error
+                questionCard.className = 'bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-6 text-center bounce-in border-2 border-red-300';
+                document.getElementById('questionText').innerHTML = `
+                    <div class="text-red-600 font-bold text-xl mb-2">❌ ผิด!</div>
+                    <div class="text-red-700">ลองใหม่อีกครั้ง</div>
+                    <div class="text-sm text-gray-600 mt-2">${currentQuestion.hint}</div>
+                `;
+                
+                // Reset to normal after 3 seconds
+                setTimeout(() => {
+                    questionCard.className = 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 text-center fade-in';
+                    document.getElementById('questionText').textContent = currentQuestion.hint;
+                    isProcessingAnswer = false; // Reset flag
+                    if (isScanning) {
+                        showScanningStatus();
+                    }
+                }, 3000); // Reduced from 5000 to 3000ms
             }
             
             resultDiv.style.display = 'block';
@@ -658,5 +1003,5 @@
             loadEquipmentList();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97cbb2e7729b74d4',t:'MTc1NzQ3MzQ3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97cc83ab700e74d4',t:'MTc1NzQ4MjAyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
