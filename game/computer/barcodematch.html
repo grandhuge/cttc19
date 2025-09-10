@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมจับคู่อุปกรณ์คอมพิวเตอร์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Kanit', sans-serif; }
+        .scanner-container { position: relative; width: 100%; max-width: 400px; height: 300px; }
+        #video { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+        .scanner-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; border: 2px solid #10b981; border-radius: 12px; }
+        .scanner-corner { position: absolute; width: 20px; height: 20px; border: 3px solid #10b981; }
+        .scanner-corner.top-left { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .scanner-corner.top-right { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+        .scanner-corner.bottom-left { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+        .scanner-corner.bottom-right { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .bounce-in { animation: bounceIn 0.6s ease-out; }
+        @keyframes bounceIn { 0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-indigo-600">🖥️ เกมจับคู่อุปกรณ์คอมพิวเตอร์</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showScreen('game')" class="px-4 py-2 text-indigo-600 hover:text-indigo-800 font-medium">เล่นเกม</button>
+                    <button onclick="showScreen('leaderboard')" class="px-4 py-2 text-indigo-600 hover:text-indigo-800 font-medium">อันดับคะแนน</button>
+                    <button onclick="showScreen('admin')" class="px-4 py-2 text-indigo-600 hover:text-indigo-800 font-medium">ผู้ดูแลระบบ</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Game Screen -->
+    <div id="gameScreen" class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Game Status -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-lg font-semibold">คำถามที่: <span id="currentQuestion" class="text-indigo-600">1</span>/<span id="totalQuestions" class="text-indigo-600">5</span></div>
+                        <div class="text-lg font-semibold">เวลา: <span id="timer" class="text-red-500">00:00</span></div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="startGameBtn" onclick="startGame()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium">เริ่มเกม</button>
+                        <button id="resetGameBtn" onclick="resetGame()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium" style="display: none;">เริ่มใหม่</button>
+                    </div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div id="progressBar" class="bg-indigo-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Game Content -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Question Panel -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">💡 คำใบ้</h2>
+                    <div id="questionCard" class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 text-center">
+                        <p id="questionText" class="text-lg text-gray-700 leading-relaxed">กดปุ่ม "เริ่มเกม" เพื่อเริ่มต้น</p>
+                    </div>
+                    <div id="playerNameInput" class="mt-4" style="display: none;">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อผู้เล่น:</label>
+                        <input type="text" id="playerName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="กรอกชื่อของคุณ">
+                    </div>
+                </div>
+
+                <!-- Scanner Panel -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">📱 สแกนบาร์โค้ด</h2>
+                    <div class="scanner-container mx-auto mb-4">
+                        <video id="video" style="display: none;"></video>
+                        <div id="scannerPlaceholder" class="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-4xl mb-2">📷</div>
+                                <p class="text-gray-500">กดเริ่มเกมเพื่อเปิดกล้อง</p>
+                            </div>
+                        </div>
+                        <div id="scannerOverlay" class="scanner-overlay" style="display: none;">
+                            <div class="scanner-corner top-left"></div>
+                            <div class="scanner-corner top-right"></div>
+                            <div class="scanner-corner bottom-left"></div>
+                            <div class="scanner-corner bottom-right"></div>
+                        </div>
+                    </div>
+                    <div id="scanResult" class="text-center" style="display: none;">
+                        <div id="resultIcon" class="text-4xl mb-2"></div>
+                        <div id="resultText" class="text-lg font-semibold"></div>
+                    </div>
+                    <button id="manualInputBtn" onclick="toggleManualInput()" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg font-medium mt-4" style="display: none;">ป้อนบาร์โค้ดด้วยตนเอง</button>
+                    <div id="manualInput" class="mt-4" style="display: none;">
+                        <input type="text" id="manualBarcode" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="ป้อนรหัสบาร์โค้ด">
+                        <button onclick="checkManualBarcode()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-lg font-medium mt-2">ตรวจสอบ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Screen -->
+    <div id="leaderboardScreen" class="container mx-auto px-4 py-8" style="display: none;">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">🏆 อันดับคะแนน</h2>
+                <div id="leaderboardList" class="space-y-4">
+                    <!-- Leaderboard entries will be populated here -->
+                </div>
+                <button onclick="clearLeaderboard()" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-medium mt-6">ล้างอันดับคะแนน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Screen -->
+    <div id="adminScreen" class="container mx-auto px-4 py-8" style="display: none;">
+        <div class="max-w-6xl mx-auto">
+            <!-- Admin Login -->
+            <div id="adminLogin" class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">🔐 เข้าสู่ระบบผู้ดูแล</h2>
+                <div class="max-w-md mx-auto">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อผู้ใช้:</label>
+                        <input type="text" id="adminUsername" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="admin">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน:</label>
+                        <input type="password" id="adminPassword" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <button onclick="adminLogin()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-lg font-medium">เข้าสู่ระบบ</button>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminPanel" style="display: none;">
+                <!-- Game Settings -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">⚙️ ตั้งค่าเกม</h3>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">เวลาจำกัด (นาที):</label>
+                            <input type="number" id="gameTimeLimit" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" value="10" min="1" max="60">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนคำถามต่อรอบ:</label>
+                            <input type="number" id="questionsPerRound" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" value="5" min="1" max="15">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="saveGameSettings()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg font-medium">บันทึกการตั้งค่า</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equipment Management -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">🖥️ จัดการอุปกรณ์</h3>
+                    
+                    <!-- Add Equipment Form -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h4 class="font-semibold text-gray-700 mb-3">เพิ่มอุปกรณ์ใหม่</h4>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">ชื่ออุปกรณ์:</label>
+                                <input type="text" id="equipmentName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="เช่น คีย์บอร์ด">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">คำใบ้:</label>
+                                <input type="text" id="equipmentHint" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="อุปกรณ์นี้ใช้ในการ...">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">บาร์โค้ด:</label>
+                                <input type="text" id="equipmentBarcode" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="รหัสบาร์โค้ด">
+                            </div>
+                        </div>
+                        <button onclick="addEquipment()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium mt-4">เพิ่มอุปกรณ์</button>
+                    </div>
+
+                    <!-- Equipment List -->
+                    <div id="equipmentList" class="space-y-3">
+                        <!-- Equipment items will be populated here -->
+                    </div>
+                </div>
+
+                <button onclick="adminLogout()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-medium">ออกจากระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Complete Modal -->
+    <div id="gameCompleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md mx-4 bounce-in">
+            <div class="text-center">
+                <div class="text-6xl mb-4">🎉</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">ยินดีด้วย!</h3>
+                <p class="text-gray-600 mb-2">คุณทำเวลาได้:</p>
+                <p id="finalTime" class="text-3xl font-bold text-indigo-600 mb-6">00:00</p>
+                <button onclick="closeGameCompleteModal()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-3 rounded-lg font-medium">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">© developed by Tle Narongphisit | CTTC19 @ CPD</p>
+        </div>
+    </footer>
+
+    <script>
+        // Game State
+        let gameState = {
+            isPlaying: false,
+            currentQuestionIndex: 0,
+            startTime: null,
+            timer: null,
+            questions: [],
+            timeLimit: 10 * 60, // 10 minutes in seconds
+            questionsPerRound: 5
+        };
+
+        // Default equipment data
+        let equipmentData = [
+            { name: 'คีย์บอร์ด', hint: 'อุปกรณ์นี้มีปุ่มตัวอักษรและตัวเลข ใช้สำหรับพิมพ์ข้อความและสั่งงานคอมพิวเตอร์', barcode: 'KB001' },
+            { name: 'หน้าจอ', hint: 'อุปกรณ์นี้เหมือนจอโทรทัศน์ แสดงภาพและข้อความให้เราเห็น', barcode: 'MON001' },
+            { name: 'เมาส์', hint: 'อุปกรณ์นี้ใช้ลากและคลิก มีลูกกลิ้งหรือเซ็นเซอร์ช่วยเลื่อนเคอร์เซอร์', barcode: 'MS001' },
+            { name: 'ลำโพง', hint: 'อุปกรณ์นี้ทำให้เราได้ยินเสียงเพลง เสียงพูด และเสียงต่างๆ จากคอมพิวเตอร์', barcode: 'SPK001' },
+            { name: 'ฮาร์ดดิสก์', hint: 'อุปกรณ์นี้เป็นที่เก็บไฟล์ รูปภาพ วิดีโอ และโปรแกรมต่างๆ ไว้ในคอมพิวเตอร์', barcode: 'HDD001' },
+            { name: 'เครื่องพิมพ์', hint: 'อุปกรณ์นี้ช่วยพิมพ์เอกสารและรูปภาพจากคอมพิวเตอร์ออกมาเป็นกระดาษ', barcode: 'PRT001' },
+            { name: 'หูฟัง', hint: 'อุปกรณ์นี้สวมใส่หู ช่วยให้ฟังเสียงจากคอมพิวเตอร์โดยไม่รบกวนคนอื่น', barcode: 'HP001' },
+            { name: 'ไมโครโฟน', hint: 'อุปกรณ์นี้ใช้พูดหรือร้องเพลง เพื่อบันทึกเสียงเข้าไปในคอมพิวเตอร์', barcode: 'MIC001' },
+            { name: 'เว็บแคม', hint: 'อุปกรณ์นี้เป็นกล้องเล็กๆ ใช้ถ่ายรูปและวิดีโอคอลกับเพื่อนๆ', barcode: 'CAM001' },
+            { name: 'แฟลชไดรฟ์', hint: 'อุปกรณ์นี้เล็กๆ เสียบพอร์ต USB ใช้เก็บไฟล์และย้ายข้อมูลระหว่างคอมพิวเตอร์', barcode: 'USB001' },
+            { name: 'แป้นพิมพ์ตัวเลข', hint: 'อุปกรณ์นี้มีแต่ปุ่มตัวเลขและเครื่องหมาย ช่วยพิมพ์ตัวเลขได้เร็วขึ้น', barcode: 'NUM001' },
+            { name: 'จอยสติ๊ก', hint: 'อุปกรณ์นี้ใช้เล่นเกม มีก้านโยกและปุ่มกด ช่วยควบคุมตัวละครในเกม', barcode: 'JOY001' },
+            { name: 'สแกนเนอร์', hint: 'อุปกรณ์นี้ช่วยถ่ายรูปเอกสารหรือภาพถ่ายเข้าไปเก็บในคอมพิวเตอร์', barcode: 'SCN001' },
+            { name: 'แท็บเล็ตวาดรูป', hint: 'อุปกรณ์นี้ใช้ปากกาพิเศษวาดรูปบนแผ่นเรียบ แล้วภาพจะปรากฏในคอมพิวเตอร์', barcode: 'TAB001' },
+            { name: 'ซีดีรอม', hint: 'อุปกรณ์นี้เป็นแผ่นกลมๆ เงาๆ ใช้เก็บเกม โปรแกรม หรือเพลงไว้', barcode: 'CD001' }
+        ];
+
+        // Scanner
+        let codeReader = null;
+        let isScanning = false;
+
+        // Load data from localStorage
+        function loadData() {
+            const savedEquipment = localStorage.getItem('equipmentData');
+            if (savedEquipment) {
+                equipmentData = JSON.parse(savedEquipment);
+            }
+            
+            const savedTimeLimit = localStorage.getItem('gameTimeLimit');
+            if (savedTimeLimit) {
+                gameState.timeLimit = parseInt(savedTimeLimit) * 60;
+                document.getElementById('gameTimeLimit').value = parseInt(savedTimeLimit);
+            }
+            
+            const savedQuestionsPerRound = localStorage.getItem('questionsPerRound');
+            if (savedQuestionsPerRound) {
+                gameState.questionsPerRound = parseInt(savedQuestionsPerRound);
+                document.getElementById('questionsPerRound').value = parseInt(savedQuestionsPerRound);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('equipmentData', JSON.stringify(equipmentData));
+        }
+
+        // Screen management
+        function showScreen(screenName) {
+            const screens = ['gameScreen', 'leaderboardScreen', 'adminScreen'];
+            screens.forEach(screen => {
+                document.getElementById(screen).style.display = 'none';
+            });
+            document.getElementById(screenName + 'Screen').style.display = 'block';
+            
+            if (screenName === 'leaderboard') {
+                loadLeaderboard();
+            } else if (screenName === 'admin') {
+                loadEquipmentList();
+            }
+        }
+
+        // Game functions
+        function startGame() {
+            const playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                document.getElementById('playerNameInput').style.display = 'block';
+                return;
+            }
+
+            gameState.isPlaying = true;
+            gameState.currentQuestionIndex = 0;
+            gameState.startTime = Date.now();
+            gameState.questions = [...equipmentData].sort(() => Math.random() - 0.5).slice(0, gameState.questionsPerRound);
+
+            document.getElementById('startGameBtn').style.display = 'none';
+            document.getElementById('resetGameBtn').style.display = 'inline-block';
+            document.getElementById('manualInputBtn').style.display = 'block';
+            document.getElementById('playerNameInput').style.display = 'none';
+
+            updateGameDisplay();
+            startTimer();
+            startScanner();
+            showNextQuestion();
+        }
+
+        function resetGame() {
+            gameState.isPlaying = false;
+            gameState.currentQuestionIndex = 0;
+            gameState.startTime = null;
+            
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+
+            document.getElementById('startGameBtn').style.display = 'inline-block';
+            document.getElementById('resetGameBtn').style.display = 'none';
+            document.getElementById('manualInputBtn').style.display = 'none';
+            document.getElementById('playerNameInput').style.display = 'none';
+            document.getElementById('manualInput').style.display = 'none';
+            document.getElementById('scanResult').style.display = 'none';
+
+            document.getElementById('questionText').textContent = 'กดปุ่ม "เริ่มเกม" เพื่อเริ่มต้น';
+            document.getElementById('timer').textContent = '00:00';
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('currentQuestion').textContent = '1';
+            document.getElementById('playerName').value = '';
+
+            stopScanner();
+        }
+
+        function showNextQuestion() {
+            if (gameState.currentQuestionIndex >= gameState.questions.length) {
+                completeGame();
+                return;
+            }
+
+            const question = gameState.questions[gameState.currentQuestionIndex];
+            document.getElementById('questionText').textContent = question.hint;
+            document.getElementById('questionCard').className = 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 text-center fade-in';
+            
+            updateGameDisplay();
+            
+            // Hide previous result and show scanning status
+            document.getElementById('manualInput').style.display = 'none';
+            if (isScanning) {
+                showScanningStatus();
+            }
+        }
+
+        function updateGameDisplay() {
+            document.getElementById('currentQuestion').textContent = gameState.currentQuestionIndex + 1;
+            document.getElementById('totalQuestions').textContent = gameState.questions.length;
+            
+            const progress = ((gameState.currentQuestionIndex) / gameState.questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function startTimer() {
+            gameState.timer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - gameState.startTime) / 1000);
+                const remaining = gameState.timeLimit - elapsed;
+                
+                if (remaining <= 0) {
+                    completeGame(true); // Time's up
+                    return;
+                }
+                
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = 
+                    String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            }, 1000);
+        }
+
+        function completeGame(timeUp = false) {
+            gameState.isPlaying = false;
+            
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+            
+            stopScanner();
+            
+            if (!timeUp) {
+                const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000);
+                const playerName = document.getElementById('playerName').value.trim();
+                
+                // Save to leaderboard
+                saveScore(playerName, totalTime);
+                
+                // Show completion modal
+                const minutes = Math.floor(totalTime / 60);
+                const seconds = totalTime % 60;
+                document.getElementById('finalTime').textContent = 
+                    String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+                document.getElementById('gameCompleteModal').style.display = 'flex';
+            } else {
+                alert('หมดเวลา! ลองเล่นใหม่อีกครั้ง');
+                resetGame();
+            }
+        }
+
+        function closeGameCompleteModal() {
+            document.getElementById('gameCompleteModal').style.display = 'none';
+            resetGame();
+        }
+
+        // Scanner functions
+        function startScanner() {
+            if (!codeReader) {
+                codeReader = new ZXing.BrowserMultiFormatReader();
+            }
+            
+            document.getElementById('scannerPlaceholder').style.display = 'none';
+            document.getElementById('video').style.display = 'block';
+            document.getElementById('scannerOverlay').style.display = 'block';
+            
+            // Show scanning status
+            showScanningStatus();
+            
+            codeReader.decodeFromVideoDevice(null, 'video', (result, err) => {
+                if (result && gameState.isPlaying) {
+                    checkBarcode(result.text);
+                } else if (gameState.isPlaying) {
+                    // Show scanning status when no barcode is detected
+                    showScanningStatus();
+                }
+            });
+            
+            isScanning = true;
+        }
+
+        function showScanningStatus() {
+            const resultDiv = document.getElementById('scanResult');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultText = document.getElementById('resultText');
+            
+            resultIcon.textContent = '🔍';
+            resultText.textContent = 'กำลังค้นหาบาร์โค้ด...';
+            resultText.className = 'text-lg font-semibold text-blue-600';
+            
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'text-center pulse';
+        }
+
+        function stopScanner() {
+            if (codeReader && isScanning) {
+                codeReader.reset();
+                isScanning = false;
+            }
+            
+            document.getElementById('scannerPlaceholder').style.display = 'flex';
+            document.getElementById('video').style.display = 'none';
+            document.getElementById('scannerOverlay').style.display = 'none';
+        }
+
+        function toggleManualInput() {
+            const manualInput = document.getElementById('manualInput');
+            manualInput.style.display = manualInput.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function checkManualBarcode() {
+            const barcode = document.getElementById('manualBarcode').value.trim();
+            if (barcode) {
+                checkBarcode(barcode);
+                document.getElementById('manualBarcode').value = '';
+            }
+        }
+
+        function checkBarcode(scannedCode) {
+            if (!gameState.isPlaying) return;
+            
+            const currentQuestion = gameState.questions[gameState.currentQuestionIndex];
+            const isCorrect = currentQuestion.barcode === scannedCode;
+            
+            const resultDiv = document.getElementById('scanResult');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultText = document.getElementById('resultText');
+            
+            if (isCorrect) {
+                resultIcon.textContent = '✅';
+                resultText.textContent = 'ถูกต้อง! ' + currentQuestion.name;
+                resultText.className = 'text-lg font-semibold text-green-600';
+                
+                setTimeout(() => {
+                    gameState.currentQuestionIndex++;
+                    showNextQuestion();
+                }, 2000);
+            } else {
+                resultIcon.textContent = '❌';
+                resultText.textContent = 'ผิด! ลองใหม่อีกครั้ง';
+                resultText.className = 'text-lg font-semibold text-red-600';
+            }
+            
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'text-center bounce-in';
+        }
+
+        // Leaderboard functions
+        function saveScore(playerName, time) {
+            let leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+            leaderboard.push({ name: playerName, time: time, date: new Date().toLocaleDateString('th-TH') });
+            leaderboard.sort((a, b) => a.time - b.time);
+            leaderboard = leaderboard.slice(0, 10); // Keep top 10
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+        }
+
+        function loadLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+            const listDiv = document.getElementById('leaderboardList');
+            
+            if (leaderboard.length === 0) {
+                listDiv.innerHTML = '<div class="text-center text-gray-500 py-8">ยังไม่มีคะแนน</div>';
+                return;
+            }
+            
+            listDiv.innerHTML = leaderboard.map((score, index) => {
+                const minutes = Math.floor(score.time / 60);
+                const seconds = score.time % 60;
+                const timeStr = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+                
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                
+                return `
+                    <div class="flex items-center justify-between p-4 bg-gradient-to-r ${index < 3 ? 'from-yellow-50 to-orange-50 border-2 border-yellow-200' : 'from-gray-50 to-gray-100'} rounded-lg">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl">${medal}</span>
+                            <div>
+                                <div class="font-semibold text-gray-800">${score.name}</div>
+                                <div class="text-sm text-gray-500">${score.date}</div>
+                            </div>
+                        </div>
+                        <div class="text-xl font-bold text-indigo-600">${timeStr}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function clearLeaderboard() {
+            const password = prompt('กรุณาใส่รหัสผ่านเพื่อล้างอันดับคะแนน:');
+            if (password === 'Tle019') {
+                if (confirm('คุณแน่ใจหรือไม่ที่จะล้างอันดับคะแนนทั้งหมด?')) {
+                    localStorage.removeItem('leaderboard');
+                    loadLeaderboard();
+                    alert('ล้างอันดับคะแนนเรียบร้อยแล้ว');
+                }
+            } else if (password !== null) {
+                alert('รหัสผ่านไม่ถูกต้อง');
+            }
+        }
+
+        // Admin functions
+        function adminLogin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (username === 'admin' && password === 'Tle019') {
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadEquipmentList();
+            } else {
+                alert('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+            }
+        }
+
+        function adminLogout() {
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminUsername').value = '';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function addEquipment() {
+            const name = document.getElementById('equipmentName').value.trim();
+            const hint = document.getElementById('equipmentHint').value.trim();
+            const barcode = document.getElementById('equipmentBarcode').value.trim();
+            
+            if (!name || !hint || !barcode) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+            
+            // Check for duplicate barcode
+            if (equipmentData.some(item => item.barcode === barcode)) {
+                alert('บาร์โค้ดนี้มีอยู่แล้ว');
+                return;
+            }
+            
+            equipmentData.push({ name, hint, barcode });
+            saveData();
+            loadEquipmentList();
+            
+            // Clear form
+            document.getElementById('equipmentName').value = '';
+            document.getElementById('equipmentHint').value = '';
+            document.getElementById('equipmentBarcode').value = '';
+            
+            alert('เพิ่มอุปกรณ์เรียบร้อยแล้ว');
+        }
+
+        function deleteEquipment(index) {
+            if (confirm('คุณแน่ใจหรือไม่ที่จะลบอุปกรณ์นี้?')) {
+                equipmentData.splice(index, 1);
+                saveData();
+                loadEquipmentList();
+            }
+        }
+
+        function loadEquipmentList() {
+            const listDiv = document.getElementById('equipmentList');
+            
+            if (equipmentData.length === 0) {
+                listDiv.innerHTML = '<div class="text-center text-gray-500 py-4">ยังไม่มีอุปกรณ์</div>';
+                return;
+            }
+            
+            listDiv.innerHTML = equipmentData.map((item, index) => `
+                <div class="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+                    <div class="flex-1">
+                        <div class="font-semibold text-gray-800">${item.name}</div>
+                        <div class="text-sm text-gray-600 mt-1">${item.hint}</div>
+                        <div class="text-xs text-gray-500 mt-1">บาร์โค้ด: ${item.barcode}</div>
+                    </div>
+                    <button onclick="deleteEquipment(${index})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">ลบ</button>
+                </div>
+            `).join('');
+        }
+
+        function saveGameSettings() {
+            const timeLimit = document.getElementById('gameTimeLimit').value;
+            const questionsPerRound = document.getElementById('questionsPerRound').value;
+            
+            gameState.timeLimit = parseInt(timeLimit) * 60;
+            gameState.questionsPerRound = parseInt(questionsPerRound);
+            
+            localStorage.setItem('gameTimeLimit', timeLimit);
+            localStorage.setItem('questionsPerRound', questionsPerRound);
+            
+            alert('บันทึกการตั้งค่าเรียบร้อยแล้ว');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            loadEquipmentList();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97cbb2e7729b74d4',t:'MTc1NzQ3MzQ3Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
