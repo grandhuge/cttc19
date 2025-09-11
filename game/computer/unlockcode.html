@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมถอดรหัสลับ 🔐</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.6s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        }
+        
+        .clue-card {
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+        
+        .clue-card:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #ff6b9d;
+        }
+        
+        .difficulty-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+            border: 3px solid white;
+        }
+        
+        .hint-counter {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .big-button {
+            font-size: 1.5rem;
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .big-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+        }
+        
+        .input-big {
+            width: 70px;
+            height: 70px;
+            font-size: 2rem;
+            border-radius: 20px;
+            border: 4px solid #ff9a9e;
+            background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+        }
+        
+        @media (min-width: 640px) {
+            .input-big {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+        }
+        
+        .input-big:focus {
+            border-color: #ff6b9d;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
+        }
+        
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .popup-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 400px;
+            margin: 1rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: bounceIn 0.5s ease-out;
+        }
+        
+        .popup-success {
+            border: 5px solid #4ade80;
+        }
+        
+        .popup-error {
+            border: 5px solid #f87171;
+        }
+        
+        .popup-wrong {
+            border: 5px solid #fb923c;
+        }
+        
+        .popup-gameover {
+            border: 5px solid #ef4444;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="max-w-3xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-5xl md:text-6xl font-bold text-white mb-4 bounce-in">🔐 เกมถอดรหัสลับ</h1>
+                <p class="text-2xl text-white font-semibold mb-2">🕵️‍♂️ มาเป็นนักสืบเก่งกันเถอะ! 🕵️‍♀️</p>
+                <p class="text-xl text-pink-100">ใช้คำใบ้เพื่อหารหัสตัวเลข 3 หลัก!</p>
+            </div>
+
+            <!-- Instructions Card -->
+            <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl mb-8 border-4 border-pink-200">
+                <h2 class="text-4xl font-bold text-gray-800 mb-8 text-center">📋 วิธีการเล่น</h2>
+                
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-r from-blue-100 to-purple-100 p-6 rounded-2xl border-4 border-blue-300 shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-3">🎯 เป้าหมาย</h3>
+                        <p class="text-lg text-gray-700 font-medium">หารหัสตัวเลข 3 หลักที่ไม่ซ้ำกัน โดยใช้คำใบ้ที่กำหนดให้</p>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-green-100 to-blue-100 p-6 rounded-2xl border-4 border-green-300 shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">🔍 การอ่านคำใบ้</h3>
+                        <div class="space-y-3">
+                            <div class="bg-white p-3 rounded-xl border-2 border-green-200">
+                                <span class="text-2xl">✅</span> <strong class="text-green-600 text-lg">ถูกและตำแหน่งถูก:</strong> 
+                                <span class="text-gray-700 text-lg">เลขนั้นอยู่ในรหัสและอยู่ตำแหน่งที่ถูกต้อง</span>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border-2 border-yellow-200">
+                                <span class="text-2xl">🔄</span> <strong class="text-yellow-600 text-lg">ถูกแต่ตำแหน่งผิด:</strong> 
+                                <span class="text-gray-700 text-lg">เลขนั้นอยู่ในรหัสแต่ตำแหน่งผิด</span>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border-2 border-red-200">
+                                <span class="text-2xl">❌</span> <strong class="text-red-600 text-lg">ไม่มีเลขที่ถูก:</strong> 
+                                <span class="text-gray-700 text-lg">ไม่มีเลขใดในชุดนี้ที่อยู่ในรหัสจริง</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-2xl border-4 border-purple-300 shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">🎚️ ระดับความยาก</h3>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <div class="bg-green-200 p-4 rounded-2xl border-3 border-green-400 shadow-md">
+                                    <span class="text-4xl">😊</span>
+                                    <p class="font-bold text-green-700 text-xl">ง่าย</p>
+                                    <p class="text-lg text-gray-600 font-semibold">6 คำใบ้</p>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-yellow-200 p-4 rounded-2xl border-3 border-yellow-400 shadow-md">
+                                    <span class="text-4xl">🤔</span>
+                                    <p class="font-bold text-yellow-700 text-xl">ปกติ</p>
+                                    <p class="text-lg text-gray-600 font-semibold">5 คำใบ้</p>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-red-200 p-4 rounded-2xl border-3 border-red-400 shadow-md">
+                                    <span class="text-4xl">😤</span>
+                                    <p class="font-bold text-red-700 text-xl">ยาก</p>
+                                    <p class="text-lg text-gray-600 font-semibold">4 คำใบ้</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-orange-100 to-red-100 p-6 rounded-2xl border-4 border-orange-300 shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-3">🏆 การให้คะแนน</h3>
+                        <ul class="text-gray-700 space-y-2 text-lg">
+                            <li class="flex items-center"><span class="text-2xl mr-2">⚡</span> เวลาที่ใช้น้อย = คะแนนมากขึ้น</li>
+                            <li class="flex items-center"><span class="text-2xl mr-2">🎯</span> จำนวนครั้งที่เหลือมาก = คะแนนมากขึ้น</li>
+                            <li class="flex items-center"><span class="text-2xl mr-2">🌟</span> ระดับยาก = คะแนนคูณ 3, ปกติ = คูณ 2, ง่าย = คูณ 1</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="text-center mt-8 space-y-4">
+                    <button id="startGameButton" class="big-button bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white font-bold transition-all duration-300 transform hover:scale-105 pulse-animation">
+                        🚀 เริ่มเกม
+                    </button>
+                    <div>
+                        <button id="welcomeLeaderboardButton" class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 border-2 border-yellow-600">
+                            🏆 ดูอันดับคะแนน
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen (Initially Hidden) -->
+        <div id="gameScreen" style="display: none;">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-5xl md:text-6xl font-bold text-white mb-4">🔐 เกมถอดรหัสลับ</h1>
+                <p class="text-2xl text-white font-semibold">🕵️‍♂️ มาเป็นนักสืบเก่งกันเถอะ! 🕵️‍♀️</p>
+            </div>
+
+            <!-- Difficulty Selection -->
+            <div class="flex justify-center mb-6">
+                <div class="bg-white/90 backdrop-blur-sm rounded-3xl p-6 border-4 border-pink-200 shadow-2xl">
+                    <div class="text-center text-gray-800 mb-4">
+                        <span class="text-2xl font-bold">🎚️ เลือกระดับความยาก:</span>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button id="easyMode" class="difficulty-btn bg-green-400 hover:bg-green-500 text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 border-3 border-green-600 shadow-lg">
+                            😊 ง่าย (6 คำใบ้)
+                        </button>
+                        <button id="normalMode" class="difficulty-btn bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 border-3 border-yellow-600 shadow-lg">
+                            🤔 ปกติ (5 คำใบ้)
+                        </button>
+                        <button id="hardMode" class="difficulty-btn bg-red-400 hover:bg-red-500 text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 border-3 border-red-600 shadow-lg">
+                            😤 ยาก (4 คำใบ้)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Stats -->
+            <div class="flex justify-center mb-6">
+                <div class="bg-white/90 backdrop-blur-sm rounded-3xl px-8 py-4 text-gray-800 border-4 border-blue-200 shadow-2xl">
+                    <div class="flex items-center justify-center space-x-6 text-xl font-bold">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-2">🎯</span>
+                            <span>ครั้งที่เหลือ: </span>
+                            <span id="attemptsLeft" class="text-3xl font-bold text-red-500 ml-2">10</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-2">📊</span>
+                            <span>ระดับ: </span>
+                            <span id="currentDifficulty" class="text-2xl font-bold text-green-500 ml-2">ง่าย</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Game Area -->
+            <div class="max-w-5xl mx-auto">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Clues Section -->
+                    <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border-4 border-blue-200">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">🕵️‍♂️ คำใบ้</h2>
+                        <div id="cluesContainer" class="space-y-4">
+                            <!-- Clues will be generated here -->
+                        </div>
+                    </div>
+
+                    <!-- Input Section -->
+                    <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border-4 border-pink-200">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">🎯 ใส่รหัสของคุณ</h2>
+                        
+                        <div class="text-center mb-8">
+                            <div class="flex justify-center space-x-2 sm:space-x-4 mb-6">
+                                <input type="text" id="digit1" maxlength="1" class="input-big text-center focus:outline-none transition-all" placeholder="?" inputmode="numeric">
+                                <input type="text" id="digit2" maxlength="1" class="input-big text-center focus:outline-none transition-all" placeholder="?" inputmode="numeric">
+                                <input type="text" id="digit3" maxlength="1" class="input-big text-center focus:outline-none transition-all" placeholder="?" inputmode="numeric">
+                            </div>
+                            
+                            <button id="checkButton" class="big-button bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600 text-white font-bold transition-all duration-300 transform hover:scale-105 pulse-animation">
+                                ตรวจสอบคำตอบ 🔍
+                            </button>
+                        </div>
+
+                        <!-- Score and Timer -->
+                        <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 mb-6 border-3 border-blue-300">
+                            <div class="grid grid-cols-2 gap-4 text-center">
+                                <div class="bg-white p-4 rounded-xl border-2 border-purple-200">
+                                    <div class="text-2xl mb-2">🏆</div>
+                                    <div class="text-lg font-semibold text-gray-600">คะแนน</div>
+                                    <div id="score" class="text-3xl font-bold text-purple-600">0</div>
+                                </div>
+                                <div class="bg-white p-4 rounded-xl border-2 border-blue-200">
+                                    <div class="text-2xl mb-2">⏰</div>
+                                    <div class="text-lg font-semibold text-gray-600">เวลา</div>
+                                    <div id="timer" class="text-3xl font-bold text-blue-600">00:00</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Game Control Buttons -->
+                        <div class="text-center mt-6 space-y-3">
+                            <button id="newGameButton" class="big-button bg-green-400 hover:bg-green-500 text-white font-bold transition-all duration-300 border-3 border-green-600" style="display: none;">
+                                🎮 เกมใหม่
+                            </button>
+                            <div class="flex justify-center space-x-3">
+                                <button id="showLeaderboardButton" class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 border-2 border-yellow-600">
+                                    🏆 อันดับคะแนน
+                                </button>
+                                <button id="backToWelcomeButton" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 border-2 border-gray-600">
+                                    🏠 กลับหน้าแรก
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup for Results -->
+    <div id="resultPopup" class="popup-overlay" style="display: none;">
+        <div id="popupContent" class="popup-content">
+            <div id="popupIcon" class="text-6xl mb-4"></div>
+            <div id="popupMessage" class="text-2xl font-bold mb-6"></div>
+            <button id="popupCloseButton" class="big-button bg-blue-400 hover:bg-blue-500 text-white font-bold transition-all duration-300">
+                ตกลง 👍
+            </button>
+        </div>
+    </div>
+
+    <!-- Name Input Popup -->
+    <div id="nameInputPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-content popup-success">
+            <div class="text-6xl mb-4">🏆</div>
+            <div class="text-2xl font-bold mb-4 text-green-600">ยินดีด้วย! คุณติดอันดับ Top 10!</div>
+            <div class="text-lg mb-6">กรุณากรอกชื่อของคุณเพื่อบันทึกคะแนน</div>
+            <input type="text" id="playerNameInput" maxlength="20" class="w-full p-4 text-xl border-4 border-green-300 rounded-xl mb-6 text-center font-bold" placeholder="ใส่ชื่อของคุณ...">
+            <div class="flex space-x-3 justify-center">
+                <button id="saveScoreButton" class="big-button bg-green-400 hover:bg-green-500 text-white font-bold transition-all duration-300">
+                    💾 บันทึกคะแนน
+                </button>
+                <button id="skipSaveButton" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300">
+                    ข้าม
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Popup -->
+    <div id="leaderboardPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-content" style="max-width: 500px;">
+            <div class="text-6xl mb-4">🏆</div>
+            <div class="text-3xl font-bold mb-6 text-yellow-600">อันดับคะแนนสูงสุด</div>
+            <div id="leaderboardContent" class="mb-6">
+                <!-- Leaderboard will be populated here -->
+            </div>
+            <div class="flex space-x-3 justify-center">
+                <button id="closeLeaderboardButton" class="big-button bg-blue-400 hover:bg-blue-500 text-white font-bold transition-all duration-300">
+                    ปิด
+                </button>
+                <button id="clearLeaderboardButton" class="bg-red-400 hover:bg-red-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300">
+                    ล้างคะแนน
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 mt-8">
+        <div class="bg-white/20 backdrop-blur-sm rounded-2xl mx-auto max-w-md py-4 px-6 border-2 border-white/30">
+            <p class="text-white text-lg font-semibold">
+                © developed by <span class="font-bold">Tle Narongphisit</span> | <span class="font-bold">CTTC19 @ CPD</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        class CodeBreakerGame {
+            constructor() {
+                this.secretCode = null;
+                this.attempts = 10;
+                this.gameOver = false;
+                this.difficulty = 'easy'; // easy, normal, hard
+                this.cluesCount = 6; // Default to easy mode
+                this.clues = [];
+                this.score = 0;
+                this.startTime = null;
+                this.timerInterval = null;
+                this.gameStarted = false;
+                
+                this.setupWelcomeScreen();
+                this.loadLeaderboard();
+            }
+
+            loadLeaderboard() {
+                const saved = localStorage.getItem('codebreaker_leaderboard');
+                this.leaderboard = saved ? JSON.parse(saved) : [];
+            }
+
+            saveLeaderboard() {
+                localStorage.setItem('codebreaker_leaderboard', JSON.stringify(this.leaderboard));
+            }
+
+            isTopScore(score) {
+                if (this.leaderboard.length < 10) return true;
+                return score > this.leaderboard[this.leaderboard.length - 1].score;
+            }
+
+            addToLeaderboard(name, score, difficulty) {
+                const entry = {
+                    name: name.trim() || 'ไม่ระบุชื่อ',
+                    score: score,
+                    difficulty: difficulty,
+                    date: new Date().toLocaleDateString('th-TH')
+                };
+                
+                this.leaderboard.push(entry);
+                this.leaderboard.sort((a, b) => b.score - a.score);
+                this.leaderboard = this.leaderboard.slice(0, 10); // Keep only top 10
+                this.saveLeaderboard();
+            }
+
+            showLeaderboard() {
+                const popup = document.getElementById('leaderboardPopup');
+                const content = document.getElementById('leaderboardContent');
+                
+                if (this.leaderboard.length === 0) {
+                    content.innerHTML = '<div class="text-gray-500 text-lg">ยังไม่มีคะแนนในระบบ</div>';
+                } else {
+                    let html = '<div class="space-y-2">';
+                    this.leaderboard.forEach((entry, index) => {
+                        const rankIcon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                        const difficultyColor = entry.difficulty === 'hard' ? 'text-red-500' : 
+                                              entry.difficulty === 'normal' ? 'text-yellow-500' : 'text-green-500';
+                        const difficultyText = entry.difficulty === 'hard' ? 'ยาก' : 
+                                             entry.difficulty === 'normal' ? 'ปกติ' : 'ง่าย';
+                        
+                        html += `
+                            <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border-2 border-yellow-200 flex justify-between items-center">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-2xl font-bold">${rankIcon}</span>
+                                    <div>
+                                        <div class="font-bold text-lg text-gray-800">${entry.name}</div>
+                                        <div class="text-sm text-gray-600">
+                                            <span class="${difficultyColor} font-semibold">${difficultyText}</span> • ${entry.date}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-2xl font-bold text-purple-600">${entry.score}</div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    content.innerHTML = html;
+                }
+                
+                popup.style.display = 'flex';
+            }
+
+            clearLeaderboard() {
+                if (confirm('คุณแน่ใจหรือไม่ที่จะล้างคะแนนทั้งหมด?')) {
+                    this.leaderboard = [];
+                    this.saveLeaderboard();
+                    this.showLeaderboard();
+                }
+            }
+
+            showNameInputPopup() {
+                const popup = document.getElementById('nameInputPopup');
+                const input = document.getElementById('playerNameInput');
+                input.value = '';
+                input.focus();
+                popup.style.display = 'flex';
+            }
+
+            savePlayerScore() {
+                const nameInput = document.getElementById('playerNameInput');
+                const playerName = nameInput.value.trim();
+                
+                if (playerName.length === 0) {
+                    alert('กรุณากรอกชื่อของคุณ');
+                    nameInput.focus();
+                    return;
+                }
+                
+                this.addToLeaderboard(playerName, this.score, this.difficulty);
+                document.getElementById('nameInputPopup').style.display = 'none';
+                
+                // Show success message with leaderboard position
+                const position = this.leaderboard.findIndex(entry => 
+                    entry.name === playerName && entry.score === this.score
+                ) + 1;
+                
+                this.showResult(`🎉 เยี่ยมมาก! คุณเป็นนักสืบที่เก่งจริงๆ! 🎉<br><br>🏆 คะแนนที่ได้: <span style="color: #9333ea; font-size: 2rem;">${this.score}</span> แต้ม<br><br>🥇 อันดับที่ <span style="color: #dc2626; font-size: 1.5rem;">${position}</span> ใน Leaderboard!`, 'success');
+            }
+
+            skipSaveScore() {
+                document.getElementById('nameInputPopup').style.display = 'none';
+                this.showResult(`🎉 เยี่ยมมาก! คุณเป็นนักสืบที่เก่งจริงๆ! 🎉<br><br>🏆 คะแนนที่ได้: <span style="color: #9333ea; font-size: 2rem;">${this.score}</span> แต้ม<br><br>💡 คะแนนของคุณติด Top 10 แต่ไม่ได้บันทึกไว้`, 'success');
+            }
+
+            generateSecretCode() {
+                const digits = [];
+                while (digits.length < 3) {
+                    const digit = Math.floor(Math.random() * 10);
+                    if (!digits.includes(digit)) {
+                        digits.push(digit);
+                    }
+                }
+                return digits.join('');
+            }
+
+            generateClues() {
+                const clues = [];
+                const usedCodes = new Set();
+                
+                // Generate clues based on difficulty
+                while (clues.length < this.cluesCount) {
+                    let clueCode;
+                    do {
+                        clueCode = this.generateRandomCode();
+                    } while (usedCodes.has(clueCode) || clueCode === this.secretCode);
+                    
+                    usedCodes.add(clueCode);
+                    const analysis = this.analyzeGuess(clueCode);
+                    clues.push({
+                        code: clueCode,
+                        hint: this.generateHintText(analysis)
+                    });
+                }
+                
+                return clues;
+            }
+
+            generateRandomCode() {
+                const digits = [];
+                while (digits.length < 3) {
+                    const digit = Math.floor(Math.random() * 10);
+                    if (!digits.includes(digit)) {
+                        digits.push(digit);
+                    }
+                }
+                return digits.join('');
+            }
+
+            analyzeGuess(guess) {
+                const secretArray = this.secretCode.split('');
+                const guessArray = guess.split('');
+                
+                let correctPosition = 0;
+                let correctDigit = 0;
+                
+                // Check for correct positions
+                for (let i = 0; i < 3; i++) {
+                    if (guessArray[i] === secretArray[i]) {
+                        correctPosition++;
+                    }
+                }
+                
+                // Check for correct digits in wrong positions
+                for (let i = 0; i < 3; i++) {
+                    if (secretArray.includes(guessArray[i])) {
+                        correctDigit++;
+                    }
+                }
+                
+                correctDigit -= correctPosition; // Remove already counted correct positions
+                
+                return { correctPosition, correctDigit };
+            }
+
+            generateHintText(analysis) {
+                const { correctPosition, correctDigit } = analysis;
+                
+                if (correctPosition === 0 && correctDigit === 0) {
+                    return "❌ ไม่มีเลขที่ถูกต้องเลย";
+                } else if (correctPosition > 0 && correctDigit === 0) {
+                    return `✅ มีเลข ${correctPosition} ตัวถูกและตำแหน่งถูก`;
+                } else if (correctPosition === 0 && correctDigit > 0) {
+                    return `🔄 มีเลข ${correctDigit} ตัวถูกแต่ตำแหน่งผิด`;
+                } else {
+                    return `✅ มีเลข ${correctPosition} ตัวถูกและตำแหน่งถูก, 🔄 มีเลข ${correctDigit} ตัวถูกแต่ตำแหน่งผิด`;
+                }
+            }
+
+            initializeGame() {
+                this.displayClues();
+                this.updateAttemptsDisplay();
+                this.updateDifficultyDisplay();
+                this.updateScoreDisplay();
+            }
+
+            startTimer() {
+                if (!this.gameStarted) return;
+                
+                this.startTime = Date.now();
+                this.timerInterval = setInterval(() => {
+                    if (!this.gameOver && this.gameStarted) {
+                        this.updateTimerDisplay();
+                    }
+                }, 1000);
+            }
+
+            updateTimerDisplay() {
+                const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            calculateScore() {
+                const timeBonus = Math.max(0, 300 - Math.floor((Date.now() - this.startTime) / 1000)); // 5 minutes max
+                const attemptsBonus = this.attempts * 10;
+                const difficultyMultiplier = this.difficulty === 'hard' ? 3 : this.difficulty === 'normal' ? 2 : 1;
+                return (100 + timeBonus + attemptsBonus) * difficultyMultiplier;
+            }
+
+            updateScoreDisplay() {
+                document.getElementById('score').textContent = this.score;
+            }
+
+            updateDifficultyDisplay() {
+                const difficultyText = {
+                    'easy': 'ง่าย',
+                    'normal': 'ปกติ', 
+                    'hard': 'ยาก'
+                };
+                document.getElementById('currentDifficulty').textContent = difficultyText[this.difficulty];
+                
+                // Update active button
+                document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(this.difficulty + 'Mode').classList.add('active');
+            }
+
+            displayClues() {
+                const container = document.getElementById('cluesContainer');
+                container.innerHTML = '';
+                
+                this.clues.forEach((clue, index) => {
+                    const clueElement = document.createElement('div');
+                    clueElement.className = 'clue-card bg-gradient-to-r from-blue-100 to-purple-100 p-6 rounded-2xl border-4 border-blue-300 shadow-lg';
+                    clueElement.innerHTML = `
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-purple-700 mb-3 bg-white rounded-xl py-2 px-4 border-2 border-purple-300">${clue.code}</div>
+                            <div class="text-lg text-gray-700 font-semibold">${clue.hint}</div>
+                        </div>
+                    `;
+                    container.appendChild(clueElement);
+                });
+            }
+
+            setupWelcomeScreen() {
+                const startButton = document.getElementById('startGameButton');
+                const welcomeLeaderboardButton = document.getElementById('welcomeLeaderboardButton');
+                
+                startButton.addEventListener('click', () => this.startGame());
+                welcomeLeaderboardButton.addEventListener('click', () => this.showLeaderboard());
+            }
+
+            startGame() {
+                // Hide welcome screen and show game screen
+                document.getElementById('welcomeScreen').style.display = 'none';
+                document.getElementById('gameScreen').style.display = 'block';
+                
+                // Initialize game
+                this.secretCode = this.generateSecretCode();
+                this.clues = this.generateClues();
+                this.gameStarted = true;
+                
+                this.initializeGame();
+                this.setupEventListeners();
+                this.startTimer();
+            }
+
+            setupEventListeners() {
+                const checkButton = document.getElementById('checkButton');
+                const newGameButton = document.getElementById('newGameButton');
+                const backToWelcomeButton = document.getElementById('backToWelcomeButton');
+                const showLeaderboardButton = document.getElementById('showLeaderboardButton');
+                const easyButton = document.getElementById('easyMode');
+                const normalButton = document.getElementById('normalMode');
+                const hardButton = document.getElementById('hardMode');
+                const popupCloseButton = document.getElementById('popupCloseButton');
+                const popup = document.getElementById('resultPopup');
+                
+                // Leaderboard elements
+                const saveScoreButton = document.getElementById('saveScoreButton');
+                const skipSaveButton = document.getElementById('skipSaveButton');
+                const closeLeaderboardButton = document.getElementById('closeLeaderboardButton');
+                const clearLeaderboardButton = document.getElementById('clearLeaderboardButton');
+                const nameInputPopup = document.getElementById('nameInputPopup');
+                const leaderboardPopup = document.getElementById('leaderboardPopup');
+                const playerNameInput = document.getElementById('playerNameInput');
+                const inputs = [
+                    document.getElementById('digit1'),
+                    document.getElementById('digit2'),
+                    document.getElementById('digit3')
+                ];
+
+                // Auto-focus next input and only allow numbers
+                inputs.forEach((input, index) => {
+                    input.addEventListener('input', (e) => {
+                        // Only allow numbers
+                        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                        
+                        if (e.target.value && index < 2) {
+                            inputs[index + 1].focus();
+                        }
+                    });
+                    
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                            inputs[index - 1].focus();
+                        }
+                        if (e.key === 'Enter') {
+                            this.checkGuess();
+                        }
+                    });
+                });
+
+                checkButton.addEventListener('click', () => this.checkGuess());
+                newGameButton.addEventListener('click', () => this.newGame());
+                backToWelcomeButton.addEventListener('click', () => this.backToWelcome());
+                showLeaderboardButton.addEventListener('click', () => this.showLeaderboard());
+                
+                // Leaderboard event listeners
+                saveScoreButton.addEventListener('click', () => this.savePlayerScore());
+                skipSaveButton.addEventListener('click', () => this.skipSaveScore());
+                closeLeaderboardButton.addEventListener('click', () => {
+                    leaderboardPopup.style.display = 'none';
+                });
+                clearLeaderboardButton.addEventListener('click', () => this.clearLeaderboard());
+                
+                // Name input popup handlers
+                playerNameInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.savePlayerScore();
+                    }
+                });
+                
+                // Close popups when clicking outside
+                nameInputPopup.addEventListener('click', (e) => {
+                    if (e.target === nameInputPopup) {
+                        this.skipSaveScore();
+                    }
+                });
+                
+                leaderboardPopup.addEventListener('click', (e) => {
+                    if (e.target === leaderboardPopup) {
+                        leaderboardPopup.style.display = 'none';
+                    }
+                });
+                
+                // Popup close handlers
+                popupCloseButton.addEventListener('click', () => {
+                    popup.style.display = 'none';
+                });
+                
+                popup.addEventListener('click', (e) => {
+                    if (e.target === popup) {
+                        popup.style.display = 'none';
+                    }
+                });
+                
+                // Difficulty buttons
+                easyButton.addEventListener('click', () => this.changeDifficulty('easy', 6));
+                normalButton.addEventListener('click', () => this.changeDifficulty('normal', 5));
+                hardButton.addEventListener('click', () => this.changeDifficulty('hard', 4));
+            }
+
+            changeDifficulty(newDifficulty, cluesCount) {
+                if (this.gameOver) return;
+                
+                // Prevent changing difficulty if game has started and attempts have been used
+                if (this.gameStarted && this.attempts < 10) {
+                    this.showResult('⚠️ ไม่สามารถเปลี่ยนระดับความยากระหว่างเล่นได้<br><br>🎮 กรุณาเริ่มเกมใหม่หรือเล่นให้จบก่อน', 'error');
+                    return;
+                }
+                
+                this.difficulty = newDifficulty;
+                this.cluesCount = cluesCount;
+                this.clues = this.generateClues();
+                this.displayClues();
+                this.updateDifficultyDisplay();
+            }
+
+            checkGuess() {
+                if (this.gameOver) return;
+
+                const digit1 = document.getElementById('digit1').value;
+                const digit2 = document.getElementById('digit2').value;
+                const digit3 = document.getElementById('digit3').value;
+
+                if (!digit1 || !digit2 || !digit3) {
+                    this.showResult('⚠️ อย่าลืมกรอกตัวเลขให้ครบ 3 หลักนะ!<br><br>📝 กรอกเลขในช่องทั้ง 3 ช่องก่อนกดตรวจสอบ', 'error');
+                    return;
+                }
+
+                // Check for duplicate digits
+                const digits = [digit1, digit2, digit3];
+                const uniqueDigits = [...new Set(digits)];
+                if (uniqueDigits.length !== 3) {
+                    this.showResult('⚠️ ตัวเลขต้องไม่ซ้ำกันนะ!<br><br>🔢 ใส่ตัวเลข 3 หลักที่แตกต่างกัน เช่น 123, 456, 789', 'error');
+                    return;
+                }
+
+                const guess = digit1 + digit2 + digit3;
+                this.attempts--;
+
+                if (guess === this.secretCode) {
+                    this.score = this.calculateScore();
+                    this.updateScoreDisplay();
+                    clearInterval(this.timerInterval);
+                    this.gameOver = true;
+                    document.getElementById('newGameButton').style.display = 'inline-block';
+                    
+                    // Check if score qualifies for leaderboard
+                    if (this.isTopScore(this.score)) {
+                        this.showNameInputPopup();
+                    } else {
+                        this.showResult(`🎉 เยี่ยมมาก! คุณเป็นนักสืบที่เก่งจริงๆ! 🎉<br><br>🏆 คะแนนที่ได้: <span style="color: #9333ea; font-size: 2rem;">${this.score}</span> แต้ม`, 'success');
+                    }
+                } else if (this.attempts <= 0) {
+                    clearInterval(this.timerInterval);
+                    this.showResult(`😢 เสียใจด้วยนะ! ลองใหม่อีกครั้งสิ<br><br>🔍 รหัสที่ถูกต้องคือ: <span style="color: #dc2626; font-size: 2rem;">${this.secretCode}</span>`, 'gameOver');
+                    this.gameOver = true;
+                    document.getElementById('newGameButton').style.display = 'inline-block';
+                } else {
+                    this.showResult(`😅 ยังไม่ถูกนะ! ลองดูคำใบ้อีกครั้ง<br><br>💪 เหลืออีก <span style="color: #dc2626; font-size: 1.5rem;">${this.attempts}</span> ครั้ง`, 'wrong');
+                    // Clear inputs for next attempt
+                    document.getElementById('digit1').value = '';
+                    document.getElementById('digit2').value = '';
+                    document.getElementById('digit3').value = '';
+                    document.getElementById('digit1').focus();
+                }
+
+                this.updateAttemptsDisplay();
+            }
+
+            showResult(message, type) {
+                const popup = document.getElementById('resultPopup');
+                const popupContent = document.getElementById('popupContent');
+                const popupIcon = document.getElementById('popupIcon');
+                const popupMessage = document.getElementById('popupMessage');
+                
+                // Set popup content based on type
+                switch (type) {
+                    case 'success':
+                        popupIcon.textContent = '🎉';
+                        popupContent.className = 'popup-content popup-success';
+                        break;
+                    case 'error':
+                        popupIcon.textContent = '⚠️';
+                        popupContent.className = 'popup-content popup-error';
+                        break;
+                    case 'wrong':
+                        popupIcon.textContent = '😅';
+                        popupContent.className = 'popup-content popup-wrong';
+                        break;
+                    case 'gameOver':
+                        popupIcon.textContent = '😢';
+                        popupContent.className = 'popup-content popup-gameover';
+                        break;
+                }
+                
+                popupMessage.innerHTML = message;
+                popup.style.display = 'flex';
+            }
+
+            getResultClass(type) {
+                switch (type) {
+                    case 'success': return 'text-green-600';
+                    case 'error': return 'text-red-600';
+                    case 'wrong': return 'text-orange-600';
+                    case 'gameOver': return 'text-red-700';
+                    default: return 'text-gray-600';
+                }
+            }
+
+            updateAttemptsDisplay() {
+                document.getElementById('attemptsLeft').textContent = this.attempts;
+                const attemptsElement = document.getElementById('attemptsLeft');
+                
+                if (this.attempts <= 3) {
+                    attemptsElement.className = 'text-3xl font-bold text-red-500 ml-2';
+                } else if (this.attempts <= 5) {
+                    attemptsElement.className = 'text-3xl font-bold text-yellow-500 ml-2';
+                } else {
+                    attemptsElement.className = 'text-3xl font-bold text-green-500 ml-2';
+                }
+            }
+
+            newGame() {
+                // Clear previous timer
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                }
+                
+                this.secretCode = this.generateSecretCode();
+                this.attempts = 10;
+                this.gameOver = false;
+                this.clues = this.generateClues();
+                this.score = 0;
+                
+                // Clear inputs
+                document.getElementById('digit1').value = '';
+                document.getElementById('digit2').value = '';
+                document.getElementById('digit3').value = '';
+                
+                // Reset UI
+                document.getElementById('resultArea').innerHTML = '<p class="text-gray-600 text-lg">กรอกรหัส 3 หลักแล้วกดตรวจสอบ!</p>';
+                document.getElementById('newGameButton').style.display = 'none';
+                
+                this.displayClues();
+                this.updateAttemptsDisplay();
+                this.updateScoreDisplay();
+                this.startTimer();
+            }
+
+            backToWelcome() {
+                // Clear timer
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                }
+                
+                // Show welcome screen and hide game screen
+                document.getElementById('welcomeScreen').style.display = 'block';
+                document.getElementById('gameScreen').style.display = 'none';
+                
+                // Reset all game state
+                this.gameStarted = false;
+                this.gameOver = false;
+                this.attempts = 10;
+                this.score = 0;
+                this.difficulty = 'easy';
+                this.cluesCount = 6;
+                
+                // Clear inputs
+                document.getElementById('digit1').value = '';
+                document.getElementById('digit2').value = '';
+                document.getElementById('digit3').value = '';
+                
+                // Hide new game button
+                document.getElementById('newGameButton').style.display = 'none';
+                
+                // Hide any open popups
+                document.getElementById('resultPopup').style.display = 'none';
+            }
+        }
+
+        // Start the game when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new CodeBreakerGame();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97d38e08535d74d4',t:'MTc1NzU1NTg1Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
