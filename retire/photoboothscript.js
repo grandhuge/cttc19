@@ -68,6 +68,22 @@
             document.getElementById('textStroke').addEventListener('click', toggleStroke);
             document.getElementById('textBackground').addEventListener('click', toggleBackground);
             document.getElementById('textGradient').addEventListener('click', toggleGradient);
+            
+            // Text formatting controls for selected text
+            document.getElementById('fontSelect').addEventListener('change', updateSelectedTextFont);
+            document.getElementById('fontSize').addEventListener('input', updateSelectedTextSize);
+            document.getElementById('textColor').addEventListener('change', updateSelectedTextColor);
+            document.getElementById('textBgColor').addEventListener('change', updateSelectedTextBgColor);
+            document.getElementById('textShadowColor').addEventListener('change', updateSelectedTextShadowColor);
+            document.getElementById('textStrokeColor').addEventListener('change', updateSelectedTextStrokeColor);
+            document.getElementById('shadowIntensity').addEventListener('input', updateSelectedTextShadowIntensity);
+            document.getElementById('strokeWidth').addEventListener('input', updateSelectedTextStrokeWidth);
+            document.getElementById('bgOpacity').addEventListener('input', updateSelectedTextBgOpacity);
+            
+            // Add event listeners for value display updates
+            document.getElementById('bgOpacity').addEventListener('input', updateBgOpacityValue);
+            document.getElementById('shadowIntensity').addEventListener('input', updateShadowIntensityValue);
+            document.getElementById('strokeWidth').addEventListener('input', updateStrokeWidthValue);
 
             // Object controls
             document.getElementById('objectSize').addEventListener('input', updateObjectSize);
@@ -75,20 +91,6 @@
             document.getElementById('objectOpacity').addEventListener('input', updateObjectOpacity);
             document.getElementById('duplicateObject').addEventListener('click', duplicateObject);
             document.getElementById('deleteObject').addEventListener('click', deleteSelectedObject);
-
-            // Text edit controls
-            document.getElementById('editTextBold').addEventListener('click', toggleEditBold);
-            document.getElementById('editTextItalic').addEventListener('click', toggleEditItalic);
-            document.getElementById('editTextShadow').addEventListener('click', toggleEditShadow);
-            document.getElementById('editTextStroke').addEventListener('click', toggleEditStroke);
-            document.getElementById('editTextBackground').addEventListener('click', toggleEditBackground);
-            document.getElementById('editTextGradient').addEventListener('click', toggleEditGradient);
-            document.getElementById('applyTextChanges').addEventListener('click', applyTextChanges);
-
-            // Emoji size control
-            document.getElementById('emojiSize').addEventListener('input', updateEmojiSize);
-
-
 
             // Gallery
             document.getElementById('refreshGallery').addEventListener('click', loadGallery);
@@ -267,18 +269,18 @@
         }
 
         function addEmoji(emoji) {
-            const defaultSize = parseInt(document.getElementById('emojiSize').value);
             const sticker = {
                 id: Date.now(),
                 type: 'emoji',
                 content: emoji,
                 x: Math.random() * 500 + 50,
                 y: Math.random() * 350 + 50,
-                size: defaultSize,
+                size: 40,
                 rotation: 0,
                 opacity: 1
             };
             stickers.push(sticker);
+            selectedElement = sticker;
             redrawCanvas();
         }
 
@@ -312,6 +314,7 @@
             };
             textElements.push(textElement);
             document.getElementById('textInput').value = '';
+            selectedElement = textElement;
             redrawCanvas();
         }
 
@@ -328,14 +331,21 @@
             stickers.forEach(sticker => {
                 editCtx.save();
                 editCtx.globalAlpha = sticker.opacity || 1;
-                editCtx.translate(sticker.x + sticker.size/2, sticker.y - sticker.size/2);
+                
+                // Calculate center position for rotation
+                const centerX = sticker.x + sticker.size / 2;
+                const centerY = sticker.y - sticker.size / 2;
+                
+                editCtx.translate(centerX, centerY);
                 editCtx.rotate((sticker.rotation || 0) * Math.PI / 180);
                 editCtx.font = `${sticker.size}px Arial`;
-                editCtx.fillText(sticker.content, -sticker.size/2, sticker.size/2);
+                editCtx.textAlign = 'center';
+                editCtx.textBaseline = 'middle';
+                editCtx.fillText(sticker.content, 0, 0);
                 editCtx.restore();
                 
                 if (selectedElement && selectedElement.id === sticker.id) {
-                    drawSelection(sticker.x - 10, sticker.y - sticker.size, sticker.size + 20, sticker.size + 10);
+                    drawSelection(sticker.x - 5, sticker.y - sticker.size - 5, sticker.size + 10, sticker.size + 10);
                 }
             });
 
@@ -352,7 +362,7 @@
                 
                 // Apply rotation
                 const metrics = editCtx.measureText(element.content);
-                editCtx.translate(element.x + metrics.width/2, element.y - element.size/2);
+                editCtx.translate(element.x + metrics.width/2, element.y);
                 editCtx.rotate((element.rotation || 0) * Math.PI / 180);
                 
                 // Draw background if enabled
@@ -360,9 +370,12 @@
                     editCtx.save();
                     editCtx.globalAlpha = element.bgOpacity || 0.8;
                     editCtx.fillStyle = element.bgColor || '#ffffff';
-                    const padding = 8;
-                    editCtx.fillRect(-metrics.width/2 - padding, -element.size + padding, 
-                                   metrics.width + padding * 2, element.size + padding);
+                    const padding = 6;
+                    // Use actual text metrics for accurate positioning
+                    const actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+                    const textTop = -metrics.actualBoundingBoxAscent;
+                    editCtx.fillRect(-metrics.width/2 - padding, textTop - padding, 
+                                   metrics.width + padding * 2, actualHeight + padding * 2);
                     editCtx.restore();
                 }
                 
@@ -385,65 +398,97 @@
                     editCtx.shadowBlur = element.shadowIntensity || 3;
                     editCtx.shadowOffsetX = element.shadowIntensity || 3;
                     editCtx.shadowOffsetY = element.shadowIntensity || 3;
-                    editCtx.fillText(element.content, -metrics.width/2, element.size/2);
+                    editCtx.fillText(element.content, -metrics.width/2, 0);
                     editCtx.restore();
                 } else {
-                    editCtx.fillText(element.content, -metrics.width/2, element.size/2);
+                    editCtx.fillText(element.content, -metrics.width/2, 0);
                 }
                 
                 // Draw stroke if enabled
                 if (element.stroke) {
                     editCtx.strokeStyle = element.strokeColor || '#000000';
                     editCtx.lineWidth = element.strokeWidth || 1;
-                    editCtx.strokeText(element.content, -metrics.width/2, element.size/2);
+                    editCtx.strokeText(element.content, -metrics.width/2, 0);
                 }
                 
                 editCtx.restore();
                 
                 if (selectedElement && selectedElement.id === element.id) {
-                    const metrics2 = editCtx.measureText(element.content);
-                    drawSelection(element.x - 5, element.y - element.size, metrics2.width + 10, element.size + 10);
+                    const bounds = getElementBounds(element);
+                    drawSelection(bounds.x - 8, bounds.y - 5, bounds.width + 16, bounds.height + 10);
                 }
             });
             
-            // Update object controls if element is selected
             updateObjectControls();
         }
 
+        function getElementBounds(element) {
+            if (element.type === 'emoji') {
+                return {
+                    x: element.x,
+                    y: element.y - element.size,
+                    width: element.size,
+                    height: element.size
+                };
+            } else if (element.type === 'text') {
+                // Create temporary context to measure text
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                let fontStyle = '';
+                if (element.italic) fontStyle += 'italic ';
+                if (element.bold) fontStyle += 'bold ';
+                tempCtx.font = `${fontStyle}${element.size}px ${element.font}`;
+                
+                const metrics = tempCtx.measureText(element.content);
+                return {
+                    x: element.x,
+                    y: element.y - element.size,
+                    width: metrics.width,
+                    height: element.size
+                };
+            }
+            return { x: 0, y: 0, width: 0, height: 0 };
+        }
+
         function drawSelection(x, y, width, height) {
+            editCtx.save();
             editCtx.strokeStyle = '#3b82f6';
             editCtx.lineWidth = 2;
             editCtx.setLineDash([5, 5]);
             editCtx.strokeRect(x, y, width, height);
             editCtx.setLineDash([]);
+            editCtx.restore();
         }
-
-
 
         function handleMouseDown(e) {
             const rect = editCanvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            selectedElement = getElementAt(x, y);
-            if (selectedElement) {
+            const clickedElement = getElementAt(x, y);
+            if (clickedElement) {
+                selectedElement = clickedElement;
                 isDragging = true;
                 dragOffset.x = x - selectedElement.x;
                 dragOffset.y = y - selectedElement.y;
+                redrawCanvas();
+            } else {
+                selectedElement = null;
                 redrawCanvas();
             }
         }
 
         function handleMouseMove(e) {
-            if (!isDragging || !selectedElement) return;
+            if (isDragging && selectedElement) {
+                const rect = editCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
 
-            const rect = editCanvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            selectedElement.x = x - dragOffset.x;
-            selectedElement.y = y - dragOffset.y;
-            redrawCanvas();
+                selectedElement.x = Math.max(0, Math.min(640 - (selectedElement.size || 40), x - dragOffset.x));
+                selectedElement.y = Math.max(selectedElement.size || 40, Math.min(480, y - dragOffset.y));
+                redrawCanvas();
+            }
         }
 
         function handleMouseUp() {
@@ -451,13 +496,7 @@
         }
 
         function handleCanvasClick(e) {
-            if (!isDragging) {
-                const rect = editCanvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                selectedElement = getElementAt(x, y);
-                redrawCanvas();
-            }
+            // Click handling is done in mousedown
         }
 
         // Touch events
@@ -488,14 +527,51 @@
         }
 
         function handleKeyDown(e) {
-            if (e.key === 'Delete' && selectedElement) {
-                if (selectedElement.type === 'emoji') {
-                    stickers = stickers.filter(s => s.id !== selectedElement.id);
-                } else if (selectedElement.type === 'text') {
-                    textElements = textElements.filter(t => t.id !== selectedElement.id);
-                }
-                selectedElement = null;
-                redrawCanvas();
+            if (!selectedElement) return;
+            
+            const moveDistance = e.shiftKey ? 10 : 1;
+            
+            switch(e.key) {
+                case 'Delete':
+                case 'Backspace':
+                    deleteSelectedObject();
+                    break;
+                    
+                case 'ArrowUp':
+                    e.preventDefault();
+                    selectedElement.y -= moveDistance;
+                    redrawCanvas();
+                    break;
+                    
+                case 'ArrowDown':
+                    e.preventDefault();
+                    selectedElement.y += moveDistance;
+                    redrawCanvas();
+                    break;
+                    
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    selectedElement.x -= moveDistance;
+                    redrawCanvas();
+                    break;
+                    
+                case 'ArrowRight':
+                    e.preventDefault();
+                    selectedElement.x += moveDistance;
+                    redrawCanvas();
+                    break;
+                    
+                case 'Escape':
+                    selectedElement = null;
+                    redrawCanvas();
+                    break;
+                    
+                case 'c':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        duplicateObject();
+                    }
+                    break;
             }
         }
 
@@ -503,20 +579,21 @@
             // Check text elements first (they're on top)
             for (let i = textElements.length - 1; i >= 0; i--) {
                 const element = textElements[i];
-                editCtx.font = `${element.size}px ${element.font}`;
-                const metrics = editCtx.measureText(element.content);
+                const bounds = getElementBounds(element);
                 
-                if (x >= element.x && x <= element.x + metrics.width &&
-                    y >= element.y - element.size && y <= element.y) {
+                if (x >= bounds.x && x <= bounds.x + bounds.width &&
+                    y >= bounds.y && y <= bounds.y + bounds.height) {
                     return element;
                 }
             }
 
-            // Check stickers
+            // Check stickers (emojis)
             for (let i = stickers.length - 1; i >= 0; i--) {
                 const sticker = stickers[i];
-                if (x >= sticker.x && x <= sticker.x + sticker.size &&
-                    y >= sticker.y - sticker.size && y <= sticker.y) {
+                const bounds = getElementBounds(sticker);
+                
+                if (x >= bounds.x && x <= bounds.x + bounds.width &&
+                    y >= bounds.y && y <= bounds.y + bounds.height) {
                     return sticker;
                 }
             }
@@ -877,74 +954,140 @@
 
         // New functions for advanced editing
         function toggleBold() {
-            textBold = !textBold;
-            const btn = document.getElementById('textBold');
-            if (textBold) {
-                btn.classList.add('bg-blue-500', 'text-white');
-                btn.classList.remove('bg-gray-200');
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.bold = !selectedElement.bold;
+                updateButtonState('textBold', selectedElement.bold);
+                redrawCanvas();
             } else {
-                btn.classList.remove('bg-blue-500', 'text-white');
-                btn.classList.add('bg-gray-200');
+                textBold = !textBold;
+                updateButtonState('textBold', textBold);
             }
         }
 
         function toggleItalic() {
-            textItalic = !textItalic;
-            const btn = document.getElementById('textItalic');
-            if (textItalic) {
-                btn.classList.add('bg-blue-500', 'text-white');
-                btn.classList.remove('bg-gray-200');
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.italic = !selectedElement.italic;
+                updateButtonState('textItalic', selectedElement.italic);
+                redrawCanvas();
             } else {
-                btn.classList.remove('bg-blue-500', 'text-white');
-                btn.classList.add('bg-gray-200');
+                textItalic = !textItalic;
+                updateButtonState('textItalic', textItalic);
             }
         }
 
         function toggleShadow() {
-            textShadow = !textShadow;
-            const btn = document.getElementById('textShadow');
-            if (textShadow) {
-                btn.classList.add('bg-blue-500', 'text-white');
-                btn.classList.remove('bg-gray-200');
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.shadow = !selectedElement.shadow;
+                updateButtonState('textShadow', selectedElement.shadow);
+                updateControlsVisibility();
+                redrawCanvas();
             } else {
-                btn.classList.remove('bg-blue-500', 'text-white');
-                btn.classList.add('bg-gray-200');
+                textShadow = !textShadow;
+                updateButtonState('textShadow', textShadow);
+                updateControlsVisibility();
             }
         }
 
         function toggleStroke() {
-            textStroke = !textStroke;
-            const btn = document.getElementById('textStroke');
-            if (textStroke) {
-                btn.classList.add('bg-blue-500', 'text-white');
-                btn.classList.remove('bg-gray-200');
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.stroke = !selectedElement.stroke;
+                updateButtonState('textStroke', selectedElement.stroke);
+                updateControlsVisibility();
+                redrawCanvas();
             } else {
-                btn.classList.remove('bg-blue-500', 'text-white');
-                btn.classList.add('bg-gray-200');
+                textStroke = !textStroke;
+                updateButtonState('textStroke', textStroke);
+                updateControlsVisibility();
             }
         }
 
         function toggleBackground() {
-            textBackground = !textBackground;
-            const btn = document.getElementById('textBackground');
-            if (textBackground) {
-                btn.classList.add('bg-blue-500', 'text-white');
-                btn.classList.remove('bg-gray-200');
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.background = !selectedElement.background;
+                updateButtonState('textBackground', selectedElement.background);
+                updateControlsVisibility();
+                redrawCanvas();
             } else {
-                btn.classList.remove('bg-blue-500', 'text-white');
-                btn.classList.add('bg-gray-200');
+                textBackground = !textBackground;
+                updateButtonState('textBackground', textBackground);
+                updateControlsVisibility();
             }
         }
 
         function toggleGradient() {
-            textGradient = !textGradient;
-            const btn = document.getElementById('textGradient');
-            if (textGradient) {
-                btn.classList.add('bg-blue-500', 'text-white');
-                btn.classList.remove('bg-gray-200');
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.gradient = !selectedElement.gradient;
+                updateButtonState('textGradient', selectedElement.gradient);
+                redrawCanvas();
             } else {
-                btn.classList.remove('bg-blue-500', 'text-white');
-                btn.classList.add('bg-gray-200');
+                textGradient = !textGradient;
+                updateButtonState('textGradient', textGradient);
+            }
+        }
+
+        // Functions to update selected text properties
+        function updateSelectedTextFont() {
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.font = document.getElementById('fontSelect').value;
+                redrawCanvas();
+            }
+        }
+
+        function updateSelectedTextSize() {
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.size = parseInt(document.getElementById('fontSize').value);
+                document.getElementById('objectSize').value = selectedElement.size;
+                document.getElementById('sizeValue').textContent = selectedElement.size;
+                redrawCanvas();
+            }
+        }
+
+        function updateSelectedTextColor() {
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.color = document.getElementById('textColor').value;
+                redrawCanvas();
+            }
+        }
+
+        function updateSelectedTextBgColor() {
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.bgColor = document.getElementById('textBgColor').value;
+                redrawCanvas();
+            }
+        }
+
+        function updateSelectedTextShadowColor() {
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.shadowColor = document.getElementById('textShadowColor').value;
+                redrawCanvas();
+            }
+        }
+
+        function updateSelectedTextStrokeColor() {
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.strokeColor = document.getElementById('textStrokeColor').value;
+                redrawCanvas();
+            }
+        }
+
+        function updateSelectedTextShadowIntensity() {
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.shadowIntensity = parseInt(document.getElementById('shadowIntensity').value);
+                redrawCanvas();
+            }
+        }
+
+        function updateSelectedTextStrokeWidth() {
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.strokeWidth = parseInt(document.getElementById('strokeWidth').value);
+                redrawCanvas();
+            }
+        }
+
+        function updateSelectedTextBgOpacity() {
+            if (selectedElement && selectedElement.type === 'text') {
+                selectedElement.bgOpacity = parseInt(document.getElementById('bgOpacity').value) / 100;
+                redrawCanvas();
             }
         }
 
@@ -952,14 +1095,6 @@
             if (selectedElement) {
                 document.getElementById('objectControls').style.display = 'block';
                 document.getElementById('noObjectSelected').style.display = 'none';
-                
-                // Show/hide text edit controls based on element type
-                if (selectedElement.type === 'text') {
-                    document.getElementById('textEditControls').style.display = 'block';
-                    populateTextEditControls();
-                } else {
-                    document.getElementById('textEditControls').style.display = 'none';
-                }
                 
                 // Update control values
                 document.getElementById('objectSize').value = selectedElement.size || 40;
@@ -976,9 +1111,93 @@
                     `อีโมจิ: ${selectedElement.content}` : 
                     `ข้อความ: ${selectedElement.content.substring(0, 10)}${selectedElement.content.length > 10 ? '...' : ''}`;
                 document.getElementById('selectedObjectName').textContent = name;
+                
+                // Show/hide text formatting controls
+                const textFormatting = document.getElementById('textFormatting');
+                if (selectedElement.type === 'text') {
+                    textFormatting.style.display = 'block';
+                    updateTextFormattingControls();
+                } else {
+                    textFormatting.style.display = 'none';
+                }
             } else {
                 document.getElementById('objectControls').style.display = 'none';
                 document.getElementById('noObjectSelected').style.display = 'block';
+            }
+        }
+
+        function updateTextFormattingControls() {
+            if (!selectedElement || selectedElement.type !== 'text') return;
+            
+            // Update form controls with selected text element values
+            document.getElementById('fontSelect').value = selectedElement.font || 'Kanit';
+            document.getElementById('fontSize').value = selectedElement.size || 24;
+            document.getElementById('textColor').value = selectedElement.color || '#000000';
+            document.getElementById('textBgColor').value = selectedElement.bgColor || '#ffffff';
+            document.getElementById('textShadowColor').value = selectedElement.shadowColor || '#808080';
+            document.getElementById('textStrokeColor').value = selectedElement.strokeColor || '#000000';
+            document.getElementById('shadowIntensity').value = selectedElement.shadowIntensity || 3;
+            document.getElementById('strokeWidth').value = selectedElement.strokeWidth || 1;
+            document.getElementById('bgOpacity').value = (selectedElement.bgOpacity || 0.8) * 100;
+            
+            // Update value displays
+            document.getElementById('bgOpacityValue').textContent = `${Math.round((selectedElement.bgOpacity || 0.8) * 100)}%`;
+            document.getElementById('shadowIntensityValue').textContent = selectedElement.shadowIntensity || 3;
+            document.getElementById('strokeWidthValue').textContent = selectedElement.strokeWidth || 1;
+            
+            // Update button states
+            updateButtonState('textBold', selectedElement.bold);
+            updateButtonState('textItalic', selectedElement.italic);
+            updateButtonState('textShadow', selectedElement.shadow);
+            updateButtonState('textStroke', selectedElement.stroke);
+            updateButtonState('textBackground', selectedElement.background);
+            updateButtonState('textGradient', selectedElement.gradient);
+            
+            // Update controls visibility
+            updateControlsVisibility();
+        }
+        
+        function updateControlsVisibility() {
+            const backgroundControls = document.getElementById('backgroundControls');
+            const shadowControls = document.getElementById('shadowControls');
+            const strokeControls = document.getElementById('strokeControls');
+            
+            if (selectedElement && selectedElement.type === 'text') {
+                // Show controls based on selected element's state
+                backgroundControls.style.display = selectedElement.background ? 'block' : 'none';
+                shadowControls.style.display = selectedElement.shadow ? 'block' : 'none';
+                strokeControls.style.display = selectedElement.stroke ? 'block' : 'none';
+            } else {
+                // Show controls based on global state for new text
+                backgroundControls.style.display = textBackground ? 'block' : 'none';
+                shadowControls.style.display = textShadow ? 'block' : 'none';
+                strokeControls.style.display = textStroke ? 'block' : 'none';
+            }
+        }
+        
+        function updateBgOpacityValue() {
+            const value = document.getElementById('bgOpacity').value;
+            document.getElementById('bgOpacityValue').textContent = `${value}%`;
+        }
+        
+        function updateShadowIntensityValue() {
+            const value = document.getElementById('shadowIntensity').value;
+            document.getElementById('shadowIntensityValue').textContent = value;
+        }
+        
+        function updateStrokeWidthValue() {
+            const value = document.getElementById('strokeWidth').value;
+            document.getElementById('strokeWidthValue').textContent = value;
+        }
+
+        function updateButtonState(buttonId, isActive) {
+            const btn = document.getElementById(buttonId);
+            if (isActive) {
+                btn.classList.add('bg-blue-500', 'text-white');
+                btn.classList.remove('bg-gray-200');
+            } else {
+                btn.classList.remove('bg-blue-500', 'text-white');
+                btn.classList.add('bg-gray-200');
             }
         }
 
@@ -1001,11 +1220,6 @@
             selectedElement.opacity = parseInt(document.getElementById('objectOpacity').value) / 100;
             document.getElementById('opacityValue').textContent = `${Math.round(selectedElement.opacity * 100)}%`;
             redrawCanvas();
-        }
-
-        function updateEmojiSize() {
-            // This updates the default size for new emojis
-            // Existing emojis are updated through object controls
         }
 
         function duplicateObject() {
@@ -1039,102 +1253,6 @@
             redrawCanvas();
         }
 
-
-
-        // Text editing functions
-        function populateTextEditControls() {
-            if (!selectedElement || selectedElement.type !== 'text') return;
-            
-            // Populate form fields with current text element properties
-            document.getElementById('editTextContent').value = selectedElement.content || '';
-            document.getElementById('editFontSelect').value = selectedElement.font || 'Kanit';
-            document.getElementById('editFontSize').value = selectedElement.size || 24;
-            document.getElementById('editTextColor').value = selectedElement.color || '#000000';
-            document.getElementById('editTextBgColor').value = selectedElement.bgColor || '#ffffff';
-            document.getElementById('editTextShadowColor').value = selectedElement.shadowColor || '#808080';
-            document.getElementById('editTextStrokeColor').value = selectedElement.strokeColor || '#000000';
-            document.getElementById('editShadowIntensity').value = selectedElement.shadowIntensity || 3;
-            document.getElementById('editStrokeWidth').value = selectedElement.strokeWidth || 1;
-            document.getElementById('editBgOpacity').value = (selectedElement.bgOpacity || 0.8) * 100;
-            
-            // Update button states
-            updateEditButton('editTextBold', selectedElement.bold);
-            updateEditButton('editTextItalic', selectedElement.italic);
-            updateEditButton('editTextShadow', selectedElement.shadow);
-            updateEditButton('editTextStroke', selectedElement.stroke);
-            updateEditButton('editTextBackground', selectedElement.background);
-            updateEditButton('editTextGradient', selectedElement.gradient);
-        }
-
-        function updateEditButton(buttonId, isActive) {
-            const btn = document.getElementById(buttonId);
-            if (isActive) {
-                btn.classList.add('bg-blue-500', 'text-white');
-                btn.classList.remove('bg-gray-200');
-            } else {
-                btn.classList.remove('bg-blue-500', 'text-white');
-                btn.classList.add('bg-gray-200');
-            }
-        }
-
-        function toggleEditBold() {
-            if (!selectedElement || selectedElement.type !== 'text') return;
-            selectedElement.bold = !selectedElement.bold;
-            updateEditButton('editTextBold', selectedElement.bold);
-        }
-
-        function toggleEditItalic() {
-            if (!selectedElement || selectedElement.type !== 'text') return;
-            selectedElement.italic = !selectedElement.italic;
-            updateEditButton('editTextItalic', selectedElement.italic);
-        }
-
-        function toggleEditShadow() {
-            if (!selectedElement || selectedElement.type !== 'text') return;
-            selectedElement.shadow = !selectedElement.shadow;
-            updateEditButton('editTextShadow', selectedElement.shadow);
-        }
-
-        function toggleEditStroke() {
-            if (!selectedElement || selectedElement.type !== 'text') return;
-            selectedElement.stroke = !selectedElement.stroke;
-            updateEditButton('editTextStroke', selectedElement.stroke);
-        }
-
-        function toggleEditBackground() {
-            if (!selectedElement || selectedElement.type !== 'text') return;
-            selectedElement.background = !selectedElement.background;
-            updateEditButton('editTextBackground', selectedElement.background);
-        }
-
-        function toggleEditGradient() {
-            if (!selectedElement || selectedElement.type !== 'text') return;
-            selectedElement.gradient = !selectedElement.gradient;
-            updateEditButton('editTextGradient', selectedElement.gradient);
-        }
-
-        function applyTextChanges() {
-            if (!selectedElement || selectedElement.type !== 'text') return;
-            
-            // Apply all changes from the edit form
-            selectedElement.content = document.getElementById('editTextContent').value || selectedElement.content;
-            selectedElement.font = document.getElementById('editFontSelect').value;
-            selectedElement.size = parseInt(document.getElementById('editFontSize').value) || selectedElement.size;
-            selectedElement.color = document.getElementById('editTextColor').value;
-            selectedElement.bgColor = document.getElementById('editTextBgColor').value;
-            selectedElement.shadowColor = document.getElementById('editTextShadowColor').value;
-            selectedElement.strokeColor = document.getElementById('editTextStrokeColor').value;
-            selectedElement.shadowIntensity = parseInt(document.getElementById('editShadowIntensity').value);
-            selectedElement.strokeWidth = parseInt(document.getElementById('editStrokeWidth').value);
-            selectedElement.bgOpacity = parseInt(document.getElementById('editBgOpacity').value) / 100;
-            
-            // Update object name display
-            const name = `ข้อความ: ${selectedElement.content.substring(0, 10)}${selectedElement.content.length > 10 ? '...' : ''}`;
-            document.getElementById('selectedObjectName').textContent = name;
-            
-            // Redraw canvas with updated text
-            redrawCanvas();
-        }
-
         // Global function for navigation buttons
         window.changeSlide = changeSlide;
+    

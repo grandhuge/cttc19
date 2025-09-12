@@ -233,69 +233,12 @@
                                 <div class="emoji-item" data-emoji="🌸">🌸</div>
                                 <div class="emoji-item" data-emoji="🌺">🌺</div>
                             </div>
-                            <div class="space-y-2">
-                                <label class="block text-xs text-gray-600">ขนาดอีโมจิ</label>
-                                <input type="range" id="emojiSize" min="20" max="80" value="40" class="w-full">
-                            </div>
                         </div>
 
                         <!-- Text Section -->
                         <div>
                             <h3 class="font-semibold mb-3 text-gray-800">✏️ ข้อความ</h3>
                             <input type="text" id="textInput" placeholder="พิมพ์ข้อความ..." class="w-full p-2 border rounded-lg mb-2 text-sm">
-                            <div class="grid grid-cols-2 gap-2 mb-2">
-                                <select id="fontSelect" class="p-2 border rounded-lg text-sm">
-                                    <option value="Kanit">Kanit</option>
-                                    <option value="Arial">Arial</option>
-                                    <option value="Impact">Impact</option>
-                                    <option value="Comic Sans MS">Comic Sans</option>
-                                </select>
-                                <input type="number" id="fontSize" value="24" min="12" max="72" class="p-2 border rounded-lg text-sm" placeholder="ขนาด">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 mb-2">
-                                <div>
-                                    <label class="block text-xs text-gray-600 mb-1">สีข้อความ</label>
-                                    <input type="color" id="textColor" value="#000000" class="w-full h-6 border rounded">
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-600 mb-1">สีพื้นหลัง</label>
-                                    <input type="color" id="textBgColor" value="#ffffff" class="w-full h-6 border rounded">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 mb-2">
-                                <div>
-                                    <label class="block text-xs text-gray-600 mb-1">สีเงา</label>
-                                    <input type="color" id="textShadowColor" value="#808080" class="w-full h-6 border rounded">
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-600 mb-1">สีขอบ</label>
-                                    <input type="color" id="textStrokeColor" value="#000000" class="w-full h-6 border rounded">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-4 gap-1 mb-2">
-                                <button id="textBold" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs font-bold">B</button>
-                                <button id="textItalic" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs italic">I</button>
-                                <button id="textShadow" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs">🌫️</button>
-                                <button id="textStroke" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs">⭕</button>
-                            </div>
-                            <div class="grid grid-cols-2 gap-1 mb-2">
-                                <button id="textBackground" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs">🎨 BG</button>
-                                <button id="textGradient" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs">🌈</button>
-                            </div>
-                            <div class="space-y-1 mb-2">
-                                <div>
-                                    <label class="block text-xs text-gray-600">ความเข้มเงา</label>
-                                    <input type="range" id="shadowIntensity" min="0" max="10" value="3" class="w-full h-1">
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-600">ความหนาขอบ</label>
-                                    <input type="range" id="strokeWidth" min="0" max="5" value="1" class="w-full h-1">
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-600">โปร่งใสพื้นหลัง</label>
-                                    <input type="range" id="bgOpacity" min="0" max="100" value="80" class="w-full h-1">
-                                </div>
-                            </div>
                             <button id="addText" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-all text-sm">
                                 เพิ่มข้อความ
                             </button>
@@ -309,78 +252,7 @@
                                     <span id="selectedObjectName" class="text-sm font-medium text-blue-600"></span>
                                 </div>
                                 
-                                <!-- Text Edit Controls (only for text elements) -->
-                                <div id="textEditControls" style="display: none;">
-                                    <div class="border-t pt-3 mb-3">
-                                        <h4 class="text-xs font-semibold text-gray-700 mb-2">✏️ แก้ไขข้อความ</h4>
-                                        <input type="text" id="editTextContent" placeholder="แก้ไขข้อความ..." class="w-full p-2 border rounded text-xs mb-2">
-                                        
-                                        <div class="grid grid-cols-2 gap-1 mb-2">
-                                            <select id="editFontSelect" class="p-1 border rounded text-xs">
-                                                <option value="Kanit">Kanit</option>
-                                                <option value="Arial">Arial</option>
-                                                <option value="Impact">Impact</option>
-                                                <option value="Comic Sans MS">Comic Sans</option>
-                                            </select>
-                                            <input type="number" id="editFontSize" min="12" max="72" class="p-1 border rounded text-xs" placeholder="ขนาด">
-                                        </div>
-                                        
-                                        <div class="grid grid-cols-2 gap-1 mb-2">
-                                            <div>
-                                                <label class="block text-xs text-gray-600 mb-1">สีข้อความ</label>
-                                                <input type="color" id="editTextColor" class="w-full h-5 border rounded">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs text-gray-600 mb-1">สีพื้นหลัง</label>
-                                                <input type="color" id="editTextBgColor" class="w-full h-5 border rounded">
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="grid grid-cols-2 gap-1 mb-2">
-                                            <div>
-                                                <label class="block text-xs text-gray-600 mb-1">สีเงา</label>
-                                                <input type="color" id="editTextShadowColor" class="w-full h-5 border rounded">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs text-gray-600 mb-1">สีขอบ</label>
-                                                <input type="color" id="editTextStrokeColor" class="w-full h-5 border rounded">
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="grid grid-cols-4 gap-1 mb-2">
-                                            <button id="editTextBold" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs font-bold">B</button>
-                                            <button id="editTextItalic" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs italic">I</button>
-                                            <button id="editTextShadow" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">🌫️</button>
-                                            <button id="editTextStroke" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">⭕</button>
-                                        </div>
-                                        
-                                        <div class="grid grid-cols-2 gap-1 mb-2">
-                                            <button id="editTextBackground" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">🎨 BG</button>
-                                            <button id="editTextGradient" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">🌈</button>
-                                        </div>
-                                        
-                                        <div class="space-y-1 mb-2">
-                                            <div>
-                                                <label class="block text-xs text-gray-600">ความเข้มเงา</label>
-                                                <input type="range" id="editShadowIntensity" min="0" max="10" value="3" class="w-full h-1">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs text-gray-600">ความหนาขอบ</label>
-                                                <input type="range" id="editStrokeWidth" min="0" max="5" value="1" class="w-full h-1">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs text-gray-600">โปร่งใสพื้นหลัง</label>
-                                                <input type="range" id="editBgOpacity" min="0" max="100" value="80" class="w-full h-1">
-                                            </div>
-                                        </div>
-                                        
-                                        <button id="applyTextChanges" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-1 rounded text-xs mb-2">
-                                            ✅ ใช้การเปลี่ยนแปลง
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- General Object Controls -->
+                                <!-- Basic Controls -->
                                 <div>
                                     <label class="block text-xs text-gray-600 mb-1">ขนาด</label>
                                     <input type="range" id="objectSize" min="10" max="100" value="40" class="w-full">
@@ -396,7 +268,79 @@
                                     <input type="range" id="objectOpacity" min="10" max="100" value="100" class="w-full">
                                     <span id="opacityValue" class="text-xs text-gray-500">100%</span>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2">
+                                
+                                <!-- Text Formatting (only for text elements) -->
+                                <div id="textFormatting" class="border-t pt-3" style="display: none;">
+                                    <h4 class="text-xs font-semibold text-gray-700 mb-2">🎨 รูปแบบข้อความ</h4>
+                                    
+                                    <div class="grid grid-cols-2 gap-1 mb-2">
+                                        <select id="fontSelect" class="p-1 border rounded text-xs">
+                                            <option value="Kanit">Kanit</option>
+                                            <option value="Arial">Arial</option>
+                                            <option value="Impact">Impact</option>
+                                            <option value="Comic Sans MS">Comic Sans</option>
+                                        </select>
+                                        <input type="number" id="fontSize" min="12" max="72" value="24" class="p-1 border rounded text-xs" placeholder="ขนาด">
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <label class="block text-xs text-gray-600 mb-1">สีข้อความ</label>
+                                        <input type="color" id="textColor" value="#000000" class="w-full h-5 border rounded">
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-4 gap-1 mb-2">
+                                        <button id="textBold" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs font-bold">B</button>
+                                        <button id="textItalic" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs italic">I</button>
+                                        <button id="textShadow" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">🌫️</button>
+                                        <button id="textStroke" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">⭕</button>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-1 mb-2">
+                                        <button id="textBackground" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">🎨 BG</button>
+                                        <button id="textGradient" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">🌈</button>
+                                    </div>
+                                    
+                                    <!-- Background Controls (only when textBackground is active) -->
+                                    <div id="backgroundControls" class="space-y-1 mb-2" style="display: none;">
+                                        <div>
+                                            <label class="block text-xs text-gray-600 mb-1">สีพื้นหลัง</label>
+                                            <input type="color" id="textBgColor" value="#ffffff" class="w-full h-5 border rounded">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-600">โปร่งใสพื้นหลัง</label>
+                                            <input type="range" id="bgOpacity" min="0" max="100" value="80" class="w-full h-1">
+                                            <span id="bgOpacityValue" class="text-xs text-gray-500">80%</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Shadow Controls (only when textShadow is active) -->
+                                    <div id="shadowControls" class="space-y-1 mb-2" style="display: none;">
+                                        <div>
+                                            <label class="block text-xs text-gray-600 mb-1">สีเงา</label>
+                                            <input type="color" id="textShadowColor" value="#808080" class="w-full h-5 border rounded">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-600">ความเข้มเงา</label>
+                                            <input type="range" id="shadowIntensity" min="0" max="10" value="3" class="w-full h-1">
+                                            <span id="shadowIntensityValue" class="text-xs text-gray-500">3</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Stroke Controls (only when textStroke is active) -->
+                                    <div id="strokeControls" class="space-y-1 mb-2" style="display: none;">
+                                        <div>
+                                            <label class="block text-xs text-gray-600 mb-1">สีขอบ</label>
+                                            <input type="color" id="textStrokeColor" value="#000000" class="w-full h-5 border rounded">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs text-gray-600">ความหนาขอบ</label>
+                                            <input type="range" id="strokeWidth" min="0" max="5" value="1" class="w-full h-1">
+                                            <span id="strokeWidthValue" class="text-xs text-gray-500">1</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-2 pt-3 border-t">
                                     <button id="duplicateObject" class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-xs">
                                         📋 คัดลอก
                                     </button>
@@ -409,8 +353,6 @@
                                 คลิกเลือก Object<br>เพื่อปรับแต่ง
                             </div>
                         </div>
-
-
                     </div>
 
                     <!-- Action Buttons -->
@@ -520,5 +462,5 @@
     </div>
 
     <script src="./photoboothscript.js"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97dcb0e873bc7325',t:'MTc1NzY1MTY1Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97dddbf6a63a7323',t:'MTc1NzY2MzkwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
