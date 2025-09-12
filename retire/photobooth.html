@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตู้ถ่ายรูปสติ๊กเกอร์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        .sticker {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            z-index: 10;
+        }
+        
+        .sticker:hover {
+            transform: scale(1.1);
+        }
+        
+        .sticker.selected {
+            border: 2px dashed #3b82f6;
+            border-radius: 8px;
+        }
+        
+        .text-element {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            z-index: 10;
+            min-width: 50px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .text-element:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .text-element.selected {
+            border: 2px dashed #3b82f6;
+        }
+        
+        .canvas-container {
+            position: relative;
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .photo-frame {
+            border: 8px solid white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .slideshow-container {
+            position: relative;
+            max-width: 100%;
+            margin: auto;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .slide {
+            display: none;
+            position: relative;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        .slide img {
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+        }
+        
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            margin-top: -22px;
+            padding: 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            user-select: none;
+            transition: 0.3s ease;
+        }
+        
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+        
+        .prev {
+            left: 0;
+            border-radius: 0 3px 3px 0;
+        }
+        
+        .prev:hover, .next:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .emoji-item {
+            font-size: 24px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .emoji-item:hover {
+            background: #f3f4f6;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">📸 ตู้ถ่ายรูปสติ๊กเกอร์</h1>
+            <p class="text-white/80">ถ่ายรูป ตกแต่ง และแชร์ความทรงจำของคุณ</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex justify-center mb-8">
+            <div class="bg-white/20 backdrop-blur-lg rounded-full p-2">
+                <button id="cameraBtn" class="px-6 py-3 bg-white text-purple-600 rounded-full font-medium mx-2 transition-all hover:bg-purple-100 active-tab">
+                    📷 ถ่ายรูป
+                </button>
+                <button id="galleryBtn" class="px-6 py-3 text-white rounded-full font-medium mx-2 transition-all hover:bg-white/20">
+                    🖼️ แกลอรี่
+                </button>
+            </div>
+        </div>
+
+        <!-- Camera Section -->
+        <div id="cameraSection" class="section">
+            <div class="max-w-4xl mx-auto">
+                <!-- Camera Controls -->
+                <div class="text-center mb-6">
+                    <button id="startCamera" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-medium mr-4 transition-all">
+                        🎥 เปิดกล้อง
+                    </button>
+                    <button id="captureBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-medium mr-4 transition-all" disabled>
+                        📸 ถ่ายรูป
+                    </button>
+                    <button id="switchCamera" class="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-full font-medium transition-all" disabled>
+                        🔄 เปลี่ยนกล้อง
+                    </button>
+                </div>
+
+                <!-- Camera/Canvas Container -->
+                <div class="flex justify-center mb-6">
+                    <div class="canvas-container">
+                        <video id="video" class="photo-frame" width="640" height="480" autoplay style="display: none;"></video>
+                        <canvas id="canvas" class="photo-frame" width="640" height="480" style="display: none;"></canvas>
+                        <div id="photoContainer" class="relative" style="display: none;">
+                            <canvas id="editCanvas" class="photo-frame" width="640" height="480"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Tools -->
+                <div id="editTools" class="bg-white/90 backdrop-blur-lg rounded-2xl p-6 mb-6" style="display: none;">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Emoji Section -->
+                        <div>
+                            <h3 class="font-semibold mb-3 text-gray-800">😊 อีโมจิ</h3>
+                            <div class="emoji-grid bg-gray-50 rounded-lg p-3 mb-3">
+                                <div class="emoji-item" data-emoji="😀">😀</div>
+                                <div class="emoji-item" data-emoji="😍">😍</div>
+                                <div class="emoji-item" data-emoji="🥰">🥰</div>
+                                <div class="emoji-item" data-emoji="😎">😎</div>
+                                <div class="emoji-item" data-emoji="🤩">🤩</div>
+                                <div class="emoji-item" data-emoji="😂">😂</div>
+                                <div class="emoji-item" data-emoji="🤣">🤣</div>
+                                <div class="emoji-item" data-emoji="😊">😊</div>
+                                <div class="emoji-item" data-emoji="❤️">❤️</div>
+                                <div class="emoji-item" data-emoji="💕">💕</div>
+                                <div class="emoji-item" data-emoji="💖">💖</div>
+                                <div class="emoji-item" data-emoji="✨">✨</div>
+                                <div class="emoji-item" data-emoji="🌟">🌟</div>
+                                <div class="emoji-item" data-emoji="⭐">⭐</div>
+                                <div class="emoji-item" data-emoji="🎉">🎉</div>
+                                <div class="emoji-item" data-emoji="🎊">🎊</div>
+                                <div class="emoji-item" data-emoji="🌈">🌈</div>
+                                <div class="emoji-item" data-emoji="🦄">🦄</div>
+                                <div class="emoji-item" data-emoji="🎈">🎈</div>
+                                <div class="emoji-item" data-emoji="🎀">🎀</div>
+                                <div class="emoji-item" data-emoji="👑">👑</div>
+                                <div class="emoji-item" data-emoji="💎">💎</div>
+                                <div class="emoji-item" data-emoji="🌸">🌸</div>
+                                <div class="emoji-item" data-emoji="🌺">🌺</div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs text-gray-600">ขนาดอีโมจิ</label>
+                                <input type="range" id="emojiSize" min="20" max="80" value="40" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- Text Section -->
+                        <div>
+                            <h3 class="font-semibold mb-3 text-gray-800">✏️ ข้อความ</h3>
+                            <input type="text" id="textInput" placeholder="พิมพ์ข้อความ..." class="w-full p-2 border rounded-lg mb-2 text-sm">
+                            <div class="grid grid-cols-2 gap-2 mb-2">
+                                <select id="fontSelect" class="p-2 border rounded-lg text-sm">
+                                    <option value="Kanit">Kanit</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Impact">Impact</option>
+                                    <option value="Comic Sans MS">Comic Sans</option>
+                                </select>
+                                <input type="number" id="fontSize" value="24" min="12" max="72" class="p-2 border rounded-lg text-sm" placeholder="ขนาด">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mb-2">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">สีข้อความ</label>
+                                    <input type="color" id="textColor" value="#000000" class="w-full h-6 border rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">สีพื้นหลัง</label>
+                                    <input type="color" id="textBgColor" value="#ffffff" class="w-full h-6 border rounded">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mb-2">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">สีเงา</label>
+                                    <input type="color" id="textShadowColor" value="#808080" class="w-full h-6 border rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">สีขอบ</label>
+                                    <input type="color" id="textStrokeColor" value="#000000" class="w-full h-6 border rounded">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-4 gap-1 mb-2">
+                                <button id="textBold" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs font-bold">B</button>
+                                <button id="textItalic" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs italic">I</button>
+                                <button id="textShadow" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs">🌫️</button>
+                                <button id="textStroke" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs">⭕</button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 mb-2">
+                                <button id="textBackground" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs">🎨 BG</button>
+                                <button id="textGradient" class="bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-xs">🌈</button>
+                            </div>
+                            <div class="space-y-1 mb-2">
+                                <div>
+                                    <label class="block text-xs text-gray-600">ความเข้มเงา</label>
+                                    <input type="range" id="shadowIntensity" min="0" max="10" value="3" class="w-full h-1">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600">ความหนาขอบ</label>
+                                    <input type="range" id="strokeWidth" min="0" max="5" value="1" class="w-full h-1">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600">โปร่งใสพื้นหลัง</label>
+                                    <input type="range" id="bgOpacity" min="0" max="100" value="80" class="w-full h-1">
+                                </div>
+                            </div>
+                            <button id="addText" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-all text-sm">
+                                เพิ่มข้อความ
+                            </button>
+                        </div>
+
+                        <!-- Object Controls -->
+                        <div>
+                            <h3 class="font-semibold mb-3 text-gray-800">🎛️ ควบคุม Object</h3>
+                            <div id="objectControls" class="space-y-3" style="display: none;">
+                                <div class="text-center mb-2">
+                                    <span id="selectedObjectName" class="text-sm font-medium text-blue-600"></span>
+                                </div>
+                                
+                                <!-- Text Edit Controls (only for text elements) -->
+                                <div id="textEditControls" style="display: none;">
+                                    <div class="border-t pt-3 mb-3">
+                                        <h4 class="text-xs font-semibold text-gray-700 mb-2">✏️ แก้ไขข้อความ</h4>
+                                        <input type="text" id="editTextContent" placeholder="แก้ไขข้อความ..." class="w-full p-2 border rounded text-xs mb-2">
+                                        
+                                        <div class="grid grid-cols-2 gap-1 mb-2">
+                                            <select id="editFontSelect" class="p-1 border rounded text-xs">
+                                                <option value="Kanit">Kanit</option>
+                                                <option value="Arial">Arial</option>
+                                                <option value="Impact">Impact</option>
+                                                <option value="Comic Sans MS">Comic Sans</option>
+                                            </select>
+                                            <input type="number" id="editFontSize" min="12" max="72" class="p-1 border rounded text-xs" placeholder="ขนาด">
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-1 mb-2">
+                                            <div>
+                                                <label class="block text-xs text-gray-600 mb-1">สีข้อความ</label>
+                                                <input type="color" id="editTextColor" class="w-full h-5 border rounded">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-gray-600 mb-1">สีพื้นหลัง</label>
+                                                <input type="color" id="editTextBgColor" class="w-full h-5 border rounded">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-1 mb-2">
+                                            <div>
+                                                <label class="block text-xs text-gray-600 mb-1">สีเงา</label>
+                                                <input type="color" id="editTextShadowColor" class="w-full h-5 border rounded">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-gray-600 mb-1">สีขอบ</label>
+                                                <input type="color" id="editTextStrokeColor" class="w-full h-5 border rounded">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-4 gap-1 mb-2">
+                                            <button id="editTextBold" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs font-bold">B</button>
+                                            <button id="editTextItalic" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs italic">I</button>
+                                            <button id="editTextShadow" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">🌫️</button>
+                                            <button id="editTextStroke" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">⭕</button>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-1 mb-2">
+                                            <button id="editTextBackground" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">🎨 BG</button>
+                                            <button id="editTextGradient" class="bg-gray-200 hover:bg-gray-300 px-1 py-1 rounded text-xs">🌈</button>
+                                        </div>
+                                        
+                                        <div class="space-y-1 mb-2">
+                                            <div>
+                                                <label class="block text-xs text-gray-600">ความเข้มเงา</label>
+                                                <input type="range" id="editShadowIntensity" min="0" max="10" value="3" class="w-full h-1">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-gray-600">ความหนาขอบ</label>
+                                                <input type="range" id="editStrokeWidth" min="0" max="5" value="1" class="w-full h-1">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-gray-600">โปร่งใสพื้นหลัง</label>
+                                                <input type="range" id="editBgOpacity" min="0" max="100" value="80" class="w-full h-1">
+                                            </div>
+                                        </div>
+                                        
+                                        <button id="applyTextChanges" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-1 rounded text-xs mb-2">
+                                            ✅ ใช้การเปลี่ยนแปลง
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- General Object Controls -->
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">ขนาด</label>
+                                    <input type="range" id="objectSize" min="10" max="100" value="40" class="w-full">
+                                    <span id="sizeValue" class="text-xs text-gray-500">40</span>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">หมุน</label>
+                                    <input type="range" id="objectRotation" min="0" max="360" value="0" class="w-full">
+                                    <span id="rotationValue" class="text-xs text-gray-500">0°</span>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">โปร่งใส</label>
+                                    <input type="range" id="objectOpacity" min="10" max="100" value="100" class="w-full">
+                                    <span id="opacityValue" class="text-xs text-gray-500">100%</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button id="duplicateObject" class="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded text-xs">
+                                        📋 คัดลอก
+                                    </button>
+                                    <button id="deleteObject" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-xs">
+                                        🗑️ ลบ
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="noObjectSelected" class="text-center text-gray-500 text-sm py-8">
+                                คลิกเลือก Object<br>เพื่อปรับแต่ง
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-center mt-6 space-x-4">
+                        <button id="clearAll" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-all">
+                            🗑️ ลบทั้งหมด
+                        </button>
+                        <button id="savePhoto" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-all">
+                            💾 บันทึกรูป
+                        </button>
+                        <button id="uploadPhoto" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-all">
+                            ☁️ อัปโหลด
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Section -->
+        <div id="gallerySection" class="section" style="display: none;">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-6">
+                    <button id="refreshGallery" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-all">
+                        🔄 รีเฟรชแกลอรี่
+                    </button>
+                </div>
+
+                <div id="galleryContent" class="bg-white/90 backdrop-blur-lg rounded-2xl p-6">
+                    <div id="loadingGallery" class="text-center py-8">
+                        <div class="loading mx-auto mb-4"></div>
+                        <p class="text-gray-600">กำลังโหลดรูปภาพ...</p>
+                    </div>
+
+                    <div id="slideshowContainer" class="slideshow-container" style="display: none;">
+                        <div id="slides"></div>
+                        <button class="prev" onclick="changeSlide(-1)">❮</button>
+                        <button class="next" onclick="changeSlide(1)">❯</button>
+                    </div>
+
+                    <div id="slideControls" class="text-center mt-4" style="display: none;">
+                        <button id="playPause" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-2 transition-all">
+                            ⏸️ หยุด
+                        </button>
+                        <button id="randomBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg mr-2 transition-all">
+                            🎲 สุ่ม
+                        </button>
+                        <button id="fullscreenBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg mr-2 transition-all">
+                            🔍 เต็มจอ
+                        </button>
+                        <span id="slideCounter" class="text-gray-600 mx-4">1 / 1</span>
+                    </div>
+
+                    <div id="noPhotos" class="text-center py-8" style="display: none;">
+                        <p class="text-gray-600 text-lg">ยังไม่มีรูปภาพในแกลอรี่</p>
+                        <p class="text-gray-500">ถ่ายรูปและอัปโหลดเพื่อดูในแกลอรี่</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-8 mt-12">
+        <div class="text-white/80 text-sm">
+            © developed by Tle Narongphisit | CTTC19 @ CPD
+        </div>
+    </footer>
+
+    <!-- Upload Status Modal -->
+    <div id="uploadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" style="display: none;">
+        <div class="bg-white rounded-2xl p-8 max-w-md mx-4">
+            <div id="uploadStatus" class="text-center">
+                <div class="loading mx-auto mb-4"></div>
+                <p class="text-lg font-medium mb-2">กำลังอัปโหลด...</p>
+                <p class="text-gray-600">กรุณารอสักครู่</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Modal -->
+    <div id="fullscreenModal" class="fixed inset-0 bg-black z-50 flex items-center justify-center" style="display: none;">
+        <div class="relative w-full h-full flex items-center justify-center">
+            <!-- Close Button -->
+            <button id="closeFullscreen" class="absolute top-4 right-4 text-white text-2xl bg-black/50 rounded-full w-12 h-12 flex items-center justify-center hover:bg-black/70 transition-all z-10">
+                ✕
+            </button>
+            
+            <!-- Navigation Buttons -->
+            <button id="fullscreenPrev" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl bg-black/50 rounded-full w-16 h-16 flex items-center justify-center hover:bg-black/70 transition-all z-10">
+                ❮
+            </button>
+            <button id="fullscreenNext" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl bg-black/50 rounded-full w-16 h-16 flex items-center justify-center hover:bg-black/70 transition-all z-10">
+                ❯
+            </button>
+            
+            <!-- Image Container -->
+            <div id="fullscreenImageContainer" class="max-w-full max-h-full p-8">
+                <img id="fullscreenImage" class="max-w-full max-h-full object-contain" src="" alt="">
+            </div>
+            
+            <!-- Image Info -->
+            <div id="fullscreenInfo" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-center bg-black/50 px-4 py-2 rounded-lg">
+                <div id="fullscreenImageName" class="font-medium mb-1"></div>
+                <div id="fullscreenCounter" class="text-sm opacity-80"></div>
+            </div>
+        </div>
+    </div>
+
+    <script scr="./photoboothscript.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97dcb0e873bc7325',t:'MTc1NzY1MTY1Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

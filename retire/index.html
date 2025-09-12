@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ร้อยรักรวมใจ สายใยผูกพัน by CTTC19</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        header {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            padding: 30px 20px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .decoration {
+            font-size: 3rem;
+            margin: 15px 0;
+        }
+        
+        .main-content {
+            padding: 40px 20px;
+        }
+        
+        .welcome-text {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .activities {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .activity-card {
+            background: white;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .activity-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .photo-activity {
+            color: #3498db;
+            border-top: 5px solid #3498db;
+        }
+        
+        .wish-activity {
+            color: #e74c3c;
+            border-top: 5px solid #e74c3c;
+        }
+        
+        .activity-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .activity-description {
+            color: #7f8c8d;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            transition: background 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background: #3498db;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .activities {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .activity-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="decoration">🎉</div>
+            <h1>ร้อยรักรวมใจ สายใยผูกพัน by CTTC19</h1>
+            <p class="subtitle">ขอเชิญร่วมแสดงความยินดีและบันทึกความประทับใจ ในงานเลี้ยงผู้เกษียณอายุราชการ</p>
+            <div class="decoration">🎓</div>
+        </header>
+        
+        <div class="main-content">
+            <p class="welcome-text">สวัสดีครับ/ค่ะ ขอต้อนรับทุกท่านสู่งานเกษียณอายุราชการ<br>เลือกกิจกรรมด้านล่างเพื่อร่วมบันทึกความประทับใจ</p>
+            
+            <div class="activities">
+                <div class="activity-card photo-activity">
+                    <div class="activity-icon">📸</div>
+                    <h2 class="activity-title">กิจกรรมถ่ายรูปที่ระลึก</h2>
+                    <p class="activity-description">ร่วมถ่ายภาพที่ระลึกกับผู้เกษียณอายุ เพื่อนำไปแสดงในงานเลี้ยงและเป็นความทรงจำตลอดกาล</p>
+                    <button class="btn" onclick="window.location.href='./photobooth.html'">เริ่มถ่ายภาพ</button>
+                </div>
+                
+                <div class="activity-card wish-activity">
+                    <div class="activity-icon">✍️</div>
+                    <h2 class="activity-title">กิจกรรมเขียนคำอวยพร</h2>
+                    <p class="activity-description">เขียนความในใจและคำอวยพรถึงผู้เกษียณอายุ เพื่อแสดงความขอบคุณและความปรารถนาดี</p>
+                    <button class="btn" onclick="window.location.href='./blessing.html'">เขียนคำอวยพร</button>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3>วิธีการใช้งาน</h3>
+                <ol>
+                    <li>เลือกกิจกรรมที่ต้องการร่วม (ถ่ายภาพหรือเขียนคำอวยพร)</li>
+                    <li>ทำตามคำแนะนำในหน้าจอสำหรับกิจกรรมที่เลือก</li>
+                    <li>สำหรับการถ่ายภาพ: ยืนตรงจุดที่กำหนดและกดปุ่มถ่ายภาพ</li>
+                    <li>สำหรับการเขียนคำอวยพร: พิมพ์ข้อความของคุณแล้วกดส่ง</li>
+                    <li>ภาพและคำอวยพรจะถูกนำไปแสดงในงานเลี้ยงโดยทันที</li>
+                </ol>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© developed by Tle Narongphisit - CTTC19 @ CPD</p>
+        </footer>
+    </div>
+
+    <script>
+        // ฟังก์ชันสำหรับการนำไปสู่กิจกรรมต่างๆ
+        document.querySelectorAll('.activity-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const title = this.querySelector('.activity-title').textContent;
+                
+                if (title === 'กิจกรรมถ่ายรูปที่ระลึก') {
+                    alert('กำลังนำไปสู่หน้าถ่ายภาพ... (ในระบบจริงจะเปิดกล้องและหน้าถ่ายภาพ)');
+                    // ในระบบจริง: window.location.href = 'photo-activity.html';
+                } else if (title === 'กิจกรรมเขียนคำอวยพร') {
+                    alert('กำลังนำไปสู่หน้าการเขียนคำอวยพร... (ในระบบจริงจะเปิดฟอร์มเขียนคำอวยพร)');
+                    // ในระบบจริง: window.location.href = 'wish-activity.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
