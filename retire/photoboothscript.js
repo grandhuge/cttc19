@@ -1138,4 +1138,3 @@
 
         // Global function for navigation buttons
         window.changeSlide = changeSlide;
-    
