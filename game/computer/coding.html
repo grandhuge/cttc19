@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Code Adventure - เกมเขียนโค้ดสำหรับเด็ก</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .robot {
+            transition: all 0.5s ease-in-out;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+        }
+        
+        .grid-cell {
+            transition: background-color 0.3s ease;
+            aspect-ratio: 1;
+            min-height: 40px;
+        }
+        
+        .code-block {
+            cursor: grab;
+            transition: all 0.2s ease;
+            touch-action: none;
+            user-select: none;
+        }
+        
+        .code-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .code-block:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+        
+        .drop-zone {
+            min-height: 60px;
+            border: 2px dashed #cbd5e1;
+            transition: all 0.2s ease;
+        }
+        
+        .drop-zone.drag-over {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        
+        .star {
+            animation: twinkle 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+        
+        .bounce {
+            animation: bounce 0.5s ease-in-out;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes floatUp {
+            0% { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-30px); 
+            }
+        }
+        
+        .combo-glow {
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.6);
+            animation: glow 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(255, 165, 0, 0.6); }
+            to { box-shadow: 0 0 30px rgba(255, 165, 0, 0.8); }
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .grid-cell {
+                min-height: 35px;
+                font-size: 1.2rem;
+            }
+            
+            .code-block {
+                font-size: 0.8rem;
+                padding: 0.5rem;
+            }
+            
+            .mobile-scroll {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .mobile-grid {
+                min-width: 300px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .grid-cell {
+                min-height: 30px;
+                font-size: 1rem;
+            }
+            
+            .code-block {
+                font-size: 0.7rem;
+                padding: 0.4rem;
+            }
+        }
+        
+        /* Touch-friendly interactions */
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        /* Landscape mobile adjustments */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header-compact {
+                padding: 0.5rem 0;
+            }
+            
+            .content-compact {
+                padding: 0.5rem;
+            }
+        }
+        
+        /* Tablet optimizations */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .tablet-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .grid-cell {
+                border-width: 1px;
+            }
+        }
+        
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            .robot, .bounce, .pulse, .star, .combo-glow {
+                animation: none;
+            }
+            
+            .code-block {
+                transition: none;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .dark-mode-bg {
+                background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white/90 backdrop-blur-sm shadow-lg header-compact">
+        <div class="container mx-auto px-2 sm:px-4 py-2 sm:py-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div class="text-2xl sm:text-3xl">🤖</div>
+                    <h1 class="text-lg sm:text-2xl font-bold text-gray-800 hidden sm:block">Robot Code Adventure</h1>
+                    <h1 class="text-lg font-bold text-gray-800 sm:hidden">Robot Code</h1>
+                </div>
+                
+                <!-- Desktop Stats -->
+                <div class="hidden lg:flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-blue-500 text-xl">🏆</span>
+                        <span id="score" class="font-semibold text-gray-700">0</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-yellow-500 text-xl">⭐</span>
+                        <span id="stars" class="font-semibold text-gray-700">0</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-purple-500 text-xl">💎</span>
+                        <span id="gems" class="font-semibold text-gray-700">0</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-500 text-xl">⚡</span>
+                        <div class="w-16 bg-gray-200 rounded-full h-2">
+                            <div id="energyBar" class="bg-green-500 h-2 rounded-full transition-all duration-300" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600">ด่าน <span id="level">1</span>/8</div>
+                    <div class="text-sm text-gray-600">⏱️ <span id="timer">--</span>s</div>
+                </div>
+                
+                <!-- Mobile Stats -->
+                <div class="flex lg:hidden items-center space-x-2 text-sm">
+                    <div class="flex items-center space-x-1">
+                        <span class="text-blue-500">🏆</span>
+                        <span id="scoreMobile" class="font-semibold text-gray-700">0</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <span class="text-yellow-500">⭐</span>
+                        <span id="starsMobile" class="font-semibold text-gray-700">0</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <span class="text-purple-500">💎</span>
+                        <span id="gemsMobile" class="font-semibold text-gray-700">0</span>
+                    </div>
+                    <div class="text-gray-600"><span id="levelMobile">1</span>/8</div>
+                    <div class="text-gray-600">⏱️<span id="timerMobile">--</span>s</div>
+                </div>
+            </div>
+            
+            <!-- Mobile Energy Bar -->
+            <div class="lg:hidden mt-2">
+                <div class="flex items-center space-x-2">
+                    <span class="text-green-500 text-sm">⚡</span>
+                    <div class="flex-1 bg-gray-200 rounded-full h-2">
+                        <div id="energyBarMobile" class="bg-green-500 h-2 rounded-full transition-all duration-300" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Welcome Screen -->
+    <div id="welcomeScreen" class="container mx-auto px-4 py-8 text-center">
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-2xl mx-auto">
+            <div class="text-6xl mb-6">🤖✨</div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Robot Code Adventure</h1>
+            <h2 class="text-2xl text-purple-600 mb-6">เกมเขียนโค้ดสำหรับเด็ก</h2>
+            
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">🎯 วิธีเล่น</h3>
+                <div class="grid md:grid-cols-2 gap-4 text-left">
+                    <div class="space-y-3">
+                        <div class="flex items-start space-x-3">
+                            <span class="text-2xl">1️⃣</span>
+                            <div>
+                                <h4 class="font-semibold text-gray-700">ลากบล็อกคำสั่ง</h4>
+                                <p class="text-sm text-gray-600">เลือกบล็อกคำสั่งจากด้านซ้าย แล้วลากไปวางในพื้นที่โค้ด</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <span class="text-2xl">2️⃣</span>
+                            <div>
+                                <h4 class="font-semibold text-gray-700">เรียงลำดับคำสั่ง</h4>
+                                <p class="text-sm text-gray-600">จัดเรียงคำสั่งให้ถูกต้องเพื่อให้หุ่นยนต์เดินไปเก็บดาว</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-start space-x-3">
+                            <span class="text-2xl">3️⃣</span>
+                            <div>
+                                <h4 class="font-semibold text-gray-700">รันโค้ด</h4>
+                                <p class="text-sm text-gray-600">กดปุ่ม "รันโค้ด" เพื่อให้หุ่นยนต์ทำตามคำสั่งที่คุณเขียน</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <span class="text-2xl">4️⃣</span>
+                            <div>
+                                <h4 class="font-semibold text-gray-700">เก็บไอเท็ม</h4>
+                                <p class="text-sm text-gray-600">เก็บดาว ⭐ เพชร 💎 และพลังงาน ⚡ เพื่อคะแนนสูง</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8">
+                <h3 class="text-lg font-semibold text-yellow-800 mb-2">💡 เคล็ดลับ</h3>
+                <div class="text-sm text-yellow-700 space-y-1">
+                    <p>• ใช้บล็อก "ทำซ้ำ" เพื่อลดจำนวนคำสั่ง</p>
+                    <p>• เก็บเพชรทั้งหมดเพื่อคะแนนโบนัส</p>
+                    <p>• ทำให้เร็วเพื่อได้คะแนนเวลาโบนัส</p>
+                    <p>• หลีกเลี่ยงอุปสรรค 🧱 และดูแลพลังงาน ⚡</p>
+                </div>
+            </div>
+            
+            <button id="startGameBtn" class="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white text-xl font-bold px-8 py-4 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200">
+                🚀 เริ่มเกม
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Content -->
+    <div id="gameContent" class="container mx-auto px-2 sm:px-4 py-3 sm:py-6 content-compact hidden">
+        <div class="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-2 gap-3 sm:gap-6 tablet-layout">
+            <!-- Game Board -->
+            <div class="xl:col-span-2 lg:col-span-1 order-1">
+                <div class="bg-white/95 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-3 sm:mb-4 gap-2">
+                        <h2 class="text-lg sm:text-xl font-semibold text-gray-800">🎯 ภารกิจ: ช่วยหุ่นยนต์เก็บดาว!</h2>
+                        <div class="flex space-x-2">
+                            <button id="runBtn" class="bg-green-500 hover:bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors touch-target text-sm sm:text-base">
+                                ▶️ รันโค้ด
+                            </button>
+                            <button id="resetBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors touch-target text-sm sm:text-base">
+                                🔄 รีเซ็ต
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Game Grid Container with horizontal scroll on mobile -->
+                    <div class="mobile-scroll mb-3 sm:mb-4">
+                        <div id="gameGrid" class="grid grid-cols-5 gap-1 sm:gap-2 max-w-xs sm:max-w-md mx-auto mobile-grid">
+                            <!-- Grid cells will be generated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Level Info -->
+                    <div id="levelInfo" class="bg-blue-50 border-l-4 border-blue-400 p-3 sm:p-4 rounded-r-lg">
+                        <h3 class="font-semibold text-blue-800 mb-2 text-sm sm:text-base">📚 ด่าน 1: การเรียงลำดับคำสั่ง</h3>
+                        <p class="text-blue-700 text-sm sm:text-base">ลากบล็อกคำสั่งมาเรียงกัน แล้วกด "รันโค้ด" เพื่อให้หุ่นยนต์เดินไปเก็บดาว!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coding Panel -->
+            <div class="space-y-3 sm:space-y-6 order-2 lg:order-2">
+                <!-- Available Blocks -->
+                <div class="bg-white/95 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-6">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">🧩 บล็อกคำสั่ง</h3>
+                    <div id="blockPalette" class="space-y-2 sm:space-y-3">
+                        <!-- Code blocks will be generated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Code Area -->
+                <div class="bg-white/95 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-6">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">📝 โค้ดของคุณ</h3>
+                    <div id="codeArea" class="drop-zone rounded-lg p-3 sm:p-4 space-y-2 min-h-[120px] sm:min-h-[160px]">
+                        <div class="text-gray-400 text-center py-4 sm:py-8 text-sm sm:text-base">ลากบล็อกคำสั่งมาวางที่นี่</div>
+                    </div>
+                </div>
+
+                <!-- Progress & Stats -->
+                <div class="bg-white/95 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-6">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">📊 สถิติ & ความก้าวหน้า</h3>
+                    <div class="space-y-2 sm:space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs sm:text-sm text-gray-600">ด่านที่ผ่าน</span>
+                            <span id="completedLevels" class="font-semibold text-green-600 text-sm sm:text-base">0/8</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="progressBar" class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 sm:gap-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs sm:text-sm text-gray-600">คอมโบ</span>
+                                <span id="combo" class="font-semibold text-orange-600 text-sm sm:text-base">0x</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs sm:text-sm text-gray-600">ความพยายาม</span>
+                                <span id="attempts" class="font-semibold text-blue-600 text-sm sm:text-base">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="bg-white/95 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-6">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">🏅 ความสำเร็จ</h3>
+                    <div id="achievements" class="space-y-2 max-h-32 sm:max-h-48 overflow-y-auto">
+                        <div class="text-gray-400 text-center text-xs sm:text-sm">ยังไม่มีความสำเร็จ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-8 max-w-sm sm:max-w-md w-full mx-auto text-center transform scale-95 transition-transform">
+            <div class="text-4xl sm:text-6xl mb-3 sm:mb-4">🎉</div>
+            <h3 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">ยินดีด้วย!</h3>
+            <p id="successMessage" class="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">คุณผ่านด่านแล้ว!</p>
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 justify-center">
+                <button id="nextLevelBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg font-medium transition-colors touch-target text-sm sm:text-base">
+                    ด่านถัดไป
+                </button>
+                <button id="replayBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 sm:px-6 py-2 rounded-lg font-medium transition-colors touch-target text-sm sm:text-base">
+                    เล่นอีกครั้ง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm">© developed by Tle Narongphisit | CTTC19 @ CPD</p>
+        </div>
+    </footer>
+
+    <script>
+        class RobotCodeGame {
+            constructor() {
+                this.currentLevel = 1;
+                this.totalStars = 0;
+                this.completedLevels = 0;
+                this.robotPosition = { x: 0, y: 0 };
+                this.robotDirection = 'right'; // right, left, up, down
+                this.codeBlocks = [];
+                this.isRunning = false;
+                
+                // Scoring system
+                this.score = 0;
+                this.attempts = 0;
+                this.timeStarted = null;
+                this.levelStartTime = null;
+                this.bestTimes = {};
+                this.achievements = [];
+                this.combo = 0;
+                this.maxCombo = 0;
+                this.levelScores = {}; // เก็บคะแนนสูงสุดของแต่ละด่าน
+                this.totalLevels = 8; // จำนวนด่านทั้งหมด
+                
+                // Game mechanics
+                this.gems = [];
+                this.obstacles = [];
+                this.powerUps = [];
+                this.energy = 100;
+                this.maxEnergy = 100;
+                
+                this.levels = {
+                    1: {
+                        title: "การเรียงลำดับคำสั่ง",
+                        description: "ลากบล็อกคำสั่งมาเรียงกัน แล้วกด \"รันโค้ด\" เพื่อให้หุ่นยนต์เดินไปเก็บดาว!",
+                        grid: [
+                            ['🤖', '⬜', '💎', '⭐', '⚡'],
+                            ['⬜', '⬜', '⬜', '⬜', '⬜'],
+                            ['⬜', '⬜', '⬜', '⬜', '⬜'],
+                            ['⬜', '⬜', '⬜', '⬜', '⬜'],
+                            ['⬜', '⬜', '⬜', '⬜', '⬜']
+                        ],
+                        availableBlocks: ['forward', 'forward', 'forward', 'forward'],
+                        stars: [{ x: 3, y: 0 }],
+                        gems: [{ x: 2, y: 0 }],
+                        powerUps: [{ x: 4, y: 0 }],
+                        timeLimit: 30,
+                        optimalMoves: 4,
+                        maxScore: 1000
+                    },
+                    2: {
+                        title: "การใช้ลูป (Loop)",
+                        description: "ใช้บล็อก \"ทำซ้ำ\" เพื่อลดจำนวนคำสั่งที่ต้องเขียน! เก็บเพชรเพื่อคะแนนโบนัส!",
+                        grid: [
+                            ['🤖', '💎', '⬜', '💎', '⭐'],
+                            ['⬜', '⬜', '⬜', '⬜', '💎'],
+                            ['⬜', '⬜', '⬜', '⬜', '⬜'],
+                            ['⬜', '⬜', '⬜', '⬜', '⬜'],
+                            ['⬜', '⬜', '⬜', '⬜', '⬜']
+                        ],
+                        availableBlocks: ['repeat', 'forward', 'turnRight'],
+                        stars: [{ x: 4, y: 0 }],
+                        gems: [{ x: 1, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 1 }],
+                        timeLimit: 45,
+                        optimalMoves: 3,
+                        maxScore: 1500
+                    },
+                    3: {
+                        title: "เขาวงกตท้าทาย",
+                        description: "หลีกเลี่ยงอุปสรรค เก็บเพชรทั้งหมด และไปถึงดาว! ระวังพลังงานด้วย!",
+                        grid: [
+                            ['🤖', '⬜', '🧱', '💎', '⬜'],
+                            ['💎', '⬜', '🧱', '⬜', '💎'],
+                            ['⬜', '⬜', '⬜', '🧱', '⬜'],
+                            ['🧱', '💎', '⬜', '⬜', '⭐'],
+                            ['⬜', '⬜', '🧱', '⬜', '⚡']
+                        ],
+                        availableBlocks: ['forward', 'turnRight', 'turnLeft', 'repeat'],
+                        stars: [{ x: 4, y: 3 }],
+                        gems: [{ x: 3, y: 0 }, { x: 0, y: 1 }, { x: 4, y: 1 }, { x: 1, y: 3 }],
+                        powerUps: [{ x: 4, y: 4 }],
+                        obstacles: [{ x: 2, y: 0 }, { x: 2, y: 1 }, { x: 3, y: 2 }, { x: 0, y: 3 }, { x: 2, y: 4 }],
+                        timeLimit: 60,
+                        optimalMoves: 8,
+                        maxScore: 2000
+                    },
+                    4: {
+                        title: "ปริศนาแห่งความเร็ว",
+                        description: "ด่านโบนัส! เก็บเพชรให้ได้มากที่สุดภายในเวลาที่กำหนด!",
+                        grid: [
+                            ['🤖', '💎', '💎', '💎', '💎'],
+                            ['💎', '🧱', '⬜', '🧱', '💎'],
+                            ['💎', '⬜', '⭐', '⬜', '💎'],
+                            ['💎', '🧱', '⬜', '🧱', '💎'],
+                            ['💎', '💎', '💎', '💎', '⚡']
+                        ],
+                        availableBlocks: ['forward', 'turnRight', 'turnLeft', 'repeat'],
+                        stars: [{ x: 2, y: 2 }],
+                        gems: [
+                            { x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 0 },
+                            { x: 0, y: 1 }, { x: 4, y: 1 }, { x: 0, y: 2 }, { x: 4, y: 2 },
+                            { x: 0, y: 3 }, { x: 4, y: 3 }, { x: 0, y: 4 }, { x: 1, y: 4 },
+                            { x: 2, y: 4 }, { x: 3, y: 4 }
+                        ],
+                        powerUps: [{ x: 4, y: 4 }],
+                        obstacles: [{ x: 1, y: 1 }, { x: 3, y: 1 }, { x: 1, y: 3 }, { x: 3, y: 3 }],
+                        timeLimit: 90,
+                        optimalMoves: 12,
+                        maxScore: 3000
+                    },
+                    5: {
+                        title: "เขาวงกตซับซ้อน",
+                        description: "เขาวงกตที่ซับซ้อนขึ้น! ใช้ลูปและการเลี้ยวอย่างชาญฉลาด!",
+                        grid: [
+                            ['🤖', '🧱', '💎', '🧱', '⬜'],
+                            ['⬜', '🧱', '⬜', '🧱', '💎'],
+                            ['💎', '⬜', '⬜', '⬜', '🧱'],
+                            ['🧱', '🧱', '💎', '⬜', '⭐'],
+                            ['⚡', '⬜', '⬜', '🧱', '💎']
+                        ],
+                        availableBlocks: ['forward', 'turnRight', 'turnLeft', 'repeat'],
+                        stars: [{ x: 4, y: 3 }],
+                        gems: [{ x: 2, y: 0 }, { x: 4, y: 1 }, { x: 0, y: 2 }, { x: 2, y: 3 }, { x: 4, y: 4 }],
+                        powerUps: [{ x: 0, y: 4 }],
+                        obstacles: [
+                            { x: 1, y: 0 }, { x: 3, y: 0 }, { x: 1, y: 1 }, { x: 3, y: 1 }, 
+                            { x: 4, y: 2 }, { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 3, y: 4 }
+                        ],
+                        timeLimit: 75,
+                        optimalMoves: 10,
+                        maxScore: 2500
+                    },
+                    6: {
+                        title: "ด่านแห่งการวางแผน",
+                        description: "วางแผนเส้นทางให้ดี! เก็บเพชรทั้งหมดก่อนไปเก็บดาว!",
+                        grid: [
+                            ['⬜', '💎', '🧱', '💎', '⬜'],
+                            ['🤖', '⬜', '🧱', '⬜', '💎'],
+                            ['🧱', '⬜', '⬜', '⬜', '🧱'],
+                            ['💎', '⬜', '🧱', '⬜', '💎'],
+                            ['⬜', '💎', '⭐', '💎', '⚡']
+                        ],
+                        availableBlocks: ['forward', 'turnRight', 'turnLeft', 'repeat'],
+                        stars: [{ x: 2, y: 4 }],
+                        gems: [
+                            { x: 1, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 1 }, 
+                            { x: 0, y: 3 }, { x: 4, y: 3 }, { x: 1, y: 4 }, { x: 3, y: 4 }
+                        ],
+                        powerUps: [{ x: 4, y: 4 }],
+                        obstacles: [
+                            { x: 2, y: 0 }, { x: 2, y: 1 }, { x: 0, y: 2 }, { x: 4, y: 2 }, { x: 2, y: 3 }
+                        ],
+                        robotStart: { x: 0, y: 1 }, // กำหนดตำแหน่งเริ่มต้นชัดเจน
+                        timeLimit: 90,
+                        optimalMoves: 15,
+                        maxScore: 3500
+                    },
+                    7: {
+                        title: "ปริศนาสุดท้าทาย",
+                        description: "ด่านที่ยากที่สุด! ใช้ทุกทักษะที่เรียนมาเพื่อผ่านด่านนี้!",
+                        grid: [
+                            ['🤖', '🧱', '💎', '🧱', '💎'],
+                            ['💎', '⬜', '🧱', '⬜', '🧱'],
+                            ['🧱', '⬜', '💎', '⬜', '💎'],
+                            ['💎', '🧱', '⬜', '🧱', '⬜'],
+                            ['⚡', '💎', '🧱', '⭐', '💎']
+                        ],
+                        availableBlocks: ['forward', 'turnRight', 'turnLeft', 'repeat'],
+                        stars: [{ x: 3, y: 4 }],
+                        gems: [
+                            { x: 2, y: 0 }, { x: 4, y: 0 }, { x: 0, y: 1 }, { x: 4, y: 2 }, 
+                            { x: 2, y: 2 }, { x: 0, y: 3 }, { x: 1, y: 4 }, { x: 4, y: 4 }
+                        ],
+                        powerUps: [{ x: 0, y: 4 }],
+                        obstacles: [
+                            { x: 1, y: 0 }, { x: 3, y: 0 }, { x: 2, y: 1 }, { x: 4, y: 1 }, 
+                            { x: 0, y: 2 }, { x: 1, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 4 }
+                        ],
+                        timeLimit: 120,
+                        optimalMoves: 18,
+                        maxScore: 4000
+                    },
+                    8: {
+                        title: "ด่านโบนัสสุดพิเศษ",
+                        description: "ด่านโบนัสสุดท้าย! เก็บเพชรให้ได้มากที่สุดในเวลาจำกัด!",
+                        grid: [
+                            ['💎', '💎', '🧱', '💎', '💎'],
+                            ['💎', '🧱', '💎', '🧱', '💎'],
+                            ['🧱', '💎', '🤖', '💎', '🧱'],
+                            ['💎', '🧱', '💎', '🧱', '💎'],
+                            ['💎', '💎', '⭐', '💎', '⚡']
+                        ],
+                        availableBlocks: ['forward', 'turnRight', 'turnLeft', 'repeat'],
+                        stars: [{ x: 2, y: 4 }],
+                        gems: [
+                            { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 0 },
+                            { x: 0, y: 1 }, { x: 2, y: 1 }, { x: 4, y: 1 }, { x: 1, y: 2 }, { x: 3, y: 2 },
+                            { x: 0, y: 3 }, { x: 2, y: 3 }, { x: 4, y: 3 }, { x: 0, y: 4 }, 
+                            { x: 1, y: 4 }, { x: 3, y: 4 }
+                        ],
+                        powerUps: [{ x: 4, y: 4 }],
+                        obstacles: [
+                            { x: 2, y: 0 }, { x: 1, y: 1 }, { x: 3, y: 1 }, { x: 0, y: 2 }, 
+                            { x: 4, y: 2 }, { x: 1, y: 3 }, { x: 3, y: 3 }
+                        ],
+                        timeLimit: 150,
+                        optimalMoves: 20,
+                        maxScore: 5000
+                    }
+                };
+                
+                this.blockTypes = {
+                    forward: { 
+                        label: '⬆️ เดินไปข้างหน้า', 
+                        color: 'bg-blue-500', 
+                        action: () => this.moveForward() 
+                    },
+                    turnLeft: { 
+                        label: '⬅️ เลี้ยวซ้าย', 
+                        color: 'bg-yellow-500', 
+                        action: () => this.turnLeft() 
+                    },
+                    turnRight: { 
+                        label: '➡️ เลี้ยวขวา', 
+                        color: 'bg-orange-500', 
+                        action: () => this.turnRight() 
+                    },
+                    repeat: { 
+                        label: '🔄 ทำซ้ำ 2 ครั้ง', 
+                        color: 'bg-purple-500', 
+                        action: async (times, childBlocks) => await this.repeat(times || 2, childBlocks) 
+                    }
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                // Don't load level immediately - wait for start button
+                this.updateUI();
+            }
+            
+            setupEventListeners() {
+                document.getElementById('startGameBtn').addEventListener('click', () => this.startGame());
+                document.getElementById('runBtn').addEventListener('click', () => this.runCode());
+                document.getElementById('resetBtn').addEventListener('click', () => this.resetLevel());
+                document.getElementById('nextLevelBtn').addEventListener('click', () => this.nextLevel());
+                document.getElementById('replayBtn').addEventListener('click', () => this.hideSuccessModal());
+                
+                // Setup drag and drop
+                this.setupDragAndDrop();
+            }
+            
+            startGame() {
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('gameContent').classList.remove('hidden');
+                this.loadLevel(1);
+            }
+            
+            setupDragAndDrop() {
+                const codeArea = document.getElementById('codeArea');
+                
+                // Traditional drag and drop for desktop
+                codeArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    codeArea.classList.add('drag-over');
+                });
+                
+                codeArea.addEventListener('dragleave', () => {
+                    codeArea.classList.remove('drag-over');
+                });
+                
+                codeArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    codeArea.classList.remove('drag-over');
+                    
+                    const blockType = e.dataTransfer.getData('text/plain');
+                    this.addCodeBlock(blockType);
+                });
+                
+                // Touch support for mobile devices
+                this.setupTouchSupport();
+            }
+            
+            setupTouchSupport() {
+                let draggedElement = null;
+                let touchOffset = { x: 0, y: 0 };
+                
+                document.addEventListener('touchstart', (e) => {
+                    const target = e.target.closest('.code-block');
+                    if (target && target.draggable) {
+                        draggedElement = target;
+                        const touch = e.touches[0];
+                        const rect = target.getBoundingClientRect();
+                        touchOffset.x = touch.clientX - rect.left;
+                        touchOffset.y = touch.clientY - rect.top;
+                        
+                        // Visual feedback
+                        target.style.opacity = '0.7';
+                        target.style.transform = 'scale(1.05)';
+                        
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                
+                document.addEventListener('touchmove', (e) => {
+                    if (draggedElement) {
+                        const touch = e.touches[0];
+                        
+                        // Create or update ghost element
+                        let ghost = document.getElementById('touch-ghost');
+                        if (!ghost) {
+                            ghost = draggedElement.cloneNode(true);
+                            ghost.id = 'touch-ghost';
+                            ghost.style.position = 'fixed';
+                            ghost.style.pointerEvents = 'none';
+                            ghost.style.zIndex = '1000';
+                            ghost.style.opacity = '0.8';
+                            ghost.style.transform = 'scale(0.9)';
+                            document.body.appendChild(ghost);
+                        }
+                        
+                        ghost.style.left = (touch.clientX - touchOffset.x) + 'px';
+                        ghost.style.top = (touch.clientY - touchOffset.y) + 'px';
+                        
+                        // Check if over drop zone
+                        const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                        const dropZone = elementBelow?.closest('#codeArea');
+                        
+                        if (dropZone) {
+                            dropZone.classList.add('drag-over');
+                        } else {
+                            document.getElementById('codeArea').classList.remove('drag-over');
+                        }
+                        
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                
+                document.addEventListener('touchend', (e) => {
+                    if (draggedElement) {
+                        const touch = e.changedTouches[0];
+                        const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                        const dropZone = elementBelow?.closest('#codeArea');
+                        
+                        if (dropZone) {
+                            const blockType = draggedElement.textContent.includes('เดินไปข้างหน้า') ? 'forward' :
+                                            draggedElement.textContent.includes('เลี้ยวซ้าย') ? 'turnLeft' :
+                                            draggedElement.textContent.includes('เลี้ยวขวา') ? 'turnRight' :
+                                            draggedElement.textContent.includes('ทำซ้ำ') ? 'repeat' : null;
+                            
+                            if (blockType) {
+                                this.addCodeBlock(blockType);
+                            }
+                        }
+                        
+                        // Cleanup
+                        draggedElement.style.opacity = '';
+                        draggedElement.style.transform = '';
+                        document.getElementById('codeArea').classList.remove('drag-over');
+                        
+                        const ghost = document.getElementById('touch-ghost');
+                        if (ghost) {
+                            ghost.remove();
+                        }
+                        
+                        draggedElement = null;
+                    }
+                });
+            }
+            
+            loadLevel(levelNum) {
+                const level = this.levels[levelNum];
+                if (!level) return;
+                
+                this.currentLevel = levelNum;
+                
+                // ใช้ตำแหน่งเริ่มต้นที่กำหนดไว้ในด่าน หรือค่าเริ่มต้น (0,0)
+                const startPos = level.robotStart || { x: 0, y: 0 };
+                this.robotPosition = { ...startPos };
+                this.robotDirection = 'right';
+                this.attempts = 0;
+                this.energy = this.maxEnergy;
+                this.levelStartTime = Date.now();
+                this.gems = [...(level.gems || [])];
+                this.powerUps = [...(level.powerUps || [])];
+                this.obstacles = [...(level.obstacles || [])];
+                
+                // Store initial level state for resets
+                this.initialLevelState = {
+                    gems: [...(level.gems || [])],
+                    powerUps: [...(level.powerUps || [])],
+                    robotPosition: { ...startPos },
+                    robotDirection: 'right'
+                };
+                
+                // Start timer
+                this.startTimer(level.timeLimit);
+                
+                // Update level info
+                document.getElementById('levelInfo').innerHTML = `
+                    <h3 class="font-semibold text-blue-800 mb-2">📚 ด่าน ${levelNum}: ${level.title}</h3>
+                    <p class="text-blue-700">${level.description}</p>
+                    <div class="mt-2 flex items-center space-x-4 text-sm">
+                        <span class="text-green-600">⏱️ เวลา: ${level.timeLimit}s</span>
+                        <span class="text-purple-600">🎯 คำสั่งที่เหมาะสม: ${level.optimalMoves}</span>
+                        <span class="text-blue-600">🏆 คะแนนสูงสุด: ${level.maxScore}</span>
+                    </div>
+                `;
+                
+                // Generate grid
+                this.generateGrid(level.grid);
+                
+                // Generate available blocks
+                this.generateBlockPalette(level.availableBlocks);
+                
+                // Clear code area
+                this.clearCodeArea();
+                
+                this.updateUI();
+            }
+            
+            resetRobotPosition() {
+                if (!this.initialLevelState) return;
+                
+                // Remove robot from current position
+                const currentCell = document.querySelector(`[data-x="${this.robotPosition.x}"][data-y="${this.robotPosition.y}"]`);
+                if (currentCell) {
+                    // Check if there should be collectibles at this position
+                    const level = this.levels[this.currentLevel];
+                    const hasGem = level.gems?.some(gem => gem.x === this.robotPosition.x && gem.y === this.robotPosition.y);
+                    const hasPowerUp = level.powerUps?.some(p => p.x === this.robotPosition.x && p.y === this.robotPosition.y);
+                    const hasStar = level.stars?.some(star => star.x === this.robotPosition.x && star.y === this.robotPosition.y);
+                    
+                    let cellContent = '';
+                    if (hasGem && !this.isGemCollected({x: this.robotPosition.x, y: this.robotPosition.y})) cellContent += '💎';
+                    if (hasPowerUp && this.powerUps.some(p => p.x === this.robotPosition.x && p.y === this.robotPosition.y)) cellContent += '⚡';
+                    if (hasStar) cellContent += '<div class="star">⭐</div>';
+                    
+                    currentCell.innerHTML = cellContent;
+                }
+                
+                // Reset robot to starting position
+                this.robotPosition = { ...this.initialLevelState.robotPosition };
+                this.robotDirection = this.initialLevelState.robotDirection;
+                
+                // Place robot at starting position
+                const startCell = document.querySelector(`[data-x="${this.robotPosition.x}"][data-y="${this.robotPosition.y}"]`);
+                if (startCell) {
+                    const directions = {
+                        'right': '🤖➡️',
+                        'left': '⬅️🤖',
+                        'up': '⬆️🤖',
+                        'down': '⬇️🤖'
+                    };
+                    startCell.innerHTML = `<div class="robot">${directions[this.robotDirection]}</div>`;
+                }
+            }
+            
+            generateGrid(gridData) {
+                const gameGrid = document.getElementById('gameGrid');
+                gameGrid.innerHTML = '';
+                
+                // Detect device type for appropriate sizing
+                const isMobile = window.innerWidth < 768;
+                const cellSize = isMobile ? 'w-12 h-12' : 'w-16 h-16';
+                const textSize = isMobile ? 'text-lg' : 'text-2xl';
+                
+                for (let y = 0; y < gridData.length; y++) {
+                    for (let x = 0; x < gridData[y].length; x++) {
+                        const cell = document.createElement('div');
+                        cell.className = `grid-cell ${cellSize} border-2 border-gray-300 rounded-lg flex items-center justify-center ${textSize} bg-white`;
+                        cell.dataset.x = x;
+                        cell.dataset.y = y;
+                        
+                        const content = gridData[y][x];
+                        
+                        // แสดงเนื้อหาของเซลล์ตามที่กำหนดในตาราง
+                        if (content === '🤖') {
+                            // หุ่นยนต์จะถูกวางในตำแหน่งที่ถูกต้องโดย loadLevel()
+                            cell.innerHTML = '<div class="robot">🤖➡️</div>';
+                        } else if (content === '⭐') {
+                            cell.innerHTML = '<div class="star">⭐</div>';
+                        } else if (content === '🧱') {
+                            cell.innerHTML = '🧱';
+                            cell.classList.add('bg-gray-400');
+                        } else if (content === '💎') {
+                            cell.innerHTML = '💎';
+                        } else if (content === '⚡') {
+                            cell.innerHTML = '⚡';
+                        }
+                        
+                        gameGrid.appendChild(cell);
+                    }
+                }
+                
+                // วางหุ่นยนต์ในตำแหน่งที่ถูกต้องหลังจากสร้างตาราง
+                this.placeRobotAtCorrectPosition();
+            }
+            
+            placeRobotAtCorrectPosition() {
+                // ล้างหุ่นยนต์จากทุกตำแหน่ง
+                const allCells = document.querySelectorAll('.grid-cell');
+                allCells.forEach(cell => {
+                    if (cell.innerHTML.includes('🤖')) {
+                        // เก็บเนื้อหาอื่นๆ ที่ไม่ใช่หุ่นยนต์
+                        const level = this.levels[this.currentLevel];
+                        const x = parseInt(cell.dataset.x);
+                        const y = parseInt(cell.dataset.y);
+                        
+                        let cellContent = '';
+                        
+                        // ตรวจสอบว่ามีไอเท็มอื่นๆ ในตำแหน่งนี้หรือไม่
+                        if (level.gems?.some(gem => gem.x === x && gem.y === y)) cellContent += '💎';
+                        if (level.powerUps?.some(p => p.x === x && p.y === y)) cellContent += '⚡';
+                        if (level.stars?.some(star => star.x === x && star.y === y)) cellContent += '<div class="star">⭐</div>';
+                        if (level.grid[y][x] === '🧱') {
+                            cellContent = '🧱';
+                            cell.classList.add('bg-gray-400');
+                        }
+                        
+                        cell.innerHTML = cellContent;
+                    }
+                });
+                
+                // วางหุ่นยนต์ในตำแหน่งที่ถูกต้อง
+                const robotCell = document.querySelector(`[data-x="${this.robotPosition.x}"][data-y="${this.robotPosition.y}"]`);
+                if (robotCell) {
+                    const directions = {
+                        'right': '🤖➡️',
+                        'left': '⬅️🤖',
+                        'up': '⬆️🤖',
+                        'down': '⬇️🤖'
+                    };
+                    
+                    // เก็บเนื้อหาเดิมของเซลล์
+                    const existingContent = robotCell.innerHTML;
+                    robotCell.innerHTML = `<div class="robot">${directions[this.robotDirection]}</div>` + 
+                                         (existingContent && !existingContent.includes('🤖') ? existingContent : '');
+                }
+            }
+            
+            generateBlockPalette(availableBlocks) {
+                const palette = document.getElementById('blockPalette');
+                palette.innerHTML = '';
+                
+                const uniqueBlocks = [...new Set(availableBlocks)];
+                
+                uniqueBlocks.forEach(blockType => {
+                    const block = this.blockTypes[blockType];
+                    if (!block) return;
+                    
+                    const blockElement = document.createElement('div');
+                    blockElement.className = `code-block ${block.color} text-white px-4 py-3 rounded-lg font-medium text-sm`;
+                    blockElement.draggable = true;
+                    blockElement.textContent = block.label;
+                    
+                    blockElement.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', blockType);
+                    });
+                    
+                    palette.appendChild(blockElement);
+                });
+            }
+            
+            addCodeBlock(blockType) {
+                const block = this.blockTypes[blockType];
+                if (!block) return;
+                
+                const codeArea = document.getElementById('codeArea');
+                if (codeArea.children.length === 1 && codeArea.children[0].textContent.includes('ลากบล็อก')) {
+                    codeArea.innerHTML = '';
+                }
+                
+                const blockElement = document.createElement('div');
+                blockElement.className = `${block.color} text-white px-4 py-3 rounded-lg font-medium text-sm flex items-center justify-between`;
+                blockElement.dataset.blockType = blockType;
+                blockElement.innerHTML = `
+                    <span>${block.label}</span>
+                    <button class="ml-2 text-white hover:text-red-200 remove-btn">❌</button>
+                `;
+                
+                // Add event listener for remove button
+                const removeBtn = blockElement.querySelector('.remove-btn');
+                removeBtn.addEventListener('click', () => {
+                    blockElement.remove();
+                });
+                
+                codeArea.appendChild(blockElement);
+            }
+            
+            removeCodeBlock(blockElement) {
+                blockElement.remove();
+            }
+            
+            getCurrentCodeBlocks() {
+                const codeArea = document.getElementById('codeArea');
+                const blocks = [];
+                
+                Array.from(codeArea.children).forEach(child => {
+                    if (child.dataset.blockType) {
+                        blocks.push(child.dataset.blockType);
+                    }
+                });
+                
+                return blocks;
+            }
+            
+            clearCodeArea() {
+                const codeArea = document.getElementById('codeArea');
+                codeArea.innerHTML = '<div class="text-gray-400 text-center py-8">ลากบล็อกคำสั่งมาวางที่นี่</div>';
+            }
+            
+            startTimer(timeLimit) {
+                this.timeRemaining = timeLimit;
+                this.timerInterval = setInterval(() => {
+                    this.timeRemaining--;
+                    document.getElementById('timer').textContent = this.timeRemaining;
+                    
+                    if (this.timeRemaining <= 0) {
+                        clearInterval(this.timerInterval);
+                        this.gameOver('เวลาหมด! ลองใหม่อีกครั้ง');
+                    }
+                }, 1000);
+            }
+            
+            stopTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                }
+            }
+            
+            calculateScore() {
+                const level = this.levels[this.currentLevel];
+                const currentBlocks = this.getCurrentCodeBlocks();
+                const timeBonus = Math.max(0, this.timeRemaining * 10);
+                const moveEfficiency = Math.max(0, (level.optimalMoves - currentBlocks.length + level.optimalMoves) * 50);
+                const gemBonus = this.gems.filter(gem => !this.isGemCollected(gem)).length === 0 ? 500 : 0;
+                const comboBonus = this.combo * 100;
+                const attemptPenalty = Math.max(0, (this.attempts - 1) * 50);
+                
+                return Math.max(0, timeBonus + moveEfficiency + gemBonus + comboBonus - attemptPenalty);
+            }
+            
+            async runCode() {
+                // Get current code blocks from the UI
+                const currentBlocks = this.getCurrentCodeBlocks();
+                
+                if (this.isRunning || currentBlocks.length === 0) return;
+                
+                this.attempts++;
+                this.isRunning = true;
+                document.getElementById('runBtn').disabled = true;
+                document.getElementById('runBtn').textContent = '⏳ กำลังรัน...';
+                
+                // Reset robot to starting position before running
+                this.resetRobotPosition();
+                
+                // Consume energy
+                this.energy = Math.max(0, this.energy - 10);
+                
+                try {
+                    await this.executeBlocks(currentBlocks);
+                    this.checkWinCondition();
+                } catch (error) {
+                    console.error('Error running code:', error);
+                    this.combo = 0; // Reset combo on error
+                }
+                
+                this.isRunning = false;
+                document.getElementById('runBtn').disabled = false;
+                document.getElementById('runBtn').textContent = '▶️ รันโค้ด';
+                this.updateUI();
+            }
+            
+            async executeBlocks(blocks) {
+                for (let i = 0; i < blocks.length; i++) {
+                    const blockType = blocks[i];
+                    const block = this.blockTypes[blockType];
+                    
+                    if (block && block.action) {
+                        if (blockType === 'repeat') {
+                            // หาคำสั่งก่อนหน้า
+                            const previousCommand = i > 0 ? blocks[i - 1] : 'forward';
+                            await block.action(2, [previousCommand]);
+                        } else {
+                            await new Promise(resolve => {
+                                setTimeout(() => {
+                                    block.action();
+                                    resolve();
+                                }, 500);
+                            });
+                        }
+                    }
+                }
+            }
+            
+            moveForward() {
+                const { x, y } = this.robotPosition;
+                let newX = x, newY = y;
+                
+                switch (this.robotDirection) {
+                    case 'right': newX = x + 1; break;
+                    case 'left': newX = x - 1; break;
+                    case 'up': newY = y - 1; break;
+                    case 'down': newY = y + 1; break;
+                }
+                
+                // Check bounds
+                if (newX >= 0 && newX < 5 && newY >= 0 && newY < 5) {
+                    // Check for obstacles using level data instead of DOM
+                    const level = this.levels[this.currentLevel];
+                    const isObstacle = level.obstacles?.some(obs => obs.x === newX && obs.y === newY) || 
+                                      level.grid[newY][newX] === '🧱';
+                    
+                    if (!isObstacle) {
+                        this.updateRobotPosition(newX, newY);
+                    } else {
+                        console.log('Cannot move - obstacle detected at', newX, newY);
+                    }
+                } else {
+                    console.log('Cannot move - out of bounds', newX, newY);
+                }
+            }
+            
+            turnLeft() {
+                const directions = ['up', 'left', 'down', 'right'];
+                const currentIndex = directions.indexOf(this.robotDirection);
+                this.robotDirection = directions[(currentIndex + 1) % 4];
+                this.updateRobotDirection();
+            }
+            
+            turnRight() {
+                const directions = ['up', 'right', 'down', 'left'];
+                const currentIndex = directions.indexOf(this.robotDirection);
+                this.robotDirection = directions[(currentIndex + 1) % 4];
+                this.updateRobotDirection();
+            }
+            
+            async repeat(times, childBlocks) {
+                // ถ้าไม่มี childBlocks ให้ใช้คำสั่งเดินไปข้างหน้า 4 ครั้ง
+                const blocksToRepeat = childBlocks || ['forward'];
+                
+                for (let i = 0; i < times; i++) {
+                    await this.executeBlocks(blocksToRepeat);
+                    // เพิ่มหน่วงเวลาเล็กน้อยเพื่อให้เห็นการเคลื่อนไหวชัดเจน
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            }
+            
+            updateRobotPosition(newX, newY) {
+                // Remove robot from old position
+                const oldCell = document.querySelector(`[data-x="${this.robotPosition.x}"][data-y="${this.robotPosition.y}"]`);
+                oldCell.innerHTML = '';
+                
+                // Add robot to new position
+                const newCell = document.querySelector(`[data-x="${newX}"][data-y="${newY}"]`);
+                
+                // Check collectibles
+                if (newCell.textContent.includes('⭐')) {
+                    this.collectStar(newX, newY);
+                }
+                if (newCell.textContent.includes('💎')) {
+                    this.collectGem(newX, newY);
+                }
+                if (newCell.textContent.includes('⚡')) {
+                    this.collectPowerUp(newX, newY);
+                }
+                
+                const directions = {
+                    'right': '🤖➡️',
+                    'left': '⬅️🤖',
+                    'up': '⬆️🤖',
+                    'down': '⬇️🤖'
+                };
+                newCell.innerHTML = `<div class="robot bounce">${directions[this.robotDirection]}</div>`;
+                this.robotPosition = { x: newX, y: newY };
+            }
+            
+            collectGem(x, y) {
+                const gemIndex = this.gems.findIndex(gem => gem.x === x && gem.y === y);
+                if (gemIndex !== -1) {
+                    this.gems.splice(gemIndex, 1);
+                    this.score += 100;
+                    this.combo++;
+                    this.maxCombo = Math.max(this.maxCombo, this.combo);
+                    this.showFloatingScore('+100', x, y, 'text-purple-600');
+                    this.checkAchievements();
+                }
+            }
+            
+            collectPowerUp(x, y) {
+                const powerUpIndex = this.powerUps.findIndex(p => p.x === x && p.y === y);
+                if (powerUpIndex !== -1) {
+                    this.powerUps.splice(powerUpIndex, 1);
+                    this.energy = Math.min(this.maxEnergy, this.energy + 30);
+                    this.score += 200;
+                    this.showFloatingScore('+200 ⚡', x, y, 'text-green-600');
+                }
+            }
+            
+            isGemCollected(gem) {
+                return !this.gems.find(g => g.x === gem.x && g.y === gem.y);
+            }
+            
+            showFloatingScore(text, x, y, className) {
+                const cell = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+                const floatingText = document.createElement('div');
+                floatingText.className = `absolute ${className} font-bold text-sm pointer-events-none z-10`;
+                floatingText.textContent = text;
+                floatingText.style.animation = 'floatUp 1s ease-out forwards';
+                
+                cell.style.position = 'relative';
+                cell.appendChild(floatingText);
+                
+                setTimeout(() => floatingText.remove(), 1000);
+            }
+            
+            updateRobotDirection() {
+                const robotElement = document.querySelector('.robot');
+                if (robotElement) {
+                    const directions = {
+                        'right': '🤖➡️',
+                        'left': '⬅️🤖',
+                        'up': '⬆️🤖',
+                        'down': '⬇️🤖'
+                    };
+                    robotElement.innerHTML = directions[this.robotDirection];
+                }
+            }
+            
+            collectStar(x, y) {
+                this.totalStars++;
+                this.updateUI();
+                
+                // Add visual feedback
+                const cell = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+                cell.classList.add('bounce');
+                setTimeout(() => cell.classList.remove('bounce'), 500);
+            }
+            
+            checkAchievements() {
+                const newAchievements = [];
+                
+                // First gem
+                if (this.score >= 100 && !this.achievements.includes('first_gem')) {
+                    newAchievements.push({ id: 'first_gem', title: '💎 นักสะสมเพชร', desc: 'เก็บเพชรครั้งแรก' });
+                }
+                
+                // Speed demon
+                if (this.combo >= 3 && !this.achievements.includes('speed_demon')) {
+                    newAchievements.push({ id: 'speed_demon', title: '⚡ นักเก็บสายฟ้า', desc: 'เก็บไอเท็ม 3 ชิ้นติดต่อกัน' });
+                }
+                
+                // Perfect level
+                if (this.attempts === 1 && this.currentLevel > 1 && !this.achievements.includes('perfect_' + this.currentLevel)) {
+                    newAchievements.push({ id: 'perfect_' + this.currentLevel, title: '🎯 นักแก้ปัญหา', desc: 'ผ่านด่านในครั้งเดียว' });
+                }
+                
+                // Code master
+                const currentBlocks = this.getCurrentCodeBlocks();
+                if (currentBlocks.length <= this.levels[this.currentLevel].optimalMoves && !this.achievements.includes('code_master_' + this.currentLevel)) {
+                    newAchievements.push({ id: 'code_master_' + this.currentLevel, title: '🧠 นักเขียนโค้ดเก่ง', desc: 'ใช้คำสั่งน้อยที่สุด' });
+                }
+                
+                newAchievements.forEach(achievement => {
+                    this.achievements.push(achievement.id);
+                    this.showAchievement(achievement);
+                });
+            }
+            
+            showAchievement(achievement) {
+                const achievementDiv = document.createElement('div');
+                achievementDiv.className = 'bg-yellow-100 border border-yellow-300 rounded-lg p-3 mb-2 animate-pulse';
+                achievementDiv.innerHTML = `
+                    <div class="font-semibold text-yellow-800">${achievement.title}</div>
+                    <div class="text-sm text-yellow-600">${achievement.desc}</div>
+                `;
+                
+                const container = document.getElementById('achievements');
+                if (container.children[0]?.textContent.includes('ยังไม่มี')) {
+                    container.innerHTML = '';
+                }
+                container.appendChild(achievementDiv);
+                
+                // Show floating achievement
+                this.showFloatingAchievement(achievement.title);
+            }
+            
+            showFloatingAchievement(title) {
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-20 right-4 bg-yellow-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-500';
+                notification.innerHTML = `<div class="font-bold">🏆 ความสำเร็จใหม่!</div><div class="text-sm">${title}</div>`;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => notification.classList.remove('translate-x-full'), 100);
+                setTimeout(() => {
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => notification.remove(), 500);
+                }, 3000);
+            }
+            
+            gameOver(message) {
+                this.stopTimer();
+                alert(message);
+                this.resetLevel();
+            }
+            
+            checkWinCondition() {
+                const level = this.levels[this.currentLevel];
+                const allStarsCollected = level.stars.every(star => {
+                    const { x, y } = this.robotPosition;
+                    return star.x === x && star.y === y;
+                });
+                
+                if (allStarsCollected) {
+                    this.stopTimer();
+                    const levelScore = this.calculateScore();
+                    
+                    // เก็บคะแนนสูงสุดของด่าน
+                    if (!this.levelScores[this.currentLevel] || levelScore > this.levelScores[this.currentLevel]) {
+                        this.levelScores[this.currentLevel] = levelScore;
+                    }
+                    
+                    this.combo++;
+                    this.completedLevels = Math.max(this.completedLevels, this.currentLevel);
+                    
+                    // Save best time
+                    const timeUsed = this.levels[this.currentLevel].timeLimit - this.timeRemaining;
+                    if (!this.bestTimes[this.currentLevel] || timeUsed < this.bestTimes[this.currentLevel]) {
+                        this.bestTimes[this.currentLevel] = timeUsed;
+                    }
+                    
+                    this.checkAchievements();
+                    
+                    // ตรวจสอบว่าผ่านด่านสุดท้ายหรือไม่
+                    if (this.currentLevel === this.totalLevels) {
+                        this.showFinalScoreModal();
+                    } else {
+                        this.showSuccessModal(levelScore);
+                    }
+                    
+                    this.updateUI();
+                }
+            }
+            
+            showSuccessModal(levelScore) {
+                const modal = document.getElementById('successModal');
+                const message = document.getElementById('successMessage');
+                
+                const level = this.levels[this.currentLevel];
+                const timeUsed = level.timeLimit - this.timeRemaining;
+                const gemsCollected = (level.gems?.length || 0) - this.gems.length;
+                const totalGems = level.gems?.length || 0;
+                
+                let rating = '⭐';
+                if (levelScore >= level.maxScore * 0.8) rating = '⭐⭐⭐';
+                else if (levelScore >= level.maxScore * 0.6) rating = '⭐⭐';
+                
+                message.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-4xl mb-2">${rating}</div>
+                        <div class="text-lg font-bold mb-2">ด่าน ${this.currentLevel} สำเร็จ!</div>
+                        <div class="space-y-1 text-sm text-gray-600">
+                            <div>🏆 คะแนน: +${levelScore}</div>
+                            <div>⏱️ เวลาที่ใช้: ${timeUsed}s</div>
+                            <div>💎 เพชร: ${gemsCollected}/${totalGems}</div>
+                            <div>🔥 คอมโบ: ${this.combo}x</div>
+                        </div>
+                    </div>
+                `;
+                
+                // แสดงปุ่มด่านถัดไป
+                document.getElementById('nextLevelBtn').style.display = 'inline-block';
+                
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+            
+            showFinalScoreModal() {
+                const modal = document.getElementById('successModal');
+                const message = document.getElementById('successMessage');
+                
+                // คำนวณคะแนนรวมจากคะแนนสูงสุดของแต่ละด่าน
+                const totalScore = Object.values(this.levelScores).reduce((sum, score) => sum + score, 0);
+                const averageScore = totalScore / this.totalLevels;
+                
+                let finalRating = '🥉';
+                if (averageScore >= 3000) finalRating = '🥇';
+                else if (averageScore >= 2000) finalRating = '🥈';
+                
+                message.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">🎉👑🏆</div>
+                        <div class="text-2xl font-bold mb-4 text-purple-600">ยินดีด้วย! เกมจบแล้ว!</div>
+                        
+                        <div class="bg-gradient-to-r from-purple-100 to-blue-100 rounded-xl p-4 mb-4">
+                            <div class="text-4xl mb-2">${finalRating}</div>
+                            <div class="text-xl font-bold text-gray-800">คะแนนรวมสูงสุด</div>
+                            <div class="text-3xl font-bold text-purple-600">${totalScore.toLocaleString()}</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                            <div class="bg-white rounded-lg p-3">
+                                <div class="text-blue-600 font-semibold">ด่านที่ผ่าน</div>
+                                <div class="text-2xl font-bold">${this.completedLevels}/${this.totalLevels}</div>
+                            </div>
+                            <div class="bg-white rounded-lg p-3">
+                                <div class="text-orange-600 font-semibold">คอมโบสูงสุด</div>
+                                <div class="text-2xl font-bold">${this.maxCombo}x</div>
+                            </div>
+                            <div class="bg-white rounded-lg p-3">
+                                <div class="text-green-600 font-semibold">ความสำเร็จ</div>
+                                <div class="text-2xl font-bold">${this.achievements.length}</div>
+                            </div>
+                            <div class="bg-white rounded-lg p-3">
+                                <div class="text-purple-600 font-semibold">คะแนนเฉลี่ย</div>
+                                <div class="text-2xl font-bold">${Math.round(averageScore)}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-sm text-gray-600 mb-4">
+                            <div class="font-semibold mb-2">🏆 คะแนนแต่ละด่าน (สูงสุด):</div>
+                            <div class="grid grid-cols-4 gap-2">
+                                ${Array.from({length: this.totalLevels}, (_, i) => {
+                                    const level = i + 1;
+                                    const score = this.levelScores[level] || 0;
+                                    return `<div class="bg-gray-100 rounded px-2 py-1">ด่าน${level}: ${score}</div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // ซ่อนปุ่มด่านถัดไป
+                document.getElementById('nextLevelBtn').style.display = 'none';
+                
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+            
+            hideSuccessModal() {
+                const modal = document.getElementById('successModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+            
+            nextLevel() {
+                this.hideSuccessModal();
+                if (this.currentLevel < this.totalLevels) {
+                    this.loadLevel(this.currentLevel + 1);
+                }
+            }
+            
+            resetLevel() {
+                this.stopTimer();
+                this.combo = 0; // Reset combo on manual reset
+                this.loadLevel(this.currentLevel);
+            }
+            
+            updateUI() {
+                // Update desktop UI
+                const scoreEl = document.getElementById('score');
+                const starsEl = document.getElementById('stars');
+                const gemsEl = document.getElementById('gems');
+                const levelEl = document.getElementById('level');
+                const timerEl = document.getElementById('timer');
+                
+                if (scoreEl) scoreEl.textContent = this.score.toLocaleString();
+                if (starsEl) starsEl.textContent = this.totalStars;
+                if (gemsEl) gemsEl.textContent = (this.levels[this.currentLevel]?.gems?.length || 0) - this.gems.length;
+                if (levelEl) levelEl.textContent = this.currentLevel;
+                if (timerEl) timerEl.textContent = this.timeRemaining || '--';
+                
+                // Update mobile UI
+                const scoreMobileEl = document.getElementById('scoreMobile');
+                const starsMobileEl = document.getElementById('starsMobile');
+                const gemsMobileEl = document.getElementById('gemsMobile');
+                const levelMobileEl = document.getElementById('levelMobile');
+                const timerMobileEl = document.getElementById('timerMobile');
+                
+                if (scoreMobileEl) scoreMobileEl.textContent = this.score.toLocaleString();
+                if (starsMobileEl) starsMobileEl.textContent = this.totalStars;
+                if (gemsMobileEl) gemsMobileEl.textContent = (this.levels[this.currentLevel]?.gems?.length || 0) - this.gems.length;
+                if (levelMobileEl) levelMobileEl.textContent = this.currentLevel;
+                if (timerMobileEl) timerMobileEl.textContent = this.timeRemaining || '--';
+                
+                // Update other UI elements
+                document.getElementById('completedLevels').textContent = `${this.completedLevels}/${this.totalLevels}`;
+                document.getElementById('combo').textContent = `${this.combo}x`;
+                document.getElementById('attempts').textContent = this.attempts;
+                
+                // Update energy bars (both desktop and mobile)
+                const energyPercent = (this.energy / this.maxEnergy) * 100;
+                const energyBars = [document.getElementById('energyBar'), document.getElementById('energyBarMobile')];
+                
+                energyBars.forEach(energyBar => {
+                    if (energyBar) {
+                        energyBar.style.width = `${energyPercent}%`;
+                        
+                        if (energyPercent <= 20) {
+                            energyBar.className = 'bg-red-500 h-2 rounded-full transition-all duration-300';
+                        } else if (energyPercent <= 50) {
+                            energyBar.className = 'bg-yellow-500 h-2 rounded-full transition-all duration-300';
+                        } else {
+                            energyBar.className = 'bg-green-500 h-2 rounded-full transition-all duration-300';
+                        }
+                    }
+                });
+                
+                const progress = (this.completedLevels / this.totalLevels) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+            }
+        }
+        
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Viewport height fix for mobile browsers
+            const setVH = () => {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            };
+            
+            setVH();
+            window.addEventListener('resize', setVH);
+            window.addEventListener('orientationchange', () => {
+                setTimeout(setVH, 100);
+            });
+            
+            // Prevent zoom on double tap for iOS
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (event) => {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Prevent pull-to-refresh on mobile
+            document.body.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1 && window.scrollY === 0) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            document.body.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1 && window.scrollY === 0) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            // Initialize game
+            new RobotCodeGame();
+            
+            // Performance monitoring
+            if ('performance' in window) {
+                window.addEventListener('load', () => {
+                    setTimeout(() => {
+                        const perfData = performance.getEntriesByType('navigation')[0];
+                        console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+                    }, 0);
+                });
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97f74185d513a1ae',t:'MTc1NzkzMDIwNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
