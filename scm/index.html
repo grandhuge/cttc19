@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกณฑ์ประเมินความเข้มแข็งสหกรณ์ภาคการเกษตร</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-5xl font-bold text-[#003f5c]">เกณฑ์ประเมินความเข้มแข็งสหกรณ์ภาคการเกษตร</h1>
+            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">ภาพรวม 4 มิติ 18 ตัวชี้วัดสำคัญ เพื่อขับเคลื่อนสหกรณ์สู่ความยั่งยืน โดยกรมส่งเสริมสหกรณ์และกรมตรวจบัญชีสหกรณ์</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-center text-[#2f4b7c] mb-4">สัดส่วนคะแนน 4 มิติ (รวม 100 คะแนน)</h2>
+                <p class="text-center text-gray-500 mb-6">แสดงให้เห็นถึงน้ำหนักความสำคัญของแต่ละมิติในการประเมินความเข้มแข็งโดยรวมของสหกรณ์</p>
+                <div class="chart-container h-64 md:h-80 max-h-[450px]">
+                    <canvas id="dimensionsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-[#665191] mb-2">มิติที่ 1: ความสามารถในการให้บริการสมาชิก (30 คะแนน)</h3>
+                <p class="text-gray-500 mb-6">เป้าหมาย: สหกรณ์ทำหน้าที่เพื่อสมาชิก มีส่วนร่วมทางธุรกิจ และคืนประโยชน์สู่สังคม</p>
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="font-semibold">1. สมาชิกมีส่วนร่วมในธุรกิจ</h4>
+                        <p class="text-sm text-gray-500 mb-2">เกณฑ์สูงสุด (15 คะแนน): สมาชิกต้องมีส่วนร่วมในธุรกิจหลักมากกว่า 80%</p>
+                        <div class="chart-container h-48 max-h-[200px]"><canvas id="participationChart"></canvas></div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold">2. การคืนกำไรและสวัสดิการ</h4>
+                        <p class="text-sm text-gray-500 mb-3">เกณฑ์สูงสุด (10 คะแนน): จัดสรรและจ่ายทุนสวัสดิการและทุนสาธารณประโยชน์ต่อเนื่อง 2 ปี</p>
+                         <div class="flex items-center p-3 bg-green-100 rounded-lg">
+                            <span class="text-2xl mr-4">✅</span>
+                            <span class="font-medium text-green-800">จัดสรรและจ่ายครบ 2 ทุน ต่อเนื่อง 2 ปีบัญชี</span>
+                        </div>
+                    </div>
+                     <div>
+                        <h4 class="font-semibold">3. ความหลากหลายของธุรกิจ</h4>
+                        <p class="text-sm text-gray-500 mb-3">เกณฑ์สูงสุด (5 คะแนน): ดำเนินธุรกิจครบ 6 ประเภท</p>
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="p-2 bg-blue-100 text-blue-800 rounded">เงินฝาก</div>
+                            <div class="p-2 bg-blue-100 text-blue-800 rounded">สินเชื่อ</div>
+                            <div class="p-2 bg-blue-100 text-blue-800 rounded">รวบรวมผลผลิต</div>
+                            <div class="p-2 bg-blue-100 text-blue-800 rounded">แปรรูป</div>
+                            <div class="p-2 bg-blue-100 text-blue-800 rounded">จัดหาสินค้า</div>
+                            <div class="p-2 bg-blue-100 text-blue-800 rounded">บริการ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                 <h3 class="text-xl font-bold text-[#a05195] mb-2">มิติที่ 3: ประสิทธิภาพในการจัดการองค์กร (20 คะแนน)</h3>
+                <p class="text-gray-500 mb-6">เป้าหมาย: สหกรณ์มีการบริหารจัดการข้อมูลที่ดี และมีระบบควบคุมภายในที่เข้มแข็ง</p>
+                <div class="space-y-4">
+                    <div class="flex items-center p-3 bg-purple-100 rounded-lg">
+                        <span class="text-2xl mr-4">💻</span>
+                        <div>
+                            <h4 class="font-semibold text-purple-800">ใช้เทคโนโลยีการบัญชี (4 คะแนน)</h4>
+                            <p class="text-sm text-purple-700">ใช้งานโปรแกรมบัญชีเต็มระบบในทุกธุรกิจ</p>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                         <h4 class="font-semibold text-purple-800 mb-2">ระบบควบคุมภายใน (16 คะแนน)</h4>
+                         <p class="text-sm text-gray-500 mb-4">การประเมิน 4 ด้าน โดยแต่ละด้านต้องมีระดับการควบคุมภายในที่ดีเพื่อให้ได้ 4 คะแนนเต็ม</p>
+                         <div class="chart-container h-64 max-h-[300px]">
+                            <canvas id="orgManagementChart"></canvas>
+                         </div>
+                     </div>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-[#d45087] mb-2">มิติที่ 2: ประสิทธิภาพในการดำเนินธุรกิจ (20 คะแนน)</h3>
+                <p class="text-gray-500 mb-6 text-center">เป้าหมาย: สหกรณ์มีฐานะการเงินที่แข็งแกร่ง มีกำไร และสภาพคล่องที่ดี ผ่านตัวชี้วัดทางการเงิน 6 ด้าน</p>
+                <div class="chart-container h-80 md:h-96 max-h-[500px]">
+                    <canvas id="businessEfficiencyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-[#f95d6a] mb-2">มิติที่ 4: ประสิทธิภาพของการบริหารงาน (30 คะแนน)</h3>
+                <p class="text-gray-500 mb-6">เป้าหมาย: สหกรณ์มีการบริหารจัดการที่ดี ปลอดการทุจริต และมีเจ้าหน้าที่มืออาชีพ</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="flex flex-col items-center text-center p-4 bg-red-50 rounded-lg">
+                        <span class="text-4xl">⚖️</span>
+                        <h4 class="font-bold mt-2">ปฏิบัติตามกฎหมาย</h4>
+                        <p class="text-sm text-gray-600">ไม่มีข้อบกพร่อง หรือแก้ไขแล้วเสร็จ</p>
+                        <span class="mt-2 text-2xl font-bold text-[#f95d6a]">15 คะแนน</span>
+                    </div>
+                     <div class="flex flex-col items-center text-center p-4 bg-orange-50 rounded-lg">
+                        <span class="text-4xl">📈</span>
+                        <h4 class="font-bold mt-2">ไม่มีผลขาดทุน</h4>
+                        <p class="text-sm text-gray-600">มีกำไรต่อเนื่อง 2 ปีบัญชีล่าสุด</p>
+                         <span class="mt-2 text-2xl font-bold text-[#ff7c43]">5 คะแนน</span>
+                    </div>
+                    <div class="flex flex-col items-center text-center p-4 bg-yellow-50 rounded-lg">
+                        <span class="text-4xl">🗓️</span>
+                        <h4 class="font-bold mt-2">จัดทำงบการเงินตรงเวลา</h4>
+                        <p class="text-sm text-gray-600">ส่งตรวจใน 30 วัน และอนุมัติใน 150 วัน</p>
+                         <span class="mt-2 text-2xl font-bold text-[#ffa600]">5 คะแนน</span>
+                    </div>
+                     <div class="flex flex-col items-center text-center p-4 bg-green-50 rounded-lg">
+                        <span class="text-4xl">👥</span>
+                        <h4 class="font-bold mt-2">มีเจ้าหน้าที่ประจำ</h4>
+                        <p class="text-sm text-gray-600">จัดจ้างพนักงานประจำตามสัญญา</p>
+                         <span class="mt-2 text-2xl font-bold text-green-600">5 คะแนน</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const wrapLabel = (label, maxLength = 16) => {
+                if (label.length <= maxLength) {
+                    return label;
+                }
+                const words = label.split(' ');
+                const lines = [];
+                let currentLine = '';
+                for (const word of words) {
+                    if ((currentLine + word).length > maxLength) {
+                        lines.push(currentLine.trim());
+                        currentLine = '';
+                    }
+                    currentLine += word + ' ';
+                }
+                lines.push(currentLine.trim());
+                return lines;
+            };
+
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                } else {
+                    return label;
+                }
+            };
+            
+            const sharedTooltipOptions = {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                }
+            };
+
+            const brandColors = {
+                dim1: '#665191',
+                dim2: '#d45087',
+                dim3: '#a05195',
+                dim4: '#f95d6a',
+                success: '#28a745',
+                remaining: '#e9ecef'
+            };
+
+            const dimensionsCtx = document.getElementById('dimensionsChart').getContext('2d');
+            new Chart(dimensionsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['มิติที่ 1: บริการสมาชิก', 'มิติที่ 2: ดำเนินธุรกิจ', 'มิติที่ 3: จัดการองค์กร', 'มิติที่ 4: บริหารงาน'],
+                    datasets: [{
+                        label: 'สัดส่วนคะแนน',
+                        data: [30, 20, 20, 30],
+                        backgroundColor: [brandColors.dim1, brandColors.dim2, brandColors.dim3, brandColors.dim4],
+                        borderColor: '#ffffff',
+                        borderWidth: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                     plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: sharedTooltipOptions.plugins.tooltip
+                    }
+                }
+            });
+
+            const participationCtx = document.getElementById('participationChart').getContext('2d');
+            new Chart(participationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['สมาชิกมีส่วนร่วม', 'เป้าหมายที่เหลือ'],
+                    datasets: [{
+                        data: [80, 20],
+                        backgroundColor: [brandColors.success, brandColors.remaining],
+                        borderColor: '#ffffff',
+                        borderWidth: 4,
+                        circumference: 180,
+                        rotation: 270,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                         legend: { display: false },
+                         tooltip: { enabled: false }
+                    },
+                    cutout: '70%'
+                }
+            });
+            
+            const businessEfficiencyCtx = document.getElementById('businessEfficiencyChart').getContext('2d');
+            new Chart(businessEfficiencyCtx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        wrapLabel('หนี้สินต่อทุน (<0.75)'), 
+                        wrapLabel('ทุนสำรองต่อสินทรัพย์ (>0.20)'), 
+                        wrapLabel('ผลตอบแทนต่อสินทรัพย์ (>3.00%)'), 
+                        wrapLabel('ค่าใช้จ่ายดำเนินงาน (<45%)'), 
+                        wrapLabel('ทุนหมุนเวียน (>1.75)'), 
+                        wrapLabel('การชำระหนี้ระยะสั้น (>90%)')
+                    ],
+                    datasets: [{
+                        label: 'เกณฑ์ขั้นสูง',
+                        data: [3, 2, 4, 4, 3, 4],
+                        backgroundColor: 'rgba(212, 80, 135, 0.2)',
+                        borderColor: brandColors.dim2,
+                        pointBackgroundColor: brandColors.dim2,
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: brandColors.dim2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: { font: { size: 12 } },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                stepSize: 1
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 5
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: sharedTooltipOptions.plugins.tooltip
+                    }
+                }
+            });
+
+            const orgManagementCtx = document.getElementById('orgManagementChart').getContext('2d');
+            new Chart(orgManagementCtx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        wrapLabel('สภาพแวดล้อมการควบคุม'), 
+                        wrapLabel('ประเมินความเสี่ยง'), 
+                        wrapLabel('ระบบข้อมูลสารสนเทศ'), 
+                        wrapLabel('การติดตามและประเมินผล')
+                    ],
+                    datasets: [{
+                        label: 'คะแนนเต็ม',
+                        data: [4, 4, 4, 4],
+                        backgroundColor: 'rgba(160, 81, 149, 0.6)',
+                        borderColor: brandColors.dim3,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                     scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 5,
+                            grid: { display: false }
+                        },
+                        y: {
+                           grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: sharedTooltipOptions.plugins.tooltip
+                    }
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
