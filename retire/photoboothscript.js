@@ -828,47 +828,70 @@
         }
 
         async function loadGalleryQuietly() {
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=list`);
-                const result = await response.json();
+    try {
+        const response = await fetch(`${SCRIPT_URL}?action=list`);
+        const result = await response.json();
 
-                if (result.success && result.files && result.files.length > 0) {
-                    const oldLength = galleryPhotos.length;
-                    galleryPhotos = result.files;
-                    
-                    // If new photos were added, update the slideshow
-                    if (galleryPhotos.length > oldLength) {
-                        updateSlideshowWithNewPhotos(oldLength);
-                    }
-                }
-            } catch (error) {
-                console.error('Error quietly loading gallery:', error);
+        if (result.success && result.files && result.files.length > 0) {
+            const oldLength = galleryPhotos.length;
+            galleryPhotos = result.files;
+            
+            // If new photos were added, update the slideshow
+            if (galleryPhotos.length > oldLength) {
+                updateSlideshowWithNewPhotos(oldLength);
             }
         }
+    } catch (error) {
+        console.error('Error quietly loading gallery:', error);
+    }
+}
 
         function updateSlideshowWithNewPhotos(oldLength) {
-            const slidesContainer = document.getElementById('slides');
-            
-            // Add new slides
-            for (let i = oldLength; i < galleryPhotos.length; i++) {
-                const photo = galleryPhotos[i];
-                const slide = document.createElement('div');
-                slide.className = 'slide';
-                
-                const imageUrl = `https://drive.google.com/thumbnail?id=${photo.id}&sz=w640-h480`;
-                
-                slide.innerHTML = `
-                    <img src="${imageUrl}" alt="Photo ${i + 1}" loading="lazy" 
-                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDY0MCA0ODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI2NDAiIGhlaWdodD0iNDgwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Im0zMjAgMjQwIDgwLTgwdjE2MGwtODAtODB6bS04MCA4MCA4MC04MHYxNjBsLTgwLTgweiIgZmlsbD0iIzlmYTJhNyIvPgo8dGV4dCB4PSIzMjAiIHk9IjI2MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmaWxsPSIjNmI3Mjg0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7guYTguKHguYjguKrguLLguKHguLLguKPguJbguYLguKvguKXguJTguYTguJTguYk8L3RleHQ+Cjwvc3ZnPgo='; this.alt='ไม่สามารถโหลดรูปภาพได้';">
-                    <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-lg">
-                        ${photo.name}
-                    </div>
-                `;
-                slidesContainer.appendChild(slide);
-            }
-            
-            updateSlideCounter();
-        }
+    const slidesContainer = document.getElementById('slides');
+    
+    // Add new slides
+    for (let i = oldLength; i < galleryPhotos.length; i++) {
+        const photo = galleryPhotos[i];
+        const slide = document.createElement('div');
+        slide.className = 'slide';
+        
+        const imageUrl = `https://drive.google.com/thumbnail?id=${photo.id}&sz=w640-h480`;
+        
+        slide.innerHTML = `
+            <img src="${imageUrl}" alt="Photo ${i + 1}" loading="lazy" 
+                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgdmlld0JveD0iMCAwIDY0MCA0ODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI2NDAiIGhlaWdodD0iNDgwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Im0zMjAgMjQwIDgwLTgwdjE2MGwtODAtODB6bS04MCA4MCA4MC04MHYxNjBsLTgwLTgweiIgZmlsbD0iIzlmYTJhNyIvPgo8dGV4dCB4PSIzMjAiIHk9IjI2MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmaWxsPSIjNmI3Mjg0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7guYTguKHguYjguKrguLLguKHguLLguKPguJbguYLguKvguKXguJTguYTguJTguYk8L3RleHQ+Cjwvc3ZnPgo='; this.alt='ไม่สามารถโหลดรูปภาพได้';">
+            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-1 rounded-lg">
+                ${photo.name}
+            </div>
+        `;
+        slidesContainer.appendChild(slide);
+    }
+    
+    updateSlideCounter();
+    
+    // เรียกใช้งาน refreshGallery เมื่อมีรูปภาพใหม่เพิ่มเข้ามา
+    if (galleryPhotos.length > oldLength) {
+        refreshGallery();
+    }
+}
+
+// เพิ่มฟังก์ชัน refreshGallery
+function refreshGallery() {
+    // อัพเดตการแสดงผลแกลเลอรี
+    displaySlideshow();
+    
+    // รีเซ็ตโหมดสไลด์แบบสุ่ม
+    if (isRandomMode) {
+        generateShuffledIndices();
+    }
+    
+    // รีสตาร์ทสไลด์โชว์
+    if (isPlaying) {
+        startSlideshow();
+    }
+    
+    console.log('แกลเลอรีได้รับการรีเฟรชแล้ว มีรูปภาพทั้งหมด:', galleryPhotos.length);
+}
 
         function toggleSlideshow() {
             isPlaying = !isPlaying;
