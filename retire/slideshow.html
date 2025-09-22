@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive Slideshow</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            touch-action: pan-y; /* Prevent vertical scroll while swiping horizontally */
+        }
+        .slideshow-container {
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Standard */
+        }
+        .slide {
+            transition: opacity 0.7s ease-in-out;
+        }
+        .slide.active {
+            opacity: 1;
+        }
+        .slide:not(.active) {
+            opacity: 0;
+        }
+        .nav-btn {
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .nav-btn:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+            transform: scale(1.1);
+        }
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+        .dots-container {
+            bottom: 20px;
+        }
+        .dot {
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .connection-status {
+            transition: all 0.3s ease;
+        }
+        .offline {
+            background-color: #ef4444 !important;
+        }
+        .preview-overlay {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .slide:hover .preview-overlay {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden">
+
+    <div class="w-full max-w-4xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-gray-100">My Drive Slideshow</h1>
+        <p class="text-center text-gray-400 mb-6">รูปภาพจะอัปเดตอัตโนมัติทุก 30 วินาที</p>
+
+        <!-- Connection Status -->
+        <div id="connection-status" class="connection-status bg-blue-600 text-white px-4 py-2 rounded-full text-sm text-center mb-4 hidden">
+            <span id="status-text">กำลังตรวจสอบการเชื่อมต่อ...</span>
+            <button id="retry-btn" class="ml-2 bg-white text-blue-600 px-2 py-1 rounded text-xs font-bold hidden">ลองอีกครั้ง</button>
+        </div>
+
+        <!-- Slideshow Container -->
+        <div id="slideshow-container" class="slideshow-container relative w-full aspect-video bg-black rounded-xl shadow-2xl overflow-hidden">
+            
+            <!-- Image Slides Area -->
+            <div id="slides-wrapper" class="w-full h-full">
+                <!-- Images will be injected here by JavaScript -->
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loading-spinner" class="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-20">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+                <p class="ml-4 text-lg">กำลังโหลดรูปภาพ...</p>
+            </div>
+            
+            <!-- Update Notification -->
+            <div id="update-notification" class="absolute top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm shadow-lg opacity-0 transition-opacity duration-500 z-30">
+                สไลด์โชว์อัปเดตแล้ว!
+            </div>
+
+            <!-- Navigation Buttons -->
+            <button id="prev-btn" class="nav-btn absolute top-1/2 left-4 -translate-y-1/2 bg-black bg-opacity-40 rounded-full p-2 z-10 hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <button id="next-btn" class="nav-btn absolute top-1/2 right-4 -translate-y-1/2 bg-black bg-opacity-40 rounded-full p-2 z-10 hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+
+            <!-- Dots Indicator -->
+            <div id="dots-container" class="dots-container absolute w-full flex justify-center items-center gap-2 z-10">
+                <!-- Dots will be generated by JS -->
+            </div>
+        </div>
+        <div id="image-counter" class="text-center text-gray-400 mt-4 text-sm"></div>
+        
+        <!-- Image Info -->
+        <div id="image-info" class="text-center text-gray-500 mt-2 text-xs hidden">
+            <span id="image-name"></span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- CONFIGURATION ---
+            const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwg3_XWcc7V1u3_0bCEqV2ncT8RaGweY_fr9dr6EIT7Dig3D8wOPdx6fyr5FEFFwyBxHA/exec';
+            const SLIDESHOW_INTERVAL_MS = 5000; // 5 seconds
+            const UPDATE_CHECK_INTERVAL_MS = 30000; // 30 seconds
+            const RETRY_DELAY_MS = 5000; // 5 seconds for retry
+
+            // --- DOM ELEMENTS ---
+            const container = document.getElementById('slideshow-container');
+            const slidesWrapper = document.getElementById('slides-wrapper');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const dotsContainer = document.getElementById('dots-container');
+            const imageCounter = document.getElementById('image-counter');
+            const updateNotification = document.getElementById('update-notification');
+            const connectionStatus = document.getElementById('connection-status');
+            const statusText = document.getElementById('status-text');
+            const retryBtn = document.getElementById('retry-btn');
+            const imageInfo = document.getElementById('image-info');
+            const imageName = document.getElementById('image-name');
+
+            // --- STATE ---
+            let images = [];
+            let currentIndex = 0;
+            let slideshowInterval;
+            let touchStartX = 0;
+            let isOnline = true;
+            let retryTimeout = null;
+            
+            // --- FUNCTIONS ---
+
+            /**
+             * Updates connection status UI
+             */
+            function updateConnectionStatus(online, message = '') {
+                isOnline = online;
+                
+                if (online) {
+                    connectionStatus.classList.remove('offline', 'hidden');
+                    connectionStatus.classList.add('bg-blue-600');
+                    statusText.textContent = 'เชื่อมต่อแล้ว';
+                    retryBtn.classList.add('hidden');
+                    
+                    // Hide status after 3 seconds
+                    setTimeout(() => {
+                        connectionStatus.classList.add('hidden');
+                    }, 3000);
+                } else {
+                    connectionStatus.classList.remove('hidden', 'bg-blue-600');
+                    connectionStatus.classList.add('offline');
+                    statusText.textContent = message || 'การเชื่อมต่อมีปัญหา';
+                    retryBtn.classList.remove('hidden');
+                }
+            }
+
+            /**
+             * Fetches image data from Google Apps Script.
+             */
+            async function fetchImages() {
+                try {
+                    // Show connection checking status
+                    if (images.length === 0) {
+                        updateConnectionStatus(true, 'กำลังตรวจสอบการเชื่อมต่อ...');
+                    }
+                    
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+                    
+                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const newImages = await response.json();
+
+                    // Check if the Apps Script returned an error object or if the response isn't an array.
+                    if (newImages && newImages.error) {
+                        throw new Error(newImages.message);
+                    }
+                    if (!Array.isArray(newImages)) {
+                        console.error("Received data is not an array:", newImages);
+                        throw new Error('รูปแบบข้อมูลที่ได้รับไม่ถูกต้อง');
+                    }
+
+                    // Update connection status
+                    updateConnectionStatus(true);
+
+                    // Check if there are new images and update the slideshow
+                    if (JSON.stringify(newImages) !== JSON.stringify(images)) {
+                        const isInitialLoad = images.length === 0;
+                        const newCount = newImages.length - images.length;
+                        images = newImages;
+                        
+                        if (images.length === 0) {
+                            // Handle case where folder is empty or contains no images
+                            slidesWrapper.innerHTML = `<div class="w-full h-full flex items-center justify-center text-gray-400 p-4">ไม่พบรูปภาพในโฟลเดอร์</div>`;
+                            dotsContainer.innerHTML = '';
+                            updateUI(); // Update counter and hide buttons
+                            return;
+                        }
+                        
+                        renderSlides();
+                        
+                        if (!isInitialLoad && newCount > 0) {
+                            showUpdateNotification();
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('Failed to fetch images:', error);
+                    
+                    // Handle different error types
+                    let errorMessage = 'เกิดข้อผิดพลาดในการโหลดรูปภาพ';
+                    
+                    if (error.name === 'AbortError') {
+                        errorMessage = 'การเชื่อมต่อใช้เวลานานเกินไป';
+                    } else if (error.message.includes('Failed to fetch') || 
+                               error.message.includes('NETWORK') ||
+                               error.message.includes('INTERNET')) {
+                        errorMessage = 'การเชื่อมต่อมีปัญหา กรุณาตรวจสอบอินเทอร์เน็ต';
+                    }
+                    
+                    // Update connection status
+                    updateConnectionStatus(false, errorMessage);
+                    
+                    // Only show error if we don't have any images yet
+                    if (images.length === 0) {
+                        slidesWrapper.innerHTML = `
+                            <div class="w-full h-full flex flex-col items-center justify-center text-red-400 p-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <p class="text-center">${errorMessage}</p>
+                                <p class="text-sm mt-2 text-gray-400">ระบบจะพยายามโหลดอีกครั้งโดยอัตโนมัติ</p>
+                            </div>`;
+                    }
+                    
+                    // Schedule a retry
+                    scheduleRetry();
+                } finally {
+                    // Always hide spinner after the first attempt is complete (success or fail)
+                    loadingSpinner.style.display = 'none';
+                }
+            }
+            
+            /**
+             * Schedule a retry after a delay
+             */
+            function scheduleRetry() {
+                if (retryTimeout) {
+                    clearTimeout(retryTimeout);
+                }
+                
+                retryTimeout = setTimeout(() => {
+                    fetchImages();
+                }, RETRY_DELAY_MS);
+            }
+            
+            /**
+             * Renders the slide images and navigation dots.
+             */
+            function renderSlides() {
+                if (images.length === 0) return;
+
+                slidesWrapper.innerHTML = '';
+                dotsContainer.innerHTML = '';
+
+                images.forEach((imageData, index) => {
+                    // Create slide container
+                    const slideDiv = document.createElement('div');
+                    slideDiv.className = 'slide absolute w-full h-full';
+                    if (index === currentIndex) {
+                        slideDiv.classList.add('active');
+                    }
+                    
+                    // Create image element with base64 data
+                    const img = document.createElement('img');
+                    img.src = imageData.data;
+                    img.alt = imageData.name || `Slide ${index + 1}`;
+                    img.className = 'w-full h-full object-contain';
+                    img.loading = 'lazy';
+                    
+                    // Create overlay with image name
+                    const overlay = document.createElement('div');
+                    overlay.className = 'preview-overlay absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 p-2 text-sm text-white text-center';
+                    overlay.textContent = imageData.name || `Image ${index + 1}`;
+                    
+                    slideDiv.appendChild(img);
+                    slideDiv.appendChild(overlay);
+                    slidesWrapper.appendChild(slideDiv);
+
+                    // Create dot element
+                    const dot = document.createElement('div');
+                    dot.className = 'dot w-2 h-2 md:w-2.5 md:h-2.5 bg-gray-500 rounded-full cursor-pointer';
+                    dot.addEventListener('click', () => {
+                        goToSlide(index);
+                        resetSlideshowInterval();
+                    });
+                    dotsContainer.appendChild(dot);
+                });
+                
+                updateUI();
+                startSlideshow();
+            }
+
+            /**
+             * Updates the active slide, dots, counter, and navigation buttons.
+             */
+            function updateUI() {
+                const slides = document.querySelectorAll('.slide');
+                const dots = document.querySelectorAll('.dot');
+                
+                slides.forEach((slide, index) => {
+                    slide.classList.toggle('active', index === currentIndex);
+                });
+                
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('bg-white', index === currentIndex);
+                    dot.classList.toggle('scale-125', index === currentIndex);
+                    dot.classList.toggle('bg-gray-500', index !== currentIndex);
+                });
+                
+                if (images.length > 0) {
+                    imageCounter.textContent = `รูปที่ ${currentIndex + 1} / ${images.length}`;
+                    
+                    // Show current image name
+                    if (images[currentIndex].name) {
+                        imageName.textContent = images[currentIndex].name;
+                        imageInfo.classList.remove('hidden');
+                    } else {
+                        imageInfo.classList.add('hidden');
+                    }
+                } else {
+                    imageCounter.textContent = 'ไม่พบรูปภาพ';
+                    imageInfo.classList.add('hidden');
+                }
+                
+                // Show/hide nav buttons
+                if (images.length > 1) {
+                    prevBtn.classList.remove('hidden');
+                    nextBtn.classList.remove('hidden');
+                } else {
+                    prevBtn.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                }
+            }
+
+            /**
+             * Navigates to a specific slide index.
+             */
+            function goToSlide(index) {
+                currentIndex = index;
+                updateUI();
+            }
+
+            /**
+             * Moves to the next slide.
+             */
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % images.length;
+                updateUI();
+            }
+            
+            /**
+             * Moves to the previous slide.
+             */
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + images.length) % images.length;
+                updateUI();
+            }
+
+            /**
+             * Starts or restarts the automatic slideshow interval.
+             */
+            function startSlideshow() {
+                if (slideshowInterval) clearInterval(slideshowInterval);
+                if (images.length > 1) {
+                    slideshowInterval = setInterval(nextSlide, SLIDESHOW_INTERVAL_MS);
+                }
+            }
+
+            function resetSlideshowInterval() {
+                clearInterval(slideshowInterval);
+                startSlideshow();
+            }
+            
+            /**
+             * Shows a notification when new images are added.
+             */
+            function showUpdateNotification() {
+                updateNotification.classList.remove('opacity-0');
+                setTimeout(() => {
+                    updateNotification.classList.add('opacity-0');
+                }, 3000);
+            }
+
+            // --- EVENT LISTENERS ---
+            nextBtn.addEventListener('click', () => {
+                nextSlide();
+                resetSlideshowInterval();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                prevSlide();
+                resetSlideshowInterval();
+            });
+            
+            // Retry button
+            retryBtn.addEventListener('click', () => {
+                fetchImages();
+            });
+            
+            // Swipe gestures for mobile
+            container.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            container.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].screenX;
+                const swipeDistance = touchEndX - touchStartX;
+
+                if (Math.abs(swipeDistance) > 50) { // Minimum swipe distance
+                    if (swipeDistance < 0) {
+                        nextSlide(); // Swiped left
+                    } else {
+                        prevSlide(); // Swiped right
+                    }
+                    resetSlideshowInterval();
+                }
+            });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') {
+                    nextSlide();
+                    resetSlideshowInterval();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                    resetSlideshowInterval();
+                }
+            });
+
+            // Online/offline detection
+            window.addEventListener('online', () => {
+                updateConnectionStatus(true);
+                fetchImages();
+            });
+            
+            window.addEventListener('offline', () => {
+                updateConnectionStatus(false, 'การเชื่อมต่อขาดหาย');
+            });
+
+            // --- INITIALIZATION ---
+            async function initialize() {
+                // Check initial connection status
+                if (!navigator.onLine) {
+                    updateConnectionStatus(false, 'อุปกรณ์ออฟไลน์');
+                }
+                
+                await fetchImages(); // Initial load
+                setInterval(fetchImages, UPDATE_CHECK_INTERVAL_MS); // Set up periodic checks
+            }
+
+            initialize();
+        });
+    </script>
+</body>
+</html>
