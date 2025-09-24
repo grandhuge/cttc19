@@ -28,8 +28,7 @@
         let changeQuestionUsed = false;
         let shieldUsed = false;
 		
-		// URL ของ Google Apps Script Web App
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzdXcuFQMH8h9trVXHHcR96UsnKJhT3MzC6GGzkB0dGiirXxMeFib2bQv6ivGH90WUk/exec';
+
 
         // องค์ประกอบ DOM
         const startScreen = document.getElementById('start-screen');
@@ -90,63 +89,79 @@
         const soundToggle = document.getElementById('sound-toggle');
         const soundIcon = document.getElementById('sound-icon');
 
+// =============================================
+// ฟังก์ชันใหม่ที่ใช้ localStorage แทน API
+// =============================================
+
+// ฟังก์ชันบันทึกคะแนน
+function saveScoreToLocalStorage(playerName, score, correctAnswers, wrongAnswers, totalTime) {
+    try {
+        // ดึงข้อมูลคะแนนที่มีอยู่
+        const existingScores = JSON.parse(localStorage.getItem('gameScores')) || [];
+        
+        // สร้างข้อมูลคะแนนใหม่
+        const newScore = {
+            id: Date.now(), // ใช้ timestamp เป็น ID
+            playerName: playerName,
+            score: parseFloat(score.toFixed(1)),
+            correctAnswers: correctAnswers,
+            wrongAnswers: wrongAnswers,
+            totalTime: totalTime,
+            date: new Date().toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            })
+        };
+        
+        // เพิ่มคะแนนใหม่
+        existingScores.push(newScore);
+        
+        // เรียงลำดับคะแนนจากสูงไปต่ำ
+        existingScores.sort((a, b) => b.score - a.score);
+        
+        // เก็บเฉพาะ 50 อันดับแรก
+        const topScores = existingScores.slice(0, 50);
+        
+        // บันทึกลง localStorage
+        localStorage.setItem('gameScores', JSON.stringify(topScores));
+        
+        return { status: 'success', message: 'บันทึกคะแนนสำเร็จ!' };
+    } catch (error) {
+        console.error('Error saving score:', error);
+        return { status: 'error', message: 'เกิดข้อผิดพลาดในการบันทึก' };
+    }
+}
+
+// ฟังก์ชันดึงข้อมูลคะแนนสูงสุด
+function fetchHighScoresFromLocalStorage() {
+    try {
+        const scores = JSON.parse(localStorage.getItem('gameScores')) || [];
+        return { status: 'success', data: scores };
+    } catch (error) {
+        console.error('Error fetching scores:', error);
+        return { status: 'error', message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' };
+    }
+}
+
+
 		// =============================================
         // ฟังก์ชันใหม่ที่เพิ่มสำหรับการเชื่อมต่อกับ API
         // =============================================
 
-        // ฟังก์ชันบันทึกคะแนน
-        async function saveScoreToAPI(playerName, score, correctAnswers, wrongAnswers, totalTime) {
-            try {
-                showLoading();
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        playerName: playerName,
-                        score: score,
-                        correctAnswers: correctAnswers,
-                        wrongAnswers: wrongAnswers,
-                        totalTime: totalTime
-                    }),
-                    redirect: 'follow'
-                });
-                
-                const result = await response.json();
-                hideLoading();
-                return result;
-            } catch (error) {
-                console.error('Error saving score:', error);
-                hideLoading();
-                return { status: 'error', message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' };
-            }
-        }
+ 
 
-        // ฟังก์ชันดึงข้อมูลคะแนนสูงสุด
-        async function fetchHighScores() {
-            try {
-                showLoading();
-                const response = await fetch(`${API_URL}?action=getScores`);
-                const result = await response.json();
-                hideLoading();
-                return result;
-            } catch (error) {
-                console.error('Error fetching scores:', error);
-                hideLoading();
-                return { status: 'error', message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' };
-            }
-        }
+ // ฟังก์ชันแสดงหน้าจอโหลด (ปรับปรุง)
+function showLoading() {
+    // สำหรับ localStorage เราไม่ต้องแสดงหน้าจอโหลดนาน
+    // แต่ยังคงใช้สำหรับกรณีที่ต้องการแสดงการประมวลผล
+    loadingModal.classList.remove('hidden');
+}
 
-        // ฟังก์ชันแสดงหน้าจอโหลด
-        function showLoading() {
-            loadingModal.classList.remove('hidden');
-        }
-
-        // ฟังก์ชันซ่อนหน้าจอโหลด
-        function hideLoading() {
-            loadingModal.classList.add('hidden');
-        }
+// ฟังก์ชันซ่อนหน้าจอโหลด (ปรับปรุง)
+function hideLoading() {
+    loadingModal.classList.add('hidden');
+}
 
         // ฟังก์ชันแสดงข้อความแจ้งเตือน
         function showNotification(message, type = 'info') {
@@ -172,185 +187,162 @@
         // ฟังก์ชันเดิมที่ปรับปรุงเพื่อรองรับระบบใหม่
         // =============================================
 
-        // แสดงผลลัพธ์ (ปรับปรุง)
-        function showResults() {
-            // หยุดเพลงพื้นหลัง
-            bgMusic.pause();
-            
-            // คำนวณเวลาที่ใช้ทั้งหมด
-            totalGameTime = Math.floor((Date.now() - gameStartTime) / 1000);
-            totalTimeDisplay.textContent = totalGameTime;
-            
-            // คำนวณจำนวนคำถามที่ตอบถูก
-            const correctCount = Math.floor(score);
-            correctCountDisplay.textContent = correctCount;
-            
-            // แสดงคะแนน
-            scoreDisplay.textContent = score.toFixed(1);
-            
-            // ตรวจสอบโบนัสไม่ตอบผิดเลย
-            if (totalWrongAttempts === 0) {
-                perfectBonusElement.classList.remove('bg-gray-100');
-                perfectBonusElement.classList.add('bg-green-100');
-                perfectBonusText.textContent = 'ได้รับโบนัส +2.0 คะแนน';
-                perfectBonusText.classList.remove('text-gray-500');
-                perfectBonusText.classList.add('text-green-600', 'font-bold');
-                score += 2.0;
-            } else {
-                perfectBonusText.textContent = 'ไม่ได้รับโบนัส (ตอบผิด ' + totalWrongAttempts + ' ครั้ง)';
-            }
-            
-            // ตรวจสอบโบนัสเวลา (สมมติว่าเวลาดีคือน้อยกว่า 300 วินาที)
-            if (totalGameTime <= 300) {
-                timeBonusElement.classList.remove('bg-gray-100');
-                timeBonusElement.classList.add('bg-green-100');
-                timeBonusText.textContent = 'ได้รับโบนัส +1.0 คะแนน';
-                timeBonusText.classList.remove('text-gray-500');
-                timeBonusText.classList.add('text-green-600', 'font-bold');
-                score += 1.0;
-            } else {
-                timeBonusText.textContent = 'ไม่ได้รับโบนัส (ใช้เวลา ' + totalGameTime + ' วินาที)';
-            }
-            
-            // อัพเดทคะแนนที่แสดง
-            scoreDisplay.textContent = score.toFixed(1);
-            
-            // แสดงข้อความผลลัพธ์
-            let message = '';
-            if (score >= 18.4) {
-                message = 'ยอดเยี่ยมมาก! คุณเก่งมากเลย 🎉';
-            } else if (score >= 16.4) {
-                message = 'ทำได้ดีมาก! เกือบจะเต็มแล้ว 😊';
-            } else if (score >= 12.3) {
-                message = 'ดีแล้ว! ลองเล่นอีกครั้งเพื่อทำคะแนนให้ดีขึ้นนะ 👍';
-            } else {
-                message = 'ยังมีที่สำหรับการพัฒนาอีกนะ ลองเล่นอีกครั้งดู! 💪';
-            }
-            resultMessage.innerHTML = `<p class="text-2xl">${message}</p>`;
-            
-            // ซ่อนหน้าคำถามและแสดงหน้าผลลัพธ์
-            quizScreen.classList.add('hidden');
-            resultScreen.classList.remove('hidden');
-            
-            // ซ่อนหน้าจอโหลด
-            hideLoading();
-        }
+ // แสดงผลลัพธ์ (ปรับปรุง)
+function showResults() {
+    // หยุดเพลงพื้นหลัง
+    bgMusic.pause();
+    
+    // คำนวณเวลาที่ใช้ทั้งหมด
+    totalGameTime = Math.floor((Date.now() - gameStartTime) / 1000);
+    totalTimeDisplay.textContent = totalGameTime;
+    
+    // คำนวณจำนวนคำถามที่ตอบถูก
+    const correctCount = Math.floor(score);
+    correctCountDisplay.textContent = correctCount;
+    
+    // แสดงคะแนน
+    scoreDisplay.textContent = score.toFixed(1);
+    
+    // ตรวจสอบโบนัสไม่ตอบผิดเลย
+    if (totalWrongAttempts === 0) {
+        perfectBonusElement.classList.remove('bg-gray-100');
+        perfectBonusElement.classList.add('bg-green-100');
+        perfectBonusText.textContent = 'ได้รับโบนัส +2.0 คะแนน';
+        perfectBonusText.classList.remove('text-gray-500');
+        perfectBonusText.classList.add('text-green-600', 'font-bold');
+        score += 2.0;
+    } else {
+        perfectBonusText.textContent = 'ไม่ได้รับโบนัส (ตอบผิด ' + totalWrongAttempts + ' ครั้ง)';
+    }
+    
+    // ตรวจสอบโบนัสเวลา (สมมติว่าเวลาดีคือน้อยกว่า 300 วินาที)
+    if (totalGameTime <= 300) {
+        timeBonusElement.classList.remove('bg-gray-100');
+        timeBonusElement.classList.add('bg-green-100');
+        timeBonusText.textContent = 'ได้รับโบนัส +1.0 คะแนน';
+        timeBonusText.classList.remove('text-gray-500');
+        timeBonusText.classList.add('text-green-600', 'font-bold');
+        score += 1.0;
+    } else {
+        timeBonusText.textContent = 'ไม่ได้รับโบนัส (ใช้เวลา ' + totalGameTime + ' วินาที)';
+    }
+    
+    // อัพเดทคะแนนที่แสดง
+    scoreDisplay.textContent = score.toFixed(1);
+    
+    // แสดงข้อความผลลัพธ์
+    let message = '';
+    if (score >= 18.4) {
+        message = 'ยอดเยี่ยมมาก! คุณเก่งมากเลย 🎉';
+    } else if (score >= 16.4) {
+        message = 'ทำได้ดีมาก! เกือบจะเต็มแล้ว 😊';
+    } else if (score >= 12.3) {
+        message = 'ดีแล้ว! ลองเล่นอีกครั้งเพื่อทำคะแนนให้ดีขึ้นนะ 👍';
+    } else {
+        message = 'ยังมีที่สำหรับการพัฒนาอีกนะ ลองเล่นอีกครั้งดู! 💪';
+    }
+    resultMessage.innerHTML = `<p class="text-2xl">${message}</p>`;
+    
+    // ซ่อนหน้าคำถามและแสดงหน้าผลลัพธ์
+    quizScreen.classList.add('hidden');
+    resultScreen.classList.remove('hidden');
+}
 
-        // เมื่อคลิกปุ่มบันทึกคะแนน
-saveScoreButton.addEventListener('click', async () => {
+
+// =============================================
+// ปรับปรุงฟังก์ชันเดิมให้ใช้ localStorage
+// =============================================
+
+// เมื่อคลิกปุ่มบันทึกคะแนน (ปรับปรุง)
+saveScoreButton.addEventListener('click', () => {
     const playerName = playerNameInput.value.trim();
     
-	document.getElementById("save-score").disabled = true; //ปิดการใช้งานปุ่มบันทึกคะแนน
-	
+    document.getElementById("save-score").disabled = true; //ปิดการใช้งานปุ่มบันทึกคะแนน
+    
     if (!playerName) {
         saveStatusMessage.textContent = 'กรุณากรอกชื่อผู้เล่น';
         saveStatusMessage.className = 'mt-2 text-sm text-red-500';
         return;
     }
     
-    // แสดงหน้าจอโหลด
-    showLoading();
-    
     // คำนวณจำนวนคำถามที่ตอบถูกและผิด
     const correctCount = Math.floor(score);
     const wrongCount = 10 - correctCount;
     
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                playerName: playerName,
-                score: score.toFixed(1),
-                correctAnswers: correctCount,
-                wrongAnswers: wrongCount,
-                totalTime: totalGameTime
-            })
-        });
+        const result = saveScoreToLocalStorage(playerName, score, correctCount, wrongCount, totalGameTime);
         
-        // ตรวจสอบว่า response เป็น JSON หรือไม่
-        let result;
-        try {
-            result = await response.json();
-        } catch (jsonError) {
-            throw new Error('รูปแบบข้อมูลตอบกลับไม่ถูกต้อง');
-        }
-        
-        if (!response.ok || result.status !== 'success') {
+        if (result.status === 'success') {
+            saveStatusMessage.textContent = 'บันทึกคะแนนสำเร็จ!';
+            saveStatusMessage.className = 'mt-2 text-sm text-green-500';
+            saveScoreButton.disabled = true;
+            showNotification('บันทึกคะแนนสำเร็จ!', 'success');
+        } else {
             throw new Error(result.message || 'เกิดข้อผิดพลาดในการบันทึก');
         }
-        
-        saveStatusMessage.textContent = 'บันทึกคะแนนสำเร็จ!';
-        saveStatusMessage.className = 'mt-2 text-sm text-green-500';
-        saveScoreButton.disabled = true;
-        showNotification('บันทึกคะแนนสำเร็จ!', 'success');
         
     } catch (error) {
         console.error('Error saving score:', error);
         saveStatusMessage.textContent = 'เกิดข้อผิดพลาด: ' + error.message;
         saveStatusMessage.className = 'mt-2 text-sm text-red-500';
         showNotification('บันทึกคะแนนไม่สำเร็จ: ' + error.message, 'error');
-    } finally {
-        hideLoading();
     }
 });
 
-        // เมื่อคลิกแท็บสถิติผู้เล่น (ปรับปรุง)
-        tabLeaderboard.addEventListener('click', async () => {
-            tabGame.classList.remove('active');
-            tabLeaderboard.classList.add('active');
-            gameTab.classList.remove('active');
-            leaderboardTab.classList.remove('hidden');
-            leaderboardTab.classList.add('active');
+// เมื่อคลิกแท็บสถิติผู้เล่น (ปรับปรุง)
+tabLeaderboard.addEventListener('click', () => {
+    tabGame.classList.remove('active');
+    tabLeaderboard.classList.add('active');
+    gameTab.classList.remove('active');
+    leaderboardTab.classList.remove('hidden');
+    leaderboardTab.classList.add('active');
+    
+    // แสดงหน้าจอโหลด
+    leaderboardLoading.classList.remove('hidden');
+    leaderboardContent.classList.add('hidden');
+    leaderboardError.classList.add('hidden');
+    
+    try {
+        const result = fetchHighScoresFromLocalStorage();
+        
+        if (result.status === 'success') {
+            // ล้างข้อมูลเดิม
+            leaderboardData.innerHTML = '';
             
-            // แสดงหน้าจอโหลด
-            leaderboardLoading.classList.remove('hidden');
-            leaderboardContent.classList.add('hidden');
-            leaderboardError.classList.add('hidden');
-            
-            try {
-                const result = await fetchHighScores();
+            // เพิ่มข้อมูลใหม่
+            if (result.data && result.data.length > 0) {
+                result.data.forEach((player, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${player.playerName}</td>
+                        <td>${player.score.toFixed(1)}</td>
+                        <td>${player.totalTime} วินาที</td>
+                        <td>${player.date}</td>
+                    `;
+                    leaderboardData.appendChild(row);
+                });
                 
-                if (result.status === 'success') {
-                    // ล้างข้อมูลเดิม
-                    leaderboardData.innerHTML = '';
-                    
-                    // เพิ่มข้อมูลใหม่
-                    if (result.data && result.data.length > 0) {
-                        result.data.forEach((player, index) => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${player.playerName}</td>
-                                <td>${player.score.toFixed(1)}</td>
-                                <td>${player.totalTime} วินาที</td>
-                                <td>${player.date}</td>
-                            `;
-                            leaderboardData.appendChild(row);
-                        });
-                        
-                        leaderboardLoading.classList.add('hidden');
-                        leaderboardContent.classList.remove('hidden');
-                    } else {
-                        leaderboardLoading.classList.add('hidden');
-                        leaderboardError.textContent = 'ยังไม่มีข้อมูลคะแนน';
-                        leaderboardError.classList.remove('hidden');
-                    }
-                } else {
-                    leaderboardLoading.classList.add('hidden');
-                    leaderboardError.textContent = result.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล';
-                    leaderboardError.classList.remove('hidden');
-                    showNotification('ดึงข้อมูลคะแนนไม่สำเร็จ: ' + (result.message || 'ไม่ทราบสาเหตุ'), 'error');
-                }
-            } catch (error) {
                 leaderboardLoading.classList.add('hidden');
-                leaderboardError.textContent = 'เกิดข้อผิดพลาดในการเชื่อมต่อ';
+                leaderboardContent.classList.remove('hidden');
+            } else {
+                leaderboardLoading.classList.add('hidden');
+                leaderboardError.textContent = 'ยังไม่มีข้อมูลคะแนน';
                 leaderboardError.classList.remove('hidden');
-                showNotification('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
             }
-        });
+        } else {
+            leaderboardLoading.classList.add('hidden');
+            leaderboardError.textContent = result.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล';
+            leaderboardError.classList.remove('hidden');
+            showNotification('ดึงข้อมูลคะแนนไม่สำเร็จ: ' + (result.message || 'ไม่ทราบสาเหตุ'), 'error');
+        }
+    } catch (error) {
+        leaderboardLoading.classList.add('hidden');
+        leaderboardError.textContent = 'เกิดข้อผิดพลาดในการเชื่อมต่อ';
+        leaderboardError.classList.remove('hidden');
+        showNotification('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+    }
+});
 
         // เมื่อคลิกปุ่มเริ่มเกม (ปรับปรุง)
         startButton.addEventListener('click', () => {
