@@ -1,7 +1,7 @@
 <html lang="th"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เกมกดให้ไว..ตอบให้ทัน!! by cttc19 Ver.demo</title>
+    <title>เกมกดให้ไว..ตอบให้ทัน!! by cttc19</title>
     <script src="./js/tailwindcss.js"></script>
     <link href="./css/fontgoogle.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
@@ -50,7 +50,7 @@ function closeTab() {
             <!-- Tab Navigation -->
             <div class="mb-4 flex justify-center gap-2">
                 <button id="tab-game" class="tab-button active">เล่นเกม</button>
-                <button id="tab-leaderboard" class="tab-button">สถิติผู้เล่น (demo)</button>
+                <button id="tab-leaderboard" class="tab-button">สถิติผู้เล่น</button>
             </div>
             
             <!-- Game Tab Content -->
@@ -270,23 +270,16 @@ function closeTab() {
             
             <!-- บันทึกคะแนน -->
             <div class="bg-indigo-50 p-6 rounded-2xl mb-6">
-  <h3 class="text-2xl font-bold text-indigo-600 mb-4">
-    บันทึกคะแนนของคุณ (ไม่เปิดใช้งานฟังก์ชั่นนี้)
-  </h3>
-  <div class="mb-4">
-    <label for="player-name" class="block text-left text-indigo-700 mb-2">ชื่อผู้เล่น:</label>
-    <input type="text" id="player-name"
-      class="w-full px-4 py-2 border border-indigo-300 rounded-lg bg-gray-200 text-gray-500 cursor-not-allowed"
-      placeholder="กรุณาใส่ชื่อของคุณ" disabled>
-  </div>
-  <button id="save-score"
-    class="bg-gray-300 text-gray-500 font-bold py-3 px-6 rounded-xl text-lg cursor-not-allowed"
-    disabled>
-    บันทึกคะแนน 💾
-  </button>
-  <p id="save-status" class="mt-2 text-sm"></p>
-</div>
-
+                <h3 class="text-2xl font-bold text-indigo-600 mb-4">บันทึกคะแนนของคุณ</h3>
+                <div class="mb-4">
+                    <label for="player-name" class="block text-left text-indigo-700 mb-2">ชื่อผู้เล่น:</label>
+                    <input type="text" id="player-name" class="w-full px-4 py-2 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="กรุณาใส่ชื่อของคุณ">
+                </div>
+                <button id="save-score" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl text-lg transition-all">
+                    บันทึกคะแนน 💾
+                </button>
+                <p id="save-status" class="mt-2 text-sm"></p>
+            </div>
             
             <div class="flex justify-center gap-4">
                 <button id="restart-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-2xl text-xl transition-all transform hover:scale-105 shadow-lg">
