@@ -3,25 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfolio - Tle Narongphisit</title>
+  <title>CTTC19 Project - Tle Narongphisit</title>
   <link rel="stylesheet" href="style.css">
   <!-- Google Font + Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+    text-align: center;
+    animation: slideUp 0.3s ease-in-out;
+  }
+
+  .close-button {
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+  }
+
+  .close-button:hover {
+    color: #333;
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
+
+  @keyframes slideUp {
+    from {transform: translateY(50px); opacity: 0;}
+    to {transform: translateY(0); opacity: 1;}
+  }
+</style>
 </head>
 <body>
   <!-- Header Section -->
   <header>
     <nav>
       <div class="nav-brand">
-        <h2>Project</h2>
+        <h2>CTTC19</h2>
       </div>
       <ul class="nav-menu">
         <li><a href="#home">Home</a></li>
         <li><a href="#about">About</a></li>
-        <li><a href="#portfolio">Portfolio</a></li>
+        <li><a href="#portfolio">Project</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
       <div class="hamburger">
@@ -41,8 +89,8 @@
           <div class="profile-overlay"></div>
         </div>
       </div>
-      <h1 class="hero-title">นายณรงพิสิษฐ์ วรวิวัฒน์</h1>
-      <p class="hero-subtitle">นักทรัพยากรบุคคลชำนาญการ ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี</p>
+      <h1 class="hero-title">นวัตกรรม ศูนย์ฯ19</h1>
+      <p class="hero-subtitle">จัดทำโดย นายณรงพิสิษฐ์ วรวิวัฒน์ (เติ้ล) นักทรัพยากรบุคคลชำนาญการ ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี</p>
       <div class="hero-buttons">
         <a href="#portfolio" class="cta-btn">ระบบและสื่อออนไลน์</a>
         <a href="#contact" class="cta-btn secondary">ติดต่อฉัน</a>
@@ -61,7 +109,7 @@
       <div class="about-content">
         <div class="about-text">
           <p>สวัสดีครับ! ผม <strong>ณรงพิสิษฐ์ วรวิวัฒน์</strong> นักทรัพยากรบุคคลชำนาญการ ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี สำนักพัฒนาและถ่ายทอดเทคโนโลยีการสหกรณ์ กรมส่งเสริมสหกรณ์</p>
-          <p>เว็บไซต์นี้สร้างขึ้นโดยมีวัตถุประสงค์เพื่อเป็นเครื่องมือ/สื่ออำนวยความสะดวกในการปฏิบัติงานขณะดำรงตำแหน่งนักทรัพยากรบุคคลที่มีหน้าที่ตามที่ได้รับมอบหมายของหน่วยงานศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19</p>
+          <p>เว็บไซต์นี้สร้างขึ้นโดยมีวัตถุประสงค์เพื่อเป็นเครื่องมือ/สื่ออำนวยความสะดวกและสนับสนุนการปฏิบัติงานขณะดำรงตำแหน่งนักทรัพยากรบุคคลที่มีหน้าที่ตามที่ได้รับมอบหมายของหน่วยงานศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19</p>
           <div class="skills">
             <h3>ประกอบด้วย</h3>
             <div class="skill-list">
@@ -319,19 +367,29 @@
             </div>
           </div>
           <div class="social-links">
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="https://www.facebook.com/cttc19"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.tiktok.com/@cttc19.cttc.cpd.go.th"><i class="fab fa-tiktok"></i></a>
+            <a href="https://www.youtube.com/@cpd.cttc19"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.youtube.com/@CPD_cttd19"><i class="fab fa-youtube"></i></a>
           </div>
         </div>
-        <form class="contact-form">
-          <input type="text" placeholder="ชื่อของคุณ" required>
-          <input type="email" placeholder="อีเมลของคุณ" required>
-          <input type="text" placeholder="หัวข้อ" required>
-          <textarea placeholder="ข้อความของคุณ" rows="5" required></textarea>
-          <button type="submit">ส่งข้อความ</button>
-        </form>
+		
+<form id="contactForm" class="contact-form">
+  <input type="text" name="name" placeholder="ชื่อของคุณ" required>
+  <input type="email" name="email" placeholder="อีเมลของคุณ" required>
+  <input type="text" name="subject" placeholder="หัวข้อ" required>
+  <textarea name="message" placeholder="ข้อความของคุณ" rows="5" required></textarea>
+  <button type="submit">ส่งข้อความ</button>
+</form>
+
+<!-- Modal แจ้งสถานะ -->
+<div id="statusModal" class="modal">
+  <div class="modal-content">
+    <span class="close-button" onclick="closeModal()">&times;</span>
+    <p id="modalMessage"></p>
+  </div>
+</div>
+
       </div>
     </div>
   </section>
@@ -352,6 +410,48 @@
   <button class="scroll-top" id="scrollTop">
     <i class="fas fa-chevron-up"></i>
   </button>
+
+<script>
+  function showModal(message) {
+    const modal = document.getElementById("statusModal");
+    const modalMessage = document.getElementById("modalMessage");
+    modalMessage.textContent = message;
+    modal.style.display = "block";
+  }
+
+  function closeModal() {
+    document.getElementById("statusModal").style.display = "none";
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("contactForm");
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      fetch("https://formspree.io/f/mrbypkzd", {
+        method: "POST",
+        body: new FormData(form),
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          showModal("✅ ส่งข้อความเรียบร้อยแล้ว ขอบคุณที่ติดต่อเรา!");
+          form.reset();
+        } else {
+          showModal("❌ เกิดข้อผิดพลาดในการส่ง กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง");
+          console.error("Form submission failed with status:", response.status);
+        }
+      })
+      .catch(error => {
+        showModal("⚠️ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ กรุณาตรวจสอบอินเทอร์เน็ต");
+        console.error("Form submission error:", error);
+      });
+    });
+  });
+</script>
 
   <script>
     // Theme Toggle
@@ -421,5 +521,4 @@
     });
   </script>
 </body>
-
 </html>
