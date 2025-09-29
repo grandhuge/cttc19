@@ -1,817 +1,133 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบันทึกเวลาเข้า-ออกงาน QR Code by cttc19</title>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #a8e6cf 0%, #88d8a3 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .nav-tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-            background: rgba(255,255,255,0.25);
-            border-radius: 20px;
-            padding: 8px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(136,216,163,0.3);
-        }
-
-        .nav-tab {
-            padding: 18px 25px;
-            background: transparent;
-            border: none;
-            color: white;
-            cursor: pointer;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin: 0 3px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-
-        .nav-tab.active {
-            background: rgba(255,255,255,0.4);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(136,216,163,0.4);
-            color: #2d5a3d;
-            text-shadow: none;
-        }
-
-        .nav-tab:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-1px);
-        }
-
-        .admin-nav-tab {
-            padding: 12px 20px;
-            background: transparent;
-            border: none;
-            color: #4a7c59;
-            cursor: pointer;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin: 0 2px;
-            flex: 1;
-            text-align: center;
-        }
-
-        .admin-nav-tab.active {
-            background: linear-gradient(45deg, #88d8a3, #a8e6cf);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(136, 216, 163, 0.4);
-        }
-
-        .admin-nav-tab:hover {
-            background: rgba(136, 216, 163, 0.2);
-            transform: translateY(-1px);
-        }
-
-        .admin-nav-tab.active:hover {
-            background: linear-gradient(45deg, #a8e6cf, #88d8a3);
-        }
-
-        .admin-tab-content {
-            display: none;
-        }
-
-        .admin-tab-content.active {
-            display: block;
-        }
-
-        .tab-content {
-            display: none;
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .scan-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .scan-button {
-            background: linear-gradient(45deg, #88d8a3, #a8e6cf);
-            color: white;
-            border: none;
-            padding: 25px 50px;
-            font-size: 1.4rem;
-            font-weight: 700;
-            border-radius: 60px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 15px 35px rgba(136, 216, 163, 0.4);
-            margin: 15px;
-            min-width: 280px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .scan-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(136, 216, 163, 0.6);
-            background: linear-gradient(45deg, #a8e6cf, #88d8a3);
-        }
-
-        .scan-button:active {
-            transform: translateY(-2px);
-        }
-
-        .scan-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .stop-scan-button {
-            background: linear-gradient(45deg, #f44336, #d32f2f);
-            box-shadow: 0 15px 35px rgba(244, 67, 54, 0.4);
-        }
-
-        .stop-scan-button:hover {
-            background: linear-gradient(45deg, #d32f2f, #f44336);
-            box-shadow: 0 20px 40px rgba(244, 67, 54, 0.5);
-        }
-
-        #qr-reader {
-            width: 100%;
-            max-width: 500px;
-            margin: 20px auto;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .employee-info {
-            display: none;
-            background: linear-gradient(135deg, #e8f5e8, #d4f1d4);
-            border-radius: 15px;
-            padding: 30px;
-            margin: 20px 0;
-            text-align: center;
-            border-left: 5px solid #88d8a3;
-        }
-
-        .employee-photo {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            background: #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: #666;
-            border: 5px solid white;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        .employee-name {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #4a7c59;
-            margin-bottom: 10px;
-        }
-
-        .employee-id {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .time-display {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #88d8a3;
-            margin: 20px 0;
-        }
-
-        .status-message {
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .admin-section {
-            margin-top: 30px;
-        }
-
-        .login-form {
-            max-width: 400px;
-            margin: 0 auto;
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #88d8a3;
-            box-shadow: 0 0 0 3px rgba(136, 216, 163, 0.2);
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #88d8a3, #a8e6cf);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin: 5px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(136, 216, 163, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
-        }
-
-        .btn-success {
-            background: linear-gradient(45deg, #88d8a3, #6bb77b);
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid #e9ecef;
-        }
-
-        .data-table th, .data-table td {
-            padding: 18px 15px;
-            text-align: left;
-            border-bottom: 1px solid #f1f3f4;
-        }
-
-        .data-table th {
-            background: linear-gradient(135deg, #88d8a3, #a8e6cf);
-            color: white;
-            font-weight: 700;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            position: relative;
-            user-select: none;
-            transition: all 0.3s ease;
-        }
-
-        .data-table th:hover {
-            background: linear-gradient(135deg, #a8e6cf, #88d8a3);
-            transform: translateY(-1px);
-        }
-
-        .data-table th.sortable::after {
-            content: ' ↕️';
-            font-size: 0.8rem;
-            opacity: 0.7;
-        }
-
-        .data-table th.sort-asc::after {
-            content: ' ↑';
-            color: #4CAF50;
-            opacity: 1;
-        }
-
-        .data-table th.sort-desc::after {
-            content: ' ↓';
-            color: #f44336;
-            opacity: 1;
-        }
-
-        .data-table tr:hover {
-            background: linear-gradient(135deg, #f0f9f4, #e8f5e8);
-            transform: scale(1.01);
-            transition: all 0.3s ease;
-        }
-
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .filters {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: end;
-        }
-
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .summary-card {
-            background: linear-gradient(135deg, #88d8a3, #a8e6cf);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(136, 216, 163, 0.3);
-        }
-
-        .summary-card h3 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .summary-card p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .scanning-indicator {
-            animation: pulse 2s infinite;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .nav-tabs {
-                flex-wrap: wrap;
-                padding: 5px;
-            }
-            
-            .nav-tab {
-                padding: 12px 15px;
-                font-size: 0.9rem;
-                margin: 2px;
-                min-width: auto;
-            }
-            
-            .scan-button {
-                padding: 20px 30px;
-                font-size: 1.2rem;
-                min-width: 250px;
-            }
-            
-            .filters {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .data-table {
-                font-size: 0.85rem;
-            }
-            
-            .data-table th, .data-table td {
-                padding: 12px 8px;
-            }
-            
-            .summary-cards {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .tab-content {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🏢 ระบบบันทึกเวลาเข้า-ออกพนักงานจ้างเหมาบริการ</h1>
-            <p>สแกน QR Code เพื่อลงเวลาทำงาน ณ ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19</p>
-        </div>
-
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('scan')">📱 สแกน QR Code</button>
-            <button class="nav-tab" onclick="showTab('admin')">👨‍💼 ผู้ดูแลระบบ</button>
-        </div>
-
-        <!-- Scan Tab -->
-        <div id="scan" class="tab-content active">
-            <div class="scan-section">
-                <h2 style="color: #333; margin-bottom: 15px; font-size: 2rem;">📷 สแกน QR Code จากบัตรประจำตัวพนักงาน</h2>
-                <p style="margin: 20px 0; color: #666; font-size: 1.1rem; line-height: 1.6;">
-                    กดปุ่ม "เริ่มสแกน" เพื่อเปิดกล้องและสแกน QR Code<br>
-                    <small style="color: #999;">ระบบจะทำงานต่อเนื่องจนกว่าจะกดหยุด</small>
-                </p>
-                
-                <button id="start-scan" class="scan-button" onclick="startScanning()">
-                    🎥 เริ่มสแกน QR Code
-                </button>
-                <button id="stop-scan" class="scan-button stop-scan-button" onclick="stopScanning()" style="display: none;">
-                    ⏹️ หยุดสแกน
-                </button>
-                
-                <div id="qr-reader"></div>
-                
-                <!-- Scan Log Display -->
-                <div id="scan-log-container" style="
-                    display: none;
-                    background: linear-gradient(135deg, #f0f9f4, #e8f5e8);
-                    border-radius: 20px;
-                    padding: 25px;
-                    margin: 30px 0;
-                    box-shadow: 0 15px 35px rgba(136, 216, 163, 0.2);
-                    border: 1px solid #c3e6cb;
-                ">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3 style="color: #333; margin: 0; font-size: 1.3rem; font-weight: 700;">📋 ประวัติการสแกนล่าสุด</h3>
-                        <button onclick="clearScanLog()" style="
-                            background: linear-gradient(45deg, #f44336, #d32f2f);
-                            color: white;
-                            border: none;
-                            padding: 10px 20px;
-                            border-radius: 25px;
-                            cursor: pointer;
-                            font-size: 0.9rem;
-                            font-weight: 600;
-                            transition: all 0.3s ease;
-                            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
-                        " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">🗑️ ล้างประวัติ</button>
-                    </div>
-                    <div id="scan-log" style="
-                        max-height: 350px;
-                        overflow-y: auto;
-                        border: 2px solid #c3e6cb;
-                        border-radius: 15px;
-                        padding: 15px;
-                        background: white;
-                    "></div>
-                </div>
-                
-                <div id="status-message"></div>
-            </div>
-        </div>
-
-        <!-- Admin Tab -->
-        <div id="admin" class="tab-content">
-            <div id="admin-login" class="login-form">
-                <h2 style="text-align: center; margin-bottom: 30px;">🔐 เข้าสู่ระบบผู้ดูแล</h2>
-                <div class="form-group">
-                    <label>ชื่อผู้ใช้:</label>
-                    <input type="text" id="admin-username" placeholder="admin">
-                </div>
-                <div class="form-group">
-                    <label>รหัสผ่าน:</label>
-                    <input type="password" id="admin-password" placeholder="รหัสผ่าน">
-                </div>
-                <button class="btn" onclick="adminLogin()" style="width: 100%;">เข้าสู่ระบบ</button>
-            </div>
-
-            <div id="admin-panel" style="display: none;">
-                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 30px;">
-                    <h2>👨‍💼 ระบบผู้ดูแล</h2>
-                    <button class="btn btn-danger" onclick="adminLogout()" style="margin-left: auto;">ออกจากระบบ</button>
-                </div>
-
-                <!-- Admin Sub Navigation -->
-                <div class="admin-nav-tabs" style="
-                    display: flex;
-                    justify-content: center;
-                    margin-bottom: 30px;
-                    background: rgba(136, 216, 163, 0.1);
-                    border-radius: 15px;
-                    padding: 8px;
-                    gap: 5px;
-                ">
-                    <button class="admin-nav-tab active" onclick="showAdminTab('employees')">👥 จัดการพนักงาน</button>
-                    <button class="admin-nav-tab" onclick="showAdminTab('schedules')">⏰ จัดการเวลาทำงาน</button>
-                    <button class="admin-nav-tab" onclick="showAdminTab('reports')">📊 รายงาน</button>
-                </div>
-
-                <!-- Employees Tab -->
-                <div id="admin-employees" class="admin-tab-content active">
-                    <div class="form-group">
-                        <h3>➕ เพิ่มพนักงานใหม่</h3>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0;">
-                            <input type="text" id="new-employee-name" placeholder="ชื่อ-นามสกุล">
-                            <select id="new-employee-position">
-                                <option value="">เลือกตำแหน่ง</option>
-                            </select>
-                            <select id="new-employee-photo">
-                                <option value="👤">👤 ทั่วไป</option>
-                                <option value="👨‍💼">👨‍💼 ผู้ชายสูท</option>
-                                <option value="👩‍💼">👩‍💼 ผู้หญิงสูท</option>
-                                <option value="👨‍🔧">👨‍🔧 ช่างผู้ชาย</option>
-                                <option value="👩‍🔧">👩‍🔧 ช่างผู้หญิง</option>
-                                <option value="👨‍💻">👨‍💻 โปรแกรมเมอร์ผู้ชาย</option>
-                                <option value="👩‍💻">👩‍💻 โปรแกรมเมอร์ผู้หญิง</option>
-                                <option value="👮‍♂️">👮‍♂️ รปภ.ผู้ชาย</option>
-                                <option value="👮‍♀️">👮‍♀️ รปภ.ผู้หญิง</option>
-                                <option value="🚗">🚗 คนขับรถ</option>
-                                <option value="🧹">🧹 พนักงานทำความสะอาด</option>
-                            </select>
-                            <button class="btn btn-success" onclick="addEmployee()">เพิ่มพนักงาน</button>
-                        </div>
-                    </div>
-
-                    <div class="summary-cards">
-                        <div class="summary-card">
-                            <h3 id="total-employees">0</h3>
-                            <p>จำนวนพนักงานทั้งหมด</p>
-                        </div>
-                        <div class="summary-card">
-                            <h3 id="present-today">0</h3>
-                            <p>มาทำงานวันนี้</p>
-                        </div>
-                        <div class="summary-card">
-                            <h3 id="late-today">0</h3>
-                            <p>มาสายวันนี้</p>
-                        </div>
-                    </div>
-
-                    <h3>📋 รายชื่อพนักงาน</h3>
-                    <table class="data-table" id="employees-table">
-                        <thead>
-                            <tr>
-                                <th class="sortable" onclick="sortTable('employees-table', 0)">รหัสพนักงาน</th>
-                                <th class="sortable" onclick="sortTable('employees-table', 1)">ชื่อ-นามสกุล</th>
-                                <th class="sortable" onclick="sortTable('employees-table', 2)">ตำแหน่ง</th>
-                                <th class="sortable" onclick="sortTable('employees-table', 3)">สถานะวันนี้</th>
-                                <th>การจัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-
-                <!-- Schedules Tab -->
-                <div id="admin-schedules" class="admin-tab-content">
-                    <div class="form-group">
-                        <h3>➕ เพิ่มตำแหน่งงานใหม่</h3>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0;">
-                            <input type="text" id="new-position-name" placeholder="ชื่อตำแหน่ง">
-                            <input type="time" id="new-start-time" placeholder="เวลาเข้างาน">
-                            <input type="time" id="new-end-time" placeholder="เวลาออกงาน">
-                            <input type="number" id="new-break-time" placeholder="พักเบรก (นาที)" min="0" max="120">
-                            <button class="btn btn-success" onclick="addWorkSchedule()">เพิ่มตำแหน่ง</button>
-                        </div>
-                    </div>
-
-                    <h3>📋 ตารางเวลาทำงานตามตำแหน่ง</h3>
-                    <table class="data-table" id="schedules-table">
-                        <thead>
-                            <tr>
-                                <th class="sortable" onclick="sortTable('schedules-table', 0)">ตำแหน่งงาน</th>
-                                <th class="sortable" onclick="sortTable('schedules-table', 1)">เวลาเข้างาน</th>
-                                <th class="sortable" onclick="sortTable('schedules-table', 2)">เวลาออกงาน</th>
-                                <th class="sortable" onclick="sortTable('schedules-table', 3)">ชั่วโมงทำงาน</th>
-                                <th class="sortable" onclick="sortTable('schedules-table', 4)">เวลาพักเบรก (นาที)</th>
-                                <th>การจัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-
-                <!-- Reports Tab -->
-                <div id="admin-reports" class="admin-tab-content">
-                    <div class="filters">
-                        <div class="form-group">
-                            <label>ค้นหาพนักงาน:</label>
-                            <input type="text" id="search-employee" placeholder="ชื่อพนักงาน" onkeyup="filterReports()">
-                        </div>
-                        <div class="form-group">
-                            <label>ตำแหน่งงาน:</label>
-                            <select id="position-filter" onchange="filterReports()">
-                                <option value="">ทุกตำแหน่ง</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>วันที่เริ่มต้น:</label>
-                            <input type="date" id="start-date" onchange="filterReports()">
-                        </div>
-                        <div class="form-group">
-                            <label>วันที่สิ้นสุด:</label>
-                            <input type="date" id="end-date" onchange="filterReports()">
-                        </div>
-                        <div class="form-group">
-                            <label>&nbsp;</label>
-                            <button class="btn btn-success" onclick="exportToExcel()">📊 Export Excel</button>
-                            <button class="btn" onclick="exportToPDF()">📄 Export PDF</button>
-                        </div>
-                    </div>
-
-                    <table class="data-table" id="reports-table">
-                        <thead>
-                            <tr>
-                                <th class="sortable" onclick="sortTable('reports-table', 0)">วันที่</th>
-                                <th class="sortable" onclick="sortTable('reports-table', 1)">ชื่อ-นามสกุล</th>
-                                <th class="sortable" onclick="sortTable('reports-table', 2)">ตำแหน่ง</th>
-                                <th class="sortable" onclick="sortTable('reports-table', 3)">เวลาเข้างาน</th>
-                                <th class="sortable" onclick="sortTable('reports-table', 4)">เวลาออกงาน</th>
-                                <th class="sortable" onclick="sortTable('reports-table', 5)">ชั่วโมงทำงาน</th>
-                                <th class="sortable" onclick="sortTable('reports-table', 6)">สถานะ</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-
-                <!-- Edit Employee Modal -->
-                <div id="edit-employee-modal" style="
-                    display: none;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.5);
-                    z-index: 1000;
-                    backdrop-filter: blur(5px);
-                ">
-                    <div style="
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        background: white;
-                        padding: 30px;
-                        border-radius: 20px;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        max-width: 500px;
-                        width: 90%;
-                    ">
-                        <h3 style="margin-bottom: 20px; text-align: center;">✏️ แก้ไขข้อมูลพนักงาน</h3>
-                        <div class="form-group">
-                            <label>รหัสพนักงาน:</label>
-                            <input type="text" id="edit-employee-id" readonly style="background: #f5f5f5;">
-                        </div>
-                        <div class="form-group">
-                            <label>ชื่อ-นามสกุล:</label>
-                            <input type="text" id="edit-employee-name">
-                        </div>
-                        <div class="form-group">
-                            <label>ตำแหน่ง:</label>
-                            <select id="edit-employee-position">
-                                <option value="">เลือกตำแหน่ง</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>ไอคอน:</label>
-                            <select id="edit-employee-photo">
-                                <option value="👤">👤 ทั่วไป</option>
-                                <option value="👨‍💼">👨‍💼 ผู้ชายสูท</option>
-                                <option value="👩‍💼">👩‍💼 ผู้หญิงสูท</option>
-                                <option value="👨‍🔧">👨‍🔧 ช่างผู้ชาย</option>
-                                <option value="👩‍🔧">👩‍🔧 ช่างผู้หญิง</option>
-                                <option value="👨‍💻">👨‍💻 โปรแกรมเมอร์ผู้ชาย</option>
-                                <option value="👩‍💻">👩‍💻 โปรแกรมเมอร์ผู้หญิง</option>
-                                <option value="👮‍♂️">👮‍♂️ รปภ.ผู้ชาย</option>
-                                <option value="👮‍♀️">👮‍♀️ รปภ.ผู้หญิง</option>
-                                <option value="🚗">🚗 คนขับรถ</option>
-                                <option value="🧹">🧹 พนักงานทำความสะอาด</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                            <button class="btn btn-success" onclick="saveEmployeeEdit()">บันทึก</button>
-                            <button class="btn" onclick="closeEditModal()">ยกเลิก</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-    </div>
-
-    <!-- Footer -->
-    <footer style="
-        background: rgba(0,0,0,0.8);
-        color: white;
-        text-align: center;
-        padding: 20px;
-        margin-top: 50px;
-        backdrop-filter: blur(10px);
-    ">
-        <p style="margin: 0; font-size: 0.9rem;">
-            © developed by <strong>Tle Narongphisit</strong> | <strong>CTTC19 @ CPD</strong>
-        </p>
-    </footer>
-
-    <script src="./systemscript.js"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97c5b78dd6587334',t:'MTc1NzQxMDc1Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-</html>
+<div>
+	<meta charset="UTF-8" />
+</div>
+<div>
+	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+</div>
+<div style="max-width: 800px; margin: 0 auto; background-color: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 20px; margin-top: 20px; margin-bottom: 20px;" align="center">
+	<header>
+		<table style="border-radius: 10px; width: 100%;" cellpadding="10" bgcolor="#7fbf7f">
+			<tbody>
+				<tr>
+					<td align="center"><span style="color: white; font-size: xx-large;">🏢 ยินดีต้อนรับเข้าสู่ระบบงานจ้างเหมาบริการ</span></td>
+				</tr>
+			</tbody>
+		</table>
+	</header>
+	<table style="width: 100%;" cellpadding="20">
+		<tbody>
+			<tr>
+				<td align="center"><span style="color: #5ca05c; font-size: x-large;"><b>📋 กรุณาเลือกเมนูที่ต้องการเพื่อดำเนินการต่อ</b></span><br /><br /> <span style="font-size: medium;">ระบบรายงานการปฏิบัติงานช่วยให้ศูนย์ฯ19 สามารถจัดการข้อมูลได้อย่างมีประสิทธิภาพ รวดเร็ว และง่ายดาย <br /><span style="font-size: medium;">คณะกรรมการตรวจรับงานจ้าง</span>สามารถเพิ่มประสิทธิภาพการติดตามและประเมินผลงาน<br />พร้อมให้ผู้รับบริการซึ่งเป็นบุคลากรในหน่วยงานได้ประเมินความพึงพอใจผลการปฏิบัติงานของผู้รับจ้าง<br /></span></td>
+			</tr>
+		</tbody>
+	</table>
+	<table style="border-radius: 10px; margin-top: 20px; width: 100%;" cellpadding="10" bgcolor="#f0f4f8">
+		<tbody>
+			<tr>
+				<td colspan="2" align="center"><span style="color: #1a73e8; font-size: large;"><b>รายงานการปฏิบัติงานประจำวัน</b></span></td>
+			</tr>
+			<tr>
+				<td colspan="2" style="width: 100%;" align="center"><a href="./checkin.html" target="_blank" rel="noopener" style="text-decoration: none;" title="ลงเวลาเข้า-ออกงาน">
+						<table style="border-radius: 8px; width: 80%;" cellpadding="15" bgcolor="FF9A00">
+							<tbody>
+								<tr>
+									<td align="center"><span style="color: white; font-size: large;">🕣 ลงเวลาการปฏิบัติงาน</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</a></td>
+			</tr>
+			<tr>
+				<td colspan="2" style="width: 100%;" align="center"><a href="https://forms.gle/fJdT7pnSMXUS36UG7" target="_blank" rel="noopener" style="text-decoration: none;" title="แบบรายการการปฏิบัติงานประจำวันจ้างเหมาบริการ">
+						<table style="border-radius: 8px; width: 80%;" cellpadding="15" bgcolor="#4285f4">
+							<tbody>
+								<tr>
+									<td align="center"><span style="color: white; font-size: large;">📝 รายงานการปฏิบัติงาน</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</a></td>
+			</tr>
+			<tr>
+				<td colspan="2" style="width: 100%;" align="center"><a href="https://drive.google.com/file/d/1J6lUR7f9mJ3vsODsX_Xr-N04DUQBRh1c" target="_blank" rel="noopener" style="text-decoration: none;" title="ดาวน์โหลดไฟล์เข้าระบบฟอร์มรายงาน">
+						<table style="border-radius: 8px; width: 80%;" cellpadding="15" bgcolor="#0f9d58">
+							<tbody>
+								<tr>
+									<td align="center"><span style="color: white; font-size: large;">💾 ดาวน์โหลดไฟล์เข้าระบบฟอร์มรายงาน</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</a></td>
+			</tr>
+			<tr>
+				<td colspan="1" style="width: 50%;" align="center"><a href="https://shorturl.at/qNe4o" target="_blank" rel="noopener" style="text-decoration: none;" title="ระบบตรวจสอบผลการรายงานจ้างเหมาบริการ V.1">
+						<table style="border-radius: 8px; width: 100%;" cellpadding="15" bgcolor="#db4437">
+							<tbody>
+								<tr>
+									<td align="center"><span style="color: white; font-size: large;">🔍 ตรวจสอบรายงาน V.1</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</a></td>
+				<td colspan="1" style="width: 50%;" align="center"><a href="./report.html" target="_blank" rel="noopener" style="text-decoration: none;" title="ระบบตรวจสอบผลการรายงานจ้างเหมาบริการ V.2">
+						<table style="border-radius: 8px; width: 100%;" cellpadding="15" bgcolor="#db4437">
+							<tbody>
+								<tr>
+									<td align="center"><span style="color: white; font-size: large;">🔍 ตรวจสอบรายงาน V.2</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</a></td>
+			</tr>
+		</tbody>
+	</table>
+	<table style="border-radius: 10px; margin-top: 20px; width: 100%;" cellpadding="10" bgcolor="#f0f4f8">
+		<tbody>
+			<tr>
+				<td colspan="2" align="center"><span style="color: #1a73e8; font-size: large;"><b>รายงานผลประเมิน (รอบ 6 เดือน)</b></span></td>
+			</tr>
+			<tr>
+				<td colspan="2" style="width: 100%;" align="center"><a href="https://forms.gle/TJjBD12KafStLDjH7" target="_blank" rel="noopener" style="text-decoration: none;" title="แบบประเมินความพึงพอใจงานจ้างเหมาบริการ">
+						<table style="border-radius: 8px; width: 80%;" cellpadding="15" bgcolor="#f4b400">
+							<tbody>
+								<tr>
+									<td align="center"><span style="color: white; font-size: large;">⭐ ประเมินผลการปฏิบัติงาน</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</a></td>
+			</tr>
+			<tr>
+				<td colspan="1" style="width: 50%;" align="center"><a href="https://shorturl.at/MKkBy" target="_blank" rel="noopener" style="text-decoration: none;" title="รายงานผลประเมินงานจ้างเหมาบริการ">
+						<table style="border-radius: 8px; width: 100%;" cellpadding="15" bgcolor="#673ab7">
+							<tbody>
+								<tr>
+									<td align="center"><span style="color: white; font-size: large;">📊 สรุปผลประเมิน V.1</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</a></td>
+				<td colspan="1" style="width: 50%;" align="center"><a href="./results.html" target="_blank" rel="noopener" style="text-decoration: none;" title="รายงานผลประเมินงานจ้างเหมาบริการ">
+						<table style="border-radius: 8px; width: 100%;" cellpadding="15" bgcolor="#673ab7">
+							<tbody>
+								<tr>
+									<td align="center"><span style="color: white; font-size: large;">📊 สรุปผลประเมิน V.2</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</a></td>
+			</tr>
+		</tbody>
+	</table>
+	<footer>
+		<table style="margin-top: 30px; width: 100%;" cellpadding="10">
+			<tbody>
+				<tr>
+					<td align="center">
+						<hr width="80%" /><span style="color: #666666; font-size: small;">ระบบรายงานการปฏิบัติงาน © 2025 Developed by Tle Narongphisit</span><br /> <span id="currentDateTime" style="color: #666666; font-size: small;">ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</footer>
+</div>
