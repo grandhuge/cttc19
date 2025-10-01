@@ -35,9 +35,10 @@
                 } else {
                     // Initialize default users if none exist
                     users = {
-                        'admin': { password: 'Tle019', isAdmin: true },
+                        'test': { password: '123456', isAdmin: true },
                         'user1': { password: 'password123', isAdmin: false },
-                        'user2': { password: 'password456', isAdmin: false }
+                        'user2': { password: 'password456', isAdmin: false },
+                        'user3': { password: 'password789', isAdmin: false }
                     };
                     await database.ref('users').set(users);
                 }
@@ -1005,4 +1006,5 @@
         }
 
         // Firebase initialization complete
+
     
