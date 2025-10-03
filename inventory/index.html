@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดเก็บครุภัณฑ์ - ศูนย์ฯ19</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --theme-color-1: #1E9AFE;
+            --theme-color-2: #60DFCD;
+            --theme-shadow-color: rgba(30, 154, 254, 0.5);
+        }
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, var(--theme-color-1), var(--theme-color-2));
+            min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+        .main-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--theme-color-1), var(--theme-color-2));
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px 0 var(--theme-shadow-color);
+        }
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex items-center justify-center">
+
+    <div class="main-container w-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <img src="https://cttc19.onrender.com/logo-cttc19.png" alt="Logo" class="w-32 h-24 mx-auto mb-4 rounded-full shadow-md">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">ระบบบริหารจัดการครุภัณฑ์ ศูนย์ฯ19</h1>
+            <p class="text-gray-600">โดย ฝ่ายงานพัสดุ และคณะกรรมการตรวจนับพัสดุประจำปี 2568</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="flex flex-wrap justify-center items-center gap-2 mb-8">
+            <button onclick="showPage('dashboardPage')" class="nav-btn btn-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md"><i class="fas fa-chart-pie mr-2"></i>ภาพรวม</button>
+            <button onclick="showPage('reportPage')" class="nav-btn btn-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md"><i class="fas fa-file-alt mr-2"></i>รายงาน</button>
+<!--            <button onclick="handleOpenForm()" class="nav-btn btn-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md"><i class="fas fa-plus-circle mr-2"></i>เพิ่มข้อมูลใหม่</button>-->
+            <button id="logoutButton" onclick="logout()" class="nav-btn bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hidden"><i class="fas fa-sign-out-alt mr-2"></i>ออกจากระบบ</button>
+            <!-- Theme Changer Dropdown -->
+            <div class="relative">
+                <button id="theme-menu-button" class="nav-btn bg-white hover:bg-gray-100 text-gray-700 font-semibold py-2 px-4 rounded-lg shadow-md"><i class="fas fa-palette mr-2"></i>ธีม</button>
+                <div id="theme-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl hidden z-10 p-2">
+                    <!-- Theme swatches will be injected here by JavaScript -->
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="app-content">
+            <!-- Dashboard Page -->
+            <div id="dashboardPage" class="page">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4 text-center">สถิติครุภัณฑ์</h2>
+                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8 text-center">
+                      <div class="bg-blue-100 p-4 rounded-xl shadow-sm"><h3 class="font-semibold text-blue-800">ทั้งหมด</h3><p id="total-count" class="text-2xl font-bold text-blue-900">0</p></div>
+                      <div class="bg-green-100 p-4 rounded-xl shadow-sm"><h3 class="font-semibold text-green-800">ใช้งานได้</h3><p id="usable-count" class="text-2xl font-bold text-green-900">0</p></div>
+                      <div class="bg-yellow-100 p-4 rounded-xl shadow-sm"><h3 class="font-semibold text-yellow-800">รอซ่อม</h3><p id="repair-count" class="text-2xl font-bold text-yellow-900">0</p></div>
+                      <div class="bg-red-100 p-4 rounded-xl shadow-sm"><h3 class="font-semibold text-red-800">ชำรุด</h3><p id="damaged-count" class="text-2xl font-bold text-red-900">0</p></div>
+                      <div class="bg-gray-100 p-4 rounded-xl shadow-sm"><h3 class="font-semibold text-gray-800">รอจำหน่าย</h3><p id="dispose-count" class="text-2xl font-bold text-gray-900">0</p></div>
+                 </div>
+
+                <!-- Filter Buttons -->
+                <div class="my-8 text-center">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">ดูรายการตามสถานะ</h3>
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <button onclick="applyFilterAndSwitchPage('all')" class="filter-btn bg-white hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm">ทั้งหมด</button>
+                        <button onclick="applyFilterAndSwitchPage('ใช้งานได้')" class="filter-btn bg-green-100 hover:bg-green-200 text-green-800 font-semibold py-2 px-4 rounded-lg shadow-sm">ใช้งานได้</button>
+                        <button onclick="applyFilterAndSwitchPage('รอซ่อม')" class="filter-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-800 font-semibold py-2 px-4 rounded-lg shadow-sm">รอซ่อม</button>
+                        <button onclick="applyFilterAndSwitchPage('ชำรุด')" class="filter-btn bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-2 px-4 rounded-lg shadow-sm">ชำรุด</button>
+                        <button onclick="applyFilterAndSwitchPage('รอจำหน่าย')" class="filter-btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow-sm">รอจำหน่าย</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-lg">
+                    <div class="relative h-64 md:h-80">
+                        <canvas id="inventoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Page -->
+            <div id="reportPage" class="page hidden">
+                 <h2 class="text-2xl font-semibold text-gray-700 mb-4 text-center">รายการครุภัณฑ์ทั้งหมด</h2>
+
+                 <!-- Search and Filter Controls -->
+                 <div class="mb-6 bg-white p-4 rounded-xl shadow-md">
+                     <div class="flex flex-col sm:flex-row gap-4 items-center">
+                         <div class="relative flex-grow w-full">
+                             <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                 <i class="fas fa-search text-gray-400"></i>
+                             </span>
+                             <input type="text" id="searchInput" placeholder="ค้นหาตามชื่อ, รหัส ..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         </div>
+                         <div class="flex-shrink-0 w-full sm:w-auto">
+                             <select id="statusFilter" class="w-full sm:w-auto border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                 <option value="all">ทุกสถานะ</option>
+                                 <option value="ใช้งานได้">ใช้งานได้</option>
+                                 <option value="รอซ่อม">รอซ่อม</option>
+                                 <option value="ชำรุด">ชำรุด</option>
+                                 <option value="รอจำหน่าย">รอจำหน่าย</option>
+                             </select>
+                         </div>
+                         <div class="flex-shrink-0">
+                            <button onclick="printReport()" class="btn-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md w-full sm:w-auto"><i class="fas fa-print mr-2"></i>พิมพ์รายงาน</button>
+                         </div>
+                     </div>
+                 </div>
+
+                 <div id="report-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                     <!-- Cards will be injected here -->
+                 </div>
+                 
+                 <!-- Pagination Controls -->
+                 <div id="pagination-container" class="mt-8 flex justify-center items-center gap-2">
+                     <!-- Pagination buttons will be injected here by JavaScript -->
+                 </div>
+            </div>
+            
+            <!-- Form Page -->
+            <div id="formPage" class="page hidden">
+                <h2 id="form-title" class="text-2xl font-semibold text-gray-700 mb-4 text-center">เพิ่มข้อมูลครุภัณฑ์</h2>
+                <form id="inventory-form" class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-lg">
+                    <input type="hidden" id="rowId" name="rowId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="inventoryId" class="block text-sm font-medium text-gray-700">รหัสครุภัณฑ์</label>
+                            <input type="text" id="inventoryId" name="inventoryId" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                        <div>
+                            <label for="itemName" class="block text-sm font-medium text-gray-700">ชื่อรายการ</label>
+                            <input type="text" id="itemName" name="itemName" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                        <div>
+                            <label for="quantity" class="block text-sm font-medium text-gray-700">จำนวน</label>
+                            <input type="number" id="quantity" name="quantity" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required min="1" value="1">
+                        </div>
+                         <div>
+                            <label for="purchaseDate" class="block text-sm font-medium text-gray-700">วันที่ซื้อ</label>
+                            <input type="date" id="purchaseDate" name="purchaseDate" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="location" class="block text-sm font-medium text-gray-700">สถานที่จัดเก็บ</label>
+                            <input type="text" id="location" name="location" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="brandmodel" class="block text-sm font-medium text-gray-700">ยี่ห้อ/รุ่น</label>
+                            <input type="text" id="brandmodel" name="brandmodel" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="responsiblePerson" class="block text-sm font-medium text-gray-700">ผู้รับผิดชอบ</label>
+                            <input type="text" id="responsiblePerson" name="responsiblePerson" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-gray-700">สถานะ</label>
+                            <select id="status" name="status" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                <option>ใช้งานได้</option>
+                                <option>ชำรุด</option>
+                                <option>รอซ่อม</option>
+                                <option>รอจำหน่าย</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                             <label for="image" class="block text-sm font-medium text-gray-700">รูปภาพ</label>
+                             <input type="file" id="image" name="image" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" accept="image/*">
+                             <img id="image-preview" src="" class="hidden mt-4 max-h-40 rounded-lg"/>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-4">
+                         <button type="button" onclick="showPage('reportPage')" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">ยกเลิก</button>
+                         <button type="submit" class="btn-primary text-white font-semibold py-2 px-6 rounded-lg shadow-md"><i class="fas fa-save mr-2"></i>บันทึกข้อมูล</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Details Modal -->
+    <div id="detailsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden">
+      <div class="relative mx-auto p-5 border w-full max-w-lg shadow-lg rounded-2xl bg-white">
+        <div class="mt-3 text-center">
+            <h3 id="modal-title" class="text-2xl leading-6 font-bold text-gray-900 mb-4"></h3>
+            <div class="mt-2 text-left space-y-3 px-4">
+                <img id="modal-img" src="" class="w-full h-auto max-h-64 object-contain rounded-lg mx-auto mb-4" onerror="this.onerror=null;this.src='https://placehold.co/600x400/FECACA/991B1B?text=โหลดรูปไม่ได้';">
+                <p class="text-sm text-gray-600"><strong>รหัส:</strong> <span id="modal-id"></span></p>
+                <p class="text-sm text-gray-600"><strong>สถานะ:</strong> <span id="modal-status" class="font-semibold px-2 py-1 rounded-full text-xs"></span></p>
+                <p class="text-sm text-gray-600"><strong>จำนวน:</strong> <span id="modal-quantity"></span></p>
+                <p class="text-sm text-gray-600"><strong>วันที่ซื้อ:</strong> <span id="modal-date"></span></p>
+                <p class="text-sm text-gray-600"><strong>สถานที่:</strong> <span id="modal-location"></span></p>
+                <p class="text-sm text-gray-600"><strong>ยี่ห้อ/รุ่น:</strong> <span id="modal-brandmodel"></span></p>
+                <p class="text-sm text-gray-600"><strong>ผู้รับผิดชอบ:</strong> <span id="modal-person"></span></p>
+            </div>
+            <div class="items-center px-4 py-3 mt-4">
+                <button id="closeModal" class="px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    ปิด
+                </button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+
+    <footer class="fixed bottom-0 left-0 right-0 text-center py-2">
+        <p class="text-xs text-white/80">Copyright © 2025 ระบบจัดเก็บครุภัณฑ์ | By Tle Narongphisit</p>
+    </footer>
+
+    <script src="./script.js"></script>
+</body>
+</html>
+
