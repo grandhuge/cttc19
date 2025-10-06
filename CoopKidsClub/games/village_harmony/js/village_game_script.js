@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const coopBuildingImg = document.getElementById('coopBuildingImg');
 
     let villageHappiness = 0;
-    const totalMinigames = 3; // Farmer, Weaver, Fisherman
+    const totalMinigames = 3;
     let completedMinigames = 0;
 
     const gameState = {
@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
         coopBuilt: false
     };
 
-    // --- Mascot Feedback Function ---
     function setFeedback(text, mascot = "aomtung") {
         feedbackTextEl.textContent = text;
         if (mascot === "aomtung") {
@@ -33,8 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- View Switching ---
-    function showView(viewToShow) { // 'map' or 'minigame'
+    function showView(viewToShow) {
         if (viewToShow === 'map') {
             villageMapContainer.classList.add('active-view');
             minigameView.classList.remove('active-view');
@@ -47,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Update Progress ---
     function updateProgress() {
         const happinessPercentage = Math.round((completedMinigames / totalMinigames) * 100);
         villageHappiness = happinessPercentage;
@@ -61,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gameState.coopBuilt) {
              villageMapBg.src = 'images/village_map_happy.png';
              coopBuildingImg.src = 'images/coop_building_active.png';
-             // Add coop sign image over the building if available
              let sign = document.getElementById('coopSign');
              if (!sign) {
                 sign = document.createElement('img');
@@ -69,21 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 sign.id = 'coopSign';
                 sign.style.position = 'absolute';
                 sign.style.width = '70px';
-                sign.style.bottom = '50px'; // Adjust
+                sign.style.bottom = '50px';
                 sign.style.left = '50%';
                 sign.style.transform = 'translateX(-50%)';
                 coopBuildingHotspot.appendChild(sign);
              }
-
              setFeedback("หมู่บ้านหรรษากลับมามีความสุขแล้ว เพราะทุกคนร่วมมือกันสร้าง 'สหกรณ์หมู่บ้านหรรษา'!", "aomtung");
         }
     }
 
-    // --- Mini-Game Loading and Logic ---
     const minigames = {
         farmer: {
-            title: "ช่วยลุงมีจัดการฟาร์ม",
-            instructions: "ลุงมีประสบปัญหาราคาปุ๋ยแพงและเครื่องมือทำฟาร์มเก่า ลองช่วยลุงมีหาวิธีแก้ปัญหากัน!",
             initHTML: () => `
                 <h3 class="minigame-title">ช่วยลุงมีจัดการฟาร์ม</h3>
                 <p class="minigame-instructions">เลือกวิธีซื้อปุ๋ยที่คุ้มค่าที่สุด และหาวิธีจัดหาเครื่องมือใหม่</p>
@@ -100,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div id="fertilizerResult" style="margin-top:10px; font-weight:bold;"></div>
-
                     <h4 style="margin-top:20px;">2. ปัญหาเครื่องมือเก่า</h4>
                     <div class="tool-sharing-ui">
                         <img src="images/icon_coin.png" alt="เหรียญ"> + <img src="images/icon_coin.png" alt="เหรียญ"> + <img src="images/icon_coin.png" alt="เหรียญ">
@@ -131,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         gameState.farmerSolved = true;
                         completedMinigames++;
                         document.getElementById('hotspotFarmer').classList.add('solved');
-                        document.getElementById('farmerSolvedIndicator').style.display = 'block'; // Show happy farmer
+                        document.getElementById('farmerSolvedIndicator').style.display = 'block';
                         updateProgress();
                     }
                     showView('map');
@@ -139,18 +130,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         weaver: {
-            title: "เปิดร้านให้ป้าสวย",
-            instructions: "ป้าสวยทอผ้าสวยมาก แต่ไม่มีที่ขาย ลองช่วยป้าสวยและเพื่อนๆ จัดร้านค้าชุมชนกัน!",
             initHTML: () => `
                 <h3 class="minigame-title">เปิดร้านให้ป้าสวย</h3>
                 <p class="minigame-instructions">ลากสินค้าหัตถกรรมไปวางบนแผงขายของชุมชนให้น่าสนใจ!</p>
                 <div class="minigame-content-wrapper">
-                    <div class="available-crafts" style="margin-bottom:20px;">
-                        <div class="craft-item" data-item="fabric" draggable="true" title="ผ้าทอ"></div>
-                        <div class="craft-item" data-item="pottery" draggable="true" title="เครื่องปั้นดินเผา"></div>
-                        </div>
-                    <div class="market-stall-area" id="marketStallDropzone">
-                        </div>
+                    <div class="available-crafts" style="margin-bottom:20px; display:flex; gap:10px;">
+                        <div class="craft-item" data-item="fabric" draggable="true" title="ผ้าทอ" style="background-image: url('images/weaver_fabric_icon.png');"></div>
+                        <div class="craft-item" data-item="pottery" draggable="true" title="เครื่องปั้นดินเผา" style="background-image: url('images/pottery_icon.png');"></div>
+                    </div>
+                    <div class="market-stall-area" id="marketStallDropzone"></div>
                     <div id="marketStatus" style="margin-top:10px; font-weight:bold;"></div>
                     <button id="openShopBtn" class="game-btn" style="margin-top:20px;">เปิดร้านค้าชุมชน!</button>
                 </div>
@@ -175,20 +163,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const itemName = e.dataTransfer.getData('text/plain');
                     const droppedItem = Array.from(items).find(i => i.dataset.item === itemName && !i.parentElement.isSameNode(stall));
                     
-                    if (droppedItem && itemsOnStall < 3) { // Limit items for simplicity
+                    if (droppedItem && itemsOnStall < 3) {
                         const newItemVisual = droppedItem.cloneNode(true);
-                        newItemVisual.style.cursor = 'default'; // Not draggable anymore
+                        newItemVisual.style.cursor = 'default';
                         stall.appendChild(newItemVisual);
                         itemsOnStall++;
                         minigameView.querySelector('#marketStatus').textContent = `มีสินค้า ${itemsOnStall} ชิ้นบนแผงแล้ว!`;
-                        if(itemsOnStall >= 2){ // Make it easy to "win"
+                        if(itemsOnStall >= 2){
                              stall.style.backgroundImage = "url('images/market_stall_full.png')";
                         }
                     }
                 });
 
                 minigameView.querySelector('#openShopBtn').addEventListener('click', () => {
-                     if (itemsOnStall >= 2 && !gameState.weaverSolved) { // Example condition
+                     if (itemsOnStall >= 2 && !gameState.weaverSolved) {
                         gameState.weaverSolved = true;
                         completedMinigames++;
                         document.getElementById('hotspotWeaver').classList.add('solved');
@@ -200,15 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         fisherman: {
-            // ... Define fisherman minigame (e.g., choosing to buy fuel together, pooling resources for a better boat)
-            title: "รวมพลังชาวประมง",
-            instructions: "น้าชัยและเพื่อนๆ ชาวประมงเจอปัญหาน้ำมันแพงและเรือลำเล็ก ลองช่วยพวกเขาหาวิธีรวมพลังกัน!",
             initHTML: () => `
                 <h3 class="minigame-title">รวมพลังชาวประมง</h3>
                 <p class="minigame-instructions">1. เลือกวิธีซื้อน้ำมัน และ 2. ลองดูว่าจะรวมเงินซื้ออุปกรณ์ที่ดีขึ้นได้ไหม</p>
                 <div class="minigame-content-wrapper">
-                    <h4>1. ปัญหาน้ำมันแพง (คล้ายปุ๋ย)</h4>
-                    <div class="farmer-options">
+                    <h4>1. ปัญหาน้ำมันแพง</h4>
+                     <div class="farmer-options">
                         <div class="farmer-option" data-choice="single-fuel">
                             <img src="images/icon_fuel.png" alt="ซื้อน้ำมันคนเดียว">
                             <p>ซื้อคนเดียว: 50 บาท/ลิตร</p>
@@ -219,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div id="fuelResult" style="margin-top:10px; font-weight:bold;"></div>
-
                     <h4 style="margin-top:20px;">2. ปัญหาเรือเล็กและอุปกรณ์</h4>
                     <p>เมื่อชาวประมงหลายคนร่วมกันลงเงิน (<img src="images/icon_coin.png" style="height:20px;vertical-align:middle;">) ก็สามารถซื้อเรือลำใหญ่ขึ้น (<img src="images/fishing_boat_improved.png" style="height:40px;vertical-align:middle;">) หรืออุปกรณ์ที่ดีกว่า (<img src="images/icon_net.png" style="height:30px;vertical-align:middle;">) มาใช้ร่วมกันได้</p>
                     <button id="solveFishermanProblemBtn" class="game-btn" style="margin-top:20px;">แก้ปัญหานี้สำเร็จ!</button>
@@ -254,11 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         coop_build: {
-            title: "สร้างสหกรณ์หมู่บ้านหรรษา",
-            instructions: "เมื่อทุกคนร่วมมือกันแก้ปัญหา ก็ถึงเวลารวมพลังสร้างสหกรณ์ของพวกเราแล้ว!",
             initHTML: () => `
                 <h3 class="minigame-title">สร้างสหกรณ์หมู่บ้านหรรษา!</h3>
-                <p class="minigame-instructions">ลากชาวบ้านที่แก้ปัญหาแล้วมารวมกันที่อาคารสหกรณ์!</p>
+                <p class="minigame-instructions">เมื่อทุกคนร่วมมือกันแก้ปัญหา ก็ถึงเวลารวมพลังสร้างสหกรณ์ของพวกเราแล้ว!</p>
                 <div class="minigame-content-wrapper" style="flex-direction:row; justify-content:space-around; align-items:flex-end;">
                     <div id="villagerSourceArea" style="display:flex; flex-direction:column; gap:10px;">
                         ${gameState.farmerSolved ? '<img src="images/farmer_happy.png" class="draggable-villager" data-villager="farmer" style="height:80px; cursor:grab;" alt="ลุงมี">' : ''}
@@ -292,8 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const villagerEl = minigameView.querySelector(`.draggable-villager[data-villager="${villagerType}"]`);
                     if (villagerEl && !villagerEl.classList.contains('dropped')) {
                         villagerEl.classList.add('dropped');
-                        villagerEl.style.display = 'none'; // Hide original
-                        // Could add small icons to the dropzone instead of hiding
+                        villagerEl.style.display = 'none';
                         villagersInCoop++;
                         statusEl.textContent = `มีสมาชิก ${villagersInCoop}/${totalVillagersToDrag} คนแล้ว!`;
                         if (villagersInCoop === totalVillagersToDrag) {
@@ -306,8 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 completeBtn.addEventListener('click', () => {
                     if(!gameState.coopBuilt){
                         gameState.coopBuilt = true;
-                        // completedMinigames++; // This could be the final step
-                        updateProgress(); // This will trigger happy map and final message
+                        updateProgress();
                     }
                     showView('map');
                 });
@@ -324,25 +304,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Event Listeners ---
-    document.querySelectorAll('.problem-hotspot').forEach(hotspot => {
+    document.querySelectorAll('.problem-hotspot, .coop-building-spot').forEach(hotspot => {
         hotspot.addEventListener('click', () => {
-            if (!hotspot.classList.contains('solved') || hotspot.id === 'coopBuildingHotspot') { // Allow clicking coop building if visible
+            if (!hotspot.classList.contains('solved')) {
                 const gameKey = hotspot.dataset.minigame;
                 loadMiniGame(gameKey);
             }
         });
     });
-    coopBuildingHotspot.addEventListener('click', () => { // Separate listener for coop building
-        if (completedMinigames === totalMinigames) {
-             loadMiniGame('coop_build');
-        }
-    });
-
 
     backToMapBtn.addEventListener('click', () => showView('map'));
-
-    // --- Initial Setup ---
-    showView('map'); // Start with the map
-    updateProgress(); // Initialize progress bar
+    showView('map');
+    updateProgress();
 });
