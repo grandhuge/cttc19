@@ -409,7 +409,7 @@
             statusSpan.textContent = item.status;
             statusSpan.className = `font-semibold px-2 py-1 rounded-full text-xs ${getStatusBadgeStyle(item.status)}`;
             
-            document.getElementById('modal-quantity').textContent = item.quantity;
+            document.getElementById('modal-price').textContent = item.price;
             document.getElementById('modal-date').textContent = new Date(item.purchaseDate).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
             document.getElementById('modal-location').textContent = item.location;
             document.getElementById('modal-brandmodel').textContent = item.brandmodel || '-';
@@ -439,7 +439,7 @@
                     document.getElementById('rowId').value = item.rowId;
                     document.getElementById('inventoryId').value = item.inventoryId;
                     document.getElementById('itemName').value = item.itemName;
-                    document.getElementById('quantity').value = item.quantity;
+                    document.getElementById('price').value = item.price;
                     document.getElementById('purchaseDate').value = item.purchaseDate; // Already in YYYY-MM-DD
                     document.getElementById('location').value = item.location;
                     document.getElementById('brandmodel').value = item.brandmodel || '';
@@ -470,7 +470,7 @@
                 rowId: document.getElementById('rowId').value,
                 inventoryId: document.getElementById('inventoryId').value,
                 itemName: document.getElementById('itemName').value,
-                quantity: document.getElementById('quantity').value,
+                price: document.getElementById('price').value,
                 purchaseDate: document.getElementById('purchaseDate').value,
                 location: document.getElementById('location').value,
                 brandmodel: document.getElementById('brandmodel').value,
@@ -627,6 +627,7 @@
             const brandmodels = [...new Set(filteredData.map(item => item.brandmodel))].filter(Boolean).join(', ');
             const responsiblePeople = [...new Set(filteredData.map(item => item.responsiblePerson))].filter(Boolean).join(', ');
             const locations = [...new Set(filteredData.map(item => item.location))].filter(Boolean).join(', ');
+			const status = [...new Set(filteredData.map(item => item.status))].filter(Boolean).join(', ');
 
             const printContent = `
                 <html>
@@ -682,11 +683,6 @@
                 <body>
                     <div class="main-title">แบบสำรวจครุภัณฑ์ ประจำปีงบประมาณ 2568</div>
                     <br>
-                    <div class="header-info">
-                        <span><b>ยี่ห้อ/รุ่น:</b> ${brandmodels || '-'}</span>
-                        <span><b>สถานที่เก็บ:</b> ${locations || '-'}</span>
-                        <span><b>ผู้รับผิดชอบ:</b> ${responsiblePeople || '-'}</span>
-                    </div>
                     <table>
                         <thead>
                             <tr>
@@ -710,6 +706,12 @@
                             ${tableRows}
                         </tbody>
                     </table>
+					<br>
+					<div class="header-info">
+                        <span><b>สถานที่เก็บ:</b> ${locations || '-'}</span>
+                        <span><b>ผู้รับผิดชอบ:</b> ${responsiblePeople || '-'}</span>
+						<span><b>สถานะ:</b> ${status || '-'}</span>
+                    </div>
                 </body>
                 </html>
             `;
