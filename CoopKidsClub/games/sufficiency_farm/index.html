@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกม: ฟาร์มสุขพอเพียง - Co-op Kids Club</title>
+    <link rel="stylesheet" href="css/farm_game_style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container" id="farmGameApp">
+        <header class="game-header">
+            <a href="../../activities.html" class="back-to-activities-btn">ᐊ กลับหน้ากิจกรรมหลัก</a>
+            <h1>ฟาร์มสุขพอเพียง</h1>
+        </header>
+
+        <div class="game-status-bar">
+            <div id="seasonDisplay">ฤดูกาลที่: 1</div>
+            <div id="moneyDisplay"><img src="images/icon_money.png" alt="เงิน"> 1,000 บาท</div>
+            <div id="farmHappinessDisplay">
+                ความสุขของฟาร์ม:
+                <div class="progress-bar-container"><div class="progress-bar-fill" id="happinessFill" style="width: 10%;">10%</div></div>
+            </div>
+        </div>
+
+        <main class="game-layout">
+            <div class="left-panel">
+                <div class="farm-view">
+                    <div id="farmerCharacter"><img src="images/farmer_in_normal.png" alt="ลุงอิน"></div>
+                    <div id="farmPlotsContainer">
+                        <div class="farm-plot" data-plot-id="1"><img src="images/plot_empty.png" alt="แปลงที่ 1"></div>
+                        <div class="farm-plot" data-plot-id="2"><img src="images/plot_empty.png" alt="แปลงที่ 2"></div>
+                        <div class="farm-plot" data-plot-id="3"><img src="images/plot_empty.png" alt="แปลงที่ 3"></div>
+                        <div class="farm-plot" data-plot-id="4"><img src="images/plot_empty.png" alt="แปลงที่ 4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel" id="actionPanel">
+                <div class="phase-container" id="planningPhase">
+                    <h3 class="phase-title">ขั้นตอนที่ 1: วางแผนการเพาะปลูก</h3>
+                    <div class="mascot-instruction panpol">
+                        <img src="images/panpol_farmer.png" alt="น้องปันผล">
+                        <p>"เรามาวางแผนอย่างพอประมาณและมีเหตุผลกันนะ! เลือกปลูกพืชให้หลากหลายเพื่อสร้างภูมิคุ้มกันที่ดีจ้ะ"</p>
+                    </div>
+                    <div id="eventCard" class="event-card-hidden"></div>
+                    <p class="shop-title">เลือกเมล็ดพันธุ์ (จากร้านค้าสหกรณ์)</p>
+                    <div class="seed-selection-container" id="seedShop">
+                        </div>
+                    <button id="finishPlanningBtn" class="game-btn">ยืนยันการปลูก</button>
+                </div>
+
+                <div class="phase-container hidden" id="growingPhase">
+                    <h3 class="phase-title">ขั้นตอนที่ 2: ดูแลฟาร์ม</h3>
+                     <div class="mascot-instruction aomtung">
+                        <img src="images/aomtung_farmer.png" alt="พี่ออมตังค์">
+                        <p>"เจอปัญหาใหญ่เหรอ? ไม่ต้องห่วง! สหกรณ์มีเครื่องมือดีๆ ให้ยืมใช้นะครับ"</p>
+                    </div>
+                    <div id="growingProblem"></div>
+                    <div id="growingChoices"></div>
+                </div>
+
+                <div class="phase-container hidden" id="harvestPhase">
+                    <h3 class="phase-title">ขั้นตอนที่ 3: เก็บเกี่ยวและขาย</h3>
+                     <div class="mascot-instruction aomtung">
+                        <img src="images/aomtung_farmer.png" alt="พี่ออมตังค์">
+                        <p>"รวมกันขายผ่านสหกรณ์สิ ได้ราคาดีกว่าขายคนเดียวนะ!"</p>
+                    </div>
+                    <div class="harvest-choices">
+                        <button id="sellLocalBtn" class="harvest-btn"><img src="images/market_local.png" alt="ตลาดทั่วไป">ขายที่ตลาดคนเดียว</button>
+                        <button id="sellCoopBtn" class="harvest-btn"><img src="images/market_coop.png" alt="ตลาดสหกรณ์">ขายผ่านสหกรณ์</button>
+                    </div>
+                </div>
+
+                 <div class="phase-container hidden" id="resultPhase">
+                    <h3 class="phase-title">สรุปผลฤดูกาล</h3>
+                    <div id="seasonResultText"></div>
+                    <button id="nextSeasonBtn" class="game-btn">เริ่มฤดูกาลถัดไป</button>
+                </div>
+            </div>
+        </main>
+        
+        <div id="game-over-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 id="gameOverTitle">ยินดีด้วย!</h2>
+                <p id="gameOverText">คุณช่วยลุงอินพัฒนาฟาร์มจนมีความสุข 100% สำเร็จ!</p>
+                <img id="gameOverImage" src="images/farmer_in_happy.png" alt="ลุงอินมีความสุข">
+                <button class="game-btn" id="playAgainBtn">เล่นอีกครั้ง</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/farm_game_script.js"></script>
+</body>
+</html>
