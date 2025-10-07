@@ -254,6 +254,15 @@
             });
         }
 
+function maskPhone(phone) {
+    if (!phone) return '';
+    const digits = phone.replace(/\D/g, ''); // ลบตัวอักษรที่ไม่ใช่ตัวเลข
+    if (digits.length < 7) return phone; // ถ้าเบอร์สั้นเกินไปไม่ต้องแปลง
+
+    const visiblePart = digits.slice(0, digits.length - 4);
+    return `${visiblePart}XXXX`;
+}
+
         function loadSummaryData() {
             // JSONP callback for getting summary data
             window.handleSummaryResponse = function(response) {
@@ -302,7 +311,7 @@
                                 <td class="px-6 py-4">
                                     <div class="text-sm font-medium text-gray-800">${dept.department}</div>
                                     <div class="text-xs text-gray-500 mt-1">ผู้ประสานงาน: ${dept.coordinator}</div>
-                                    <div class="text-xs text-gray-500">โทร: ${dept.phone}</div>
+                                    <div class="text-xs text-gray-500">โทร: ${maskPhone(dept.phone)}</div>
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
