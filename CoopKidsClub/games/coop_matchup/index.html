@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกม: จับคู่คุณประโยชน์ - Co-op Kids Club</title>
+    <link rel="stylesheet" href="css/matchup_game_style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container" id="matchupGameApp">
+        <header class="game-header">
+            <a href="../../activities.html" class="back-to-activities-btn">ᐊ กลับหน้ากิจกรรมหลัก</a>
+            <h1>เกมจับคู่คุณประโยชน์</h1>
+        </header>
+
+        <main class="game-area">
+            <div id="gameStatus" class="game-status">
+                <h2 id="roundTitle">รอบที่ 1: สหกรณ์ประเภทต่างๆ</h2>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+            </div>
+            
+            <div id="mascotInstruction" class="mascot-instruction">
+                <img id="mascotImage" src="../../assets/images/mascots/มาสคลอต ปันผล+ออมตัง_02.jpg" alt="มาสคอต">
+                <p id="instructionText">ลากคำอธิบายด้านขวา ไปวางให้ตรงกับประเภทของสหกรณ์ด้านซ้ายได้เลย!</p>
+            </div>
+
+            <div class="matchup-board">
+                <div class="column" id="dropZonesContainer">
+                    </div>
+                <div class="column" id="draggableCardsContainer">
+                    </div>
+            </div>
+
+            <div id="roundCompleteMessage" class="round-complete hidden">
+                <h3>ยอดเยี่ยมมาก! ผ่านรอบนี้แล้ว</h3>
+                <button id="nextRoundBtn" class="game-btn">ไปรอบต่อไป!</button>
+            </div>
+        </main>
+        
+        <div id="finalScoreModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>สุดยอดไปเลย!</h2>
+                <p>น้องๆ เข้าใจเรื่องสหกรณ์เป็นอย่างดี!</p>
+                <div id="finalScoreText">คุณตอบถูกทั้งหมด!</div>
+                <img src="../../assets/images/mascots/มาสคลอต ปันผล+ออมตัง_02.jpg" alt="มาสคอตยินดี" style="height: 150px; margin: 15px 0;">
+                <div class="modal-buttons">
+                    <button class="game-btn" onclick="window.location.reload()">เล่นอีกครั้ง</button>
+                    <a href="../../activities.html" class="game-btn secondary">กลับหน้ากิจกรรม</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/matchup_game_script.js"></script>
+</body>
+</html>
