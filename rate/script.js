@@ -1123,9 +1123,10 @@
             });
             
             // Redraw charts after resize
-            if (typeof loadDashboardData === 'function') {
-                loadDashboardData();
-            }
+    // ❌ ลบบรรทัดนี้ออก ❌
+    // if (typeof loadDashboardData === 'function') {
+    //     loadDashboardData();
+    // }
         }
 
         // Handle window resize
