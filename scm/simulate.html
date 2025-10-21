@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โปรแกรมจำลองความเข้มแข็งสหกรณ์การเกษตร</title>
+    <title>โปรแกรมจำลองความเข้มแข็งสหกรณ์ภาคการเกษตร</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,7 +51,7 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: #2f4b7c;
+            background: #008744; /* Dark Green */
             cursor: pointer;
         }
         input[type="number"] {
@@ -70,9 +70,12 @@
             padding: 1rem;
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            min-height: 200px; /* เพิ่มความสูงสำหรับข้อความเตือน */
+            min-height: 200px; 
             transition: all 0.3s ease;
         }
+        .class-1 { color: #10b981; } /* Emerald Green */
+        .class-2 { color: #38bdf8; } /* Sky Blue */
+        .class-3 { color: #f87171; } /* Red */
     </style>
 </head>
 <body class="text-gray-800">
@@ -80,8 +83,8 @@
     <div class="container mx-auto p-4 md:p-8">
 
         <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-[#003f5c]">โปรแกรมจำลองความเข้มแข็งสหกรณ์การเกษตร</h1>
-            <p class="mt-2 text-lg text-gray-600 max-w-4xl mx-auto">ปรับคะแนนตัวชี้วัดเพื่อจำลองการจัดชั้นความเข้มแข็งปี 2567 (อ้างอิงเกณฑ์บังคับ 3 ข้อ)</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-[#008744]">โปรแกรมจำลองความเข้มแข็งสหกรณ์ภาคการเกษตร</h1>
+            <p class="mt-2 text-lg text-gray-600 max-w-4xl mx-auto">เกณฑ์การประเมินและการจัดชั้น (ชั้น 1, 2, 3) อ้างอิงตามเกณฑ์สหกรณ์ภาคการเกษตร ปี พ.ศ. 2567</p>
         </header>
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -99,9 +102,9 @@
                             <input type="number" id="v1_1" min="0" max="15" value="12">
                         </div>
                         <div class="slider-container">
-                            <label class="slider-label" for="m1_2">2. จัดสรรและจ่ายทุนสวัสดิการ/สาธารณประโยชน์ (0-10)</label>
-                            <input type="range" id="m1_2" min="0" max="10" value="8">
-                            <input type="number" id="v1_2" min="0" max="10" value="8">
+                            <label class="slider-label" for="m1_2">2. จัดสรรและจ่ายทุนสวัสดิการสมาชิกฯ และทุนสาธารณประโยชน์ 2 ปี (0-10)</label>
+                            <input type="range" id="m1_2" min="0" max="10" value="10">
+                            <input type="number" id="v1_2" min="0" max="10" value="10">
                         </div>
                         <div class="slider-container">
                             <label class="slider-label" for="m1_3">3. จำนวนประเภทธุรกิจที่สหกรณ์ดำเนินงาน (0-5)</label>
@@ -112,10 +115,9 @@
                     </div>
                 </div>
 
-                <!-- Miti 2: 20 Points (เงื่อนไขบังคับ: ต้องได้ >= 10 คะแนน) -->
+                <!-- Miti 2: 20 Points -->
                 <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-[#d45087]">
                     <h3 class="text-xl font-bold text-[#d45087] mb-4">มิติที่ 2: ประสิทธิภาพในการดำเนินธุรกิจ (20 คะแนน)</h3>
-                    <p class="text-xs text-red-500 font-semibold mb-2">** เงื่อนไขบังคับ: ต้องได้คะแนนรวมมิติ 2 ไม่ต่ำกว่า 10 คะแนน **</p>
                     <div class="space-y-2 text-sm">
                         <div class="slider-container">
                             <label class="slider-label" for="m2_1">1. อัตราส่วนหนี้สินต่อทุน (<0.75) (0-3)</label>
@@ -124,13 +126,13 @@
                         </div>
                         <div class="slider-container">
                             <label class="slider-label" for="m2_2">2. อัตราส่วนทุนสำรองต่อสินทรัพย์ (>0.20) (0-2)</label>
-                            <input type="range" id="m2_2" min="0" max="2" value="1">
-                            <input type="number" id="v2_2" min="0" max="2" value="1">
+                            <input type="range" id="m2_2" min="0" max="2" value="2">
+                            <input type="number" id="v2_2" min="0" max="2" value="2">
                         </div>
                         <div class="slider-container">
                             <label class="slider-label" for="m2_3">3. อัตราผลตอบแทนต่อสินทรัพย์ (>3.00%) (0-4)</label>
-                            <input type="range" id="m2_3" min="0" max="4" value="2">
-                            <input type="number" id="v2_3" min="0" max="4" value="2">
+                            <input type="range" id="m2_3" min="0" max="4" value="4">
+                            <input type="number" id="v2_3" min="0" max="4" value="4">
                         </div>
                         <div class="slider-container">
                             <label class="slider-label" for="m2_4">4. ค่าใช้จ่ายดำเนินงานต่อรายได้รวม (<45%) (0-4)</label>
@@ -185,13 +187,16 @@
                     </div>
                 </div>
                 
-                <!-- Miti 4: 30 Points (เงื่อนไขบังคับ: M4.1=15, M4.2=5) -->
-                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-[#f95d6a]">
-                    <h3 class="text-xl font-bold text-[#f95d6a] mb-4">มิติที่ 4: ประสิทธิภาพของการบริหารงาน (30 คะแนน)</h3>
-                    <p class="text-xs text-red-500 font-semibold mb-2">** เงื่อนไขบังคับ: ข้อ 1 ต้องได้ 15 คะแนน และ ข้อ 2 ต้องได้ 5 คะแนน **</p>
+                <!-- Miti 4: 30 Points (ตชว. 4.1, 4.2, 4.3 มีเงื่อนไขบังคับ) -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-[#008744]">
+                    <h3 class="text-xl font-bold text-[#008744] mb-4">มิติที่ 4: ประสิทธิภาพของการบริหารงาน (30 คะแนน)</h3>
+                    <p class="text-xs text-red-600 font-semibold mb-2">
+                        ** เงื่อนไขพื้นฐาน: ข้อ 3 (ตชว. 4.3) ต้องได้ 5/5 คะแนน เพื่อเข้าสู่การจัดชั้น 1 หรือ 2
+                        <br>** เงื่อนไขสำคัญ ชั้น 1: ข้อ 1 (ตชว. 4.1) และ ข้อ 2 (ตชว. 4.2) ต้องได้คะแนนขั้นสูง
+                    </p>
                     <div class="space-y-2 text-sm">
                         <div class="slider-container">
-                            <label class="slider-label" for="m4_1">1. ไม่ฝ่าฝืนระเบียบ/กฎหมาย/ไม่มีข้อบกพร่อง (0-15)</label>
+                            <label class="slider-label" for="m4_1">1. ผลการดำเนินงานฯ ไม่มีข้อบกพร่อง/ทุจริต (0-15)</label>
                             <input type="range" id="m4_1" min="0" max="15" value="15">
                             <input type="number" id="v4_1" min="0" max="15" value="15">
                         </div>
@@ -210,7 +215,7 @@
                             <input type="range" id="m4_4" min="0" max="5" value="4">
                             <input type="number" id="v4_4" min="0" max="5" value="4">
                         </div>
-                        <p class="text-right font-semibold text-gray-700 mt-2">คะแนนรวมมิติ 4: <span id="score_m4" class="text-[#f95d6a]">0</span> / 30</p>
+                        <p class="text-right font-semibold text-gray-700 mt-2">คะแนนรวมมิติ 4: <span id="score_m4" class="text-[#008744]">0</span> / 30</p>
                     </div>
                 </div>
 
@@ -222,18 +227,18 @@
                 <!-- Total Score & Class -->
                 <div id="result_box" class="score-box bg-white text-center">
                     <p class="text-lg font-semibold text-gray-600">คะแนนความเข้มแข็งรวม:</p>
-                    <div class="text-6xl font-extrabold text-[#2f4b7c] my-2">
+                    <div class="text-6xl font-extrabold text-[#008744] my-2">
                         <span id="total_score">00</span>
                         <span class="text-xl text-gray-400">/ 100</span>
                     </div>
                     <p class="text-lg font-semibold text-gray-600">ระดับชั้น:</p>
-                    <p id="strength_class" class="text-3xl font-bold mt-1 text-green-600">N/A</p>
+                    <p id="strength_class" class="text-3xl font-bold mt-1 class-1">N/A</p>
                     <div id="fail_reason" class="text-sm mt-3 px-2 py-1 rounded-lg font-medium hidden"></div>
                 </div>
 
                 <!-- Radar Chart: Score by Dimension -->
                 <div class="bg-white rounded-xl shadow-lg p-2">
-                    <h4 class="text-lg font-bold text-center text-[#2f4b7c] mb-2">เปรียบเทียบคะแนนตามมิติ</h4>
+                    <h4 class="text-lg font-bold text-center text-[#008744] mb-2">เปรียบเทียบคะแนนตามมิติ</h4>
                     <div class="chart-container h-80 max-h-[350px]">
                         <canvas id="radarChart"></canvas>
                     </div>
@@ -241,7 +246,7 @@
                 
                 <!-- Doughnut Chart: Total Score Gauge -->
                 <div class="bg-white rounded-xl shadow-lg p-2">
-                    <h4 class="text-lg font-bold text-center text-[#2f4b7c] mb-2">มาตรวัดคะแนนรวม</h4>
+                    <h4 class="text-lg font-bold text-center text-[#008744] mb-2">มาตรวัดคะแนนรวม</h4>
                     <div class="chart-container h-64 max-h-[300px]">
                         <canvas id="gaugeChart"></canvas>
                     </div>
@@ -295,11 +300,11 @@
                 dim1: '#665191', 
                 dim2: '#d45087', 
                 dim3: '#a05195', 
-                dim4: '#f95d6a', 
-                A: '#10b981',    // Emerald Green
-                B: '#38bdf8',    // Sky Blue
-                C: '#fbbf24',    // Amber
-                D: '#f87171',    // Red
+                dim4: '#008744', // Dark Green
+                A: '#10b981',    // Emerald Green (Class 1)
+                B: '#38bdf8',    // Sky Blue (Class 2)
+                C: '#fbbf24',    // Amber (Class 3 if passing fundamental)
+                D: '#f87171',    // Red (Class 3 / Not meeting fundamental)
                 remaining: '#e9ecef'
             };
 
@@ -316,22 +321,27 @@
                 const total_m3 = getScoreById('m3_1') + getScoreById('m3_2') + getScoreById('m3_3') + getScoreById('m3_4') + getScoreById('m3_5');
                 scoreElements.m3.textContent = total_m3;
 
-                const total_m4 = getScoreById('m4_1') + getScoreById('m4_2') + getScoreById('m4_3') + getScoreById('m4_4');
+                const s4_1 = getScoreById('m4_1'); // ตชว. 4.1: ไม่มีข้อบกพร่อง/ทุจริต (15) - MANDATORY for Class 1
+                const s4_2 = getScoreById('m4_2'); // ตชว. 4.2: ไม่ขาดทุน 2 ปี (5) - MANDATORY for Class 1
+                const s4_3 = getScoreById('m4_3'); // ตชว. 4.3: อนุมัติงบฯ 150 วัน (5) - FUNDAMENTAL for Class 1 & 2
+                const s4_4 = getScoreById('m4_4');
+                const total_m4 = s4_1 + s4_2 + s4_3 + s4_4;
                 scoreElements.m4.textContent = total_m4;
 
                 const totalScore = total_m1 + total_m2 + total_m3 + total_m4;
                 totalScoreEl.textContent = totalScore;
 
-                const strengthClassResult = getStrengthClass(totalScore, total_m2, getScoreById('m4_1'), getScoreById('m4_2'));
+                const strengthClassResult = getStrengthClass(totalScore, s4_1, s4_2, s4_3);
                 
                 // Update classification result
                 strengthClassEl.textContent = strengthClassResult.label;
                 strengthClassEl.style.color = strengthClassResult.color;
+                strengthClassEl.className = `text-3xl font-bold mt-1 ${strengthClassResult.cssClass}`;
                 
                 // Update reason for failure (if applicable)
                 if (strengthClassResult.reason) {
                     failReasonEl.textContent = strengthClassResult.reason;
-                    failReasonEl.style.backgroundColor = 'rgba(248, 113, 113, 0.1)'; /* light red */
+                    failReasonEl.style.backgroundColor = 'rgba(248, 113, 113, 0.1)'; 
                     failReasonEl.style.color = brandColors.D;
                     failReasonEl.classList.remove('hidden');
                 } else {
@@ -353,50 +363,66 @@
                 updateCharts(total_m1, total_m2, total_m3, total_m4, totalScore, strengthClassResult.color);
             };
 
-            // OFFICIAL CLASSIFICATION LOGIC FOR AGRICULTURAL CO-OPS (ASSUMED)
-            // Based on the three key mandatory conditions.
-            const getStrengthClass = (totalScore, m2Score, m4_1Score, m4_2Score) => {
-                const results = { label: 'D (ต้องปรับปรุง)', color: brandColors.D, reason: null };
+            // OFFICIAL CLASSIFICATION LOGIC FOR AGRICULTURAL CO-OPS (Year 2567)
+            const getStrengthClass = (totalScore, m4_1Score, m4_2Score, m4_3Score) => {
+                const results = { label: 'ชั้น 3 (ต้องพัฒนา/ยกระดับ)', color: brandColors.D, cssClass: 'class-3', reason: null };
 
-                // 1. Check Mandatory Condition 1 (M4.1: No violation)
-                if (m4_1Score < 15) {
-                    results.reason = 'ไม่ผ่าน: มิติ 4 ข้อ 1 (การไม่ฝ่าฝืนฯ) ต้องได้ 15/15 คะแนน';
-                    return results;
+                // -----------------------------------------------------
+                // STEP 1: CHECK FUNDAMENTAL CONDITION (เงื่อนไขพื้นฐาน 3 ข้อ)
+                // ต้องปิดบัญชีได้ + ประชุมใหญ่ได้ + อนุมัติงบฯ ได้ (Proxy: ตชว. 4.3 ต้องได้ 5/5)
+                const isFundamentalPassed = (m4_3Score === 5);
+
+                if (!isFundamentalPassed) {
+                    results.reason = 'ไม่ผ่านเงื่อนไขพื้นฐาน: ตชว. 4.3 (การจัดทำ/อนุมัติงบฯ) ต้องได้ 5/5 คะแนน เพื่อเข้าสู่การจัดชั้น';
+                    return results; // Default to Class 3 if Fundamental fails
                 }
 
-                // 2. Check Mandatory Condition 2 (M4.2: No loss 2 years)
-                if (m4_2Score < 5) {
-                    results.reason = 'ไม่ผ่าน: มิติ 4 ข้อ 2 (ไม่ขาดทุน 2 ปี) ต้องได้ 5/5 คะแนน';
-                    return results;
-                }
-                
-                // 3. Check Mandatory Condition 3 (M2: Business Efficiency >= 50%)
-                if (m2Score < 10) {
-                    results.reason = 'ไม่ผ่าน: มิติ 2 (ดำเนินธุรกิจ) ต้องได้คะแนนรวมไม่ต่ำกว่า 10/20 คะแนน';
-                    return results;
-                }
+                // -----------------------------------------------------
+                // STEP 2: CHECK FOR CLASS 1 (เข้มแข็ง) >= 80 POINTS
+                if (totalScore >= 80) {
+                    // C1 MANDATORY 1: ตชว. 4.1 (ไม่มีข้อบกพร่อง/ทุจริต) ต้องได้ 15/15 คะแนน
+                    if (m4_1Score < 15) {
+                        results.reason = 'ไม่ผ่านเงื่อนไขสำคัญ ชั้น 1: ตชว. 4.1 (ผลการดำเนินงานฯ) ต้องได้ 15/15 คะแนน';
+                        return results;
+                    }
 
-                // 4. Check Total Score (Only if all Mandatory Conditions are met)
-                if (totalScore >= 90) {
-                    results.label = 'A (ยอดเยี่ยม)';
+                    // C1 MANDATORY 2: ตชว. 4.2 (ผลการดำเนินงานไม่ขาดทุน 2 ปี) ต้องได้ 5/5 คะแนน
+                    if (m4_2Score < 5) {
+                        results.reason = 'ไม่ผ่านเงื่อนไขสำคัญ ชั้น 1: ตชว. 4.2 (ผลการดำเนินงานไม่ขาดทุน) ต้องได้ 5/5 คะแนน';
+                        return results;
+                    }
+
+                    // If all Class 1 conditions (Total Score >= 80 + 2 Mandatories) are met
+                    results.label = 'ชั้น 1 (เข้มแข็ง)';
                     results.color = brandColors.A;
-                    results.reason = 'ผ่านทุกเงื่อนไขบังคับ';
-                } else if (totalScore >= 80) {
-                    results.label = 'B (แข็งแรง)';
-                    results.color = brandColors.B;
-                    results.reason = 'ผ่านทุกเงื่อนไขบังคับ';
-                } else if (totalScore >= 70) {
-                    results.label = 'C (ดี)';
-                    results.color = brandColors.C;
-                    results.reason = 'ผ่านทุกเงื่อนไขบังคับ';
-                } else {
-                    // Total score is < 70, even though MCs passed
-                    results.label = 'D (ต้องปรับปรุง)';
-                    results.color = brandColors.D;
-                    results.reason = 'คะแนนรวมต่ำกว่า 70 คะแนน';
+                    results.cssClass = 'class-1';
+                    results.reason = 'ผ่านเงื่อนไขพื้นฐานและเงื่อนไขสำคัญชั้น 1 ครบถ้วน';
+                    return results;
                 }
                 
-                return results;
+                // -----------------------------------------------------
+                // STEP 3: CHECK FOR CLASS 2 (พัฒนาเข้าสู่มาตรฐาน) >= 55 POINTS
+                // If total score >= 55 AND Fundamental passed (checked in Step 1)
+                if (totalScore >= 55) {
+                    results.label = 'ชั้น 2 (พัฒนาเข้าสู่มาตรฐาน)';
+                    results.color = brandColors.B;
+                    results.cssClass = 'class-2';
+                    results.reason = 'ผ่านเงื่อนไขพื้นฐาน แต่คะแนนรวมไม่ถึงเกณฑ์ชั้น 1';
+                    return results;
+                }
+                
+                // -----------------------------------------------------
+                // STEP 4: CLASS 3 (ต้องพัฒนา/ยกระดับ)
+                // If Total Score < 55 AND Fundamental passed
+                if (totalScore < 55 && isFundamentalPassed) {
+                     results.label = 'ชั้น 3 (ต้องพัฒนา/ยกระดับ)';
+                     results.color = brandColors.C;
+                     results.cssClass = 'text-amber-500'; // Using an amber color for the 'passing fundamental but low score' Class 3
+                     results.reason = 'ผ่านเงื่อนไขพื้นฐาน แต่คะแนนรวมต่ำกว่า 55 คะแนน';
+                     return results;
+                }
+                
+                return results; // Default Class 3 (If fundamental failed, it returns here with the red color/reason)
             };
 
             let radarChart, gaugeChart;
@@ -439,9 +465,9 @@
                         datasets: [{
                             label: 'คะแนนที่ได้',
                             data: [m1, m2, m3, m4],
-                            backgroundColor: 'rgba(47, 75, 124, 0.2)',
-                            borderColor: '#2f4b7c',
-                            pointBackgroundColor: '#2f4b7c',
+                            backgroundColor: 'rgba(0, 135, 68, 0.2)',
+                            borderColor: '#008744',
+                            pointBackgroundColor: '#008744',
                             pointRadius: 5
                         }]
                     },
@@ -511,10 +537,11 @@
             const initialM3 = getScoreById('m3_1') + getScoreById('m3_2') + getScoreById('m3_3') + getScoreById('m3_4') + getScoreById('m3_5');
             const initialM4_1 = getScoreById('m4_1');
             const initialM4_2 = getScoreById('m4_2');
-            const initialM4 = initialM4_1 + initialM4_2 + getScoreById('m4_3') + getScoreById('m4_4');
+            const initialM4_3 = getScoreById('m4_3');
+            const initialM4 = initialM4_1 + initialM4_2 + initialM4_3 + getScoreById('m4_4');
             const initialTotal = initialM1 + initialM2 + initialM3 + initialM4;
             
-            const initialResult = getStrengthClass(initialTotal, initialM2, initialM4_1, initialM4_2);
+            const initialResult = getStrengthClass(initialTotal, initialM4_1, initialM4_2, initialM4_3);
 
             initCharts(initialM1, initialM2, initialM3, initialM4, initialTotal, initialResult.color);
             calculateTotalScore();
