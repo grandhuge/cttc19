@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรแกรมจำลองความเข้มแข็งสหกรณ์การเกษตร</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+            padding: 1rem;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0;
+        }
+        .slider-label {
+            width: 45%;
+            font-size: 0.875rem; /* sm text */
+            line-height: 1.25rem;
+            color: #4b5563; /* gray-700 */
+        }
+        input[type="range"] {
+            width: 40%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            border-radius: 5px;
+            background: #d1d5db; /* gray-300 */
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2f4b7c;
+            cursor: pointer;
+        }
+        input[type="number"] {
+            width: 15%;
+            text-align: center;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            padding: 0.1rem 0;
+            font-size: 0.875rem;
+        }
+        .score-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            min-height: 200px; /* เพิ่มความสูงสำหรับข้อความเตือน */
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-[#003f5c]">โปรแกรมจำลองความเข้มแข็งสหกรณ์การเกษตร</h1>
+            <p class="mt-2 text-lg text-gray-600 max-w-4xl mx-auto">ปรับคะแนนตัวชี้วัดเพื่อจำลองการจัดชั้นความเข้มแข็งปี 2567 (อ้างอิงเกณฑ์บังคับ 3 ข้อ)</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Section 1: Score Inputs (lg:col-span-2) -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Miti 1: 30 Points -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-[#665191]">
+                    <h3 class="text-xl font-bold text-[#665191] mb-4">มิติที่ 1: ความสามารถในการให้บริการสมาชิก (30 คะแนน)</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="slider-container">
+                            <label class="slider-label" for="m1_1">1. อัตราส่วนสมาชิกที่มีส่วนร่วมในธุรกิจ (0-15)</label>
+                            <input type="range" id="m1_1" min="0" max="15" value="12">
+                            <input type="number" id="v1_1" min="0" max="15" value="12">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m1_2">2. จัดสรรและจ่ายทุนสวัสดิการ/สาธารณประโยชน์ (0-10)</label>
+                            <input type="range" id="m1_2" min="0" max="10" value="8">
+                            <input type="number" id="v1_2" min="0" max="10" value="8">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m1_3">3. จำนวนประเภทธุรกิจที่สหกรณ์ดำเนินงาน (0-5)</label>
+                            <input type="range" id="m1_3" min="0" max="5" value="4">
+                            <input type="number" id="v1_3" min="0" max="5" value="4">
+                        </div>
+                        <p class="text-right font-semibold text-gray-700 mt-2">คะแนนรวมมิติ 1: <span id="score_m1" class="text-[#665191]">0</span> / 30</p>
+                    </div>
+                </div>
+
+                <!-- Miti 2: 20 Points (เงื่อนไขบังคับ: ต้องได้ >= 10 คะแนน) -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-[#d45087]">
+                    <h3 class="text-xl font-bold text-[#d45087] mb-4">มิติที่ 2: ประสิทธิภาพในการดำเนินธุรกิจ (20 คะแนน)</h3>
+                    <p class="text-xs text-red-500 font-semibold mb-2">** เงื่อนไขบังคับ: ต้องได้คะแนนรวมมิติ 2 ไม่ต่ำกว่า 10 คะแนน **</p>
+                    <div class="space-y-2 text-sm">
+                        <div class="slider-container">
+                            <label class="slider-label" for="m2_1">1. อัตราส่วนหนี้สินต่อทุน (<0.75) (0-3)</label>
+                            <input type="range" id="m2_1" min="0" max="3" value="3">
+                            <input type="number" id="v2_1" min="0" max="3" value="3">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m2_2">2. อัตราส่วนทุนสำรองต่อสินทรัพย์ (>0.20) (0-2)</label>
+                            <input type="range" id="m2_2" min="0" max="2" value="1">
+                            <input type="number" id="v2_2" min="0" max="2" value="1">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m2_3">3. อัตราผลตอบแทนต่อสินทรัพย์ (>3.00%) (0-4)</label>
+                            <input type="range" id="m2_3" min="0" max="4" value="2">
+                            <input type="number" id="v2_3" min="0" max="4" value="2">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m2_4">4. ค่าใช้จ่ายดำเนินงานต่อรายได้รวม (<45%) (0-4)</label>
+                            <input type="range" id="m2_4" min="0" max="4" value="3">
+                            <input type="number" id="v2_4" min="0" max="4" value="3">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m2_5">5. อัตราส่วนทุนหมุนเวียน (>1.75) (0-3)</label>
+                            <input type="range" id="m2_5" min="0" max="3" value="2">
+                            <input type="number" id="v2_5" min="0" max="3" value="2">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m2_6">6. อัตราส่วนการชำระหนี้ระยะสั้น (>90%) (0-4)</label>
+                            <input type="range" id="m2_6" min="0" max="4" value="4">
+                            <input type="number" id="v2_6" min="0" max="4" value="4">
+                        </div>
+                        <p class="text-right font-semibold text-gray-700 mt-2">คะแนนรวมมิติ 2: <span id="score_m2" class="text-[#d45087]">0</span> / 20</p>
+                    </div>
+                </div>
+
+                <!-- Miti 3: 20 Points -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-[#a05195]">
+                    <h3 class="text-xl font-bold text-[#a05195] mb-4">มิติที่ 3: ประสิทธิภาพในการจัดการองค์กร (20 คะแนน)</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="slider-container">
+                            <label class="slider-label" for="m3_1">1. การใช้เทคโนโลยีในการบัญชี (0-4)</label>
+                            <input type="range" id="m3_1" min="0" max="4" value="4">
+                            <input type="number" id="v3_1" min="0" max="4" value="4">
+                        </div>
+                        <p class="font-semibold text-gray-700 mt-4 mb-2">ระบบควบคุมภายใน (4 ตัวชี้วัดย่อย, 0-16)</p>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m3_2">2. สภาพแวดล้อมการควบคุม (0-4)</label>
+                            <input type="range" id="m3_2" min="0" max="4" value="3">
+                            <input type="number" id="v3_2" min="0" max="4" value="3">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m3_3">3. การประเมินความเสี่ยงและการควบคุม (0-4)</label>
+                            <input type="range" id="m3_3" min="0" max="4" value="2">
+                            <input type="number" id="v3_3" min="0" max="4" value="2">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m3_4">4. ระบบข้อมูลสารสนเทศและการสื่อสาร (0-4)</label>
+                            <input type="range" id="m3_4" min="0" max="4" value="4">
+                            <input type="number" id="v3_4" min="0" max="4" value="4">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m3_5">5. การติดตามและประเมินผล (0-4)</label>
+                            <input type="range" id="m3_5" min="0" max="4" value="3">
+                            <input type="number" id="v3_5" min="0" max="4" value="3">
+                        </div>
+                        <p class="text-right font-semibold text-gray-700 mt-2">คะแนนรวมมิติ 3: <span id="score_m3" class="text-[#a05195]">0</span> / 20</p>
+                    </div>
+                </div>
+                
+                <!-- Miti 4: 30 Points (เงื่อนไขบังคับ: M4.1=15, M4.2=5) -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-[#f95d6a]">
+                    <h3 class="text-xl font-bold text-[#f95d6a] mb-4">มิติที่ 4: ประสิทธิภาพของการบริหารงาน (30 คะแนน)</h3>
+                    <p class="text-xs text-red-500 font-semibold mb-2">** เงื่อนไขบังคับ: ข้อ 1 ต้องได้ 15 คะแนน และ ข้อ 2 ต้องได้ 5 คะแนน **</p>
+                    <div class="space-y-2 text-sm">
+                        <div class="slider-container">
+                            <label class="slider-label" for="m4_1">1. ไม่ฝ่าฝืนระเบียบ/กฎหมาย/ไม่มีข้อบกพร่อง (0-15)</label>
+                            <input type="range" id="m4_1" min="0" max="15" value="15">
+                            <input type="number" id="v4_1" min="0" max="15" value="15">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m4_2">2. ผลการดำเนินงานไม่ขาดทุน 2 ปีย้อนหลัง (0-5)</label>
+                            <input type="range" id="m4_2" min="0" max="5" value="5">
+                            <input type="number" id="v4_2" min="0" max="5" value="5">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m4_3">3. จัดทำ/อนุมัติงบการเงินภายใน 150 วัน (0-5)</label>
+                            <input type="range" id="m4_3" min="0" max="5" value="5">
+                            <input type="number" id="v4_3" min="0" max="5" value="5">
+                        </div>
+                        <div class="slider-container">
+                            <label class="slider-label" for="m4_4">4. จัดจ้างเจ้าหน้าที่ปฏิบัติงานประจำ (0-5)</label>
+                            <input type="range" id="m4_4" min="0" max="5" value="4">
+                            <input type="number" id="v4_4" min="0" max="5" value="4">
+                        </div>
+                        <p class="text-right font-semibold text-gray-700 mt-2">คะแนนรวมมิติ 4: <span id="score_m4" class="text-[#f95d6a]">0</span> / 30</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Section 2: Results and Charts (lg:col-span-1) -->
+            <div class="space-y-6">
+
+                <!-- Total Score & Class -->
+                <div id="result_box" class="score-box bg-white text-center">
+                    <p class="text-lg font-semibold text-gray-600">คะแนนความเข้มแข็งรวม:</p>
+                    <div class="text-6xl font-extrabold text-[#2f4b7c] my-2">
+                        <span id="total_score">00</span>
+                        <span class="text-xl text-gray-400">/ 100</span>
+                    </div>
+                    <p class="text-lg font-semibold text-gray-600">ระดับชั้น:</p>
+                    <p id="strength_class" class="text-3xl font-bold mt-1 text-green-600">N/A</p>
+                    <div id="fail_reason" class="text-sm mt-3 px-2 py-1 rounded-lg font-medium hidden"></div>
+                </div>
+
+                <!-- Radar Chart: Score by Dimension -->
+                <div class="bg-white rounded-xl shadow-lg p-2">
+                    <h4 class="text-lg font-bold text-center text-[#2f4b7c] mb-2">เปรียบเทียบคะแนนตามมิติ</h4>
+                    <div class="chart-container h-80 max-h-[350px]">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Doughnut Chart: Total Score Gauge -->
+                <div class="bg-white rounded-xl shadow-lg p-2">
+                    <h4 class="text-lg font-bold text-center text-[#2f4b7c] mb-2">มาตรวัดคะแนนรวม</h4>
+                    <div class="chart-container h-64 max-h-[300px]">
+                        <canvas id="gaugeChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const inputs = {};
+            const scoreElements = {};
+            const totalScoreEl = document.getElementById('total_score');
+            const strengthClassEl = document.getElementById('strength_class');
+            const failReasonEl = document.getElementById('fail_reason');
+
+            const allRanges = document.querySelectorAll('input[type="range"]');
+            allRanges.forEach(range => {
+                const numberInput = document.getElementById('v' + range.id.substring(1));
+                inputs[range.id] = { range: range, number: numberInput, max: parseInt(range.max) };
+
+                // Sync range slider to number input
+                range.addEventListener('input', (e) => {
+                    numberInput.value = e.target.value;
+                    calculateTotalScore();
+                });
+                // Sync number input to range slider and enforce bounds
+                numberInput.addEventListener('input', (e) => {
+                    let val = parseInt(e.target.value);
+                    const min = parseInt(numberInput.min);
+                    const max = parseInt(numberInput.max);
+
+                    if (isNaN(val) || val < min) val = min;
+                    if (val > max) val = max;
+                    
+                    e.target.value = val; 
+                    range.value = val;
+                    calculateTotalScore();
+                });
+            });
+
+            scoreElements.m1 = document.getElementById('score_m1');
+            scoreElements.m2 = document.getElementById('score_m2');
+            scoreElements.m3 = document.getElementById('score_m3');
+            scoreElements.m4 = document.getElementById('score_m4');
+
+            const brandColors = {
+                dim1: '#665191', 
+                dim2: '#d45087', 
+                dim3: '#a05195', 
+                dim4: '#f95d6a', 
+                A: '#10b981',    // Emerald Green
+                B: '#38bdf8',    // Sky Blue
+                C: '#fbbf24',    // Amber
+                D: '#f87171',    // Red
+                remaining: '#e9ecef'
+            };
+
+            const getScoreById = (id) => parseInt(inputs[id].number.value);
+
+            const calculateTotalScore = () => {
+                // Calculate scores for each dimension
+                const total_m1 = getScoreById('m1_1') + getScoreById('m1_2') + getScoreById('m1_3');
+                scoreElements.m1.textContent = total_m1;
+
+                const total_m2 = getScoreById('m2_1') + getScoreById('m2_2') + getScoreById('m2_3') + getScoreById('m2_4') + getScoreById('m2_5') + getScoreById('m2_6');
+                scoreElements.m2.textContent = total_m2;
+
+                const total_m3 = getScoreById('m3_1') + getScoreById('m3_2') + getScoreById('m3_3') + getScoreById('m3_4') + getScoreById('m3_5');
+                scoreElements.m3.textContent = total_m3;
+
+                const total_m4 = getScoreById('m4_1') + getScoreById('m4_2') + getScoreById('m4_3') + getScoreById('m4_4');
+                scoreElements.m4.textContent = total_m4;
+
+                const totalScore = total_m1 + total_m2 + total_m3 + total_m4;
+                totalScoreEl.textContent = totalScore;
+
+                const strengthClassResult = getStrengthClass(totalScore, total_m2, getScoreById('m4_1'), getScoreById('m4_2'));
+                
+                // Update classification result
+                strengthClassEl.textContent = strengthClassResult.label;
+                strengthClassEl.style.color = strengthClassResult.color;
+                
+                // Update reason for failure (if applicable)
+                if (strengthClassResult.reason) {
+                    failReasonEl.textContent = strengthClassResult.reason;
+                    failReasonEl.style.backgroundColor = 'rgba(248, 113, 113, 0.1)'; /* light red */
+                    failReasonEl.style.color = brandColors.D;
+                    failReasonEl.classList.remove('hidden');
+                } else {
+                    failReasonEl.classList.add('hidden');
+                }
+
+                // Update result box background color (lightened version of the class color)
+                const hexToRgb = (hex) => {
+                    const bigint = parseInt(hex.slice(1), 16);
+                    const r = (bigint >> 16) & 255;
+                    const g = (bigint >> 8) & 255;
+                    const b = bigint & 255;
+                    return `${r}, ${g}, ${b}`;
+                };
+                const rgbColor = hexToRgb(strengthClassResult.color);
+                document.getElementById('result_box').style.backgroundColor = `rgba(${rgbColor}, 0.1)`;
+
+
+                updateCharts(total_m1, total_m2, total_m3, total_m4, totalScore, strengthClassResult.color);
+            };
+
+            // OFFICIAL CLASSIFICATION LOGIC FOR AGRICULTURAL CO-OPS (ASSUMED)
+            // Based on the three key mandatory conditions.
+            const getStrengthClass = (totalScore, m2Score, m4_1Score, m4_2Score) => {
+                const results = { label: 'D (ต้องปรับปรุง)', color: brandColors.D, reason: null };
+
+                // 1. Check Mandatory Condition 1 (M4.1: No violation)
+                if (m4_1Score < 15) {
+                    results.reason = 'ไม่ผ่าน: มิติ 4 ข้อ 1 (การไม่ฝ่าฝืนฯ) ต้องได้ 15/15 คะแนน';
+                    return results;
+                }
+
+                // 2. Check Mandatory Condition 2 (M4.2: No loss 2 years)
+                if (m4_2Score < 5) {
+                    results.reason = 'ไม่ผ่าน: มิติ 4 ข้อ 2 (ไม่ขาดทุน 2 ปี) ต้องได้ 5/5 คะแนน';
+                    return results;
+                }
+                
+                // 3. Check Mandatory Condition 3 (M2: Business Efficiency >= 50%)
+                if (m2Score < 10) {
+                    results.reason = 'ไม่ผ่าน: มิติ 2 (ดำเนินธุรกิจ) ต้องได้คะแนนรวมไม่ต่ำกว่า 10/20 คะแนน';
+                    return results;
+                }
+
+                // 4. Check Total Score (Only if all Mandatory Conditions are met)
+                if (totalScore >= 90) {
+                    results.label = 'A (ยอดเยี่ยม)';
+                    results.color = brandColors.A;
+                    results.reason = 'ผ่านทุกเงื่อนไขบังคับ';
+                } else if (totalScore >= 80) {
+                    results.label = 'B (แข็งแรง)';
+                    results.color = brandColors.B;
+                    results.reason = 'ผ่านทุกเงื่อนไขบังคับ';
+                } else if (totalScore >= 70) {
+                    results.label = 'C (ดี)';
+                    results.color = brandColors.C;
+                    results.reason = 'ผ่านทุกเงื่อนไขบังคับ';
+                } else {
+                    // Total score is < 70, even though MCs passed
+                    results.label = 'D (ต้องปรับปรุง)';
+                    results.color = brandColors.D;
+                    results.reason = 'คะแนนรวมต่ำกว่า 70 คะแนน';
+                }
+                
+                return results;
+            };
+
+            let radarChart, gaugeChart;
+
+            const updateCharts = (m1, m2, m3, m4, totalScore, classColor) => {
+                
+                // Radar Chart Update
+                if (radarChart) {
+                    radarChart.data.datasets[0].data = [m1, m2, m3, m4];
+                    radarChart.update();
+                }
+
+                // Gauge Chart Update
+                const remainingScore = 100 - totalScore;
+                if (gaugeChart) {
+                    gaugeChart.data.datasets[0].data = [totalScore, remainingScore];
+                    gaugeChart.data.datasets[0].backgroundColor = [classColor, brandColors.remaining];
+                    gaugeChart.update();
+                }
+            };
+            
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join(' ');
+                } else {
+                    return label;
+                }
+            };
+
+            const initCharts = (m1, m2, m3, m4, totalScore, initialClassColor) => {
+                
+                // Radar Chart Initialization
+                const radarCtx = document.getElementById('radarChart').getContext('2d');
+                radarChart = new Chart(radarCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['มิติ 1: บริการ (30)', 'มิติ 2: ธุรกิจ (20)', 'มิติ 3: จัดการ (20)', 'มิติ 4: บริหาร (30)'],
+                        datasets: [{
+                            label: 'คะแนนที่ได้',
+                            data: [m1, m2, m3, m4],
+                            backgroundColor: 'rgba(47, 75, 124, 0.2)',
+                            borderColor: '#2f4b7c',
+                            pointBackgroundColor: '#2f4b7c',
+                            pointRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                suggestedMin: 0,
+                                suggestedMax: 35,
+                                ticks: { stepSize: 5 },
+                                pointLabels: { font: { size: 12 } },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { title: tooltipTitleCallback } }
+                        }
+                    }
+                });
+
+                // Gauge Chart Initialization
+                const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
+                const remainingScore = 100 - totalScore;
+                gaugeChart = new Chart(gaugeCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['คะแนนที่ได้', 'คะแนนที่เหลือ'],
+                        datasets: [{
+                            data: [totalScore, remainingScore],
+                            backgroundColor: [initialClassColor, brandColors.remaining],
+                            borderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        circumference: 180,
+                        rotation: 270,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed.toFixed(0) + ' คะแนน';
+                                        }
+                                        return label;
+                                    },
+                                    title: tooltipTitleCallback
+                                }
+                            }
+                        }
+                    }
+                });
+            };
+
+            // Initial calculation and chart setup based on default values
+            const initialM1 = getScoreById('m1_1') + getScoreById('m1_2') + getScoreById('m1_3');
+            const initialM2 = getScoreById('m2_1') + getScoreById('m2_2') + getScoreById('m2_3') + getScoreById('m2_4') + getScoreById('m2_5') + getScoreById('m2_6');
+            const initialM3 = getScoreById('m3_1') + getScoreById('m3_2') + getScoreById('m3_3') + getScoreById('m3_4') + getScoreById('m3_5');
+            const initialM4_1 = getScoreById('m4_1');
+            const initialM4_2 = getScoreById('m4_2');
+            const initialM4 = initialM4_1 + initialM4_2 + getScoreById('m4_3') + getScoreById('m4_4');
+            const initialTotal = initialM1 + initialM2 + initialM3 + initialM4;
+            
+            const initialResult = getStrengthClass(initialTotal, initialM2, initialM4_1, initialM4_2);
+
+            initCharts(initialM1, initialM2, initialM3, initialM4, initialTotal, initialResult.color);
+            calculateTotalScore();
+        });
+    </script>
+</body>
+</html>
