@@ -231,9 +231,16 @@
             document.getElementById('avgScore').textContent = (data.averageScore || 0).toFixed(1);
             document.getElementById('satisfactionRate').textContent = Math.round(data.satisfactionRate || 0) + '%';
             
-            // Update charts
-            updateAverageChart(data.categoryAverages || {});
-            updateDistributionChart(data.distribution || {});
+			    // 👇 เพิ่มตัวแปรควบคุมการแสดงผลกราฟตรงนี้
+    const showCharts = false;
+
+    // 👇 ใช้เงื่อนไขเพื่อป้องกันการเรียกฟังก์ชันกราฟ
+    if (showCharts) {
+		// Update charts
+        updateAverageChart(data.categoryAverages || {});
+        updateDistributionChart(data.distribution || {});
+    }
+
             
             // Update demographic charts
             updateGenderChart(data.demographics?.gender || {});
