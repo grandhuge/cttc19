@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โปรแกรมประเมินความเข้มแข็งสหกรณ์ by cttc19</title>
+    <!-- Title updated -->
+    <title>โปรแกรมประเมินระดับชั้นความเข้มแข็งสหกรณ์</title>
     <!-- 1. Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 2. Load Inter Font -->
@@ -43,6 +44,10 @@
             border-color: #2563eb; /* border-blue-600 */
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* focus:ring-blue-500/25 */
         }
+        /* Style for invalid inputs */
+        .form-input:invalid:not(:placeholder-shown) {
+             border-color: #ef4444; /* border-red-500 */
+        }
         .form-select {
             width: 100%;
             padding: 0.75rem;
@@ -55,6 +60,10 @@
             background-position: right 0.5rem center;
             background-repeat: no-repeat;
             background-size: 1.5em 1.5em;
+        }
+         /* Style for invalid selects */
+        .form-select:invalid:not(:placeholder-shown) {
+             border-color: #ef4444; /* border-red-500 */
         }
         .form-label {
             display: block;
@@ -88,34 +97,48 @@
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow */
             transition: all 0.2s;
             cursor: pointer;
+            display: inline-flex; /* Align icon and text */
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .btn-primary {
             background-color: #2563eb; /* bg-blue-600 */
             color: white;
         }
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background-color: #1d4ed8; /* hover:bg-blue-700 */
         }
         .btn-secondary {
             background-color: #e5e7eb; /* bg-gray-200 */
             color: #374151; /* text-gray-700 */
         }
-        .btn-secondary:hover {
+        .btn-secondary:hover:not(:disabled) {
             background-color: #d1d5db; /* hover:bg-gray-300 */
         }
         .btn-success {
             background-color: #16a34a; /* bg-green-600 */
             color: white;
         }
-        .btn-success:hover {
+        .btn-success:hover:not(:disabled) {
             background-color: #15803d; /* hover:bg-green-700 */
         }
         .btn-warning {
             background-color: #ca8a04; /* bg-yellow-600 */
             color: white;
         }
-        .btn-warning:hover {
+        .btn-warning:hover:not(:disabled) {
             background-color: #a16207; /* hover:bg-yellow-700 */
+        }
+         .btn-danger {
+            background-color: #dc2626; /* bg-red-600 */
+            color: white;
+        }
+        .btn-danger:hover:not(:disabled) {
+            background-color: #b91c1c; /* hover:bg-red-700 */
         }
         /* Step Content Box */
         .step-box {
@@ -136,53 +159,84 @@
             color: #111827; /* text-gray-900 */
             padding: 0 0.5rem; /* px-2 */
         }
-        /* Modal styles */
+        /* Modal base styles */
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 50;
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 50; /* Sit on top */
             left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            align-items: center;
-            justify-content: center;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
         }
         .modal.active {
-            display: flex;
+            display: flex; /* Show when active */
         }
         .modal-content {
             background-color: #fefefe;
             margin: auto;
             padding: 2rem;
-            border: 1px solid #888;
+            border: 1px solid #d1d5db; /* border-gray-300 */
             width: 90%;
-            max-width: 48rem; /* max-w-3xl */
             border-radius: 0.75rem; /* rounded-xl */
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-2xl */
+            position: relative; /* For close button positioning */
         }
+        /* Specific modal content sizes */
+        .modal-content-results {
+             max-width: 48rem; /* max-w-3xl */
+        }
+        .modal-content-alert {
+             max-width: 32rem; /* max-w-lg */
+        }
+
         .modal-close {
             color: #aaa;
-            float: right;
+            position: absolute; /* Position relative to modal-content */
+            top: 0.75rem;
+            right: 1rem;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+            line-height: 1;
         }
         .modal-close:hover,
         .modal-close:focus {
-            color: black;
+            color: #374151; /* text-gray-700 */
             text-decoration: none;
             cursor: pointer;
         }
+
+        /* Spinner for loading */
+         .spinner {
+            border: 4px solid #f3f4f6; /* light grey */
+            border-top: 4px solid #3b82f6; /* blue */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin-right: 8px; /* Add some space between spinner and text */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hidden {
+             display: none;
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-8">
 
     <main class="max-w-4xl mx-auto">
         <header class="mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-center text-blue-800">โปรแกรมประเมินความเข้มแข็งสหกรณ์</h1>
+            <!-- Title updated -->
+            <h1 class="text-3xl md:text-4xl font-bold text-center text-blue-800">โปรแกรมประเมินระดับชั้นความเข้มแข็งสหกรณ์</h1>
             <p class="text-center text-lg text-gray-600 mt-2">(SCM - Strength Calculation Model)</p>
             <p class="text-center text-sm text-gray-500 mt-1">อ้างอิงเกณฑ์การประเมิน พ.ศ. 2566 – 2570</p>
         </header>
@@ -195,8 +249,9 @@
             </button>
             <input type="file" id="fileInput" class="hidden" accept=".json">
             <button id="exportBtn" class="btn btn-secondary">
-                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 9.293a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                ส่งออกข้อมูล (Export)
+                 <span id="exportSpinner" class="spinner hidden"></span> <!-- Spinner added -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-5 w-5 mr-1 icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 9.293a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                <span class="text">ส่งออกข้อมูล (Export)</span>
             </button>
         </div>
 
@@ -214,7 +269,7 @@
             <div id="step1" class="scm-step active">
                 <fieldset class="fieldset-box border-blue-200">
                     <legend class="legend-text text-blue-700">ขั้นตอนที่ 1: ข้อมูลตั้งค่าพื้นฐาน</legend>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="coop_type" class="form-label">1. เลือกประเภทสหกรณ์ <span class="text-red-500">*</span></label>
@@ -284,11 +339,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="d4_2_profit_current_year" class="form-label">ผลกำไร/ขาดทุนสุทธิ (ปีที่ประเมิน) <span class="text-red-500">*</span></label>
-                                <input type="number" id="d4_2_profit_current_year" name="d4_2_profit_current_year" class="form-input" placeholder="ใส่ตัวเลข (ติดลบได้)" required>
+                                <!-- step attribute added -->
+                                <input type="number" step="0.01" id="d4_2_profit_current_year" name="d4_2_profit_current_year" class="form-input" placeholder="ใส่ตัวเลข (ติดลบได้)" required>
                             </div>
                             <div>
                                 <label for="d4_2_profit_prev_year" class="form-label">ผลกำไร/ขาดทุนสุทธิ (ปีที่แล้ว) <span class="text-red-500">*</span></label>
-                                <input type="number" id="d4_2_profit_prev_year" name="d4_2_profit_prev_year" class="form-input" placeholder="ใส่ตัวเลข (ติดลบได้)" required>
+                                <!-- step attribute added -->
+                                <input type="number" step="0.01" id="d4_2_profit_prev_year" name="d4_2_profit_prev_year" class="form-input" placeholder="ใส่ตัวเลข (ติดลบได้)" required>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="form-label">สถานะการขาดทุนเนื่องจากข้อยกเว้น (ภัยธรรมชาติ/โรคระบาด)</label>
@@ -337,7 +394,7 @@
             <div id="step3" class="scm-step">
                 <fieldset class="fieldset-box border-green-200">
                     <legend class="legend-text text-green-700">ขั้นตอนที่ 3: มิติที่ 1 ความสามารถในการให้บริการสมาชิก (30 คะแนน)</legend>
-                    
+
                     <!-- 1.1 สมาชิกมีส่วนร่วม -->
                     <div class="mb-4 p-4 border border-gray-200 rounded-lg">
                         <h4 class="font-semibold text-lg text-gray-800">ตชว. 1.1 (สมาชิกมีส่วนร่วม)</h4>
@@ -404,7 +461,7 @@
                 <fieldset class="fieldset-box border-yellow-200">
                     <legend class="legend-text text-yellow-700">ขั้นตอนที่ 4: มิติที่ 2 ประสิทธิภาพในการดำเนินธุรกิจ (20 คะแนน)</legend>
                     <p class="text-sm text-gray-600 mb-4">กรอกข้อมูลดิบจากงบการเงิน เพื่อใช้คำนวณอัตราส่วนทางการเงิน</p>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                         <!-- 2.1 -->
                         <div>
@@ -478,7 +535,7 @@
             <div id="step5" class="scm-step">
                 <fieldset class="fieldset-box border-purple-200">
                     <legend class="legend-text text-purple-700">ขั้นตอนที่ 5: มิติที่ 3 ประสิทธิภาพในการจัดการองค์กร (20 คะแนน)</legend>
-                    
+
                     <!-- 3.1 เทคโนโลยีการบัญชี -->
                     <div class="mb-4 p-4 border border-gray-200 rounded-lg">
                         <h4 class="font-semibold text-lg text-gray-800">ตชว. 3.1 (เทคโนโลยีการบัญชี)</h4>
@@ -551,8 +608,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                 </button>
                 <button type="submit" id="calculateBtn" class="btn btn-success ml-auto" style="display: none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>
-                    คำนวณผล
+                     <span id="calcSpinner" class="spinner hidden"></span> <!-- Spinner added -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-5 w-5 mr-1 icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" /></svg>
+                    <span class="text">คำนวณผล</span>
                 </button>
             </div>
         </form>
@@ -560,12 +618,10 @@
 
     <!-- Results Modal -->
     <div id="resultsModal" class="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-start">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">ผลการประเมินความเข้มแข็งสหกรณ์</h2>
-                <span id="modalCloseBtn" class="modal-close">&times;</span>
-            </div>
-            
+        <div class="modal-content modal-content-results"> <!-- Added specific class -->
+            <span id="modalCloseBtnResults" class="modal-close">&times;</span> <!-- Unique ID -->
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">ผลการประเมินความเข้มแข็งสหกรณ์</h2>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Left: Final Class -->
                 <div class="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
@@ -618,6 +674,18 @@
         </div>
     </div>
 
+    <!-- Alert Modal -->
+    <div id="alertModal" class="modal">
+        <div class="modal-content modal-content-alert"> <!-- Specific class for styling -->
+            <span id="alertModalCloseBtn" class="modal-close">&times;</span>
+            <h2 id="alertModalTitle" class="text-xl font-bold text-gray-900 mb-3">แจ้งเตือน</h2>
+            <p id="alertModalMessage" class="text-gray-700 mb-5">ข้อความแจ้งเตือน...</p>
+            <div class="text-right">
+                <button id="alertModalOkBtn" class="btn btn-primary">ตกลง</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- JavaScript -->
     <script>
@@ -636,16 +704,58 @@
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
             const calculateBtn = document.getElementById('calculateBtn');
+            const calcSpinner = document.getElementById('calcSpinner'); // Spinner for calculate
             const steps = document.querySelectorAll('.scm-step');
-            
-            // Modal Elements
-            const modal = document.getElementById('resultsModal');
-            const modalCloseBtn = document.getElementById('modalCloseBtn');
-            
+
+            // Results Modal Elements
+            const resultsModal = document.getElementById('resultsModal');
+            const modalCloseBtnResults = document.getElementById('modalCloseBtnResults');
+
+            // Alert Modal Elements
+            const alertModal = document.getElementById('alertModal');
+            const alertModalCloseBtn = document.getElementById('alertModalCloseBtn');
+            const alertModalOkBtn = document.getElementById('alertModalOkBtn');
+            const alertModalTitle = document.getElementById('alertModalTitle');
+            const alertModalMessage = document.getElementById('alertModalMessage');
+
             // Import/Export Elements
             const importBtn = document.getElementById('importBtn');
             const exportBtn = document.getElementById('exportBtn');
+            const exportSpinner = document.getElementById('exportSpinner'); // Spinner for export
             const fileInput = document.getElementById('fileInput');
+
+            // --- Helper Functions (Moved to IIFE Scope) ---
+
+            // Helper function to get standard score (3, 2, 1, 0) based on PDF thresholds
+            function getStdScore(value, thresholdsForType, direction) {
+                if (value === null || isNaN(value)) return 0;
+                // thresholdsForType = [high_threshold, mid_threshold, low_threshold]
+                // direction = 1 means higher is better (>), -1 means lower is better (<)
+
+                if (direction === 1) { // Higher is better
+                    if (value > thresholdsForType[0]) return 3; // ขั้นสูง
+                    if (value >= thresholdsForType[1]) return 2; // ขั้นกลาง (>= mid)
+                    if (value >= thresholdsForType[2]) return 1; // ขั้นต้น (>= low)
+                    return 0; // ขั้นเตรียม
+                } else { // Lower is better
+                    if (value < thresholdsForType[0]) return 3; // ขั้นสูง
+                    if (value <= thresholdsForType[1]) return 2; // ขั้นกลาง (<= mid)
+                    if (value <= thresholdsForType[2]) return 1; // ขั้นต้น (<= low)
+                    return 0; // ขั้นเตรียม
+                }
+            }
+
+            // Helper to get score from weighted std score
+            function getWeightedScore(stdScore, weight) {
+                // Check if weight is defined and not zero to avoid division by zero or NaN
+                if (typeof weight !== 'number' || weight === 0 || stdScore < 0 || stdScore > 3) return 0;
+                // Calculate score based on standard score (0-3) and weight
+                // scoreMap index corresponds to stdScore (0, 1, 2, 3)
+                const scoreMap = [0, weight / 3, (weight * 2) / 3, weight]; // 0, 1/3, 2/3, full weight
+                // Round to 2 decimal places to match user's expected scores (like 1.33, 2.67)
+                return parseFloat(scoreMap[stdScore].toFixed(2));
+            }
+
 
             // --- Step Navigation ---
 
@@ -653,7 +763,7 @@
                 steps.forEach((step, index) => {
                     step.classList.toggle('active', index + 1 === stepNum);
                 });
-                
+
                 // Update progress bar
                 progressBar.style.width = `${(stepNum / totalSteps) * 100}%`;
 
@@ -664,49 +774,68 @@
             }
 
             function nextStep() {
+                // Remove previous invalid states before validating
+                clearValidationErrors(currentStep);
                 if (currentStep < totalSteps) {
                     if (validateStep(currentStep)) {
                         currentStep++;
                         showStep(currentStep);
+                         window.scrollTo(0, 0); // Scroll to top on step change
                     }
                 }
             }
 
             function prevStep() {
+                 clearValidationErrors(currentStep); // Clear errors when going back too
                 if (currentStep > 1) {
                     currentStep--;
                     showStep(currentStep);
+                     window.scrollTo(0, 0); // Scroll to top on step change
                 }
             }
-            
+
+             function clearValidationErrors(stepNum) {
+                const currentStepEl = document.getElementById(`step${stepNum}`);
+                const inputs = currentStepEl.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    input.style.borderColor = '#d1d5db'; // Reset border
+                });
+            }
+
             function validateStep(stepNum) {
                 const currentStepEl = document.getElementById(`step${stepNum}`);
-                const inputs = currentStepEl.querySelectorAll('input[required], select[required]');
+                // Use browser's built-in validation API
+                const inputs = currentStepEl.querySelectorAll('input:required, select:required');
+                let firstInvalid = null;
                 let isValid = true;
-                
+
                 inputs.forEach(input => {
-                    if (!input.value) {
-                        input.style.borderColor = 'red';
+                    // Also check custom validation for number inputs with step="0.01" if needed,
+                    // although type="number" step="0.01" should handle basic decimal validation.
+                    if (!input.checkValidity()) {
+                        input.style.borderColor = '#ef4444'; // Red border for invalid
+                        if (!firstInvalid) {
+                            firstInvalid = input; // Track the first invalid element
+                        }
                         isValid = false;
                     } else {
-                        input.style.borderColor = '#d1d5db'; // Reset border
+                        input.style.borderColor = '#d1d5db'; // Reset border if valid
                     }
                 });
 
-                // Custom validation for step 1
-                if (stepNum === 1) {
-                    const coopTypeEl = document.getElementById('coop_type');
-                    if (!coopTypeEl.value) {
-                        coopTypeEl.style.borderColor = 'red';
-                        isValid = false;
-                        showCustomAlert('กรุณาเลือกประเภทสหกรณ์', 'คุณต้องเลือกประเภทสหกรณ์ก่อนไปขั้นตอนถัดไป');
-                    } else {
-                         coopTypeEl.style.borderColor = '#d1d5db';
-                    }
-                }
-                
+
                 if (!isValid) {
-                     showCustomAlert('ข้อมูลไม่ครบถ้วน', 'กรุณากรอกข้อมูลในช่องที่มีเครื่องหมาย * ให้ครบถ้วน');
+                     showCustomAlert('ข้อมูลไม่ครบถ้วน', 'กรุณากรอกข้อมูลในช่องสีแดง หรือเลือกค่าให้ถูกต้อง');
+                     if (firstInvalid) {
+                        // Attempt to focus, might not work if element is not visible
+                        // but helps guide the user if it does.
+                        // Check if focusable (visible) before trying to focus
+                         const style = window.getComputedStyle(firstInvalid);
+                         if (style.display !== 'none' && style.visibility !== 'hidden') {
+                             firstInvalid.focus();
+                             firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                         }
+                     }
                 }
                 return isValid;
             }
@@ -717,11 +846,14 @@
                 const coopTypeEl = document.getElementById('coop_type');
                 coopType = coopTypeEl.value;
                 const d1_3_section = document.getElementById('d1_3_section');
-                
+
                 if (coopType === 'Ag') {
                     d1_3_section.style.display = 'block';
                 } else {
                     d1_3_section.style.display = 'none';
+                     // Clear checkboxes if switching away from Ag to avoid carrying over data
+                     const checkboxes = document.querySelectorAll('input[name="d1_3_biz_types"]');
+                     checkboxes.forEach(cb => cb.checked = false);
                 }
             }
 
@@ -731,51 +863,96 @@
                 const data = new FormData(form);
                 formData = {};
                 for (let [key, value] of data.entries()) {
-                    // Handle checkboxes (for 1.3)
-                    if (key === 'd1_3_biz_types') {
-                        if (!formData[key]) {
+                     // Handle number inputs specifically to ensure they are parsed correctly
+                    const el = document.getElementById(key) || document.querySelector(`[name="${key}"]`);
+                     if (el && el.type === 'number') {
+                         formData[key] = value === '' ? null : parseFloat(value); // Store null if empty, otherwise parse as float
+                     } else if (key === 'd1_3_biz_types') {
+                         if (!formData[key]) {
                             formData[key] = [];
                         }
-                        formData[key].push(value);
-                    } else {
-                        formData[key] = value;
+                        formData[key].push(value); // Checkbox values are pushed
+                    } else if (el && el.type === 'checkbox') {
+                         // This is handled manually below, skip here
+                         continue;
+                    }
+                     else {
+                         formData[key] = value;
                     }
                 }
-                
-                // Manually gather unchecked checkboxes for 1.2
-                const d1_2_checkboxes = [
-                    'd1_2_welfare_allocated_current', 'd1_2_welfare_paid_current', 'd1_2_public_allocated_current', 'd1_2_public_paid_current',
-                    'd1_2_welfare_allocated_prev', 'd1_2_welfare_paid_prev', 'd1_2_public_allocated_prev', 'd1_2_public_paid_prev'
-                ];
-                d1_2_checkboxes.forEach(id => {
-                    formData[id] = document.getElementById(id).checked;
-                });
-                
+
+                // Manually gather ALL checkboxes (including unchecked ones for 1.2)
+                const allCheckboxes = form.querySelectorAll('input[type="checkbox"]');
+                 allCheckboxes.forEach(cb => {
+                    // Only overwrite if it wasn't handled by FormData (like d1_3_biz_types)
+                     if (!(cb.name === 'd1_3_biz_types' && formData[cb.name])) {
+                        formData[cb.id || cb.name] = cb.checked;
+                     }
+                 });
+
+                 // Ensure d1_3_biz_types is an empty array if no boxes were checked and it's Ag type
+                 if(formData['coop_type'] === 'Ag' && !formData['d1_3_biz_types']) {
+                     formData['d1_3_biz_types'] = [];
+                 }
+
+
                 // Store coop type from step 1
                 formData['coop_type'] = document.getElementById('coop_type').value;
                 formData['fiscal_year_end_date'] = document.getElementById('fiscal_year_end_date').value;
-                
+
                 console.log("Form Data Gathered:", formData);
             }
 
             // --- Calculation Engine ---
 
-            function calculateScores() {
-                gatherFormData();
-                
-                scores = {
-                    d1: calculateDimension1(),
-                    d2: calculateDimension2(),
-                    d3: calculateDimension3(),
-                    d4: calculateDimension4(),
-                };
-                
-                scores.total = (scores.d1.totalScore || 0) + (scores.d2.totalScore || 0) + (scores.d3.totalScore || 0) + (scores.d4.totalScore || 0);
-                
-                console.log("Scores Calculated:", scores);
-                
-                const classificationResult = runClassification();
-                showResults(classificationResult);
+            // Show spinner on button
+            function showSpinner(buttonId, show = true) {
+                const btn = document.getElementById(buttonId);
+                if (!btn) return; // Add check if button exists
+                const spinner = btn.querySelector('.spinner');
+                const icon = btn.querySelector('.icon');
+                const text = btn.querySelector('.text');
+                 if (show) {
+                     if(spinner) spinner.classList.remove('hidden');
+                     if (icon) icon.classList.add('hidden');
+                     btn.disabled = true;
+                     if(text) text.textContent = 'กรุณารอสักครู่...';
+                 } else {
+                     if(spinner) spinner.classList.add('hidden');
+                     if (icon) icon.classList.remove('hidden');
+                     btn.disabled = false;
+                      if(text) text.textContent = buttonId === 'calculateBtn' ? 'คำนวณผล' : 'ส่งออกข้อมูล (Export)'; // Reset text
+                 }
+            }
+
+
+            async function calculateScores() {
+                 showSpinner('calculateBtn', true);
+                 // Simulate calculation delay
+                 await new Promise(resolve => setTimeout(resolve, 100)); // Reduced delay
+
+                try {
+                    gatherFormData();
+
+                    scores = {
+                        d1: calculateDimension1(),
+                        d2: calculateDimension2(),
+                        d3: calculateDimension3(),
+                        d4: calculateDimension4(),
+                    };
+
+                    scores.total = (scores.d1.totalScore || 0) + (scores.d2.totalScore || 0) + (scores.d3.totalScore || 0) + (scores.d4.totalScore || 0);
+
+                    console.log("Scores Calculated:", scores);
+
+                    const classificationResult = runClassification();
+                    showResults(classificationResult);
+                 } catch (error) {
+                     console.error("Calculation error:", error);
+                     showCustomAlert('ข้อผิดพลาด', 'เกิดข้อผิดพลาดระหว่างการคำนวณ: ' + error.message);
+                 } finally {
+                     showSpinner('calculateBtn', false);
+                 }
             }
 
             // --- Dimension 1 Calculation ---
@@ -783,70 +960,40 @@
                 let totalScore = 0;
                 let breakdown = {};
                 const type = formData['coop_type'];
-                
+
                 // 1.1 สมาชิกมีส่วนร่วม (15 คะแนน)
-                const totalMembers = parseFloat(formData['d1_1_total_members']) || 0;
-                const activeMembers = parseFloat(formData['d1_1_active_members']) || 0;
+                const totalMembers = formData['d1_1_total_members']; // Already parsed in gatherFormData
+                const activeMembers = formData['d1_1_active_members'];
                 let score_1_1 = 0;
-                if (totalMembers > 0) {
+                if (totalMembers !== null && totalMembers > 0) {
                     const ratio = (activeMembers / totalMembers) * 100;
+
+                    // ใช้เกณฑ์ตามคู่มือ PDF หน้า 27
                     if (type === 'Ag') { // เกษตร, นิคม, ประมง
                         if (ratio > 80) score_1_1 = 15;
                         else if (ratio > 70) score_1_1 = 12;
                         else if (ratio > 60) score_1_1 = 9;
                         else score_1_1 = 6;
-                    } else { // นอกภาคฯ (ออมทรัพย์, เครดิตยูเนี่ยน, ร้านค้า, บริการ)
-                        const thresholds = { 'NonAg': [85, 80, 70], 'NonAg_Saving': [85, 80, 70] }; // อ้างอิง PDF หน้า 27, ออมทรัพย์/เครดิตฯ ใช้เกณฑ์ต่าง
-                        // หมายเหตุ: PDF หน้า 27 เกณฑ์ ออมทรัพย์, เครดิตยูเนี่ยน, ร้านค้า, บริการ "นอกภาค" เหมือนกันหมด ยกเว้น "ออมทรัพย์" ที่ขั้นกลาง/ต้น/เตรียม ต่าง
-                        // แต่ในไฟล์ PDF ที่ให้มา เกณฑ์ของ "ออมทรัพย์" "เครดิตยูเนี่ยน" "ร้านค้า" "บริการ" ไม่เหมือนกัน
-                        // ขออ้างอิงตาม "คู่มือฯ" หน้า 27
-                        // เกษตร, นิคม, ประมง: >80, >70-80, >60-70, <=60
-                        // ออมทรัพย์: >85, >80-85, >70-80, <=70
-                        // เครดิตยูเนี่ยน: >80, >70-80, >60-70, <=60
-                        // ร้านค้า: >80, >70-80, >60-70, <=60
-                        // บริการ: >80, >70-80, >60-70, <=60
-                        // สรุปคือ "ออมทรัพย์" มีเกณฑ์ต่างที่ >85, >80, >70, <=70
-                        
-                        // คาดว่าใน prompt "นอกภาคการเกษตร (สกอ., สกร., สกบ., สกค.)"
-                        // สกอ = ออมทรัพย์
-                        // สกร = ร้านค้า
-                        // สกบ = บริการ
-                        // สกค = เครดิตยูเนี่ยน
-                        // ซึ่งใน PDF หน้า 27 ออมทรัพย์ (สกอ) ใช้เกณฑ์ >85, >80, >70, <=70.
-                        // ที่เหลือ (สกร, สกบ, สกค) ใช้เกณฑ์เดียวกับ "เกษตร" (>80, >70, >60, <=60).
-                        
-                        // ...แต่ในไฟล์ PPT หน้า 14 แสดงผลว่าเกณฑ์ "ออมทรัพย์" และ "เครดิตยูเนี่ยน" เหมือนกัน (>85, >80, >70, <=70)
-                        // ...และในไฟล์ PDF หน้า 27 เกณฑ์ "ออมทรัพย์" คือ >85, >80, >70, <=70
-                        // ...และในไฟล์ PDF หน้า 27 เกณฑ์ "เครดิตยูเนี่ยน" คือ >80, >70, >60, <=60
-                        // ข้อมูลขัดแย้งกัน
-                        // *** ขอตัดสินใจใช้เกณฑ์ตาม "คู่มือ PDF หน้า 27" เป็นหลัก ***
-                        
+                    } else { // นอกภาคฯ
+                        // Assume most NonAg types follow Ag rules, except Saving (ออมทรัพย์)
                         let th_high = 80, th_mid = 70, th_low = 60;
-                        if (formData['coop_type_specific'] === 'saving') { // สมมติว่ามีตัวเลือกย่อย
-                             th_high = 85; th_mid = 80; th_low = 70;
-                        }
-                        
-                        // เพื่อความง่าย ขอใช้เกณฑ์ "นอกภาค" แบบรวม ตาม "prompt.docx"
-                        // สกอ: >85, >80-85, >70-80, <=70
-                        // สกร, สกบ, สกค: >80, >70-80, >60-70, <=60
-                        // เนื่องจากผู้ใช้เลือกแค่ "ภาคเกษตร" กับ "นอกภาค"
-                        // ผมจะใช้เกณฑ์ "นอกภาค" ที่เป็น "ส่วนใหญ่" คือ >80, >70, >60, <=60
-                        // และใช้เกณฑ์ "ออมทรัพย์" (ซึ่งต่าง) ถ้าเราสามารถระบุได้
-                        // ...ในเมื่อ prompt ให้เลือกรวม "นอกภาค" ผมจะใช้เกณฑ์ของ ออมทรัพย์ (>85, >80, >70) ตาม PDF หน้า 27 ซึ่งเข้มที่สุด
-                        
-                        if (ratio > 85) score_1_1 = 15;       // ขั้นสูง (ออมทรัพย์)
-                        else if (ratio > 80) score_1_1 = 12;  // ขั้นกลาง (ออมทรัพย์)
-                        else if (ratio > 70) score_1_1 = 9;   // ขั้นต้น (ออมทรัพย์)
-                        else score_1_1 = 6;                   // ขั้นเตรียม (ออมทรัพย์)
+                        // Logic to check if it's Saving coop type would go here if we had more specific types
+                        // For now, using the stricter Saving coop threshold from PDF p.27 for all NonAg
+                         th_high = 85; th_mid = 80; th_low = 70; // Use Saving Coop threshold
+
+                        if (ratio > th_high) score_1_1 = 15;
+                        else if (ratio > th_mid) score_1_1 = 12;
+                        else if (ratio > th_low) score_1_1 = 9;
+                        else score_1_1 = 6;
                     }
                 }
                 breakdown['1.1'] = score_1_1;
                 totalScore += score_1_1;
-                
+
                 // 1.2 ทุนสวัสดิการ 2 ปี (เกษตร 10, นอกภาค 15)
                 const maxScore_1_2 = (type === 'Ag') ? 10 : 15;
                 let score_1_2 = 0;
-                
+
                 const alloc_w_curr = formData['d1_2_welfare_allocated_current'];
                 const pay_w_curr = formData['d1_2_welfare_paid_current'];
                 const alloc_p_curr = formData['d1_2_public_allocated_current'];
@@ -863,9 +1010,9 @@
                 const pay_2_prev = pay_w_prev && pay_p_prev;
                 const pay_1_curr = pay_w_curr || pay_p_curr; // จ่าย 1 ทุน (curr)
                 const pay_1_prev = pay_w_prev || pay_p_prev; // จ่าย 1 ทุน (prev)
-                
+
                 const exception = formData['d4_2_exception'] === 'yes'; // ใช้ข้อยกเว้นจาก 4.2
-                
+
                 // เกณฑ์ PDF หน้า 26
                 if (alloc_2_curr && alloc_2_prev && pay_2_curr && pay_2_prev) {
                     // ขั้นสูง: จัดสรร 2 ทุน (2 ปี) และ จ่าย 2 ทุน (2 ปี)
@@ -873,19 +1020,22 @@
                 } else if (alloc_2_curr && alloc_2_prev && ((pay_2_curr && pay_1_prev && !pay_2_prev) || (pay_2_prev && pay_1_curr && !pay_2_curr))) {
                     // ขั้นกลาง: จัดสรร 2 ทุน (2 ปี) และ (จ่าย 2 ทุน 1 ปี + จ่าย 1 ทุน 1 ปี)
                     score_1_2 = (type === 'Ag') ? 7 : 10;
-                } else if ((alloc_2_curr && alloc_2_prev && (pay_2_curr || pay_2_prev)) || 
+                } else if ((alloc_2_curr && alloc_2_prev && (pay_2_curr || pay_2_prev)) ||
                            (alloc_2_curr && alloc_2_prev && (pay_1_curr && pay_1_prev)) ||
                            exception) {
-                    // ขั้นต้น: 
+                    // ขั้นต้น:
                     // 1. จัดสรร 2 ทุน (2 ปี) และ จ่าย 2 ทุน (1 ปี) [กรณีอีกปีไม่จ่ายเลย]
                     // 2. จัดสรร 2 ทุน (2 ปี) และ จ่าย 1 ทุน (2 ปี)
                     // 3. มีข้อยกเว้น
                     score_1_2 = (type === 'Ag') ? 4 : 5;
                 } else {
-                    // ขั้นเตรียม: อื่นๆ
+                    // ขั้นเตรียม: อื่นๆ (ตามเงื่อนไขใน PDF หน้า 26)
+                    // (1) ไม่จัดสรร/ไม่จ่าย ปีใดปีหนึ่ง หรือทั้ง 2 ปี
+                    // (2) จัดสรร 2 ทุน 2 ปี แต่ไม่จ่ายเลยทั้ง 2 ทุน 2 ปี
+                    // (3) จ่าย 1 ทุน 1 ปี และไม่จ่ายอีก 1 ปี
                     score_1_2 = 0;
                 }
-                
+
                 breakdown['1.2'] = score_1_2;
                 totalScore += score_1_2;
 
@@ -894,339 +1044,354 @@
                 if (type === 'Ag') {
                     const bizCount = formData['d1_3_biz_types'] ? formData['d1_3_biz_types'].length : 0;
                     if (bizCount >= 6) score_1_3 = 5;
-                    else if (bizCount >= 4) score_1_3 = 3;
-                    else if (bizCount >= 2) score_1_3 = 1;
-                    else score_1_3 = 0;
+                    else if (bizCount >= 4) score_1_3 = 3; // 4-5 types
+                    else if (bizCount >= 2) score_1_3 = 1; // 2-3 types
+                    else score_1_3 = 0; // < 2 types
                 }
                 breakdown['1.3'] = score_1_3;
                 totalScore += score_1_3;
 
                 return { totalScore, breakdown };
             }
-            
+
             // --- Dimension 2 Calculation ---
             function calculateDimension2() {
-                let totalScore = 0;
-                let breakdown = {};
-                const type = formData['coop_type'];
-                
-                // Helper function to get standard score (3, 2, 1, 0)
-                // thresholds = [high, mid, low]. direction = 1 for '>' (ดี), -1 for '<' (ดี)
-                function getStdScore(value, thresholds, direction) {
-                    if (isNaN(value)) return 0;
-                    if (direction === 1) { // ยิ่งสูงยิ่งดี (>, >)
-                        if (value > thresholds[0]) return 3;
-                        if (value >= thresholds[1]) return 2; // PDF ใช้ >= (เช่น 1.50 - 3.00)
-                        if (value >= thresholds[2]) return 1;
-                        return 0;
-                    } else { // ยิ่งต่ำยิ่งดี (<, <)
-                        if (value < thresholds[0]) return 3;
-                        if (value <= thresholds[1]) return 2; // PDF ใช้ <= (เช่น 45 - 65)
-                        if (value <= thresholds[2]) return 1;
-                        return 0;
-                    }
-                }
-                
-                // Helper to get score from weighted std score
-                function getWeightedScore(stdScore, weight) {
-                    return (stdScore * weight) / 3;
-                }
-
-                // Define thresholds from PDF (หน้า 28-33)
-                // [high, mid, low]
-                // Ag: [สกก, สกน, สกป], NonAg: [สกอ, สกค, สกร, สกบ]
-                // ขอใช้ค่ากลางสำหรับแต่ละกลุ่ม Ag / NonAg (ตาม prompt)
-                const thresholds = {
-                    '2.1': { 'Ag': [0.75, 1.75, 1.75], 'NonAg': [0.50, 1.00, 1.00], dir: -1 }, // Ag: <0.75, 0.75-1.75, >1.75. NonAg: <0.50, 0.50-1.00, >1.00 (สกบ. > 1.5) -> ใช้ 1.00
-                    '2.2': { 'Ag': [0.20, 0.10, 0.10], 'NonAg': [0.10, 0.04, 0.04], dir: 1 }, // Ag(สกก): >0.20, 0.10-0.20, <0.10. NonAg(สกอ): >0.10, 0.04-0.10, <0.04
-                    '2.3': { 'Ag': [3.00, 1.50, 1.50], 'NonAg': [4.00, 2.00, 2.00], dir: 1 }, // Ag: >3, 1.5-3, <1.5. NonAg(สกอ): >4, 2-4, <2
-                    '2.4': { 'Ag': [45, 65, 65], 'NonAg': [25, 35, 35], dir: -1 }, // Ag(สกก): <45, 45-65, >65. NonAg(สกอ): <25, 25-35, >35
-                    '2.5': { 'Ag': [1.75, 0.75, 0.75], 'NonAg': [1.00, 0.50, 0.50], dir: 1 }, // Ag: >1.75, 0.75-1.75, <0.75. NonAg(สกอ): >1.00, 0.50-1.00, <0.50
-                    '2.6': { 'Ag': [90, 60, 60], 'NonAg': [95, 85, 85], dir: 1 }  // Ag: >90, 60-90, <60. NonAg(สกอ): >95, 85-95, <85
+                 let totalScore = 0;
+                 let breakdown = {};
+                 const type = formData['coop_type'];
+                 // Thresholds defined within the IIFE scope, accessible here
+                 const thresholds = {
+                    '2.1': { 'Ag': [0.75, 0.75, 1.75], 'NonAg': [0.50, 0.50, 1.00], dir: -1 },
+                    '2.2': { 'Ag': [0.20, 0.10, 0.10], 'NonAg': [0.10, 0.04, 0.04], dir: 1 },
+                    '2.3': { 'Ag': [3.00, 1.50, 1.50], 'NonAg': [4.00, 2.00, 2.00], dir: 1 },
+                    '2.4': { 'Ag': [45, 65, 65],    'NonAg': [25, 35, 35],    dir: -1 },
+                    '2.5': { 'Ag': [1.75, 0.75, 0.75], 'NonAg': [1.00, 0.50, 0.50], dir: 1 },
+                    '2.6': { 'Ag': [90, 60, 60],    'NonAg': [95, 85, 85],    dir: 1 }
                 };
-                
-                let weights = { '2.1': 3, '2.2': 2, '2.3': 4, '2.4': 4, '2.5': 3, '2.6': 4 };
 
-                // Get raw values
-                const v_total_debt = parseFloat(formData['d2_raw_total_debt']) || 0;
-                const v_total_capital = parseFloat(formData['d2_raw_total_capital']) || 0;
-                const v_reserve_fund = parseFloat(formData['d2_raw_reserve_fund']) || 0;
-                const v_assets_current = parseFloat(formData['d2_raw_assets_current']) || 0;
-                const v_assets_prev = parseFloat(formData['d2_raw_assets_prev']) || 0;
-                const v_op_profit = parseFloat(formData['d2_raw_operating_profit']) || 0;
-                const v_op_expense = parseFloat(formData['d2_raw_operating_expense']) || 0;
-                const v_profit_before_exp = parseFloat(formData['d2_raw_profit_before_expense']) || 0;
-                const v_current_assets = parseFloat(formData['d2_raw_current_assets']) || 0;
-                const v_current_liab = parseFloat(formData['d2_raw_current_liabilities']) || 0;
-                const v_debt_paid = parseFloat(formData['d2_raw_short_term_debt_paid']) || 0;
-                const v_debt_due = parseFloat(formData['d2_raw_short_term_debt_due']) || 0;
+                 let weights = { '2.1': 3, '2.2': 2, '2.3': 4, '2.4': 4, '2.5': 3, '2.6': 4 };
 
-                // 2.1
-                let r_2_1 = (v_total_capital > 0) ? (v_total_debt / v_total_capital) : Infinity;
-                let std_2_1 = (v_total_capital <= 0) ? 0 : getStdScore(r_2_1, thresholds['2.1'][type], thresholds['2.1'].dir);
-                let score_2_1 = getWeightedScore(std_2_1, weights['2.1']);
-                breakdown['2.1'] = score_2_1;
-                totalScore += score_2_1;
+                // Get raw values (already parsed floats or null)
+                 const v_total_debt = formData['d2_raw_total_debt'];
+                 const v_total_capital = formData['d2_raw_total_capital'];
+                 const v_reserve_fund = formData['d2_raw_reserve_fund'];
+                 const v_assets_current = formData['d2_raw_assets_current'];
+                 const v_assets_prev = formData['d2_raw_assets_prev'];
+                 const v_op_profit = formData['d2_raw_operating_profit'];
+                 const v_op_expense = formData['d2_raw_operating_expense'];
+                 const v_profit_before_exp = formData['d2_raw_profit_before_expense'];
+                 const v_current_assets = formData['d2_raw_current_assets'];
+                 const v_current_liab = formData['d2_raw_current_liabilities'];
+                 const v_debt_paid = formData['d2_raw_short_term_debt_paid'];
+                 const v_debt_due = formData['d2_raw_short_term_debt_due'];
 
-                // 2.2
-                let r_2_2 = (v_assets_current > 0) ? (v_reserve_fund / v_assets_current) : 0;
-                let std_2_2 = (v_reserve_fund === 0) ? 0 : getStdScore(r_2_2, thresholds['2.2'][type], thresholds['2.2'].dir);
-                let score_2_2 = getWeightedScore(std_2_2, weights['2.2']);
-                breakdown['2.2'] = score_2_2;
-                totalScore += score_2_2;
+                 // Calculate Ratios
+                 const r_2_1 = (v_total_capital !== null && v_total_capital > 0) ? (v_total_debt / v_total_capital) : null;
+                 const r_2_2 = (v_assets_current !== null && v_assets_current > 0) ? (v_reserve_fund / v_assets_current) : null;
+                 const v_assets_avg = (v_assets_current !== null && v_assets_prev !== null) ? (v_assets_current + v_assets_prev) / 2 : null;
+                 const r_2_3 = (v_assets_avg !== null && v_assets_avg > 0) ? (v_op_profit / v_assets_avg) * 100 : null;
+                 const r_2_4 = (v_profit_before_exp !== null && v_profit_before_exp > 0) ? (v_op_expense / v_profit_before_exp) * 100 : null;
+                 const r_2_5 = (v_current_liab !== null && v_current_liab > 0) ? (v_current_assets / v_current_liab) : null;
+                 const r_2_6 = (v_debt_due !== null && v_debt_due > 0) ? (v_debt_paid / v_debt_due) * 100 : null;
 
-                // 2.3
-                let v_assets_avg = (v_assets_current + v_assets_prev) / 2;
-                let r_2_3 = (v_assets_avg > 0) ? (v_op_profit / v_assets_avg) * 100 : 0;
-                let std_2_3 = (v_op_profit <= 0) ? 0 : getStdScore(r_2_3, thresholds['2.3'][type], thresholds['2.3'].dir);
-                let score_2_3 = getWeightedScore(std_2_3, weights['2.3']);
-                breakdown['2.3'] = score_2_3;
-                totalScore += score_2_3;
-                
-                // 2.4
-                let r_2_4 = (v_profit_before_exp > 0) ? (v_op_expense / v_profit_before_exp) * 100 : Infinity;
-                let std_2_4 = (v_profit_before_exp <= 0) ? 0 : getStdScore(r_2_4, thresholds['2.4'][type], thresholds['2.4'].dir);
-                let score_2_4 = getWeightedScore(std_2_4, weights['2.4']);
-                breakdown['2.4'] = score_2_4;
-                totalScore += score_2_4;
+
+                // Calculate Standard Scores and Weighted Scores using helpers defined in IIFE scope
+                 // 2.1
+                 let std_2_1 = (r_2_1 === null || v_total_capital <= 0) ? 0 : getStdScore(r_2_1, thresholds['2.1'][type], thresholds['2.1'].dir);
+                 let score_2_1 = getWeightedScore(std_2_1, weights['2.1']);
+                 breakdown['2.1'] = score_2_1;
+                 totalScore += score_2_1;
+
+                 // 2.2
+                 let std_2_2 = (r_2_2 === null || v_reserve_fund === 0) ? 0 : getStdScore(r_2_2, thresholds['2.2'][type], thresholds['2.2'].dir);
+                 let score_2_2 = getWeightedScore(std_2_2, weights['2.2']);
+                 breakdown['2.2'] = score_2_2;
+                 totalScore += score_2_2;
+
+                 // 2.3
+                 let std_2_3 = (r_2_3 === null || v_op_profit <= 0) ? 0 : getStdScore(r_2_3, thresholds['2.3'][type], thresholds['2.3'].dir);
+                 let score_2_3 = getWeightedScore(std_2_3, weights['2.3']);
+                 breakdown['2.3'] = score_2_3;
+                 totalScore += score_2_3;
+
+                 // 2.4
+                 let std_2_4 = (r_2_4 === null || v_profit_before_exp <= 0) ? 0 : getStdScore(r_2_4, thresholds['2.4'][type], thresholds['2.4'].dir);
+                 let score_2_4 = getWeightedScore(std_2_4, weights['2.4']);
+                 breakdown['2.4'] = score_2_4;
+                 totalScore += score_2_4;
+
 
                 // 2.5 & 2.6 (Handle Exception)
-                let r_2_5 = (v_current_liab > 0) ? (v_current_assets / v_current_liab) : Infinity;
-                let std_2_5 = getStdScore(r_2_5, thresholds['2.5'][type], thresholds['2.5'].dir);
-                
-                let score_2_5 = 0;
-                let score_2_6 = 0;
+                 let std_2_5 = (r_2_5 === null) ? 0 : getStdScore(r_2_5, thresholds['2.5'][type], thresholds['2.5'].dir);
+                 let score_2_5 = 0;
+                 let score_2_6 = 0;
+                 let temp_weight_2_5 = weights['2.5']; // Store original weight
 
-                if (formData['d2_raw_has_short_term_loan_biz'] === 'no') {
-                    // Exception: โอนคะแนน 2.6 (4) ไป 2.5 (3) -> 2.5 มีน้ำหนัก 7
-                    weights['2.5'] = 7;
-                    weights['2.6'] = 0;
-                    score_2_5 = getWeightedScore(std_2_5, weights['2.5']);
-                    score_2_6 = 0;
-                    breakdown['2.6'] = 0; // (โอนคะแนน)
-                } else {
-                    // Normal case
-                    score_2_5 = getWeightedScore(std_2_5, weights['2.5']);
-                    
-                    let r_2_6 = (v_debt_due > 0) ? (v_debt_paid / v_debt_due) * 100 : 0;
-                    let std_2_6 = (v_debt_paid === 0 && v_debt_due > 0) ? 0 : getStdScore(r_2_6, thresholds['2.6'][type], thresholds['2.6'].dir);
-                    score_2_6 = getWeightedScore(std_2_6, weights['2.6']);
-                    breakdown['2.6'] = score_2_6;
-                }
-                
-                breakdown['2.5'] = score_2_5;
-                totalScore += score_2_5 + score_2_6;
+                 if (formData['d2_raw_has_short_term_loan_biz'] === 'no') {
+                     // Exception: โอนคะแนน 2.6 (4) ไป 2.5 (3) -> 2.5 มีน้ำหนัก 7
+                     temp_weight_2_5 = 7; // Use temporary weight for calculation
+                     score_2_5 = getWeightedScore(std_2_5, temp_weight_2_5);
+                     score_2_6 = 0;
+                     breakdown['2.6'] = 0; // Explicitly set 2.6 score to 0
+                 } else {
+                     // Normal case
+                     score_2_5 = getWeightedScore(std_2_5, temp_weight_2_5); // Use original weight
 
-                return { totalScore, breakdown };
-            }
-            
+                     let std_2_6 = (r_2_6 === null || (v_debt_paid === 0 && v_debt_due > 0)) ? 0 : getStdScore(r_2_6, thresholds['2.6'][type], thresholds['2.6'].dir);
+                     score_2_6 = getWeightedScore(std_2_6, weights['2.6']);
+                     breakdown['2.6'] = score_2_6;
+                 }
+
+                 breakdown['2.5'] = score_2_5;
+                 totalScore += score_2_5 + score_2_6;
+
+                 return { totalScore, breakdown };
+             }
+
             // --- Dimension 3 Calculation ---
             function calculateDimension3() {
                 let totalScore = 0;
                 let breakdown = {};
 
                 // 3.1 เทคโนโลยีการบัญชี (4 คะแนน) - คะแนนตรง
-                const score_3_1 = parseFloat(formData['d3_1_status']) || 0;
+                const score_3_1 = parseFloat(formData['d3_1_status']); // Value is 4, 2, or 0
                 breakdown['3.1'] = score_3_1;
                 totalScore += score_3_1;
 
                 // 3.2 - 3.5 การควบคุมภายใน (ตัวละ 4 คะแนน, ถ่วงน้ำหนัก)
-                const std_3_2 = parseFloat(formData['d3_2_status']) || 0;
-                const std_3_3 = parseFloat(formData['d3_3_status']) || 0;
-                const std_3_4 = parseFloat(formData['d3_4_status']) || 0;
-                const std_3_5 = parseFloat(formData['d3_5_status']) || 0;
-                
-                const score_3_2 = (std_3_2 * 4) / 3;
-                const score_3_3 = (std_3_3 * 4) / 3;
-                const score_3_4 = (std_3_4 * 4) / 3;
-                const score_3_5 = (std_3_5 * 4) / 3;
-                
-                breakdown['3.2'] = score_3_2;
-                breakdown['3.3'] = score_3_3;
-                breakdown['3.4'] = score_3_4;
-                breakdown['3.5'] = score_3_5;
-                
-                totalScore += score_3_2 + score_3_3 + score_3_4 + score_3_5;
-                
+                 // Standard scores are directly from the select options (3, 2, 1, 0)
+                 const std_3_2 = parseFloat(formData['d3_2_status']);
+                 const std_3_3 = parseFloat(formData['d3_3_status']);
+                 const std_3_4 = parseFloat(formData['d3_4_status']);
+                 const std_3_5 = parseFloat(formData['d3_5_status']);
+
+                // Use the weighted score helper (now accessible)
+                 const score_3_2 = getWeightedScore(std_3_2, 4); // Weight is 4
+                 const score_3_3 = getWeightedScore(std_3_3, 4);
+                 const score_3_4 = getWeightedScore(std_3_4, 4);
+                 const score_3_5 = getWeightedScore(std_3_5, 4);
+
+                 breakdown['3.2'] = score_3_2;
+                 breakdown['3.3'] = score_3_3;
+                 breakdown['3.4'] = score_3_4;
+                 breakdown['3.5'] = score_3_5;
+
+                 totalScore += score_3_2 + score_3_3 + score_3_4 + score_3_5;
+
+
                 return { totalScore, breakdown };
             }
 
             // --- Dimension 4 Calculation ---
             function calculateDimension4() {
-                let totalScore = 0;
-                let breakdown = {};
+                 let totalScore = 0;
+                 let breakdown = {};
 
-                // 4.1 ข้อบกพร่อง/ทุจริต (15 คะแนน)
-                const score_4_1 = parseFloat(formData['d4_1_status']) || 0;
-                breakdown['4.1'] = score_4_1;
-                totalScore += score_4_1;
+                 // 4.1 ข้อบกพร่อง/ทุจริต (15 คะแนน) - คะแนนตรงจาก select value
+                 const score_4_1 = parseFloat(formData['d4_1_status']);
+                 breakdown['4.1'] = score_4_1;
+                 totalScore += score_4_1;
 
-                // 4.2 ผลประกอบการ 2 ปี (5 คะแนน)
-                const profit_curr = parseFloat(formData['d4_2_profit_current_year']);
-                const profit_prev = parseFloat(formData['d4_2_profit_prev_year']);
-                const exception = formData['d4_2_exception'] === 'yes';
-                let score_4_2 = 0;
-                
-                if (profit_curr > 0 && profit_prev > 0) score_4_2 = 5; // ขั้นสูง
-                else if (profit_curr > 0 && profit_prev <= 0) score_4_2 = 3; // ขั้นกลาง
-                else if ((profit_curr <= 0 && profit_prev > 0) || exception) score_4_2 = 1; // ขั้นต้น
-                else score_4_2 = 0; // ขั้นเตรียม (ขาดทุน 2 ปี และไม่มีข้อยกเว้น)
-                
-                breakdown['4.2'] = score_4_2;
-                totalScore += score_4_2;
+                 // 4.2 ผลประกอบการ 2 ปี (5 คะแนน)
+                 const profit_curr = formData['d4_2_profit_current_year']; // Already parsed
+                 const profit_prev = formData['d4_2_profit_prev_year'];
+                 const exception = formData['d4_2_exception'] === 'yes';
+                 let score_4_2 = 0;
+
+                 // Check for null before comparison
+                 const curr_is_profit = profit_curr !== null && profit_curr > 0;
+                 const prev_is_profit = profit_prev !== null && profit_prev > 0;
+                 const curr_is_loss = profit_curr !== null && profit_curr <= 0;
+                 const prev_is_loss = profit_prev !== null && profit_prev <= 0;
+
+
+                 if (curr_is_profit && prev_is_profit) score_4_2 = 5; // ขั้นสูง: กำไร/กำไร
+                 else if (curr_is_profit && prev_is_loss) score_4_2 = 3; // ขั้นกลาง: ขาดทุน/กำไร
+                 else if (exception || (curr_is_loss && prev_is_profit)) score_4_2 = 1; // ขั้นต้น: กำไร/ขาดทุน หรือ มีข้อยกเว้น
+                 else score_4_2 = 0; // ขั้นเตรียม: ขาดทุน/ขาดทุน (ไม่มีข้อยกเว้น)
+
+                 breakdown['4.2'] = score_4_2;
+                 totalScore += score_4_2;
+
 
                 // 4.3 งบการเงินและอนุมัติ (5 คะแนน)
                 let score_4_3 = 0;
-                const endDate = new Date(formData['fiscal_year_end_date']);
-                const sendDate = new Date(formData['d4_3_send_date']);
-                const approveDate = new Date(formData['d4_3_approve_date']);
+                const endDate = formData['fiscal_year_end_date'] ? new Date(formData['fiscal_year_end_date']) : null;
+                const sendDate = formData['d4_3_send_date'] ? new Date(formData['d4_3_send_date']) : null;
+                const approveDate = formData['d4_3_approve_date'] ? new Date(formData['d4_3_approve_date']) : null;
+                 let daysToApprove = Infinity;
+                 let daysToSend = Infinity;
 
-                if (endDate && sendDate && approveDate) {
-                    const daysToApprove = (approveDate - endDate) / (1000 * 60 * 60 * 24);
-                    const daysToSend = (sendDate - endDate) / (1000 * 60 * 60 * 24);
-                    
-                    const approved_within_150 = daysToApprove <= 150;
-                    const send_within_30 = daysToSend <= 30;
-                    const send_within_60 = daysToSend <= 60;
-                    const send_within_90 = daysToSend <= 90;
 
-                    if (approved_within_150 && send_within_30) score_4_3 = 5; // ขั้นสูง
-                    else if (approved_within_150 && send_within_60) score_4_3 = 4; // ขั้นกลาง
-                    else if (approved_within_150 && send_within_90) score_4_3 = 2; // ขั้นต้น
-                    else if (!approved_within_150 && send_within_90) score_4_3 = 1; // ขั้นเตรียม (1)
-                    else score_4_3 = 0; // ขั้นเตรียม (2), (3)
+                if (endDate && approveDate) {
+                     daysToApprove = (approveDate - endDate) / (1000 * 60 * 60 * 24);
                 }
-                breakdown['4.3'] = score_4_3;
-                totalScore += score_4_3;
+                 if(endDate && sendDate) {
+                     daysToSend = (sendDate - endDate) / (1000 * 60 * 60 * 24);
+                 }
 
-                // 4.4 เจ้าหน้าที่ประจำ (5 คะแนน)
-                const score_4_4 = parseFloat(formData['d4_4_status']) || 0;
-                breakdown['4.4'] = score_4_4;
-                totalScore += score_4_4;
-                
+
+                 const approved_within_150 = daysToApprove <= 150;
+                 const send_within_30 = daysToSend <= 30;
+                 const send_within_60 = daysToSend <= 60;
+                 const send_within_90 = daysToSend <= 90;
+
+                 if (approved_within_150 && send_within_30) score_4_3 = 5; // ขั้นสูง
+                 else if (approved_within_150 && send_within_60) score_4_3 = 4; // ขั้นกลาง
+                 else if (approved_within_150 && send_within_90) score_4_3 = 2; // ขั้นต้น
+                 else if (!approved_within_150 && send_within_90) score_4_3 = 1; // ขั้นเตรียม (1)
+                 else score_4_3 = 0; // ขั้นเตรียม (2), (3), (4 - covered by base condition check)
+
+                 breakdown['4.3'] = score_4_3;
+                 totalScore += score_4_3;
+
+
+                 // 4.4 เจ้าหน้าที่ประจำ (5 คะแนน) - คะแนนตรงจาก select value
+                 const score_4_4 = parseFloat(formData['d4_4_status']);
+                 breakdown['4.4'] = score_4_4;
+                 totalScore += score_4_4;
+
+
                 return { totalScore, breakdown };
             }
-            
-            // --- Classification Logic (ตาม PPT) ---
-            
-            function runClassification() {
-                const totalScore = scores.total;
-                const type = formData['coop_type'];
-                let conditionsBreakdown = {};
-                
-                // --- ขั้นตอนที่ 1: ตรวจสอบเงื่อนไขพื้นฐาน (Fundamental Conditions) ---
-                const cond_1_closed_books = formData['d_base_books_closed'] === 'yes';
-                const cond_2_meeting_held = formData['d_base_meeting_held'] === 'yes';
-                
-                const endDate = new Date(formData['fiscal_year_end_date']);
-                const approveDate = new Date(formData['d4_3_approve_date']);
-                const daysToApprove = (approveDate - endDate) / (1000 * 60 * 60 * 24);
-                const cond_3_approved_150 = daysToApprove <= 150;
-                
-                conditionsBreakdown['1. ปิดบัญชีได้'] = { pass: cond_1_closed_books, 'value': cond_1_closed_books ? 'ผ่าน' : 'ไม่ผ่าน' };
-                conditionsBreakdown['2. ประชุมใหญ่ได้'] = { pass: cond_2_meeting_held, 'value': cond_2_meeting_held ? 'ผ่าน' : 'ไม่ผ่าน' };
-                conditionsBreakdown['3. อนุมัติงบฯ ภายใน 150 วัน'] = { pass: cond_3_approved_150, 'value': cond_3_approved_150 ? `ผ่าน (${daysToApprove.toFixed(0)} วัน)` : `ไม่ผ่าน (${daysToApprove.toFixed(0)} วัน)` };
 
-                const passes_fundamental = cond_1_closed_books && cond_2_meeting_held && cond_3_approved_150;
+             // --- Classification Logic (ตาม PPT) ---
 
-                if (!passes_fundamental) {
-                    return { 'class': 3, 'name': 'ต้องพัฒนา', 'reason': 'ไม่ผ่านเงื่อนไขพื้นฐาน (การปิดบัญชี/ประชุมใหญ่/อนุมัติงบฯ 150 วัน)', 'conditions': conditionsBreakdown };
-                }
-                
-                // --- ขั้นตอนที่ 2: ตรวจสอบช่วงคะแนนรวม (Score Range Check) ---
-                const minScoreClass2 = (type === 'Ag') ? 55 : 65;
-                
-                if (totalScore < minScoreClass2) {
-                     return { 'class': 3, 'name': 'ต้องพัฒนา', 'reason': `ผ่านเงื่อนไขพื้นฐาน แต่คะแนนรวม (${totalScore.toFixed(2)}) ไม่ถึงเกณฑ์ ${minScoreClass2} คะแนน`, 'conditions': conditionsBreakdown };
-                }
+             function runClassification() {
+                 // Check if scores object exists
+                 if (!scores || !scores.total || !scores.d4 || !scores.d4.breakdown) {
+                    console.error("Scores not calculated properly.");
+                    throw new Error("Calculation failed before classification."); // Stop execution
+                 }
+                 const totalScore = scores.total;
+                 const type = formData['coop_type'];
+                 let conditionsBreakdown = {};
 
-                // --- ขั้นตอนที่ 3: ตรวจสอบเงื่อนไขสำคัญ (Important Conditions) ---
-                const score_4_1 = scores.d4.breakdown['4.1'];
-                const score_4_2 = scores.d4.breakdown['4.2'];
-                
-                // เงื่อนไขชั้น 1 (PPT หน้า 16, 20)
-                const cond_class1_profit = (score_4_2 === 5); // ไม่ขาดทุน 2 ปี
-                const cond_class1_defect = (score_4_1 === 15); // แก้ไขเสร็จสมบูรณ์
-                const passes_class1_conditions = cond_class1_profit && cond_class1_defect;
-                
-                conditionsBreakdown['4. (ชั้น 1) ไม่ขาดทุน 2 ปี (4.2=5)'] = { pass: cond_class1_profit, 'value': cond_class1_profit ? 'ผ่าน' : `ไม่ผ่าน (ได้ ${score_4_2} คะแนน)` };
-                conditionsBreakdown['5. (ชั้น 1) ข้อบกพร่องเสร็จสมบูรณ์ (4.1=15)'] = { pass: cond_class1_defect, 'value': cond_class1_defect ? 'ผ่าน' : `ไม่ผ่าน (ได้ ${score_4_1} คะแนน)` };
-                
-                // เงื่อนไขชั้น 2 (PPT หน้า 16, 20)
-                const cond_class2_profit = (score_4_2 >= 3); // ไม่ขาดทุนปีปัจจุบัน
-                const cond_class2_defect = (score_4_1 >= 10); // เสร็จต้องติดตาม หรือดีกว่า
-                const passes_class2_conditions = cond_class2_profit && cond_class2_defect;
+                 // --- ขั้นตอนที่ 1: ตรวจสอบเงื่อนไขพื้นฐาน (Fundamental Conditions) ---
+                 const cond_1_closed_books = formData['d_base_books_closed'] === 'yes';
+                 const cond_2_meeting_held = formData['d_base_meeting_held'] === 'yes';
 
-                conditionsBreakdown['6. (ชั้น 2) ไม่ขาดทุนปีปัจจุบัน (4.2>=3)'] = { pass: cond_class2_profit, 'value': cond_class2_profit ? 'ผ่าน' : `ไม่ผ่าน (ได้ ${score_4_2} คะแนน)` };
-                conditionsBreakdown['7. (ชั้น 2) ข้อบกพร่องเสร็จต้องติดตาม (4.1>=10)'] = { pass: cond_class2_defect, 'value': cond_class2_defect ? 'ผ่าน' : `ไม่ผ่าน (ได้ ${score_4_1} คะแนน)` };
+                 const endDate = formData['fiscal_year_end_date'] ? new Date(formData['fiscal_year_end_date']) : null;
+                 const approveDate = formData['d4_3_approve_date'] ? new Date(formData['d4_3_approve_date']) : null;
+                 let daysToApprove = Infinity;
+                  if (endDate && approveDate) {
+                     daysToApprove = (approveDate - endDate) / (1000 * 60 * 60 * 24);
+                 }
+                 const cond_3_approved_150 = daysToApprove <= 150;
 
 
-                // --- ตรรกะการจัดชั้นสุดท้าย (Final Logic) ---
-                if (totalScore >= 80 && passes_class1_conditions) {
-                    return { 'class': 1, 'name': 'เข้มแข็ง', 'reason': `คะแนน ${totalScore.toFixed(2)} (>= 80) และผ่านเงื่อนไขสำคัญชั้น 1`, 'conditions': conditionsBreakdown };
-                }
-                
-                if (passes_class2_conditions) {
-                    // กรณี: 1. คะแนน >= 80 แต่ตกเงื่อนไขชั้น 1
-                    // กรณี: 2. คะแนน < 80 (แต่ >= เกณฑ์ขั้นต่ำ)
-                    return { 'class': 2, 'name': 'เข้มแข็ง', 'reason': `คะแนน ${totalScore.toFixed(2)} และผ่านเงื่อนไขสำคัญชั้น 2 (แม้ไม่ผ่านเงื่อนไขชั้น 1)`, 'conditions': conditionsBreakdown };
-                }
+                 conditionsBreakdown['1. ปิดบัญชีได้'] = { pass: cond_1_closed_books, 'value': cond_1_closed_books ? 'ผ่าน' : 'ไม่ผ่าน' };
+                 conditionsBreakdown['2. ประชุมใหญ่ได้'] = { pass: cond_2_meeting_held, 'value': cond_2_meeting_held ? 'ผ่าน' : 'ไม่ผ่าน' };
+                 conditionsBreakdown['3. อนุมัติงบฯ ภายใน 150 วัน'] = { pass: cond_3_approved_150, 'value': cond_3_approved_150 ? `ผ่าน (${daysToApprove <= 3650 ? daysToApprove.toFixed(0) : '-'} วัน)` : `ไม่ผ่าน (${daysToApprove <= 3650 ? daysToApprove.toFixed(0) : '-'} วัน)` };
 
-                // กรณี: ผ่านเงื่อนไขพื้นฐาน, ผ่านเกณฑ์คะแนน (>=55 หรือ >=65) แต่ "ไม่ผ่านเงื่อนไขสำคัญชั้น 2"
-                return { 'class': 3, 'name': 'ต้องพัฒนา', 'reason': `ผ่านเกณฑ์คะแนน (${totalScore.toFixed(2)}) แต่ไม่ผ่านเงื่อนไขสำคัญชั้น 2 (ตชว 4.1 หรือ 4.2)`, 'conditions': conditionsBreakdown };
-            }
+                 const passes_fundamental = cond_1_closed_books && cond_2_meeting_held && cond_3_approved_150;
+
+                 if (!passes_fundamental) {
+                     return { 'class': 3, 'name': 'ต้องพัฒนา', 'reason': 'ไม่ผ่านเงื่อนไขพื้นฐาน (การปิดบัญชี/ประชุมใหญ่/อนุมัติงบฯ 150 วัน)', 'conditions': conditionsBreakdown };
+                 }
+
+                 // --- ขั้นตอนที่ 2: ตรวจสอบช่วงคะแนนรวม (Score Range Check) ---
+                 const minScoreClass2 = (type === 'Ag') ? 55 : 65;
+
+                 if (totalScore < minScoreClass2) {
+                      return { 'class': 3, 'name': 'ต้องพัฒนา', 'reason': `ผ่านเงื่อนไขพื้นฐาน แต่คะแนนรวม (${totalScore.toFixed(2)}) ไม่ถึงเกณฑ์ ${minScoreClass2} คะแนน`, 'conditions': conditionsBreakdown };
+                 }
+
+                 // --- ขั้นตอนที่ 3: ตรวจสอบเงื่อนไขสำคัญ (Important Conditions) ---
+                 const score_4_1 = scores.d4.breakdown['4.1']; // คะแนน 15, 10, 5, 0
+                 const score_4_2 = scores.d4.breakdown['4.2']; // คะแนน 5, 3, 1, 0
+
+                 // เงื่อนไขชั้น 1 (PPT หน้า 16, 20)
+                 const cond_class1_profit = (score_4_2 === 5); // ไม่ขาดทุน 2 ปี (ได้ 5 คะแนน)
+                 const cond_class1_defect = (score_4_1 === 15); // แก้ไขเสร็จสมบูรณ์ (ได้ 15 คะแนน)
+                 const passes_class1_conditions = cond_class1_profit && cond_class1_defect;
+
+                 conditionsBreakdown['4. (ชั้น 1) ไม่ขาดทุน 2 ปี (4.2=5)'] = { pass: cond_class1_profit, 'value': cond_class1_profit ? 'ผ่าน' : `ไม่ผ่าน (ได้ ${score_4_2} คะแนน)` };
+                 conditionsBreakdown['5. (ชั้น 1) ข้อบกพร่องเสร็จสมบูรณ์ (4.1=15)'] = { pass: cond_class1_defect, 'value': cond_class1_defect ? 'ผ่าน' : `ไม่ผ่าน (ได้ ${score_4_1} คะแนน)` };
+
+                 // เงื่อนไขชั้น 2 (PPT หน้า 16, 20)
+                 const cond_class2_profit = (score_4_2 >= 3); // ไม่ขาดทุนปีปัจจุบัน (ได้ 3 หรือ 5 คะแนน)
+                 const cond_class2_defect = (score_4_1 >= 10); // เสร็จต้องติดตาม หรือดีกว่า (ได้ 10 หรือ 15 คะแนน)
+                 const passes_class2_conditions = cond_class2_profit && cond_class2_defect;
+
+                 conditionsBreakdown['6. (ชั้น 2) ไม่ขาดทุนปีปัจจุบัน (4.2>=3)'] = { pass: cond_class2_profit, 'value': cond_class2_profit ? 'ผ่าน' : `ไม่ผ่าน (ได้ ${score_4_2} คะแนน)` };
+                 conditionsBreakdown['7. (ชั้น 2) ข้อบกพร่องเสร็จต้องติดตาม (4.1>=10)'] = { pass: cond_class2_defect, 'value': cond_class2_defect ? 'ผ่าน' : `ไม่ผ่าน (ได้ ${score_4_1} คะแนน)` };
+
+
+                 // --- ตรรกะการจัดชั้นสุดท้าย (Final Logic) ---
+                 if (totalScore >= 80 && passes_class1_conditions) {
+                     return { 'class': 1, 'name': 'เข้มแข็ง', 'reason': `คะแนน ${totalScore.toFixed(2)} (>= 80) และผ่านเงื่อนไขสำคัญชั้น 1`, 'conditions': conditionsBreakdown };
+                 }
+
+                 if (passes_class2_conditions) {
+                     // กรณี: 1. คะแนน >= 80 แต่ตกเงื่อนไขชั้น 1 -> ได้ชั้น 2
+                     // กรณี: 2. คะแนน < 80 (แต่ >= เกณฑ์ขั้นต่ำ 55/65) -> ได้ชั้น 2
+                      let reasonClass2 = `คะแนน ${totalScore.toFixed(2)} และผ่านเงื่อนไขสำคัญชั้น 2`;
+                      if (totalScore >= 80 && !passes_class1_conditions) {
+                          reasonClass2 += " (แต่ไม่ผ่านเงื่อนไขสำคัญชั้น 1)";
+                      }
+                     return { 'class': 2, 'name': 'เข้มแข็ง', 'reason': reasonClass2, 'conditions': conditionsBreakdown };
+                 }
+
+                 // กรณี: ผ่านเงื่อนไขพื้นฐาน, ผ่านเกณฑ์คะแนน (>=55 หรือ >=65) แต่ "ไม่ผ่านเงื่อนไขสำคัญชั้น 2"
+                 return { 'class': 3, 'name': 'ต้องพัฒนา', 'reason': `ผ่านเกณฑ์คะแนน (${totalScore.toFixed(2)}) แต่ไม่ผ่านเงื่อนไขสำคัญชั้น 2 (ตชว 4.1 หรือ 4.2)`, 'conditions': conditionsBreakdown };
+             }
+
 
             // --- Show Results Modal ---
-            
+
             function showResults(result) {
                 // Main classification
                 document.getElementById('finalClassDisplay').textContent = `ชั้น ${result.class}`;
                 document.getElementById('finalClassName').textContent = result.name;
                 document.getElementById('finalClassReason').textContent = result.reason;
-                
+
                 const classDisplay = document.getElementById('finalClassDisplay');
                 classDisplay.classList.remove('text-blue-600', 'text-green-600', 'text-red-600');
                 if (result.class === 1) classDisplay.classList.add('text-blue-600');
                 else if (result.class === 2) classDisplay.classList.add('text-green-600');
                 else classDisplay.classList.add('text-red-600');
-                
+
                 // Score summary
                 document.getElementById('totalScoreDisplay').textContent = `${scores.total.toFixed(2)} / 100`;
-                document.getElementById('d1ScoreDisplay').textContent = `${scores.d1.totalScore.toFixed(2)} / ${(formData['coop_type'] === 'Ag' ? 30 : 30).toFixed(2)}`; // D1 30 คะแนนทั้งคู่
+                // Correct max score for D1 display
+                const maxD1Score = 30.00; // D1 is 30 points for both types
+                document.getElementById('d1ScoreDisplay').textContent = `${scores.d1.totalScore.toFixed(2)} / ${maxD1Score.toFixed(2)}`;
                 document.getElementById('d2ScoreDisplay').textContent = `${scores.d2.totalScore.toFixed(2)} / 20.00`;
                 document.getElementById('d3ScoreDisplay').textContent = `${scores.d3.totalScore.toFixed(2)} / 20.00`;
                 document.getElementById('d4ScoreDisplay').textContent = `${scores.d4.totalScore.toFixed(2)} / 30.00`;
 
-                // Detailed breakdown
-                const breakdownEl = document.getElementById('detailedBreakdown');
-                breakdownEl.innerHTML = `
-                    <strong>มิติที่ 1:</strong> 
-                    1.1: ${scores.d1.breakdown['1.1'].toFixed(2)}, 
-                    1.2: ${scores.d1.breakdown['1.2'].toFixed(2)}, 
-                    1.3: ${scores.d1.breakdown['1.3'].toFixed(2)}
-                    <br>
-                    <strong>มิติที่ 2:</strong> 
-                    2.1: ${scores.d2.breakdown['2.1'].toFixed(2)}, 
-                    2.2: ${scores.d2.breakdown['2.2'].toFixed(2)}, 
-                    2.3: ${scores.d2.breakdown['2.3'].toFixed(2)}, 
-                    2.4: ${scores.d2.breakdown['2.4'].toFixed(2)}, 
-                    2.5: ${scores.d2.breakdown['2.5'].toFixed(2)}, 
-                    2.6: ${scores.d2.breakdown['2.6'].toFixed(2)}
-                    <br>
-                    <strong>มิติที่ 3:</strong> 
-                    3.1: ${scores.d3.breakdown['3.1'].toFixed(2)}, 
-                    3.2: ${scores.d3.breakdown['3.2'].toFixed(2)}, 
-                    3.3: ${scores.d3.breakdown['3.3'].toFixed(2)}, 
-                    3.4: ${scores.d3.breakdown['3.4'].toFixed(2)}, 
-                    3.5: ${scores.d3.breakdown['3.5'].toFixed(2)}
-                    <br>
-                    <strong>มิติที่ 4:</strong> 
-                    4.1: ${scores.d4.breakdown['4.1'].toFixed(2)}, 
-                    4.2: ${scores.d4.breakdown['4.2'].toFixed(2)}, 
-                    4.3: ${scores.d4.breakdown['4.3'].toFixed(2)}, 
-                    4.4: ${scores.d4.breakdown['4.4'].toFixed(2)}
-                `;
-                
+                 // Detailed breakdown - Now displays rounded scores
+                 const breakdownEl = document.getElementById('detailedBreakdown');
+                 breakdownEl.innerHTML = `
+                     <strong>มิติที่ 1:</strong>
+                     1.1 = ${scores.d1.breakdown['1.1'].toFixed(2)};
+                     1.2 = ${scores.d1.breakdown['1.2'].toFixed(2)};
+                     1.3 = ${scores.d1.breakdown['1.3'].toFixed(2)}
+                     <br>
+                     <strong>มิติที่ 2:</strong>
+                     2.1 = ${scores.d2.breakdown['2.1'].toFixed(2)};
+                     2.2 = ${scores.d2.breakdown['2.2'].toFixed(2)};
+                     2.3 = ${scores.d2.breakdown['2.3'].toFixed(2)};
+                     2.4 = ${scores.d2.breakdown['2.4'].toFixed(2)};
+                     2.5 = ${scores.d2.breakdown['2.5'].toFixed(2)};
+                     2.6 = ${scores.d2.breakdown['2.6'].toFixed(2)}
+                     <br>
+                     <strong>มิติที่ 3:</strong>
+                     3.1 = ${scores.d3.breakdown['3.1'].toFixed(2)};
+                     3.2 = ${scores.d3.breakdown['3.2'].toFixed(2)};
+                     3.3 = ${scores.d3.breakdown['3.3'].toFixed(2)};
+                     3.4 = ${scores.d3.breakdown['3.4'].toFixed(2)};
+                     3.5 = ${scores.d3.breakdown['3.5'].toFixed(2)}
+                     <br>
+                     <strong>มิติที่ 4:</strong>
+                     4.1 = ${scores.d4.breakdown['4.1'].toFixed(2)};
+                     4.2 = ${scores.d4.breakdown['4.2'].toFixed(2)};
+                     4.3 = ${scores.d4.breakdown['4.3'].toFixed(2)};
+                     4.4 = ${scores.d4.breakdown['4.4'].toFixed(2)}
+                 `;
+
+
                 // Conditions breakdown
                 const conditionsEl = document.getElementById('conditionsBreakdown');
                 conditionsEl.innerHTML = '';
@@ -1238,128 +1403,193 @@
                     conditionsEl.innerHTML += `<div class="${color} font-medium">${icon} ${key}: ${text}</div>`;
                 }
 
-                modal.classList.add('active');
+                resultsModal.classList.add('active');
             }
-            
-            function showCustomAlert(title, message) {
-                // นี่คือ placeholder - ในแอปจริงควรสร้าง modal alert ที่สวยงาม
-                // เพื่อหลีกเลี่ยงการใช้ alert() ตามข้อกำหนด
-                console.warn(`ALERT: ${title} - ${message}`);
-                // For demonstration, we'll just log it. A real implementation would pop a modal.
-                // A simple (but blocking) alert for critical validation:
-                // alert(`${title}\n\n${message}`); 
-                // We are not allowed to use alert(). So we will just focus the first invalid input.
-                const firstInvalid = form.querySelector('input:invalid, select:invalid');
-                if(firstInvalid) {
-                    firstInvalid.focus();
-                }
-            }
-            
+
+            // --- Alert Modal Functionality ---
+             function showCustomAlert(title = "แจ้งเตือน", message = "") {
+                 alertModalTitle.textContent = title;
+                 alertModalMessage.textContent = message;
+                 alertModal.classList.add('active');
+                 alertModalOkBtn.focus(); // Focus OK button
+             }
+
+             function hideAlertModal() {
+                 alertModal.classList.remove('active');
+             }
+
+
             // --- Import/Export ---
-            
-            function exportData() {
-                gatherFormData(); // ตรวจสอบว่า formData ทันสมัย
-                const dataStr = JSON.stringify(formData, null, 2);
-                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-                
-                const exportFileDefaultName = 'scm_data.json';
-                
-                let linkElement = document.createElement('a');
-                linkElement.setAttribute('href', dataUri);
-                linkElement.setAttribute('download', exportFileDefaultName);
-                linkElement.click();
+
+             async function exportData() {
+                 showSpinner('exportBtn', true);
+                  // Simulate export delay
+                 await new Promise(resolve => setTimeout(resolve, 300));
+
+                try {
+                    gatherFormData(); // Ensure formData is up-to-date
+                    const dataStr = JSON.stringify(formData, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+                    const exportFileDefaultName = 'scm_data.json';
+
+                    let linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+                    linkElement.remove(); // Clean up the link element
+
+                    // Use timeout to ensure file download dialog appears before showing alert
+                    setTimeout(() => {
+                         showCustomAlert('ส่งออกสำเร็จ', 'ข้อมูลถูกส่งออกเป็นไฟล์ scm_data.json เรียบร้อยแล้ว');
+                     }, 100); // Small delay
+
+
+                 } catch (error) {
+                      console.error("Export error:", error);
+                      showCustomAlert('ส่งออกล้มเหลว', 'เกิดข้อผิดพลาดในการส่งออกข้อมูล: ' + error.message);
+                 } finally {
+                     showSpinner('exportBtn', false);
+                 }
             }
-            
+
             function importData() {
-                fileInput.click();
+                 // Clear previous selection to allow re-importing the same file
+                 fileInput.value = null;
+                 fileInput.click();
             }
-            
+
             function loadData(event) {
                 const file = event.target.files[0];
                 if (!file) {
                     return;
                 }
-                
+
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     try {
                         const data = JSON.parse(e.target.result);
-                        
+
                         // Populate form fields
                         for (const [key, value] of Object.entries(data)) {
-                            const el = document.getElementById(key);
-                            if (el) {
-                                if (el.type === 'checkbox') {
-                                    el.checked = value;
-                                } else if (el.type === 'radio') {
-                                    // This requires radios to have matching id and value
-                                    document.querySelector(`input[name="${key}"][value="${value}"]`).checked = true;
-                                } else {
-                                    el.value = value;
-                                }
-                            } else if (key === 'd1_3_biz_types') {
-                                // Handle biz type checkboxes
-                                const checkboxes = document.querySelectorAll('input[name="d1_3_biz_types"]');
-                                checkboxes.forEach(cb => {
-                                    cb.checked = value.includes(cb.value);
-                                });
-                            }
+                             const elements = form.elements[key]; // More robust way to find elements
+
+                             if (!elements) continue; // Skip if no element found
+
+                             // Handle NodeList (radio buttons) vs single element
+                             const elementList = elements.length ? Array.from(elements) : [elements];
+
+                             elementList.forEach(el => {
+                                 if (el.type === 'checkbox') {
+                                     // Handle single checkbox or group (like d1_3_biz_types)
+                                     if (Array.isArray(value)) { // Group like d1_3
+                                         el.checked = value.includes(el.value);
+                                     } else { // Single checkbox like d1_2
+                                         el.checked = !!value; // Ensure boolean
+                                     }
+                                 } else if (el.type === 'radio') {
+                                     if (el.value === value) {
+                                         el.checked = true;
+                                     }
+                                 } else if (el.tagName === 'SELECT') {
+                                      el.value = value;
+                                 } else if (el.type === 'date') {
+                                      // Ensure date format is YYYY-MM-DD
+                                      el.value = value ? value.split('T')[0] : '';
+                                 } else {
+                                     // Handle text, number inputs
+                                     el.value = (value === null || value === undefined) ? '' : value; // Set to empty string if null/undefined
+                                 }
+                             });
                         }
-                        
+
+
                         // After loading, update UI and move to first step
-                        updateConditionalUI();
+                        updateConditionalUI(); // Update visibility based on coop type
                         currentStep = 1;
                         showStep(currentStep);
                         console.log("Data imported successfully.");
-                        
+                        showCustomAlert('นำเข้าสำเร็จ', 'ข้อมูลถูกนำเข้าเรียบร้อยแล้ว');
+
                     } catch (err) {
                         console.error("Error parsing JSON file:", err);
-                        showCustomAlert('นำเข้าข้อมูลล้มเหลว', 'ไฟล์ JSON ไม่ถูกต้องหรือไม่สามารถอ่านได้');
+                        showCustomAlert('นำเข้าข้อมูลล้มเหลว', 'ไฟล์ JSON ไม่ถูกต้องหรือไม่สามารถอ่านได้: ' + err.message);
                     }
                 };
+                 reader.onerror = function() {
+                      console.error("Error reading file");
+                      showCustomAlert('นำเข้าข้อมูลล้มเหลว', 'ไม่สามารถอ่านไฟล์ได้');
+                 };
                 reader.readAsText(file);
-                
-                // Reset file input to allow importing the same file again
-                fileInput.value = null;
+
             }
 
             // --- Event Listeners ---
-            
+
             document.addEventListener('DOMContentLoaded', () => {
                 showStep(currentStep);
-                
+
                 // Navigation
                 prevBtn.addEventListener('click', prevStep);
                 nextBtn.addEventListener('click', nextStep);
-                
+
                 // Form Submission
-                form.addEventListener('submit', (e) => {
+                form.addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    clearValidationErrors(totalSteps); // Clear previous errors
                     if (validateStep(totalSteps)) {
-                        calculateScores();
+                        await calculateScores(); // Make it async
                     }
                 });
-                
-                // Modal
-                modalCloseBtn.addEventListener('click', () => modal.classList.remove('active'));
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.classList.remove('active');
-                    }
-                });
-                
+
+                // Results Modal Close
+                modalCloseBtnResults.addEventListener('click', () => resultsModal.classList.remove('active'));
+                 resultsModal.addEventListener('click', (e) => {
+                     if (e.target === resultsModal) {
+                         resultsModal.classList.remove('active');
+                     }
+                 });
+
+
+                 // Alert Modal Close Listeners
+                 alertModalCloseBtn.addEventListener('click', hideAlertModal);
+                 alertModalOkBtn.addEventListener('click', hideAlertModal);
+                 alertModal.addEventListener('click', (e) => {
+                     if (e.target === alertModal) {
+                         hideAlertModal();
+                     }
+                 });
+
+
                 // Conditional UI
                 document.getElementById('coop_type').addEventListener('change', updateConditionalUI);
-                
+
                 // Import/Export
                 importBtn.addEventListener('click', importData);
                 exportBtn.addEventListener('click', exportData);
                 fileInput.addEventListener('change', loadData);
+
+                // Add input event listeners to clear validation border on input
+                 const allInputs = form.querySelectorAll('input, select');
+                 allInputs.forEach(input => {
+                     input.addEventListener('input', () => {
+                         if (input.checkValidity()) {
+                             input.style.borderColor = '#d1d5db';
+                         }
+                     });
+                     // For selects, 'change' event is more appropriate
+                     if(input.tagName === 'SELECT') {
+                         input.addEventListener('change', () => {
+                             if (input.checkValidity()) {
+                                 input.style.borderColor = '#d1d5db';
+                             }
+                         });
+                     }
+                 });
             });
-            
+
         })();
     </script>
 </body>
 </html>
-
 
