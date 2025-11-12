@@ -5,44 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GPF NAV Analysis Tool</title>
     
-    <!-- 1. Tailwind CSS (สำหรับความสวยงาม โดยไม่ใช้ Framework JS) -->
+    <!-- 1. Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 2. Chart.js (Library สำหรับวาดกราฟ) -->
+    <!-- 2. Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     
-    <!-- 3. PapaParse (Library สำหรับอ่านไฟล์ CSV) -->
+    <!-- 3. PapaParse -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
 
     <style>
-        /* ใช้ฟอนต์ Inter ที่ดูทันสมัยและอ่านง่าย */
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; /* cool-gray-300 */
+            background: #cbd5e1;
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; /* cool-gray-400 */
+            background: #94a3b8;
         }
-        /* ซ่อน/แสดง Input ตาม Radio button */
         .input-toggle:not(:checked) + div {
             display: none;
         }
-        /* รูปแบบแท็บ */
         .tab-btn.active {
-            border-color: #3b82f6; /* blue-600 */
+            border-color: #3b82f6;
             color: #3b82f6;
             font-weight: 600;
         }
     </style>
-    <!-- โหลดฟอนต์ Inter จาก Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
@@ -58,7 +54,6 @@
         <section class="mb-6">
             <h2 class="text-lg font-semibold mb-3 text-gray-700">1. นำเข้าข้อมูล NAV</h2>
             
-            <!-- เลือกวิธี Import -->
             <div class="flex space-x-4 mb-3">
                 <label class="flex items-center">
                     <input type="radio" name="importType" class="input-toggle" value="file" checked>
@@ -70,13 +65,17 @@
                 </label>
             </div>
 
-            <!-- Input สำหรับไฟล์ CSV -->
             <div id="file-input-group">
                 <input type="file" id="csv-file-input" class="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" accept=".csv">
-                <p class="text-xs text-gray-500 mt-1">รองรับไฟล์ .csv เท่านั้น</p>
+                
+                <!-- (NEW) Encoding Selector -->
+                <label for="encoding-select" class="text-xs text-gray-500 mt-2 block">Encoding:</label>
+                <select id="encoding-select" class="w-full text-sm p-1 border border-gray-300 rounded-lg">
+                    <option value="UTF-8">UTF-8 (Default)</option>
+                    <option value="windows-874">TIS-620 / Windows (Thai)</option>
+                </select>
             </div>
 
-            <!-- Input สำหรับ Google Sheet -->
             <div id="gsheet-input-group" class="hidden">
                 <input type="text" id="gsheet-url-input" placeholder="วางลิงก์ Google Sheet" class="w-full p-2 border border-gray-300 rounded-lg text-sm">
                 <p class="text-xs text-gray-500 mt-1">ต้องเป็นลิงก์ที่ "แชร์" และเข้าถึงได้</p>
@@ -86,7 +85,6 @@
                 โหลดข้อมูล
             </button>
 
-            <!-- (New) Import Format Hint -->
             <div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-600">
                 <h4 class="font-semibold mb-1">ข้อแนะนำข้อมูลนำเข้า:</h4>
                 <ul class="list-disc list-inside space-y-1">
@@ -114,6 +112,10 @@
                     <input type="number" id="rsi-period" value="14" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm">
                 </div>
                 <div>
+                    <label for="vol-period" class="block text-sm font-medium text-gray-600">ช่วงคำนวณความผันผวน (วัน)</label>
+                    <input type="number" id="vol-period" value="50" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm">
+                </div>
+                <div>
                     <label for="switch-limit" class="block text-sm font-medium text-gray-600">จำกัดการสลับ (ครั้ง/ปี)</label>
                     <input type="number" id="switch-limit" value="12" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm" readonly>
                 </div>
@@ -128,7 +130,7 @@
             </div>
         </section>
 
-        <!-- 1.4 (ใหม่) วิเคราะห์พอร์ตปัจจุบัน -->
+        <!-- 1.4 วิเคราะห์พอร์ตปัจจุบัน -->
         <section class="mt-6">
             <h2 class="text-lg font-semibold mb-3 text-gray-700">4. วิเคราะห์พอร์ตปัจจุบัน</h2>
             <div class="space-y-3 bg-blue-50 p-4 rounded-lg border border-blue-200">
@@ -136,7 +138,6 @@
                     <label for="current-fund-select" class="block text-sm font-medium text-gray-600">กองทุนที่ถืออยู่</label>
                     <select id="current-fund-select" class="w-full p-2 border border-gray-300 rounded-lg mt-1 text-sm">
                         <option value="">-- โปรดเลือก --</option>
-                        <!-- จะถูกเติมโดย JavaScript -->
                     </select>
                 </div>
                 <div>
@@ -146,18 +147,15 @@
             </div>
         </section>
         
-        <!-- (ย้ายมา) ปุ่มวิเคราะห์หลัก -->
         <button id="run-analysis-btn" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-700 transition duration-200 mt-6">
             วิเคราะห์
         </button>
 
-        <!-- 1.5 Status Message -->
         <div id="status-message" class="mt-4 text-sm"></div>
     </aside>
 
     <!-- ==== 2. MAIN CONTENT (พื้นที่แสดงผล) ==== -->
     <main class="ml-80 w-[calc(100%-320px)] p-8">
-        <!-- 2.1 แท็บนำทาง -->
         <div class="border-b border-gray-300 mb-6">
             <nav class="flex space-x-6">
                 <button class="tab-btn py-3 px-1 border-b-2 border-transparent text-gray-600 hover:text-blue-600 active" data-tab="dashboard">
@@ -169,25 +167,22 @@
                 <button class="tab-btn py-3 px-1 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="backtest">
                     ทดสอบสัญญาณ
                 </button>
-                <!-- (ใหม่) แท็บคำแนะนำ -->
                 <button class="tab-btn py-3 px-1 border-b-2 border-transparent text-gray-600 hover:text-blue-600" data-tab="suggestion">
                     ⭐ คำแนะนำ
                 </button>
             </nav>
         </div>
 
-        <!-- 2.2 เนื้อหาของแต่ละแท็บ -->
         <div id="tab-content">
             <!-- 2.2.1 แท็บ "สรุปสถานะ" -->
             <div id="dashboard-content" class="tab-panel">
                 <h2 class="text-2xl font-semibold mb-4">สรุปสถานะกองทุน</h2>
                 <div id="dashboard-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- การ์ดจะถูกสร้างโดย JavaScript -->
                     <p class="text-gray-500">โปรดเลือกกองทุนและกด "วิเคราะห์"</p>
                 </div>
             </div>
 
-            <!-- 2.2.2 แท็บ "กราฟวิเคราะห์" (Restore) -->
+            <!-- 2.2.2 แท็บ "กราฟวิเคราะห์" -->
             <div id="chart-content" class="tab-panel hidden">
                 <h2 class="text-2xl font-semibold mb-4">กราฟวิเคราะห์ NAV</h2>
                 <div class="bg-white p-6 rounded-lg shadow-md">
@@ -198,816 +193,1017 @@
                 </div>
             </div>
 
-            <!-- 2.2.3 แท็บ "ทดสอบสัญญาณ" (Backtest) (Restore) -->
+            <!-- 2.2.3 แท็บ "ทดสอบสัญญาณ" (Backtest) -->
             <div id="backtest-content" class="tab-panel hidden">
-                <h2 class="text-2xl font-semibold mb-4">ทดสอบสัญญาณ (นับจำนวนการสลับกองทุน)</h2>
+                <h2 class="text-2xl font-semibold mb-4">ทดสอบสัญญาณ (แสดงวันที่สลับกองทุน)</h2>
                 <p class="text-sm text-gray-600 mb-4">
-                    ส่วนนี้จะนับจำนวนครั้งที่เกิดสัญญาณสลับ (Golden/Death Cross) ในแต่ละปี เพื่อดูว่ากลยุทธ์ของคุณใช้โควต้า 12 ครั้ง/ปี คุ้มค่าหรือไม่
+                    ส่วนนี้จะแสดง "วันที่" ที่เกิดสัญญาณสลับ (Golden/Death Cross) ในแต่ละปี เพื่อประเมินความถี่และคุณภาพของกลยุทธ์
                 </p>
                 <div id="backtest-results" class="bg-white p-6 rounded-lg shadow-md space-y-4">
-                    <!-- ผลลัพธ์จะถูกสร้างโดย JavaScript -->
                     <p class="text-gray-500">โปรดเลือกกองทุนและกด "วิเคราะห์"</p>
                 </div>
             </div>
 
-            <!-- (ใหม่) 2.2.4 แท็บ "คำแนะนำ" -->
+            <!-- 2.2.4 แท็บ "คำแนะนำ" -->
             <div id="suggestion-content" class="tab-panel hidden">
                 <h2 class="text-2xl font-semibold mb-4">คำแนะนำสำหรับพอร์ตของคุณ</h2>
                 <div id="suggestion-results" class="bg-white p-6 rounded-lg shadow-md space-y-4">
                     <p class="text-gray-500">โปรดเลือก "กองทุนที่ถืออยู่" และ "วันที่เข้าลงทุน" ใน Sidebar (ส่วนที่ 4) แล้วกด "วิเคราะห์"</p>
-                    <!-- ผลลัพธ์จะถูกสร้างโดย JavaScript -->
                 </div>
             </div>
-
         </div>
 
-        <!-- (New) Footer -->
         <footer class="text-center text-xs text-gray-500 mt-12">
             © developed by Tle Narongphisit | CTTC19 CPD
         </footer>
 
     </main>
 
-    <!-- ==== 3. JAVASCRIPT (ส่วนการทำงาน) ==== -->
+    <!-- ==== 3. JAVASCRIPT (REFACTORED) ==== -->
     <script>
-        // === 3.1 ตัวแปร Global สำหรับเก็บข้อมูล ===
-        let allData = []; // เก็บข้อมูลดิบทั้งหมดจาก CSV
-        let fundsData = {}; // เก็บข้อมูลที่แบ่งตามกองทุนแล้ว
-        let navChartInstance = null; // เก็บ instance ของ Chart.js (กราฟ NAV)
-        let rsiChartInstance = null; // เก็บ instance ของ Chart.js (กราฟ RSI)
+        /**
+         * GPF Analysis Tool - Refactored Module
+         * ห่อหุ้ม Logic ทั้งหมดไว้ใน Object เดียว (GPFApp)
+         * เพื่อป้องกัน Global Scope Pollution และจัดระเบียบโค้ด
+         */
+        const GPFApp = {
+            // === 1. STATE ===
+            // สถานะส่วนกลางของแอปพลิเคชัน
+            state: {
+                fundsData: {},         // { "FundName": [{date, nav}, ...] }
+                fundsDataMap: {},      // { "FundName": Map(dateString -> nav) }
+                settings: {},          // { shortMA, longMA, rsiPeriod, ... }
+                analysisResults: [],   // ผลลัพธ์การวิเคราะห์ทั้งหมด
+                masterTimeAxis: [],    // แกนเวลาหลักสำหรับกราฟ
+            },
 
-        // === 3.2 DOM Elements (ตัวแปรอ้างอิง HTML) ===
-        const loadDataBtn = document.getElementById('load-data-btn');
-        const runAnalysisBtn = document.getElementById('run-analysis-btn');
-        const fileInput = document.getElementById('csv-file-input');
-        const gsheetInput = document.getElementById('gsheet-url-input');
-        const fileInputGroup = document.getElementById('file-input-group');
-        const gsheetInputGroup = document.getElementById('gsheet-input-group');
-        const importTypeRadios = document.querySelectorAll('input[name="importType"]');
-        const fundSelectorDiv = document.getElementById('fund-selector');
-        const statusMessage = document.getElementById('status-message');
-        
-        const shortMAInput = document.getElementById('short-ma');
-        const longMAInput = document.getElementById('long-ma');
-        const rsiPeriodInput = document.getElementById('rsi-period');
-        
-        const tabs = document.querySelectorAll('.tab-btn');
-        const tabPanels = document.querySelectorAll('.tab-panel');
-        const dashboardCardsDiv = document.getElementById('dashboard-cards');
-        const backtestResultsDiv = document.getElementById('backtest-results');
+            // === 2. DOM ELEMENTS ===
+            // อ้างอิง DOM ที่ต้องใช้บ่อย
+            elements: {},
 
-        // (ใหม่) Element สำหรับส่วนที่ 4
-        const suggestionResultsDiv = document.getElementById('suggestion-results');
-        const currentFundSelect = document.getElementById('current-fund-select');
-        const entryDateInput = document.getElementById('entry-date-input');
+            // === 3. CHART INSTANCES ===
+            // เก็บ Instance ของ Chart.js
+            charts: {
+                navChart: null,
+                rsiChart: null
+            },
 
-        // === 3.3 Event Listeners (ตัวดักจับเหตุการณ์) ===
+            // === 4. INITIALIZATION ===
+            // ฟังก์ชันเริ่มต้น (ทำงานเมื่อ DOM โหลดเสร็จ)
+            init() {
+                // 4.1. ผูก DOM Elements
+                this.elements = {
+                    loadDataBtn: document.getElementById('load-data-btn'),
+                    runAnalysisBtn: document.getElementById('run-analysis-btn'),
+                    fileInput: document.getElementById('csv-file-input'),
+                    gsheetInput: document.getElementById('gsheet-url-input'),
+                    fileInputGroup: document.getElementById('file-input-group'),
+                    gsheetInputGroup: document.getElementById('gsheet-input-group'),
+                    importTypeRadios: document.querySelectorAll('input[name="importType"]'),
+                    fundSelectorDiv: document.getElementById('fund-selector'),
+                    statusMessage: document.getElementById('status-message'),
+                    shortMAInput: document.getElementById('short-ma'),
+                    longMAInput: document.getElementById('long-ma'),
+                    rsiPeriodInput: document.getElementById('rsi-period'),
+                    volPeriodInput: document.getElementById('vol-period'),
+                    switchLimitInput: document.getElementById('switch-limit'),
+                    encodingSelect: document.getElementById('encoding-select'),
+                    tabs: document.querySelectorAll('.tab-btn'),
+                    tabPanels: document.querySelectorAll('.tab-panel'),
+                    dashboardCardsDiv: document.getElementById('dashboard-cards'),
+                    backtestResultsDiv: document.getElementById('backtest-results'),
+                    suggestionResultsDiv: document.getElementById('suggestion-results'),
+                    currentFundSelect: document.getElementById('current-fund-select'),
+                    entryDateInput: document.getElementById('entry-date-input'),
+                    navChartCanvas: document.getElementById('nav-chart'),
+                    rsiChartCanvas: document.getElementById('rsi-chart')
+                };
 
-        // สลับหน้าจอ Input ระหว่าง File/GSheet
-        importTypeRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
+                // 4.2. ผูก Event Listeners
+                // ใช้ .bind(this) เพื่อให้ 'this' ในฟังก์ชันหมายถึง GPFApp
+                this.elements.importTypeRadios.forEach(radio => {
+                    radio.addEventListener('change', this.handleImportTypeChange.bind(this));
+                });
+                this.elements.loadDataBtn.addEventListener('click', this.handleLoadData.bind(this));
+                this.elements.runAnalysisBtn.addEventListener('click', this.handleRunAnalysis.bind(this));
+                this.elements.tabs.forEach(tab => {
+                    tab.addEventListener('click', this.handleTabClick.bind(this));
+                });
+
+                this.setStatus('พร้อมใช้งาน', 'blue');
+            },
+
+            // === 5. EVENT HANDLERS ===
+            
+            handleImportTypeChange(e) {
                 if (e.target.value === 'file') {
-                    fileInputGroup.style.display = 'block';
-                    gsheetInputGroup.style.display = 'none';
+                    this.elements.fileInputGroup.style.display = 'block';
+                    this.elements.gsheetInputGroup.style.display = 'none';
                 } else {
-                    fileInputGroup.style.display = 'none';
-                    gsheetInputGroup.style.display = 'block';
+                    this.elements.fileInputGroup.style.display = 'none';
+                    this.elements.gsheetInputGroup.style.display = 'block';
                 }
-            });
-        });
+            },
 
-        // ปุ่ม "โหลดข้อมูล"
-        loadDataBtn.addEventListener('click', handleLoadData);
-
-        // ปุ่ม "วิเคราะห์"
-        runAnalysisBtn.addEventListener('click', handleRunAnalysis);
-
-        // ปุ่ม "แท็บ"
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // จัดการ Active-inactive state
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
+            handleTabClick(e) {
+                const targetTab = e.currentTarget.getAttribute('data-tab');
                 
-                // ซ่อน/แสดง Panel
-                const targetTab = tab.getAttribute('data-tab');
-                tabPanels.forEach(panel => {
-                    if (panel.id === `${targetTab}-content`) {
-                        panel.style.display = 'block';
-                    } else {
-                        panel.style.display = 'none';
+                this.elements.tabs.forEach(t => t.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                
+                this.elements.tabPanels.forEach(panel => {
+                    panel.style.display = (panel.id === `${targetTab}-content`) ? 'block' : 'none';
+                });
+            },
+
+            handleLoadData() {
+                const importType = document.querySelector('input[name="importType"]:checked').value;
+                this.setStatus('กำลังโหลดข้อมูล...', 'blue');
+
+                if (importType === 'file') {
+                    const file = this.elements.fileInput.files[0];
+                    if (!file) {
+                        this.setStatus('โปรดเลือกไฟล์ CSV ก่อน', 'red');
+                        return;
+                    }
+                    this.parseCSV(file);
+                } else {
+                    const url = this.elements.gsheetInput.value.trim();
+                    if (!url) {
+                        this.setStatus('โปรดใส่ URL ของ Google Sheet', 'red');
+                        return;
+                    }
+                    this.loadFromGSheet(url);
+                }
+            },
+
+            handleRunAnalysis() {
+                // 1. อ่านค่าตั้งค่าและกองทุนที่เลือก
+                this.updateSettings();
+                const { selectedFunds } = this.state.settings;
+
+                if (selectedFunds.length === 0) {
+                    this.setStatus('โปรดเลือกอย่างน้อย 1 กองทุน', 'red');
+                    return;
+                }
+                
+                this.setStatus('กำลังวิเคราะห์...', 'blue');
+
+                // 2. คำนวณทุกอย่าง (Core Logic)
+                this.performFullAnalysis();
+
+                // 3. แสดงผลลัพธ์
+                this.renderAll();
+
+                this.setStatus('วิเคราะห์สำเร็จ!', 'green');
+            },
+
+            // === 6. DATA LOADING & PROCESSING ===
+            
+            loadFromGSheet(url) {
+                const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                let csvUrl = url;
+                if (match && match[1]) {
+                    const sheetId = match[1];
+                    // ใช้ gid=0 (Sheet แรก)
+                    csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
+                } else {
+                    // ถ้า URL ไม่ใช่ /d/sheetId... ลองโหลดตรงๆ
+                    if (!url.includes('export?format=csv')) {
+                         this.setStatus('URL Google Sheet ไม่ถูกต้อง (ต้องเป็นลิงก์ที่แชร์)', 'red');
+                         return;
+                    }
+                }
+
+                Papa.parse(csvUrl, {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        this.processData(results.data);
+                    },
+                    error: (err) => {
+                        this.setStatus(`ไม่สามารถโหลด GSheet: ${err.message}. (อาจจะต้อง "แชร์" เป็น "ทุกคนที่มีลิงก์")`, 'red');
                     }
                 });
-            });
-        });
-
-        // === 3.4 ฟังก์ชันหลัก: การโหลดข้อมูล ===
-
-        function handleLoadData() {
-            const importType = document.querySelector('input[name="importType"]:checked').value;
-            setStatus('กำลังโหลดข้อมูล...', 'blue');
-
-            if (importType === 'file') {
-                const file = fileInput.files[0];
-                if (!file) {
-                    setStatus('โปรดเลือกไฟล์ CSV ก่อน', 'red');
-                    return;
-                }
-                parseCSV(file);
-            } else {
-                const url = gsheetInput.value.trim();
-                if (!url) {
-                    setStatus('โปรดใส่ URL ของ Google Sheet', 'red');
-                    return;
-                }
-                loadFromGSheet(url);
-            }
-        }
-
-        // แปลง URL Google Sheet ให้เป็น CSV export link
-        function getGSheetCsvUrl(url) {
-            const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
-            if (match && match[1]) {
-                const sheetId = match[1];
-                // หมายเหตุ: นี่จะดึงเฉพาะชีตแรก (gid=0)
-                // หากต้องการชีตอื่น ต้องหา gid เพิ่มเติม
-                return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
-            }
-            setStatus('URL Google Sheet ไม่ถูกต้อง', 'red');
-            return null;
-        }
-
-        // โหลดข้อมูลจาก Google Sheet
-        function loadFromGSheet(url) {
-            const csvUrl = getGSheetCsvUrl(url);
-            if (!csvUrl) return;
-
-            Papa.parse(csvUrl, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: (results) => {
-                    processData(results.data);
-                },
-                error: (err) => {
-                    setStatus(`ไม่สามารถโหลด GSheet: ${err.message}. (โปรดตรวจสอบว่าแชร์เป็น 'ทุกคนที่มีลิงก์')`, 'red');
-                }
-            });
-        }
-
-        // === 3.4 ฟังก์ชันหลัก: การโหลดข้อมูล ===
-        // สร้าง Checkbox เลือกกองทุน และ (ใหม่) Dropdown กองทุนที่ถืออยู่
-        function populateFundSelector() {
-            fundSelectorDiv.innerHTML = ''; // เคลียร์ของเก่า
-            currentFundSelect.innerHTML = '<option value="">-- โปรดเลือก --</option>'; // เคลียร์ Dropdown
-
-            const fundNames = Object.keys(fundsData).sort();
-
-            if (fundNames.length === 0) {
-                fundSelectorDiv.innerHTML = '<p class="text-sm text-gray-500">ไม่พบกองทุน</p>';
-                return;
-            }
-
-            fundNames.forEach((fundName, index) => {
-                // 1. สร้าง Checkbox
-                const div = document.createElement('div');
-                div.className = 'flex items-center';
-                div.innerHTML = `
-                    <input type_checkbox="checkbox" id="fund-${index}" value="${fundName}" class="fund-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
-                    <label for="fund-${index}" class="ml-2 block text-sm text-gray-700">${fundName}</label>
-                `;
-                // พิมพ์ผิดเป็น type_checkbox แก้เป็น type="checkbox"
-                div.querySelector('input').type = "checkbox";
-                fundSelectorDiv.appendChild(div);
-
-                // 2. (ใหม่) สร้าง Option
-                const option = document.createElement('option');
-                option.value = fundName;
-                option.textContent = fundName;
-                currentFundSelect.appendChild(option);
-            });
-        }
-
-        // === 3.6 ฟังก์ชันหลัก: การวิเคราะห์ ===
-
-        function handleRunAnalysis() {
-            const selectedFunds = Array.from(document.querySelectorAll('.fund-checkbox:checked')).map(cb => cb.value);
+            },
             
-            if (selectedFunds.length === 0) {
-                setStatus('โปรดเลือกอย่างน้อย 1 กองทุน', 'red');
-                return;
-            }
-            
-            setStatus('กำลังวิเคราะห์...', 'blue');
+            parseCSV(file) {
+                // (REFACTORED) Use FileReader to handle encoding explicitly
+                const encoding = this.elements.encodingSelect.value;
+                this.setStatus(`กำลังอ่านไฟล์ (Encoding: ${encoding})...`, 'blue');
 
-            // 1. วิเคราะห์ Dashboard (ปรับปรุงให้ return ค่า)
-            const allFundStatuses = runDashboardAnalysis(selectedFunds);
-            
-            // 2. วิเคราะห์กราฟ
-            runChartAnalysis(selectedFunds);
-
-            // 3. วิเคราะห์ Backtest
-            runBacktestAnalysis(selectedFunds);
-
-            // 4. (ใหม่) วิเคราะห์คำแนะนำ
-            runSuggestionAnalysis(allFundStatuses);
-
-            setStatus('วิเคราะห์สำเร็จ!', 'green');
-        }
-
-        // --- 3.6.1 Dashboard ---
-        // (ปรับปรุง) ให้ return สถานะของกองทุนทั้งหมด
-        function runDashboardAnalysis(selectedFunds) {
-            dashboardCardsDiv.innerHTML = ''; // เคลียร์การ์ดเก่า
-            const analysisResults = []; // (ใหม่) เก็บผลลัพธ์
-
-            selectedFunds.forEach(fundName => {
-                const data = fundsData[fundName];
-                if (data.length < 2) return; // ข้อมูลไม่พอ
-
-                // คำนวณ Indicators
-                const shortPeriod = parseInt(shortMAInput.value);
-                const longPeriod = parseInt(longMAInput.value);
-                const rsiPeriod = parseInt(rsiPeriodInput.value);
-
-                const prices = data.map(d => d.nav);
-                const smaShort = calculateMA(prices, shortPeriod);
-                const smaLong = calculateMA(prices, longPeriod);
-                const rsi = calculateRSI(prices, rsiPeriod);
-
-                // ข้อมูลล่าสุด
-                const latest = data[data.length - 1];
-                const latestShort = smaShort[smaShort.length - 1];
-                const latestLong = smaLong[smaLong.length - 1];
-                const latestRSI = rsi[rsi.length - 1];
+                const reader = new FileReader();
                 
-                // ข้อมูลวันก่อนหน้า
-                const prevShort = smaShort[smaShort.length - 2];
-                const prevLong = smaLong[smaLong.length - 2];
+                reader.onload = (e) => {
+                    const text = e.target.result;
+                    // Now parse the string result
+                    Papa.parse(text, {
+                        header: true,
+                        skipEmptyLines: true,
+                        dynamicTyping: true,
+                        complete: (results) => {
+                            this.processData(results.data);
+                        },
+                        error: (err) => {
+                            this.setStatus(`เกิดข้อผิดพลาดในการอ่านไฟล์: ${err.message}`, 'red');
+                        }
+                    });
+                };
+                
+                reader.onerror = (e) => {
+                    this.setStatus(`File reading error: ${e.message}`, 'red');
+                };
 
-                // วิเคราะห์สถานะ
+                // Read the file using the selected encoding
+                reader.readAsText(file, encoding);
+            },
+
+            processData(data) {
+                if (data.length === 0) {
+                    this.setStatus('ไม่พบข้อมูลในไฟล์', 'red');
+                    return;
+                }
+
+                // ค้นหาคอลัมน์วันที่ (อนุโลมให้ชื่อต่างกันได้)
+                const headers = Object.keys(data[0]);
+                const DATE_COL = headers.find(h => h.toLowerCase().includes('date'));
+                
+                if (!DATE_COL) {
+                    this.setStatus(`ไฟล์ต้องมีคอลัมน์วันที่ (เช่น 'Date', 'date', 'วันที่')`, 'red');
+                    return;
+                }
+
+                const fundNames = headers.filter(h => 
+                    h !== DATE_COL && h.trim() !== "" && !h.toLowerCase().includes("รวมเงินสำรอง") && !h.toLowerCase().includes("ไม่รวมสำรอง")
+                );
+
+                if (fundNames.length === 0) {
+                    this.setStatus('ไม่พบชื่อกองทุนในคอลัมน์', 'red');
+                    return;
+                }
+
+                this.state.fundsData = {}; // Reset
+                this.state.fundsDataMap = {}; // Reset
+                fundNames.forEach(fundName => {
+                    this.state.fundsData[fundName] = [];
+                    this.state.fundsDataMap[fundName] = new Map();
+                });
+
+                data.forEach(row => {
+                    const dateStr = row[DATE_COL];
+                    let date = this.parseDate(dateStr);
+
+                    if (isNaN(date) || !date) return; // ข้ามวันที่ไม่ถูกต้อง
+
+                    fundNames.forEach(fundName => {
+                        let navStr = row[fundName];
+                        if (typeof navStr === 'string') navStr = navStr.replace(/,/g, '');
+                        const nav = parseFloat(navStr);
+
+                        if (!isNaN(nav) && nav > 0) {
+                            const dataPoint = { date, nav };
+                            this.state.fundsData[fundName].push(dataPoint);
+                            this.state.fundsDataMap[fundName].set(date.getTime(), dataPoint);
+                        }
+                    });
+                });
+
+                // Sort ข้อมูลใน Array (เก่า -> ใหม่)
+                for (const fund in this.state.fundsData) {
+                    this.state.fundsData[fund].sort((a, b) => a.date - b.date);
+                    // อัปเดต Map ให้เรียงลำดับด้วย (เผื่อไว้)
+                    this.state.fundsDataMap[fund] = new Map([...this.state.fundsDataMap[fund].entries()].sort());
+                }
+
+                this.populateFundSelector();
+                this.setStatus(`โหลดข้อมูล ${Object.keys(this.state.fundsData).length} กองทุนสำเร็จ!`, 'green');
+            },
+
+            // === 7. CORE ANALYSIS (Refactored) ===
+            
+            // อ่านค่าจาก DOM มาเก็บใน State
+            updateSettings() {
+                this.state.settings = {
+                    shortMA: parseInt(this.elements.shortMAInput.value),
+                    longMA: parseInt(this.elements.longMAInput.value),
+                    rsiPeriod: parseInt(this.elements.rsiPeriodInput.value),
+                    volPeriod: parseInt(this.elements.volPeriodInput.value),
+                    switchLimit: parseInt(this.elements.switchLimitInput.value),
+                    selectedFunds: Array.from(document.querySelectorAll('.fund-checkbox:checked')).map(cb => cb.value),
+                    heldFundName: this.elements.currentFundSelect.value,
+                    entryDateStr: this.elements.entryDateInput.value
+                };
+            },
+
+            // หัวใจหลัก: คำนวณทุกอย่างในครั้งเดียว
+            performFullAnalysis() {
+                this.state.analysisResults = []; // เคลียร์ผลลัพธ์เก่า
+                this.state.masterTimeAxis = []; // เคลียร์แกนเวลา
+                const { settings, fundsData, fundsDataMap } = this.state;
+                
+                // (NEW) สร้าง Master Time Axis จากกองทุนที่เลือก
+                const allTimestamps = new Set();
+                settings.selectedFunds.forEach(fundName => {
+                    // (FIX) ต้องมั่นใจว่า fundsData[fundName] มีอยู่จริง
+                    if (fundsData[fundName]) {
+                        fundsData[fundName].forEach(dp => allTimestamps.add(dp.date.getTime()));
+                    }
+                });
+                this.state.masterTimeAxis = Array.from(allTimestamps).sort((a, b) => a - b).map(ts => new Date(ts));
+                const masterTimeStrings = this.state.masterTimeAxis.map(date => date.getTime());
+                
+                settings.selectedFunds.forEach(fundName => {
+                    const data = fundsData[fundName];
+                    const dataMap = fundsDataMap[fundName];
+
+                    // (FIX) ต้องมั่นใจว่า data และ dataMap มีอยู่จริง
+                    if (!data || !dataMap) {
+                        console.warn(`ข้ามกองทุน ${fundName} (ไม่มีข้อมูล)`);
+                        return;
+                    }
+
+                    if (data.length < settings.longMA) { // ข้อมูลน้อยไป
+                        console.warn(`ข้ามกองทุน ${fundName} (ข้อมูลไม่เพียงพอ)`);
+                        return;
+                    }
+                    
+                    // (NEW) สร้าง Series ที่จัดเรียงตาม Master Axis
+                    const alignedPrices = this.state.masterTimeAxis.map(date => dataMap.get(date.getTime())?.nav || null);
+                    
+                    // 1. คำนวณ Indicators (แบบเต็ม Series ที่จัดเรียงแล้ว)
+                    // เราต้องส่ง data.map(d => d.nav) (ข้อมูลดิบ) ไปคำนวณก่อน
+                    // แล้วค่อย map ผลลัพธ์กลับเข้าแกนเวลา
+                    
+                    const prices = data.map(d => d.nav);
+                    const dates = data.map(d => d.date);
+                    
+                    const smaShortSeries = this.calculateMA(prices, settings.shortMA);
+                    const smaLongSeries = this.calculateMA(prices, settings.longMA);
+                    const rsiSeries = this.calculateRSI(prices, settings.rsiPeriod);
+                    const volSeries = this.calculateVolatility(prices, settings.volPeriod);
+
+                    // สร้าง Map (Date -> Indicator Value) เพื่อจัดเรียง
+                    const smaShortMap = new Map(dates.map((date, i) => [date.getTime(), smaShortSeries[i]]));
+                    const smaLongMap = new Map(dates.map((date, i) => [date.getTime(), smaLongSeries[i]]));
+                    const rsiMap = new Map(dates.map((date, i) => [date.getTime(), rsiSeries[i]]));
+
+                    // (NEW) จัดเรียง Indicators เข้า Master Axis
+                    const alignedSmaShort = masterTimeStrings.map(ts => smaShortMap.get(ts) || null);
+                    const alignedSmaLong = masterTimeStrings.map(ts => smaLongMap.get(ts) || null);
+                    const alignedRsi = masterTimeStrings.map(ts => rsiMap.get(ts) || null);
+
+                    // 2. ข้อมูลล่าสุด (ดึงจากข้อมูลดิบ)
+                    const latest = data[data.length - 1];
+                    const latestShort = smaShortSeries[smaShortSeries.length - 1];
+                    const latestLong = smaLongSeries[smaLongSeries.length - 1];
+                    const latestRSI = rsiSeries[rsiSeries.length - 1];
+                    const latestVolatility = volSeries[volSeries.length - 1];
+
+                    // 3. วิเคราะห์สัญญาณ (ใช้ข้อมูลดิบ)
+                    // (NEW) ส่ง 'dates' เข้าไปเพื่อค้นหาวันที่เกิดสัญญาณ
+                    const { status, signal, color, isBuySignal, isSellSignal, latestSignalDate } = this.determineSignal(smaShortSeries, smaLongSeries, dates);
+
+                    // 4. คำนวณ Backtest (ใช้ข้อมูลดิบ)
+                    const backtest = this.calculateBacktest(data, smaShortSeries, smaLongSeries);
+                    
+                    // 5. คำนวณ Risk-Adjusted Score
+                    let riskAdjustedScore = 0;
+                    if (latestVolatility > 0) {
+                        riskAdjustedScore = latestRSI / latestVolatility;
+                    }
+
+                    // 6. เก็บผลลัพธ์
+                    this.state.analysisResults.push({
+                        name: fundName,
+                        latest: {
+                            nav: latest.nav,
+                            shortMA: latestShort,
+                            longMA: latestLong,
+                            rsi: latestRSI,
+                            volatility: latestVolatility
+                        },
+                        signal: { status, signal, color, isBuySignal, isSellSignal, latestSignalDate }, // (NEW) เพิ่ม latestSignalDate
+                        series: { // (NEW) ใช้ Series ที่จัดเรียงแล้ว
+                            prices: alignedPrices,
+                            smaShortSeries: alignedSmaShort,
+                            smaLongSeries: alignedSmaLong,
+                            rsiSeries: alignedRsi 
+                        },
+                        backtest: backtest,
+                        riskAdjustedScore: riskAdjustedScore
+                    });
+                });
+                
+                // (End) Sort ผลลัพธ์เพื่อใช้ใน "คำแนะนำ"
+                this.state.analysisResults.sort((a, b) => b.riskAdjustedScore - a.riskAdjustedScore);
+            },
+            
+            // === 8. RENDERING (Refactored) ===
+            // ฟังก์ชันที่เรียก Render ทั้งหมด
+            renderAll() {
+                this.renderDashboard();
+                this.renderChart();
+                this.renderBacktest(); // <-- Updated
+                this.renderSuggestion(); // <-- Updated
+            },
+
+            // 8.1 Render Dashboard
+            renderDashboard() {
+                this.elements.dashboardCardsDiv.innerHTML = ''; // เคลียร์
+                const { settings } = this.state;
+                
+                this.state.analysisResults.forEach(result => {
+                    const { name, latest, signal } = result;
+                    // ตรวจสอบว่ามีข้อมูลล่าสุดหรือไม่ (เผื่อกองทุนถูกกรองออก)
+                    if (isNaN(latest.nav)) return; 
+
+                    const card = document.createElement('div');
+                    card.className = `bg-white p-6 rounded-lg shadow-md border-l-4 border-${signal.color}-500`;
+                    card.innerHTML = `
+                        <h3 class="text-xl font-bold text-${signal.color}-600">${name}</h3>
+                        <p class="text-2xl font-semibold my-2">${signal.status}</p>
+                        <p class="text-gray-600 mb-3">${signal.signal}</p>
+                        <!-- (NEW) แสดงวันที่เกิดสัญญาณล่าสุด -->
+                        ${signal.latestSignalDate ? `<p class="text-sm text-gray-500 mb-3">สัญญาณล่าสุด: ${signal.latestSignalDate}</p>` : ''}
+                        <div class="text-sm space-y-1 text-gray-700">
+                            <p><strong>NAV ล่าสุด:</strong> ${latest.nav.toFixed(4)}</p>
+                            <p><strong>RSI (${settings.rsiPeriod}):</strong> ${latest.rsi.toFixed(2)} ${latest.rsi > 70 ? '(Overbought)' : latest.rsi < 30 ? '(Oversold)' : ''}</p>
+                            <p><strong>ความผันผวน (${settings.volPeriod} วัน):</strong> ${(latest.volatility * 100).toFixed(2)}%</p>
+                            <p><strong>MA ${settings.shortMA}:</strong> ${latest.shortMA.toFixed(4)}</p>
+                            <p><strong>MA ${settings.longMA}:</strong> ${latest.longMA.toFixed(4)}</p>
+                        </div>
+                    `;
+                    this.elements.dashboardCardsDiv.appendChild(card);
+                });
+            },
+
+            // 8.2 Render Chart (REFACTORED for Master Axis)
+            renderChart() {
+                const { settings } = this.state;
+                const datasets = [];
+                const colors = ['#3b82f6', '#ef4444', '#10b981', '#f97316', '#8b5cf6', '#d946ef'];
+
+                // --- สร้าง NAV Datasets ---
+                this.state.analysisResults.forEach((result, index) => {
+                    const { name, series } = result;
+                    const color = colors[index % colors.length];
+
+                    // (NEW) ใช้ series ที่จัดเรียงแล้ว (aligned data)
+                    datasets.push({
+                        label: name,
+                        data: series.prices, // prices (aligned)
+                        borderColor: color, backgroundColor: color + '33', borderWidth: 2, tension: 0.1, pointRadius: 0,
+                        spanGaps: false // ไม่เชื่อมช่องว่าง
+                    });
+                    datasets.push({
+                        label: `${name} MA ${settings.shortMA}`,
+                        data: series.smaShortSeries, // smaShortSeries (aligned)
+                        borderColor: color, borderWidth: 1.5, borderDash: [5, 5], tension: 0.1, pointRadius: 0,
+                        spanGaps: false
+                    });
+                    datasets.push({
+                        label: `${name} MA ${settings.longMA}`,
+                        data: series.smaLongSeries, // smaLongSeries (aligned)
+                        borderColor: color, borderWidth: 2, borderDash: [10, 10], tension: 0.1, pointRadius: 0,
+                        spanGaps: false
+                    });
+                });
+                
+                // (NEW) ใช้ Master Time Axis
+                const labels = this.state.masterTimeAxis; 
+                
+                if (this.charts.navChart) this.charts.navChart.destroy();
+                this.charts.navChart = new Chart(this.elements.navChartCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: { labels: labels, datasets: datasets },
+                    options: { 
+                        responsive: true, 
+                        plugins: { legend: { position: 'top' }, title: { display: true, text: 'NAV and Moving Averages' } }, 
+                        scales: { 
+                            y: { beginAtZero: false },
+                            x: { // (NEW) ตั้งค่าแกน X เป็นเวลา
+                                type: 'time',
+                                time: { unit: 'month', tooltipFormat: 'dd MMM yyyy' },
+                                ticks: { autoSkip: true, maxTicksLimit: 15 }
+                            }
+                        } 
+                    }
+                });
+
+                // --- สร้าง RSI Chart (ใช้กองทุนแรก) ---
+                const rsiBaseFund = this.state.analysisResults[0];
+                if (!rsiBaseFund) return;
+
+                if (this.charts.rsiChart) this.charts.rsiChart.destroy();
+                this.charts.rsiChart = new Chart(this.elements.rsiChartCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labels, // (NEW) ใช้ Master Time Axis
+                        datasets: [
+                            { label: `RSI (${settings.rsiPeriod}) - ${rsiBaseFund.name}`, data: rsiBaseFund.series.rsiSeries, borderColor: '#8b5cf6', borderWidth: 2, pointRadius: 0, tension: 0.1, spanGaps: false },
+                            { label: 'Overbought (70)', data: Array(labels.length).fill(70), borderColor: '#ef4444', borderWidth: 1.5, borderDash: [5, 5], pointRadius: 0 },
+                            { label: 'Oversold (30)', data: Array(labels.length).fill(30), borderColor: '#10b981', borderWidth: 1.5, borderDash: [5, 5], pointRadius: 0 }
+                        ]
+                    },
+                    options: { 
+                        responsive: true, 
+                        plugins: { legend: { position: 'top' }, title: { display: true, text: 'Relative Strength Index (RSI)' } }, 
+                        scales: { 
+                            y: { min: 0, max: 100 },
+                            x: { // (NEW) ตั้งค่าแกน X เป็นเวลา
+                                type: 'time',
+                                time: { unit: 'month', tooltipFormat: 'dd MMM yyyy' },
+                                ticks: { autoSkip: true, maxTicksLimit: 15 }
+                            }
+                        } 
+                    }
+                });
+            },
+
+            // 8.3 Render Backtest (REFACTORED for Date Lists)
+            renderBacktest() {
+                this.elements.backtestResultsDiv.innerHTML = ''; // เคลียร์
+                const { switchLimit } = this.state.settings;
+
+                this.state.analysisResults.forEach(result => {
+                    const { name, backtest } = result;
+                    if (Object.keys(backtest).length === 0) return; // ข้ามถ้าไม่มีข้อมูล
+
+                    const div = document.createElement('div');
+                    div.className = 'p-4 bg-gray-50 rounded-lg border';
+                    let html = `<h4 class="font-semibold text-lg text-blue-700">${name}</h4>`;
+                    
+                    const years = Object.keys(backtest).sort((a,b) => b - a); // เรียงปี (ใหม่ -> เก่า)
+
+                    years.forEach(year => {
+                        const stats = backtest[year];
+                        const total = stats.total;
+                        const color = total > switchLimit ? 'text-red-500 font-bold' : 'text-green-600';
+                        
+                        // (NEW) สร้าง list วันที่
+                        const goldenDatesHtml = stats.golden.length > 0 
+                            ? `<ul>${stats.golden.map(date => `<li class="text-green-600">${date}</li>`).join('')}</ul>`
+                            : '<p class="text-gray-400 text-xs">ไม่มี</p>';
+                            
+                        const deathDatesHtml = stats.death.length > 0
+                            ? `<ul>${stats.death.map(date => `<li class="text-red-600">${date}</li>`).join('')}</ul>`
+                            : '<p class="text-gray-400 text-xs">ไม่มี</p>';
+
+                        html += `
+                            <div class="mt-2 p-2 border-t">
+                                <p><strong>ปี ${year}:</strong> <span class="${color}">รวม ${total}</span> / ${switchLimit} ครั้ง</span></p>
+                                <div class="grid grid-cols-2 gap-4 mt-2 text-sm">
+                                    <div>
+                                        <p class="font-semibold">Golden Cross (${stats.golden.length}):</p>
+                                        ${goldenDatesHtml}
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">Death Cross (${stats.death.length}):</p>
+                                        ${deathDatesHtml}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    div.innerHTML += html;
+                    this.elements.backtestResultsDiv.appendChild(div);
+                });
+            },
+
+            // 8.4 Render Suggestion (REFACTORED for Date info)
+            renderSuggestion() {
+                this.elements.suggestionResultsDiv.innerHTML = ''; // เคลียร์
+                const { heldFundName, entryDateStr } = this.state.settings;
+                const { analysisResults, fundsData } = this.state;
+
+                if (!heldFundName) {
+                    this.elements.suggestionResultsDiv.innerHTML = '<p class="text-gray-500">โปรดเลือก "กองทุนที่ถืออยู่" ใน Sidebar (ส่วนที่ 4) แล้วกด "วิเคราะห์"</p>';
+                    return;
+                }
+
+                const heldFundResult = analysisResults.find(f => f.name === heldFundName);
+                if (!heldFundResult) {
+                    this.elements.suggestionResultsDiv.innerHTML = `<p class="text-red-500">ไม่พบข้อมูลวิเคราะห์สำหรับกองทุน '${heldFundName}' (อาจจะไม่ได้ติ๊กเลือกในส่วนที่ 3 หรือข้อมูลไม่เพียงพอ)</p>`;
+                    return;
+                }
+
+                // --- 1. คำนวณ P/L ---
+                let plSection = '';
+                if (entryDateStr) {
+                    const entryDate = this.parseDate(entryDateStr, true); // Parse YYYY-MM-DD
+                    const fundData = fundsData[heldFundName];
+                    const { date: actualDate, nav: entryNav } = this.findNavOnDate(fundData, entryDate);
+                    const latestNav = heldFundResult.latest.nav;
+                    
+                    if (entryNav) {
+                        const plPercent = ((latestNav - entryNav) / entryNav) * 100;
+                        const plColor = plPercent >= 0 ? 'text-green-600' : 'text-red-600';
+
+                        plSection = `
+                            <h4 class="text-lg font-semibold">สรุปพอร์ต: ${heldFundName}</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div><p class="text-gray-500">วันที่เข้า (โดยประมาณ)</p><p class="font-semibold">${actualDate.toLocaleDateString('th-TH')}</p></div>
+                                <div><p class="text-gray-500">NAV ที่เข้า</p><p class="font-semibold">${entryNav.toFixed(4)}</p></div>
+                                <div><p class="text-gray-500">NAV ล่าสุด</p><p class="font-semibold">${latestNav.toFixed(4)}</p></div>
+                                <div><p class="text-gray-500">กำไร/ขาดทุน</p><p class="font-bold text-xl ${plColor}">${plPercent.toFixed(2)}%</p></div>
+                            </div><hr class="my-4">`;
+                    }
+                }
+
+                // --- 2. วิเคราะห์คำแนะนำ (จากผลลัพธ์ที่คำนวณไว้แล้ว) ---
+                const buySignalFunds = analysisResults.filter(f => f.name !== heldFundName && f.signal.isBuySignal);
+                let suggestionHTML = '';
+
+                if (heldFundResult.signal.isBuySignal) {
+                    suggestionHTML = `
+                        <div class="p-4 rounded-lg bg-green-50 border border-green-200">
+                            <h4 class="text-xl font-bold text-green-700">✅ คำแนะนำ: ถือต่อ (Hold)</h4>
+                            <p class="mt-2 text-gray-700">
+                                กองทุน <strong>${heldFundName}</strong> ที่คุณถืออยู่ ยังคงอยู่ใน <strong>${heldFundResult.signal.status}</strong>
+                                <!-- (NEW) เพิ่มวันที่ของสัญญาณ -->
+                                ${heldFundResult.signal.latestSignalDate ? `(สัญญาณซื้อล่าสุด: ${heldFundResult.signal.latestSignalDate})` : ''}
+                            </p>
+                        </div>
+                    `;
+                } else if (heldFundResult.signal.isSellSignal) {
+                    if (buySignalFunds.length > 0) {
+                        // (buySignalFunds ถูกเรียงลำดับไว้แล้วใน performFullAnalysis)
+                        const bestFund = buySignalFunds[0];
+                        suggestionHTML = `
+                            <div class="p-4 rounded-lg bg-yellow-50 border border-yellow-300">
+                                <h4 class="text-xl font-bold text-yellow-700">⚠️ คำแนะนำ: พิจารณาสลับ (Switch)</h4>
+                                <p class="mt-2 text-gray-700">
+                                    กองทุน <strong>${heldFundName}</strong> ที่คุณถืออยู่ อยู่ในสถานะ <strong>${heldFundResult.signal.status}</strong>
+                                    <!-- (NEW) เพิ่มวันที่ของสัญญาณ -->
+                                    ${heldFundResult.signal.latestSignalDate ? `(สัญญาณขายล่าสุด: ${heldFundResult.signal.latestSignalDate})` : ''}
+                                </p>
+                                <div class="mt-4 p-3 bg-green-100 rounded-lg border border-green-300">
+                                    <p class="font-semibold text-green-800">กองทุนที่เหมาะสมที่สุด (ผลตอบแทน/ความเสี่ยง):</p>
+                                    <p class="text-xl font-bold text-green-700">${bestFund.name}</p>
+                                    <!-- (NEW) เพิ่มวันที่ของสัญญาณ -->
+                                    <span class="text-sm text-gray-700">
+                                        (${bestFund.signal.status} | สัญญาณล่าสุด: ${bestFund.signal.latestSignalDate || 'N/A'})
+                                    </span>
+                                </div>
+                                ${
+                                    buySignalFunds.length > 1 ? `
+                                    <p class="mt-4 text-gray-700">กองทุนอื่นที่มีสัญญาณซื้อ (เรียงตามผลตอบแทน/ความเสี่ยง):</p>
+                                    <ul class="list-disc list-inside mt-2 space-y-1 text-sm">
+                                        ${buySignalFunds.slice(1).map(f => `<li class="text-gray-600">${f.name} (สัญญาณล่าสุด: ${f.signal.latestSignalDate || 'N/A'})</li>`).join('')}
+                                    </ul>` : ''
+                                }
+                            </div>
+                        `;
+                    } else {
+                        // (ตรรกะ Risk-Off)
+                        // ค้นหากองทุนปลอดภัยจาก "ทุกกอง" ที่โหลดมา (ไม่จำกัดแค่ที่ติ๊กเลือก)
+                        const safeFundNames = ["ตราสารหนี้", "เงินฝาก", "แผนตลาดเงิน"];
+                        const allSafeFunds = [];
+                        
+                        safeFundNames.forEach(safeName => {
+                             const safeFundData = this.state.fundsData[safeName];
+                             if (safeFundData) {
+                                 // ต้องคำนวณสัญญาณให้กองทุนปลอดภัย (ถ้ายังไม่ได้คำนวณ)
+                                 let safeFundResult = analysisResults.find(f => f.name === safeName);
+                                 if (!safeFundResult) {
+                                     // คำนวณแบบย่อ
+                                     const prices = safeFundData.map(d => d.nav);
+                                     const dates = safeFundData.map(d => d.date);
+                                     const smaShort = this.calculateMA(prices, settings.shortMA);
+                                     const smaLong = this.calculateMA(prices, settings.longMA);
+                                     const { isSellSignal } = this.determineSignal(smaShort, smaLong, dates);
+                                     if (!isSellSignal) {
+                                         allSafeFunds.push({ name: safeName, signal: { isSellSignal: false } });
+                                     }
+                                 } else if (!safeFundResult.signal.isSellSignal) {
+                                     allSafeFunds.push(safeFundResult);
+                                 }
+                             }
+                        });
+                        
+                        if (allSafeFunds.length > 0) {
+                            const bestSafeFund = allSafeFunds[0]; // (ตัวแรกที่เจอ)
+                            suggestionHTML = `
+                                <div class="p-4 rounded-lg bg-blue-50 border border-blue-200">
+                                    <h4 class="text-xl font-bold text-blue-700">🛡️ คำแนะนำ: สลับไปกองทุนปลอดภัย (Risk-Off)</h4>
+                                    <p class="mt-2 text-gray-700">
+                                        กองทุน <strong>${heldFundName}</strong> อยู่ใน <strong>${heldFundResult.signal.status}</strong> และกองทุนสินทรัพย์เสี่ยงอื่น (ที่คุณเลือก) ก็ไม่มีสัญญาณซื้อที่ชัดเจน (สภาวะ Risk-Off)
+                                    </p>
+                                    <div class="mt-4 p-3 bg-blue-100 rounded-lg border border-blue-300">
+                                        <p class="font-semibold text-blue-800">กองทุนปลอดภัยที่แนะนำ (เพื่อรักษาเงินต้น):</p>
+                                        <p class="text-xl font-bold text-blue-700">${bestSafeFund.name}</p>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            suggestionHTML = `
+                                <div class="p-4 rounded-lg bg-red-50 border border-red-200">
+                                    <h4 class="text-xl font-bold text-red-700">🚨 คำแนะนำ: พิจารณาขาย/รอ (Wait)</h4>
+                                     <p class="mt-2 text-gray-700">
+                                        กองทุน <strong>${heldFundName}</strong> อยู่ใน <strong>${heldFundResult.signal.status}</strong> และยังไม่มีกองทุนอื่น (ทั้งสินทรัพย์เสี่ยงและปลอดภัย) ที่มีสัญญาณซื้อที่ชัดเจน
+                                    </p>
+                                    <p class="mt-2 text-gray-700">อาจพิจารณาถือเงินสด หรือรอจนกว่าจะมีสัญญาณกลับตัวที่ชัดเจน</p>
+                                </div>
+                            `;
+                        }
+                    }
+                } else {
+                    // (Sideways)
+                    suggestionHTML = `
+                        <div class="p-4 rounded-lg bg-gray-100 border border-gray-200">
+                            <h4 class="text-xl font-bold text-gray-700">⚖️ คำแนะนำ: รอดูท่าที (Sideways)</h4>
+                            <p class="mt-2 text-gray-700">
+                                กองทุน <strong>${heldFundName}</strong> อยู่ในสถานะ <strong>${heldFundResult.signal.status}</strong> (ไม่ชัดเจน)
+                                แนะนำให้รอดูทิศทาง หรือรอให้เกิดสัญญาณ Golden/Death Cross ที่ชัดเจนก่อนตัดสินใจ
+                            </p>
+                        </div>
+                    `;
+                }
+
+                this.elements.suggestionResultsDiv.innerHTML = plSection + suggestionHTML;
+            },
+
+            // === 9. UI HELPERS ===
+            
+            populateFundSelector() {
+                this.elements.fundSelectorDiv.innerHTML = ''; // เคลียร์
+                this.elements.currentFundSelect.innerHTML = '<option value="">-- โปรดเลือก --</option>'; // เคลียร์
+
+                const fundNames = Object.keys(this.state.fundsData).sort();
+
+                if (fundNames.length === 0) {
+                    this.elements.fundSelectorDiv.innerHTML = '<p class="text-sm text-gray-500">ไม่พบกองทุน</p>';
+                    return;
+                }
+
+                fundNames.forEach((fundName, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center';
+                    div.innerHTML = `
+                        <input type="checkbox" id="fund-${index}" value="${fundName}" class="fund-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                        <label for="fund-${index}" class="ml-2 block text-sm text-gray-700">${fundName}</label>
+                    `;
+                    this.elements.fundSelectorDiv.appendChild(div);
+
+                    const option = document.createElement('option');
+                    option.value = fundName;
+                    option.textContent = fundName;
+                    this.elements.currentFundSelect.appendChild(option);
+                });
+            },
+
+            setStatus(message, color) {
+                if (!this.elements.statusMessage) return; // Guard clause
+                this.elements.statusMessage.textContent = message;
+                if (color === 'green') {
+                    this.elements.statusMessage.className = 'mt-4 text-sm text-green-600';
+                } else if (color === 'red') {
+                    this.elements.statusMessage.className = 'mt-4 text-sm text-red-600';
+                } else {
+                    this.elements.statusMessage.className = 'mt-4 text-sm text-blue-600';
+                }
+            },
+
+            // === 10. CALCULATION HELPERS ===
+
+            parseDate(dateStr, isISO = false) {
+                if (isISO && dateStr) {
+                    // สำหรับ YYYY-MM-DD (จาก input type="date")
+                    return new Date(dateStr);
+                }
+                
+                if (typeof dateStr !== 'string' || !dateStr.includes('/')) {
+                    // ถ้าไม่ใช่ string หรือ ไม่มี /
+                    return new Date(dateStr); // ลองแปลงตรงๆ (เผื่อเป็น Date object มาแล้ว)
+                }
+
+                const parts = dateStr.split('/'); // [dd, mm, yyyy]
+                if (parts.length === 3) {
+                    const day = parts[0];
+                    const month = parts[1]; // 01-12
+                    let year = parseInt(parts[2]);
+                    if (year > 2500) year = year - 543; // แปลง พ.ศ.
+                    // (เดือนใน JS เริ่มจาก 0)
+                    return new Date(year, parseInt(month) - 1, parseInt(day));
+                }
+                
+                return null; // แปลงไม่ได้
+            },
+
+            findNavOnDate(fundData, targetDate) {
+                if (!fundData || fundData.length === 0 || !(targetDate instanceof Date) || isNaN(targetDate)) {
+                    return { date: null, nav: null };
+                }
+                
+                // หาข้อมูลที่ใกล้วันที่เป้าหมายที่สุด (เผื่อวันหยุด)
+                let closestData = fundData[0];
+                let minDiff = Math.abs(targetDate.getTime() - closestData.date.getTime());
+
+                for (let i = 1; i < fundData.length; i++) {
+                    const currentDiff = Math.abs(targetDate.getTime() - fundData[i].date.getTime());
+                    if (currentDiff < minDiff) {
+                        minDiff = currentDiff;
+                        closestData = fundData[i];
+                    }
+                }
+                return closestData; // { date: Date, nav: Number }
+            },
+            
+            // (Refactored) แยกตรรกะการตัดสินใจ
+            // (NEW) เพิ่ม `dates` (Array) เพื่อค้นหาวันที่
+            determineSignal(smaShort, smaLong, dates) {
+                // หาค่าล่าสุดที่ไม่ใช่ NaN
+                const getLastValid = (arr) => arr.slice().reverse().find(v => !isNaN(v));
+                const getSecondLastValid = (arr) => {
+                    const validArr = arr.filter(v => !isNaN(v));
+                    return validArr[validArr.length - 2];
+                };
+
+                const latestShort = getLastValid(smaShort);
+                const latestLong = getLastValid(smaLong);
+                const prevShort = getSecondLastValid(smaShort);
+                const prevLong = getSecondLastValid(smaLong);
+
                 let status = 'ไม่ชัดเจน (Sideways)';
                 let signal = 'รอสัญญาณ';
-                let statusColor = 'gray';
+                let color = 'gray';
+                let isBuySignal = false;
+                let isSellSignal = false;
+                let latestSignalDate = null; // (NEW)
+                
+                if (isNaN(latestShort) || isNaN(latestLong) || isNaN(prevShort) || isNaN(prevLong)) {
+                    status = 'ข้อมูลไม่เพียงพอ';
+                    return { status, signal, color, isBuySignal, isSellSignal, latestSignalDate };
+                }
+                
+                // (NEW) ค้นหาวันที่เกิดสัญญาณล่าสุด
+                const startIndex = smaLong.findIndex(v => !isNaN(v));
+                if (startIndex > -1) {
+                    for (let i = dates.length - 1; i > startIndex; i--) {
+                        if (isNaN(smaShort[i]) || isNaN(smaLong[i]) || isNaN(smaShort[i-1]) || isNaN(smaLong[i-1])) continue;
+                        
+                        const isGolden = smaShort[i-1] <= smaLong[i-1] && smaShort[i] > smaLong[i];
+                        const isDeath = smaShort[i-1] >= smaLong[i-1] && smaShort[i] < smaLong[i];
+                        
+                        if (isGolden || isDeath) {
+                            latestSignalDate = dates[i] ? dates[i].toLocaleDateString('th-TH') : null;
+                            break; // เจออันล่าสุดแล้ว หยุด
+                        }
+                    }
+                }
 
                 if (latestShort > latestLong && prevShort <= prevLong) {
                     status = 'Golden Cross!';
                     signal = 'สัญญาณซื้อ (แนวโน้มขาขึ้น)';
-                    statusColor = 'green';
+                    color = 'green';
+                    isBuySignal = true;
                 } else if (latestShort < latestLong && prevShort >= prevLong) {
                     status = 'Death Cross!';
                     signal = 'สัญญาณขาย (แนวโน้มขาลง)';
-                    statusColor = 'red';
+                    color = 'red';
+                    isSellSignal = true;
                 } else if (latestShort > latestLong) {
                     status = 'แนวโน้มขาขึ้น';
                     signal = 'ถือ (Above Long MA)';
-                    statusColor = 'green';
+                    color = 'green';
+                    isBuySignal = true;
                 } else if (latestShort < latestLong) {
                     status = 'แนวโน้มขาลง';
                     signal = 'รอ (Below Long MA)';
-                    statusColor = 'red';
+                    color = 'red';
+                    isSellSignal = true;
                 }
-
-                // (ใหม่) เก็บผลลัพธ์
-                analysisResults.push({
-                    name: fundName,
-                    status: status,
-                    signal: signal,
-                    color: statusColor,
-                    latestRSI: latestRSI,
-                    isBuySignal: (status === 'Golden Cross!' || status === 'แนวโน้มขาขึ้น'),
-                    isSellSignal: (status === 'Death Cross!' || status === 'แนวโน้มขาลง')
-                });
-
-                // สร้างการ์ด
-                const card = document.createElement('div');
-                card.className = `bg-white p-6 rounded-lg shadow-md border-l-4 border-${statusColor}-500`;
-                card.innerHTML = `
-                    <h3 class="text-xl font-bold text-${statusColor}-600">${fundName}</h3>
-                    <p class="text-2xl font-semibold my-2">${status}</p>
-                    <p class="text-gray-600 mb-3">${signal}</p>
-                    <div class="text-sm space-y-1 text-gray-700">
-                        <p><strong>NAV ล่าสุด:</strong> ${latest.nav.toFixed(4)}</p>
-                        <p><strong>RSI (${rsiPeriod}):</strong> ${latestRSI.toFixed(2)} ${latestRSI > 70 ? '(Overbought)' : latestRSI < 30 ? '(Oversold)' : ''}</p>
-                        <p><strong>MA ${shortPeriod}:</strong> ${latestShort.toFixed(4)}</p>
-                        <p><strong>MA ${longPeriod}:</strong> ${latestLong.toFixed(4)}</p>
-                    </div>
-                `;
-                dashboardCardsDiv.appendChild(card);
-            });
-
-            return analysisResults; // (ใหม่) ส่งค่ากลับ
-        }
-
-        // --- 3.6.2 Chart ---
-        function runChartAnalysis(selectedFunds) {
-            const shortPeriod = parseInt(shortMAInput.value);
-            const longPeriod = parseInt(longMAInput.value);
-            const rsiPeriod = parseInt(rsiPeriodInput.value);
-
-            // ใช้กองทุนแรกที่เลือกเป็นฐานสำหรับกราฟ RSI
-            const rsiBaseFund = selectedFunds[0];
-            const rsiBaseData = fundsData[rsiBaseFund].map(d => d.nav);
-            const rsiValues = calculateRSI(rsiBaseData, rsiPeriod);
-            const labels = fundsData[rsiBaseFund].map(d => d.date.toLocaleDateString('th-TH'));
+                
+                return { status, signal, color, isBuySignal, isSellSignal, latestSignalDate };
+            },
             
-            // --- สร้างกราฟ NAV ---
-            const navCtx = document.getElementById('nav-chart').getContext('2d');
-            const datasets = [];
-            const colors = ['#3b82f6', '#ef4444', '#10b981', '#f97316', '#8b5cf6', '#d946ef'];
+            // (Refactored) แยกตรรกะคำนวณ Backtest
+            // (NEW) เก็บวันที่ของสัญญาณ ไม่ใช่แค่การนับ
+            calculateBacktest(data, smaShort, smaLong) {
+                let signals = {}; // { 2024: { golden: [Date], death: [Date], total: 2 }, 2025: ... }
+                
+                // หา index แรกที่ smaLong มีค่า
+                const startIndex = smaLong.findIndex(v => !isNaN(v));
+                if (startIndex === -1 || startIndex === 0) return {}; // ไม่มีข้อมูล
 
-            selectedFunds.forEach((fundName, index) => {
-                const data = fundsData[fundName];
-                const prices = data.map(d => d.nav);
-                const smaShort = calculateMA(prices, shortPeriod);
-                const smaLong = calculateMA(prices, longPeriod);
-                const color = colors[index % colors.length];
-
-                // 1. กราฟ NAV
-                datasets.push({
-                    label: fundName,
-                    data: prices,
-                    borderColor: color,
-                    backgroundColor: color + '33', // สีจางๆ
-                    borderWidth: 2,
-                    tension: 0.1,
-                    pointRadius: 0,
-                });
-
-                // 2. กราฟ MA สั้น
-                datasets.push({
-                    label: `${fundName} MA ${shortPeriod}`,
-                    data: smaShort,
-                    borderColor: color,
-                    borderWidth: 1.5,
-                    borderDash: [5, 5], // เส้นประ
-                    tension: 0.1,
-                    pointRadius: 0,
-                });
-
-                // 3. กราฟ MA ยาว
-                datasets.push({
-                    label: `${fundName} MA ${longPeriod}`,
-                    data: smaLong,
-                    borderColor: color,
-                    borderWidth: 2,
-                    borderDash: [10, 10], // เส้นประยาว
-                    tension: 0.1,
-                    pointRadius: 0,
-                });
-            });
-
-            if (navChartInstance) {
-                navChartInstance.destroy(); // ทำลายกราฟเก่า
-            }
-            navChartInstance = new Chart(navCtx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { position: 'top' }, title: { display: true, text: 'NAV and Moving Averages' } },
-                    scales: { y: { beginAtZero: false } }
-                }
-            });
-
-            // --- สร้างกราฟ RSI ---
-            const rsiCtx = document.getElementById('rsi-chart').getContext('2d');
-            if (rsiChartInstance) {
-                rsiChartInstance.destroy();
-            }
-            rsiChartInstance = new Chart(rsiCtx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: `RSI (${rsiPeriod}) - ${rsiBaseFund}`,
-                            data: rsiValues,
-                            borderColor: '#8b5cf6', // สีม่วง
-                            borderWidth: 2,
-                            pointRadius: 0,
-                            tension: 0.1,
-                        },
-                        // เส้น Overbought
-                        {
-                            label: 'Overbought (70)',
-                            data: Array(labels.length).fill(70),
-                            borderColor: '#ef4444', // สีแดง
-                            borderWidth: 1.5,
-                            borderDash: [5, 5],
-                            pointRadius: 0,
-                        },
-                        // เส้น Oversold
-                        {
-                            label: 'Oversold (30)',
-                            data: Array(labels.length).fill(30),
-                            borderColor: '#10b981', // สีเขียว
-                            borderWidth: 1.5,
-                            borderDash: [5, 5],
-                            pointRadius: 0,
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { position: 'top' }, title: { display: true, text: 'Relative Strength Index (RSI)' } },
-                    scales: { y: { min: 0, max: 100 } }
-                }
-            });
-        }
-
-        // --- 3.6.3 Backtest ---
-        function runBacktestAnalysis(selectedFunds) {
-            backtestResultsDiv.innerHTML = ''; // เคลียร์ผลเก่า
-            const switchLimit = parseInt(document.getElementById('switch-limit').value);
-            
-            selectedFunds.forEach(fundName => {
-                const data = fundsData[fundName];
-                if (data.length < 2) return;
-
-                const shortPeriod = parseInt(shortMAInput.value);
-                const longPeriod = parseInt(longMAInput.value);
-                const prices = data.map(d => d.nav);
-                const smaShort = calculateMA(prices, shortPeriod);
-                const smaLong = calculateMA(prices, longPeriod);
-
-                let signals = {}; // { 2024: 2, 2025: 1 }
-
-                for (let i = longPeriod; i < data.length; i++) {
+                for (let i = startIndex + 1; i < data.length; i++) {
                     const date = data[i].date;
                     const year = date.getFullYear();
                     
-                    if (!signals[year]) {
-                        signals[year] = 0;
-                    }
+                    if (!signals[year]) signals[year] = { golden: [], death: [], total: 0 };
 
                     const prevShort = smaShort[i-1];
                     const prevLong = smaLong[i-1];
                     const currShort = smaShort[i];
                     const currLong = smaLong[i];
 
-                    // Check for Crossover
-                    if ((prevShort <= prevLong && currShort > currLong) || // Golden Cross
-                        (prevShort >= prevLong && currShort < currLong)) {  // Death Cross
-                        
-                        signals[year]++;
+                    if (isNaN(prevShort) || isNaN(prevLong) || isNaN(currShort) || isNaN(currLong)) {
+                        continue; // ข้ามถ้าข้อมูลไม่ครบ
+                    }
+
+                    const dateString = date.toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric' });
+
+                    if (prevShort <= prevLong && currShort > currLong) { // Golden Cross
+                        signals[year].golden.push(dateString); // (NEW)
+                        signals[year].total++;
+                    } else if (prevShort >= prevLong && currShort < currLong) {  // Death Cross
+                        signals[year].death.push(dateString); // (NEW)
+                        signals[year].total++;
                     }
                 }
+                return signals;
+            },
 
-                // สร้างผลลัพธ์
-                const div = document.createElement('div');
-                div.className = 'p-4 bg-gray-50 rounded-lg border';
-                let html = `<h4 class="font-semibold text-lg text-blue-700">${fundName}</h4><div class="mt-2 space-y-1 text-sm">`;
-                
-                const years = Object.keys(signals).sort((a,b) => b - a); // เรียงปี (ใหม่ -> เก่า)
-
-                years.forEach(year => {
-                    const count = signals[year];
-                    const color = count > switchLimit ? 'text-red-500 font-bold' : 'text-green-600';
-                    html += `<p><strong>ปี ${year}:</strong> <span class="${color}">${count}</span> / ${switchLimit} ครั้ง</span></p>`;
-                });
-
-                html += `</div>`;
-                div.innerHTML = html;
-                backtestResultsDiv.appendChild(div);
-            });
-        }
-
-        // --- 3.6.4 Suggestion ---
-        function runSuggestionAnalysis(allFundStatuses) {
-            suggestionResultsDiv.innerHTML = ''; // เคลียร์ผลเก่า
-            
-            const heldFundName = currentFundSelect.value;
-            const entryDateStr = entryDateInput.value;
-
-            if (!heldFundName) {
-                suggestionResultsDiv.innerHTML = '<p class="text-gray-500">โปรดเลือก "กองทุนที่ถืออยู่" ใน Sidebar (ส่วนที่ 4) แล้วกด "วิเคราะห์"</p>';
-                return;
-            }
-
-            const heldFundStatus = allFundStatuses.find(f => f.name === heldFundName);
-            if (!heldFundStatus) {
-                suggestionResultsDiv.innerHTML = `<p class="text-red-500">ไม่พบข้อมูลวิเคราะห์สำหรับกองทุน '${heldFundName}' (อาจจะไม่ได้ติ๊กเลือกในส่วนที่ 3)</p>`;
-                return;
-            }
-
-            // --- 1. คำนวณ P/L ---
-            let plSection = '';
-            if (entryDateStr) {
-                const entryDate = new Date(entryDateStr);
-                const fundData = fundsData[heldFundName];
-                const { date: actualDate, nav: entryNav } = findNavOnDate(fundData, entryDate);
-                const latestNav = fundData[fundData.length - 1].nav;
-                
-                if (entryNav) {
-                    const plPercent = ((latestNav - entryNav) / entryNav) * 100;
-                    const plColor = plPercent >= 0 ? 'text-green-600' : 'text-red-600';
-
-                    plSection = `
-                        <h4 class="text-lg font-semibold">สรุปพอร์ต: ${heldFundName}</h4>
-                        <div class="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <p class="text-gray-500">วันที่เข้า (โดยประมาณ)</p>
-                                <p class="font-semibold">${actualDate.toLocaleDateString('th-TH')}</p>
-                            </div>
-                            <div>
-                                <p class="text-gray-500">NAV ที่เข้า</p>
-                                <p class="font-semibold">${entryNav.toFixed(4)}</p>
-                            </div>
-                            <div>
-                                <p class="text-gray-500">NAV ล่าสุด</p>
-                                <p class="font-semibold">${latestNav.toFixed(4)}</p>
-                            </div>
-                            <div>
-                                <p class="text-gray-500">กำไร/ขาดทุน</p>
-                                <p class="font-bold text-xl ${plColor}">${plPercent.toFixed(2)}%</p>
-                            </div>
-                        </div>
-                        <hr class="my-4">
-                    `;
-                }
-            }
-
-            // --- 2. วิเคราะห์คำแนะนำ ---
-            const buySignalFunds = allFundStatuses.filter(f => f.name !== heldFundName && f.isBuySignal);
-            let suggestionHTML = '';
-
-            if (heldFundStatus.isBuySignal) {
-                // กรณี 1: กองทุนที่ถือ แข็งแกร่ง
-                suggestionHTML = `
-                    <div class="p-4 rounded-lg bg-green-50 border border-green-200">
-                        <h4 class="text-xl font-bold text-green-700">✅ คำแนะนำ: ถือต่อ (Hold)</h4>
-                        <p class="mt-2 text-gray-700">
-                            กองทุน <strong>${heldFundName}</strong> ที่คุณถืออยู่ ยังคงอยู่ใน <strong>${heldFundStatus.status}</strong>
-                            ซึ่งเป็นสัญญาณที่ดี จึงแนะนำให้ถือต่อไปก่อน
-                        </p>
-                    </div>
-                `;
-            } else if (heldFundStatus.isSellSignal) {
-                // กรณี 2: กองทุนที่ถือ อ่อนแอ
-                if (buySignalFunds.length > 0) {
-                    // 2a: อ่อนแอ แต่มีกองอื่นให้สลับ
-                    suggestionHTML = `
-                        <div class="p-4 rounded-lg bg-yellow-50 border border-yellow-300">
-                            <h4 class="text-xl font-bold text-yellow-700">⚠️ คำแนะนำ: พิจารณาสลับ (Switch)</h4>
-                            <p class="mt-2 text-gray-700">
-                                กองทุน <strong>${heldFundName}</strong> ที่คุณถืออยู่ อยู่ในสถานะ <strong>${heldFundStatus.status}</strong> (สัญญาณขาย)
-                            </p>
-                            <p class="mt-3 text-gray-700">อย่างไรก็ตาม พบกองทุนอื่นที่มีสัญญาณดีกว่า:</p>
-                            <ul class="list-disc list-inside mt-2 space-y-1">
-                                ${buySignalFunds.map(f => `<li class="font-semibold text-green-600">${f.name} (${f.status})</li>`).join('')}
-                            </ul>
-                            <p class="mt-2 text-gray-700">อาจพิจารณาสลับการลงทุนไปยังกองทุนเหล่านี้ เพื่อจำกัดการขาดทุนและเพิ่มโอกาสทำกำไร</p>
-                        </div>
-                    `;
-                } else {
-                    // 2b: อ่อนแอ และกองอื่นก็ไม่ดี
-                    suggestionHTML = `
-                        <div class="p-4 rounded-lg bg-red-50 border border-red-200">
-                            <h4 class="text-xl font-bold text-red-700">🚨 คำแนะนำ: พิจารณาขาย/รอ (Wait)</h4>
-                            <p class="mt-2 text-gray-700">
-                                กองทุน <strong>${heldFundName}</strong> ที่คุณถืออยู่ อยู่ในสถานะ <strong>${heldFundStatus.status}</strong> (สัญญาณขาย)
-                                และในขณะนี้ <strong>ยังไม่มีกองทุนอื่น</strong> (ที่เลือกไว้) ที่แสดงสัญญาณซื้อที่ชัดเจน
-                            </p>
-                            <p class="mt-2 text-gray-700">
-                                อาจพิจารณาขายเพื่อถือเงินสด หรือสลับไปกองทุนความเสี่ยงต่ำ (เช่น ตราสารหนี้, เงินฝาก) เพื่อรอดูสัญญาณการกลับตัวรอบใหม่
-                            </p>
-                        </div>
-                    `;
-                }
-            } else {
-                // กรณี 3: กองทุนที่ถือ Sideways
-                suggestionHTML = `
-                    <div class="p-4 rounded-lg bg-gray-100 border border-gray-200">
-                        <h4 class="text-xl font-bold text-gray-700">⚖️ คำแนะนำ: รอดูท่าที (Sideways)</h4>
-                        <p class="mt-2 text-gray-700">
-                            กองทุน <strong>${heldFundName}</strong> ที่คุณถืออยู่ ยังไม่มีสัญญาณแนวโน้มที่ชัดเจน
-                            (สถานะ: ${heldFundStatus.status}) แนะนำให้รอดูสัญญาณต่อไป
-                        </p>
-                    </div>
-                `;
-            }
-
-            suggestionResultsDiv.innerHTML = plSection + suggestionHTML;
-        }
-
-        // โหลดข้อมูลจากไฟล์ CSV (Restore)
-        function parseCSV(file) {
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                dynamicTyping: true, // พยายามแปลงตัวเลข
-                complete: (results) => {
-                    processData(results.data);
-                },
-                error: (err) => {
-                    setStatus(`เกิดข้อผิดพลาดในการอ่านไฟล์: ${err.message}`, 'red');
-                }
-            });
-        }
-
-        // === 3.5 ฟังก์ชันหลัก: การประมวลผลข้อมูล ===
-
-        // (*** แก้ไข: ปรับ_คอลัมน์_วันที่_ตามไฟล์ CSV ของคุณ ***)
-        // (*** หาก_คอลัมน์_วันที่_ไม่ใช่_ 'Date' โปรดแก้ไข_ตรงนี้ ***)
-        const DATE_COL = 'Date';
-
-        function processData(data) {
-            if (data.length === 0) {
-                setStatus('ไม่พบข้อมูลในไฟล์', 'red');
-                return;
-            }
-
-            const headers = Object.keys(data[0]);
-            
-            // ตรวจสอบว่ามีคอลัมน์ 'Date' (หรือตามที่ตั้งค่า)
-            if (!headers.includes(DATE_COL)) {
-                setStatus(`ไฟล์ต้องมีคอลัมน์วันที่ (ที่ตั้งค่าเป็น '${DATE_COL}')`, 'red');
-                return;
-            }
-
-            // แยกชื่อกองทุน (คือทุกคอลัมน์ที่ไม่ใช่ 'Date' และไม่ว่างเปล่า)
-            // (ไฟล์ตัวอย่างมีคอลัมน์ว่างๆ และคอลัมน์สรุปตอนท้าย เราจะกรองออก)
-            const fundNames = headers.filter(h => 
-                h !== DATE_COL && 
-                h.trim() !== "" &&
-                !h.includes("รวมเงินสำรอง") &&  // กรองคอลัมน์สรุปจากไฟล์ตัวอย่าง
-                !h.includes("ไม่รวมสำรอง")      // กรองคอลัมน์สรุปจากไฟล์ตัวอย่าง
-            );
-
-            if (fundNames.length === 0) {
-                setStatus('ไม่พบชื่อกองทุนในคอลัมน์ (นอกจาก Date)', 'red');
-                return;
-            }
-
-            allData = data; // เก็บข้อมูลดิบไว้ (เผื่อใช้)
-            fundsData = {}; // Reset ข้อมูลเก่า
-            
-            // สร้างโครงสร้างข้อมูลกองทุน
-            fundNames.forEach(fundName => {
-                fundsData[fundName] = [];
-            });
-
-            // "Unpivot" ข้อมูล: วนลูปแต่ละแถว (แต่ละวัน)
-            data.forEach(row => {
-                const dateStr = row[DATE_COL];
-                let date;
-
-                if (typeof dateStr === 'string' && dateStr.includes('/')) {
-                    const parts = dateStr.split('/'); // [dd, mm, yyyy]
-                    if (parts.length === 3) {
-                        const day = parts[0];
-                        const month = parts[1]; // 01-12
-                        let year = parseInt(parts[2]);
-                        
-                        // ตรวจสอบว่าเป็น_พ.ศ._(ปีพุทธ)
-                        if (year > 2500) {
-                            year = year - 543; // แปลงเป็น_ค.ศ.
-                        }
-                        
-                        // JavaScript Date (month is 0-indexed)
-                        date = new Date(year, parseInt(month) - 1, parseInt(day));
+            // --- TA Calculations ---
+            calculateMA(data, period) {
+                let results = [];
+                for (let i = 0; i < data.length; i++) {
+                    if (i < period - 1) {
+                        results.push(NaN);
                     } else {
-                        date = new Date(dateStr); // ลองแปลงตรงๆ
+                        const slice = data.slice(i - (period - 1), i + 1);
+                        const sum = slice.reduce((a, b) => a + b, 0);
+                        results.push(sum / period);
                     }
-                } else {
-                    date = new Date(dateStr); // ลองแปลงตรงๆ
+                }
+                return results;
+            },
+
+            calculateRSI(data, period) {
+                let gains = [];
+                let losses = [];
+                let rsi = [];
+
+                for (let i = 1; i < data.length; i++) {
+                    const diff = data[i] - data[i-1];
+                    gains.push(diff > 0 ? diff : 0);
+                    losses.push(diff < 0 ? -diff : 0);
                 }
 
-                if (isNaN(date) || !date) {
-                    // console.warn(`ข้ามวันที่ไม่ถูกต้อง: ${row[DATE_COL]}`);
-                    return; // ข้ามแถวนี้ถ้าวันที่ไม่ถูกต้อง
-                }
+                let avgGain = NaN;
+                let avgLoss = NaN;
 
-                // วนลูปแต่ละกองทุนในแถวนั้น
-                fundNames.forEach(fundName => {
-                    let navStr = row[fundName];
+                for (let i = 0; i < data.length; i++) {
+                    if (i < period) {
+                        rsi.push(NaN); // ข้อมูลไม่พอ
+                    } else if (i === period) {
+                        // First calculation
+                        avgGain = gains.slice(0, period).reduce((a, b) => a + b, 0) / period;
+                        avgLoss = losses.slice(0, period).reduce((a, b) => a + b, 0) / period;
+                    } else {
+                        // Smoothing
+                        avgGain = ((avgGain * (period - 1)) + gains[i-1]) / period;
+                        avgLoss = ((avgLoss * (period - 1)) + losses[i-1]) / period;
+                    }
                     
-                    // PapaParse อาจอ่าน '21,254.12' เป็น string
-                    if (typeof navStr === 'string') {
-                        navStr = navStr.replace(/,/g, ''); // ลบ comma ออก
+                    if (i >= period) {
+                        if (avgLoss === 0) {
+                            rsi.push(100);
+                        } else {
+                            const rs = avgGain / avgLoss;
+                            rsi.push(100 - (100 / (1 + rs)));
+                        }
                     }
-
-                    const nav = parseFloat(navStr);
-
-                    if (!isNaN(nav) && nav > 0) { // ตรวจสอบว่าเป็นตัวเลขที่ถูกต้อง
-                        fundsData[fundName].push({
-                            date: date,
-                            nav: nav
-                        });
-                    }
-                });
-            });
-
-            // เรียงลำดับข้อมูลในแต่ละกองทุนตามวันที่ (เก่า -> ใหม่)
-            // (สำคัญมาก เพราะข้อมูลในไฟล์ CSV ของผู้ใช้เรียงจาก ใหม่ -> เก่า)
-            for (const fund in fundsData) {
-                fundsData[fund].sort((a, b) => a.date - b.date);
-            }
-
-            // แสดงรายชื่อกองทุนใน Sidebar
-            populateFundSelector();
-            setStatus(`โหลดข้อมูล ${Object.keys(fundsData).length} กองทุนสำเร็จ!`, 'green');
-        }
-
-        // === 3.7 ฟังก์ชันคำนวณ (Technical Analysis) ===
-
-        // คำนวณ Simple Moving Average (MA)
-        function calculateMA(data, period) {
-            let results = [];
-            for (let i = 0; i < data.length; i++) {
-                if (i < period - 1) {
-                    results.push(NaN); // ยังคำนวณไม่ได้
-                } else {
-                    let sum = 0;
-                    for (let k = 0; k < period; k++) {
-                        sum += data[i - k];
-                    }
-                    results.push(sum / period);
                 }
-            }
-            return results;
-        }
+                return rsi;
+            },
 
-        // === 3.7 ฟังก์ชันคำนวณ (Technical Analysis) ===
-        function calculateRSI(data, period) {
-            let gains = [];
-            let losses = [];
-            let rsi = [];
+            calculateVolatility(data, period) {
+                let results = [];
+                let returns = [];
 
-            // 1. คำนวณ Gains/Losses
-            for (let i = 1; i < data.length; i++) {
-                const change = data[i] - data[i-1];
-                gains.push(change > 0 ? change : 0);
-                losses.push(change < 0 ? Math.abs(change) : 0);
-            }
-
-            // 2. คำนวณ Average Gain/Loss เริ่มต้น
-            let avgGain = 0;
-            let avgLoss = 0;
-            for (let i = 0; i < period; i++) {
-                avgGain += gains[i];
-                avgLoss += losses[i];
-            }
-            avgGain /= period;
-            avgLoss /= period;
-            
-            // 3. เติม NaN สำหรับช่วงที่ยังคำนวณไม่ได้ (รวมถึงจุดแรก)
-            for(let i=0; i < period; i++) {
-                rsi.push(NaN);
-            }
-
-            // 4. คำนวณ RSI แรก
-            let rs = (avgLoss === 0) ? 100 : avgGain / avgLoss;
-            rsi.push(100 - (100 / (1 + rs)));
-
-            // 5. คำนวณ RSI ที่เหลือ (Smooth)
-            for (let i = period + 1; i < data.length; i++) {
-                avgGain = ((avgGain * (period - 1)) + gains[i-1]) / period;
-                avgLoss = ((avgLoss * (period - 1)) + losses[i-1]) / period;
+                for (let i = 1; i < data.length; i++) {
+                    // ป้องกันการหารด้วย 0 หรือค่าที่ผิดพลาด
+                    if (data[i-1] > 0) {
+                        returns.push((data[i] - data[i-1]) / data[i-1]);
+                    } else {
+                        returns.push(0);
+                    }
+                }
                 
-                rs = (avgLoss === 0) ? 100 : avgGain / avgLoss;
-                rsi.push(100 - (100 / (1 + rs)));
-            }
-
-            return rsi;
-        }
-
-        // === 3.8 ฟังก์ชันช่วยเหลือ ===
-        function setStatus(message, color) {
-            statusMessage.textContent = message;
-            if (color === 'green') {
-                statusMessage.className = 'text-green-600';
-            } else if (color === 'red') {
-                statusMessage.className = 'text-red-600';
-            } else {
-                statusMessage.className = 'text-blue-600';
-            }
-        }
-
-        // (ใหม่) ฟังก์ชันค้นหา NAV ณ วันที่ที่กำหนด (หรือใก้ลเคียงที่สุด)
-        function findNavOnDate(fundData, targetDate) {
-            if (!fundData || fundData.length === 0) {
-                return { date: null, nav: null };
-            }
-
-            // หาข้อมูลที่ใก้ลเคียงที่สุด (เผื่อวันหยุด)
-            let closestData = fundData[0];
-            let minDiff = Math.abs(targetDate - closestData.date);
-
-            for (let i = 1; i < fundData.length; i++) {
-                const currentDiff = Math.abs(targetDate - fundData[i].date);
-                if (currentDiff < minDiff) {
-                    minDiff = currentDiff;
-                    closestData = fundData[i];
+                // (returns จะน้อยกว่า data 1 ช่อง)
+                for (let i = 0; i < returns.length; i++) {
+                    if (i < period - 1) {
+                        results.push(NaN);
+                    } else {
+                        const slice = returns.slice(i - (period - 1), i + 1);
+                        const mean = slice.reduce((a, b) => a + b, 0) / period;
+                        const variance = slice.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / period;
+                        results.push(Math.sqrt(variance));
+                    }
                 }
+                results.unshift(NaN); // เพิ่ม NaN ข้างหน้าเพื่อให้ช่องตรงกับ 'data'
+                return results;
             }
-            
-            return closestData; // { date: Date, nav: Number }
-        }
+        };
+
+        // === START APP ===
+        // เริ่มการทำงานของแอปเมื่อ DOM โหลดเสร็จ
+        window.addEventListener('DOMContentLoaded', () => {
+            GPFApp.init();
+        });
 
     </script>
 </body>
