@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องมือสร้างกราฟ (Data Visualization Tool)</title>
+    
+    <!-- 1. โหลด Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. โหลด Chart.js (สำหรับวาดกราฟ) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- 3. โหลด PapaParse (สำหรับอ่าน .csv) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <!-- 4. โหลด SheetJS (js-xlsx) (สำหรับอ่าน .xls, .xlsx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        /* 5. ใช้ฟอนต์ที่ดูทันสมัย (Inter) */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            background-color: #f1f5f9; /* bg-slate-100 */
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto max-w-6xl p-4 md:p-8">
+        
+        <!-- ส่วนหัว -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-600">Data Visualization Tool</h1>
+            <p class="text-lg text-slate-600 mt-2">สร้างกราฟเปรียบเทียบสัดส่วนจากไฟล์ XLS หรือ CSV ของคุณ</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- คอลัมน์ซ้าย: ตั้งค่า -->
+            <div class="lg:col-span-1 space-y-6">
+                
+                <!-- ขั้นตอนที่ 1: นำเข้าข้อมูล -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-semibold border-b pb-3 mb-4 text-blue-700">ขั้นตอนที่ 1: นำเข้าข้อมูล</h2>
+                    
+                    <!-- เพิ่มคำแนะนำรูปแบบข้อมูล -->
+                    <div class="bg-blue-50 p-3 rounded-lg text-sm text-blue-800 space-y-1 mb-4">
+                        <div class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-2 inline-block text-blue-600 flex-shrink-0 mt-0.5">
+                              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                            </svg>
+                            <div>
+                                <span class="font-semibold">คำแนะนำรูปแบบข้อมูล</span>
+                                <ul class="list-disc list-inside mt-1">
+                                    <li><b>แถวแรก:</b> ต้องเป็นหัวข้อ (เช่น <code>จังหวัด</code>, <code>ความพึงพอใจโดยรวม</code>)</li>
+                                    <li><b>ข้อมูล:</b> คอลัมน์ที่จะคำนวณต้องเป็นตัวเลข (เช่น <code>3</code>, <code>4</code>, <code>5</code>)</li>
+                                    <li><b>ตัวอย่าง:</b> คอลัมน์แรกเป็น <code>จังหวัด</code> (Label) และคอลัมน์ถัดไปเป็นหัวข้อคะแนน (เช่น <code>บรรลุวัตถุประสงค์</code>, <code>เนื้อหาอบรม</code>)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <label for="fileInput" class="block text-sm font-medium text-slate-700 mb-2">เลือกไฟล์ .xls, .xlsx, หรือ .csv</label>
+                    <input type="file" id="fileInput" accept=".csv, .xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                           class="block w-full text-sm text-slate-500
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-blue-50 file:text-blue-700
+                                  hover:file:bg-blue-100 transition duration-150">
+                    <p id="fileError" class="text-red-500 text-sm mt-2"></p>
+                </div>
+
+                <!-- ขั้นตอนที่ 2: ตั้งค่ากราฟ (ซ่อนไว้ตอนแรก) -->
+                <div id="configSection" class="bg-white p-6 rounded-xl shadow-lg space-y-4 hidden">
+                    <h2 class="text-xl font-semibold border-b pb-3 mb-4 text-blue-700">ขั้นตอนที่ 2: ตั้งค่ากราฟ</h2>
+                    
+                    <!-- เลือกโหมดการวิเคราะห์ -->
+                    <div>
+                        <label for="analysisMode" class="block text-sm font-medium text-slate-700 mb-1">เลือกโหมดการวิเคราะห์</label>
+                        <select id="analysisMode" class="w-full p-2 border border-slate-300 rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="sum">จัดกลุ่มและรวมยอด (Group & Sum)</option>
+                            <option value="count">นับจำนวนรายการ (Count Frequency)</option>
+                            <option value="average_cols">เปรียบเทียบค่าเฉลี่ยคอลัมน์</option>
+                        </select>
+                        <p id="modeHelperText" class="text-xs text-slate-500 mt-1.5"></p>
+                    </div>
+
+                    <!-- เลือกประเภทกราฟ -->
+                    <div>
+                        <label for="chartType" class="block text-sm font-medium text-slate-700 mb-1">เลือกประเภทกราฟ</label>
+                        <select id="chartType" class="w-full p-2 border border-slate-300 rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="pie">กราฟวงกลม (Pie Chart)</option>
+                            <option value="doughnut">กราฟโดนัท (Donut Chart)</option>
+                            <option value="bar">กราฟแท่ง (Bar Chart)</option>
+                            <option value="horizontalBar">กราฟแท่งแนวนอน (Horizontal Bar)</option>
+                        </select>
+                    </div>
+
+                    <!-- เลือกคอลัมน์สำหรับ Label -->
+                    <div id="labelColumnContainer">
+                        <label for="labelColumn" class="block text-sm font-medium text-slate-700 mb-1">เลือกคอลัมน์สำหรับ "ป้ายกำกับ" (Label)</label>
+                        <select id="labelColumn" class="w-full p-2 border border-slate-300 rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">— กรุณาเลือก —</option>
+                        </select>
+                    </div>
+
+                    <!-- เลือกคอลัมน์สำหรับ Value -->
+                    <div id="valueColumnContainer">
+                        <label for="valueColumn" class="block text-sm font-medium text-slate-700 mb-1">เลือกคอลัมน์สำหรับ "ค่าข้อมูล" (Value)</label>
+                        <select id="valueColumn" class="w-full p-2 border border-slate-300 rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">— กรุณาเลือก —</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- คอลัมน์ขวา: แสดงผล -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- ตัวอย่างข้อมูล (ซ่อนไว้ตอนแรก) -->
+                <div id="previewSection" class="bg-white p-6 rounded-xl shadow-lg hidden">
+                    <h2 class="text-xl font-semibold mb-4 text-blue-700">ตัวอย่างข้อมูล (5 แถวแรก)</h2>
+                    <div id="dataPreview" class="overflow-x-auto max-h-60">
+                        <!-- ตารางจะถูกสร้างโดย JavaScript -->
+                    </div>
+                </div>
+
+                <!-- พื้นที่แสดงกราฟ (ซ่อนไว้ตอนแรก) -->
+                <div id="chartSection" class="bg-white p-6 rounded-xl shadow-lg hidden">
+                    <h2 class="text-xl font-semibold mb-4 text-blue-700">ผลลัพธ์ (Visualization)</h2>
+                    <div class="relative min-h-[400px]">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- สถานะเริ่มต้น -->
+                <div id="initialState" class="flex items-center justify-center min-h-[400px] bg-white/50 border-2 border-dashed border-slate-300 rounded-xl">
+                    <p class="text-slate-500 text-lg">กรุณาอัปโหลดไฟล์ข้อมูลเพื่อเริ่มสร้างกราฟ</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-sm text-slate-500 py-6 px-4">
+        © developed by Tle Narongphisit | CTTC19 @ CPD
+    </footer>
+
+    <script type="module">
+        // --- 6. DOM Element References ---
+        const fileInput = document.getElementById('fileInput');
+        const fileError = document.getElementById('fileError');
+        const configSection = document.getElementById('configSection');
+        const previewSection = document.getElementById('previewSection');
+        const dataPreview = document.getElementById('dataPreview');
+        const chartSection = document.getElementById('chartSection');
+        const initialState = document.getElementById('initialState');
+        
+        const chartType = document.getElementById('chartType');
+        const labelColumn = document.getElementById('labelColumn');
+        const valueColumn = document.getElementById('valueColumn');
+        const analysisMode = document.getElementById('analysisMode');
+        const modeHelperText = document.getElementById('modeHelperText');
+        const labelColumnContainer = document.getElementById('labelColumnContainer');
+        const valueColumnContainer = document.getElementById('valueColumnContainer');
+        
+        const chartCanvas = document.getElementById('myChart');
+
+        // --- 7. Global State ---
+        let parsedData = []; // เก็บข้อมูลที่อ่านได้ (Array of Objects)
+        let myChartInstance = null; // เก็บ instance ของ Chart.js
+
+        // --- 8. Event Listeners ---
+        
+        // เมื่อผู้ใช้เลือกไฟล์
+        fileInput.addEventListener('change', handleFile);
+        
+        // เมื่อผู้ใช้เปลี่ยนการตั้งค่า
+        chartType.addEventListener('change', generateChart);
+        labelColumn.addEventListener('change', generateChart);
+        valueColumn.addEventListener('change', generateChart);
+        analysisMode.addEventListener('change', handleModeChange);
+
+        // --- 9. File Handling Function ---
+        function handleFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // รีเซ็ตหน้าจอ
+            resetUI();
+            
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+
+            try {
+                if (fileExtension === 'csv') {
+                    Papa.parse(file, {
+                        header: true,
+                        skipEmptyLines: true,
+                        encoding: "UTF-8", // เพิ่มการระบุ encoding เพื่อรองรับภาษาไทย
+                        complete: processData,
+                        error: handleError
+                    });
+                } else if (fileExtension === 'xls' || fileExtension === 'xlsx') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, {type: 'array'});
+                            const sheetName = workbook.SheetNames[0]; // อ่านเฉพาะ Sheet แรก
+                            const worksheet = workbook.Sheets[sheetName];
+                            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                            processData({ data: jsonData });
+                        } catch (err) {
+                            handleError(err);
+                        }
+                    };
+                    reader.onerror = handleError;
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    handleError(new Error('รองรับเฉพาะไฟล์ .csv, .xls, .xlsx เท่านั้น'));
+                }
+            } catch (err) {
+                handleError(err);
+            }
+        }
+
+        function handleError(err) {
+            console.error(err);
+            fileError.textContent = `เกิดข้อผิดพลาด: ${err.message}`;
+            resetUI();
+        }
+
+        function resetUI() {
+            fileError.textContent = '';
+            configSection.classList.add('hidden');
+            previewSection.classList.add('hidden');
+            chartSection.classList.add('hidden');
+            initialState.classList.remove('hidden');
+            dataPreview.innerHTML = '';
+            if (myChartInstance) {
+                myChartInstance.destroy();
+                myChartInstance = null;
+            }
+            
+            // Reset mode and UI
+            analysisMode.value = 'sum';
+            modeHelperText.textContent = ''; // เคลียร์ข้อความช่วยเหลือ
+            labelColumnContainer.classList.remove('hidden');
+            valueColumnContainer.classList.remove('hidden');
+        }
+
+        // --- 10. Data Processing Function ---
+        function processData(results) {
+            parsedData = results.data;
+            if (!parsedData || parsedData.length === 0) {
+                handleError(new Error('ไม่พบข้อมูลในไฟล์ หรือไฟล์อาจมีรูปแบบไม่ถูกต้อง'));
+                return;
+            }
+
+            // แสดงส่วนตั้งค่าและตัวอย่าง
+            configSection.classList.remove('hidden');
+            previewSection.classList.remove('hidden');
+            initialState.classList.add('hidden');
+
+            // 1. Get Headers
+            const headers = Object.keys(parsedData[0]);
+
+            // 2. Populate Selectors
+            populateSelectors(headers);
+
+            // 3. Show Data Preview
+            showDataPreview(parsedData, headers);
+            
+            // 4. ลองสร้างกราฟอัตโนมัติ (ถ้าเป็นไปได้)
+            autoSelectColumns(headers);
+            generateChart();
+        }
+
+        function populateSelectors(headers) {
+            labelColumn.innerHTML = '<option value="">— เลือกคอลัมน์ Label —</option>';
+            valueColumn.innerHTML = '<option value="">— เลือกคอลัมน์ Value —</option>';
+
+            headers.forEach(header => {
+                labelColumn.innerHTML += `<option value="${header}">${header}</option>`;
+                valueColumn.innerHTML += `<option value="${header}">${header}</option>`;
+            });
+        }
+        
+        function autoSelectColumns(headers) {
+            // พยายามเดาคอลัมน์
+            // หาคอลัมน์แรกที่เป็น Text
+            let firstTextCol = headers.find(h => isNaN(parseFloat(parsedData[0][h]))) || headers[0];
+            // หาคอลัมน์แรกที่เป็น Number
+            let firstNumCol = headers.find(h => !isNaN(parseFloat(parsedData[0][h]))) || headers[1];
+
+            if (firstTextCol) labelColumn.value = firstTextCol;
+            if (firstNumCol) valueColumn.value = firstNumCol;
+        }
+
+        function showDataPreview(data, headers) {
+            let table = '<table class="w-full text-left text-sm table-auto border-collapse">';
+            // Header
+            table += '<thead><tr class="bg-slate-100">';
+            headers.forEach(h => table += `<th class="border border-slate-300 p-2">${h}</th>`);
+            table += '</tr></thead>';
+
+            // Body (Top 5 rows)
+            table += '<tbody>';
+            data.slice(0, 5).forEach(row => {
+                table += '<tr>';
+                headers.forEach(h => table += `<td class="border border-slate-300 p-2">${row[h]}</td>`);
+                table += '</tr>';
+            });
+            table += '</tbody></table>';
+            dataPreview.innerHTML = table;
+        }
+
+        // --- 11. Chart Generation Function ---
+
+        function handleModeChange() {
+            const mode = analysisMode.value;
+            
+            // เคลียร์ข้อความช่วยเหลือเก่า
+            modeHelperText.textContent = '';
+            
+            if (mode === 'sum') {
+                labelColumnContainer.classList.remove('hidden');
+                valueColumnContainer.classList.remove('hidden');
+                fileError.textContent = ''; // Clear error
+                // --- เพิ่มคำอธิบาย ---
+                modeHelperText.textContent = 'เช่น: เลือก "แผนก" เป็น Label และ "ยอดขาย" เป็น Value เพื่อดูยอดขายรวมของแต่ละแผนก';
+            } else if (mode === 'count') {
+                labelColumnContainer.classList.remove('hidden');
+                valueColumnContainer.classList.add('hidden');
+                fileError.textContent = ''; // Clear error
+                // --- เพิ่มคำอธิบาย ---
+                modeHelperText.textContent = 'เช่น: เลือก "แผนก" เป็น Label เพื่อดูว่ามีรายการซ้ำกันกี่ครั้งในแต่ละแผนก';
+            } else if (mode === 'average_cols') {
+                labelColumnContainer.classList.add('hidden');
+                valueColumnContainer.classList.add('hidden');
+                fileError.textContent = ''; // Clear error
+                // --- เพิ่มคำอธิบาย ---
+                modeHelperText.textContent = 'เช่น: เปรียบเทียบคะแนนเฉลี่ยระหว่างคอลัมน์ "คณิต", "วิทย์", "อังกฤษ"';
+            }
+            
+            generateChart(); // Re-generate chart on mode change
+        }
+
+        function generateChart() {
+            // --- 11.1. Clear old chart and hide section ---
+            if (myChartInstance) {
+                myChartInstance.destroy();
+                myChartInstance = null;
+            }
+            chartSection.classList.add('hidden'); // ซ่อนกราฟไว้ก่อน
+
+            // --- 11.2. Get settings ---
+            const type = chartType.value;
+            const labelKey = labelColumn.value;
+            const valueKey = valueColumn.value;
+            const mode = analysisMode.value;
+
+            // --- 11.3. Data Aggregation ---
+            const aggregatedData = {};
+            let datasetLabel = 'ข้อมูล';
+            
+            if (mode === 'sum') {
+                // --- MODE 1: SUM (Existing Logic) ---
+                if (!type || !labelKey || !valueKey || labelKey === valueKey) {
+                    return; // ยังเลือกไม่ครบ หรือเลือกซ้ำ
+                }
+                
+                parsedData.forEach(row => {
+                    const label = row[labelKey];
+                    const value = parseFloat(row[valueKey]); // แปลงเป็นตัวเลข
+
+                    if (label && !isNaN(value)) {
+                        if (aggregatedData[label]) {
+                            aggregatedData[label] += value; // บวกค่าเพิ่ม
+                        } else {
+                            aggregatedData[label] = value; // สร้างใหม่
+                        }
+                    }
+                });
+                datasetLabel = `ยอดรวมของ ${valueKey}`;
+
+            } else if (mode === 'count') {
+                // --- MODE 2: COUNT (New Logic) ---
+                if (!type || !labelKey) {
+                    return; // ยังเลือก Label ไม่ครบ
+                }
+                
+                parsedData.forEach(row => {
+                    const label = row[labelKey];
+                    if (label) {
+                        if (aggregatedData[label]) {
+                            aggregatedData[label] += 1; // นับเพิ่ม
+                        } else {
+                            aggregatedData[label] = 1; // เริ่มนับ
+                        }
+                    }
+                });
+                datasetLabel = `จำนวนรายการใน ${labelKey}`;
+
+            } else if (mode === 'average_cols') {
+                // --- MODE 3: AVERAGE COLS (New Logic) ---
+                if (!type) return;
+
+                const headers = Object.keys(parsedData[0]);
+                // ค้นหาคอลัมน์ที่เป็นตัวเลข (จากข้อมูลแถวแรก)
+                const numericHeaders = headers.filter(h => !isNaN(parseFloat(parsedData[0][h])));
+                
+                if (numericHeaders.length === 0) {
+                     fileError.textContent = 'ไม่พบคอลัมน์ที่เป็นตัวเลขสำหรับคำนวณค่าเฉลี่ย';
+                     return;
+                }
+
+                numericHeaders.forEach(colName => {
+                    let sum = 0;
+                    let count = 0;
+                    parsedData.forEach(row => {
+                        const value = parseFloat(row[colName]);
+                        if (!isNaN(value)) {
+                            sum += value;
+                            count++;
+                        }
+                    });
+                    const average = (count > 0) ? (sum / count) : 0;
+                    aggregatedData[colName] = average;
+                });
+                datasetLabel = 'ค่าเฉลี่ยของแต่ละคอลัมน์';
+            }
+
+            // --- 11.4. Prepare data for Chart.js ---
+            const chartLabels = Object.keys(aggregatedData);
+            const chartValues = Object.values(aggregatedData);
+
+            if (chartLabels.length === 0) {
+                 return; // ไม่มีข้อมูลให้พล็อต
+            }
+
+            // --- 11.5. Render Chart ---
+            chartSection.classList.remove('hidden'); // แสดงส่วนของกราฟ
+
+            // ทำลายกราฟเก่า (ถ้ามี)
+            if (myChartInstance) {
+                myChartInstance.destroy();
+            }
+
+            // สร้างกราฟใหม่
+            const ctx = chartCanvas.getContext('2d');
+            
+            // สร้างชุดสีแบบไดนามิก
+            const colors = generateColors(chartLabels.length);
+
+            let chartConfig = {
+                type: type === 'horizontalBar' ? 'bar' : type, // 'horizontalBar' ไม่ใช่ type มาตรฐาน
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: datasetLabel, // ใช้ Label แบบไดนามิก
+                        data: chartValues,
+                        backgroundColor: colors.backgrounds,
+                        borderColor: colors.borders,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: (type === 'pie' || type === 'doughnut') ? 'top' : 'bottom',
+                            display: (type !== 'bar' && type !== 'horizontalBar') // ซ่อน legend ในกราฟแท่งถ้ามี label แกน
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.formattedValue;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // ตั้งค่าพิเศษสำหรับกราฟแต่ละประเภท
+            if (type === 'horizontalBar') {
+                chartConfig.options.indexAxis = 'y'; // ทำให้เป็นแนวนอน
+                chartConfig.options.plugins.legend.display = false;
+                chartConfig.options.scales = {
+                    x: { beginAtZero: true },
+                    y: {}
+                };
+            } else if (type === 'bar') {
+                chartConfig.options.indexAxis = 'x';
+                chartConfig.options.plugins.legend.display = false;
+                chartConfig.options.scales = {
+                    x: {},
+                    y: { beginAtZero: true }
+                };
+            } else {
+                // สำหรับ Pie/Donut
+                chartConfig.options.scales = {}; // ซ่อนแกน
+            }
+
+            myChartInstance = new Chart(ctx, chartConfig);
+        }
+        
+        // --- 12. Helper Function: Generate Colors ---
+        function generateColors(numColors) {
+            const baseColors = [
+                'rgba(54, 162, 235, 0.7)', // Blue
+                'rgba(255, 99, 132, 0.7)', // Red
+                'rgba(255, 206, 86, 0.7)', // Yellow
+                'rgba(75, 192, 192, 0.7)', // Green
+                'rgba(153, 102, 255, 0.7)', // Purple
+                'rgba(255, 159, 64, 0.7)', // Orange
+                'rgba(201, 203, 207, 0.7)', // Grey
+                'rgba(255, 99, 255, 0.7)', // Pink
+                'rgba(0, 204, 153, 0.7)', // Teal
+                'rgba(102, 0, 204, 0.7)'  // Violet
+            ];
+            
+            let backgrounds = [];
+            let borders = [];
+            
+            for (let i = 0; i < numColors; i++) {
+                const color = baseColors[i % baseColors.length];
+                backgrounds.push(color);
+                borders.push(color.replace('0.7', '1')); // สีขอบทึบกว่า
+            }
+            
+            return { backgrounds, borders };
+        }
+
+    </script>
+
+</body>
+</html>
