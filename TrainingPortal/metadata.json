@@ -1,0 +1,5 @@
+{
+  "name": "Training Portal (Firebase)",
+  "description": "A comprehensive Training Portal SPA built with React and TypeScript. It serves as a central hub for online training, allowing users to enroll in courses and follow a 4-step learning process (pre-test, content, post-test, survey). Admins can manage courses, content, quizzes, and view user progress.",
+  "requestFramePermissions": []
+}
