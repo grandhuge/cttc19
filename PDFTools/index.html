@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Mâgician 🔒 - เครื่องมือ PDF ส่วนตัว</title>
+    <!-- 1. Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 2. PDF-LIB (for creating/editing PDFs) -->
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <!-- 3. PDF.js (for rendering thumbnails) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <!-- 4. SortableJS (for drag-and-drop reordering) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+
+    <!-- Set workerSrc for PDF.js -->
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+    </script>
+    <style>
+        /* Inter Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom styles for tabs */
+        .tab-btn {
+            @apply px-4 py-3 font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300;
+        }
+
+        .tab-btn.active {
+            @apply text-indigo-600 border-indigo-600;
+        }
+
+        /* Custom styles for drop zone */
+        .drop-zone {
+            @apply border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ease-in-out;
+        }
+
+        .drop-zone.drag-over {
+            @apply border-indigo-500 bg-indigo-50;
+        }
+
+        /* Style for sortable list items */
+        .file-item {
+            @apply flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow duration-200;
+        }
+
+        .file-item.sortable-ghost {
+            @apply opacity-50 bg-indigo-100;
+        }
+
+        /* Thumbnail styles */
+        .thumbnail-item {
+            @apply relative border-2 border-transparent rounded-lg p-1 transition-all duration-200 ease-in-out;
+            user-select: none;
+        }
+        
+        /* C&R Fix: Focus state for keyboard navigation */
+        .thumbnail-item[role="button"]:focus {
+            @apply outline-none ring-2 ring-indigo-500 ring-offset-2;
+        }
+
+        .thumbnail-item.selected {
+            @apply border-red-500 bg-red-50 scale-105;
+        }
+
+        .thumbnail-overlay {
+            @apply absolute inset-0 bg-red-600 bg-opacity-75 flex items-center justify-center opacity-0 transition-opacity duration-150;
+            pointer-events: none;
+        }
+
+        .thumbnail-item.selected .thumbnail-overlay {
+            opacity: 1;
+        }
+        
+        /* UX-P1: Style for merge-list thumbnails */
+        .merge-thumbnail {
+            @apply w-10 h-10 object-cover rounded-sm mr-3 flex-shrink-0 bg-gray-200 border border-gray-300;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+
+    <!-- Loading Spinner Overlay -->
+    <div id="loader" class="fixed inset-0 z-50 flex-col items-center justify-center bg-black bg-opacity-75 backdrop-blur-sm hidden">
+        <svg class="animate-spin h-10 w-10 text-white mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-white text-lg font-medium">กำลังประมวลผล...</span>
+        <span class="text-gray-300 text-sm mt-1">ไฟล์ของคุณจะถูกประมวลผลในเครื่อง 100%</span>
+    </div>
+
+    <!-- Error Message Box -->
+    <!-- C&R Fix: Add aria-live="polite" for screen readers -->
+    <div id="error-box" class="fixed top-5 right-5 z-50 p-4 rounded-lg shadow-lg bg-red-600 text-white max-w-sm hidden animate-pulse" aria-live="polite">
+        <div class="flex items-start">
+            <svg class="w-6 h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                <h4 class="font-bold text-lg">เกิดข้อผิดพลาด</h4>
+                <p id="error-message" class="text-sm">ข้อความผิดพลาด</p>
+            </div>
+            <button id="error-close-btn" class="ml-4 text-red-100 hover:text-white" aria-label="ปิดข้อความเตือน">&times;</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container mx-auto max-w-4xl p-4 md:p-8">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-indigo-700">PDF Mâgician 🔒</h1>
+            <p class="text-lg text-gray-600 mt-2">เครื่องมือจัดการ PDF ส่วนตัวของคุณ</p>
+        </header>
+
+        <!-- UI-Refactor: Privacy Box (Changed to Green for "Safe" feeling) -->
+        <div class="bg-green-50 border-l-4 border-green-500 text-green-800 p-4 rounded-lg mb-8" role="alert">
+            <div class="flex items-center">
+                <svg class="w-6 h-6 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                <div>
+                    <h3 class="font-bold">🔒 ปลอดภัย มั่นใจ 100%</h3>
+                    <p class="text-sm">ไฟล์ของคุณจะไม่ถูกอัปโหลดไปที่ใดเลย การประมวลผลทั้งหมดเกิดขึ้นในเบราว์เซอร์ของคุณ 100%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="mb-6">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                    <button class="tab-btn active" data-tab="tab-merge">
+                        <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        รวมไฟล์
+                    </button>
+                    <button class="tab-btn" data-tab="tab-delete">
+                        <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        ลบหน้า
+                    </button>
+                    <button class="tab-btn" data-tab="tab-rotate">
+                        <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9H4V4m0 0L8 8m12 12v-5h-.582m-15.356-2a8.001 8.001 0 0015.356 2H20v5m0 0l-4-4"></path>
+                        </svg>
+                        หมุนหน้า
+                    </button>
+                    <button class="tab-btn" data-tab="tab-image">
+                        <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 14m6-6l.01.01"></path>
+                        </svg>
+                        แปลงรูปเป็น PDF
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Tab Panels -->
+        <main>
+            <!-- ================================== -->
+            <!-- Panel 1: Merge PDF                 -->
+            <!-- ================================== -->
+            <section id="tab-merge" class="tab-panel">
+                <!-- UI-Refactor: Softer background -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                    
+                    <!-- Step 1: Upload -->
+                    <div id="merge-upload-view">
+                        <h2 class="text-2xl font-semibold mb-4">1. รวมไฟล์ PDF (Merge PDFs)</h2>
+                        <p class="text-gray-600 mb-6">ลากไฟล์ PDF ที่คุณต้องการรวมมาวาง หรือคลิกเพื่อเลือกไฟล์ (รองรับหลายไฟล์)</p>
+
+                        <!-- Merge Drop Zone -->
+                        <div id="merge-drop-zone" class="drop-zone">
+                            <input type="file" id="merge-file-input" class="hidden" accept="application/pdf" multiple>
+                            <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v5a4 4 0 01-4 4H7z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11v6m0 0l-3-3m3 3l3-3"></path>
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-600">ลากไฟล์มาวางที่นี่ หรือ <span class="font-medium text-indigo-600 hover:text-indigo-500">คลิกเพื่ออัปโหลด</span></p>
+                            <p class="text-xs text-gray-500 mt-1">คำแนะนำ: ไฟล์ขนาดใหญ่อาจใช้เวลาประมวลผลนาน</p>
+                        </div>
+
+                        <!-- Merge File List -->
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium mb-2">รายการไฟล์ (ลากเพื่อจัดลำดับ):</h3>
+                            <div id="merge-file-list" class="space-y-3">
+                                <p id="merge-empty-state" class="text-gray-500 text-sm">ยังไม่มีไฟล์ในรายการ</p>
+                            </div>
+                        </div>
+
+                        <!-- Merge Button -->
+                        <button id="merge-button" class="mt-6 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                            กรุณาเลือก 2 ไฟล์ขึ้นไป
+                        </button>
+                    </div>
+                    
+                    <!-- UX-Refactor: Step 2: Success View (NEW) -->
+                    <div id="merge-success-view" class="hidden text-center p-8">
+                        <svg class="w-16 h-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h2 class="text-2xl font-semibold text-green-700 mt-4">ดำเนินการเสร็จสิ้น!</h2>
+                        <p class="text-gray-600 mt-2">ไฟล์ที่รวมแล้วของคุณพร้อมให้ดาวน์โหลด</p>
+                        <a id="merge-download-btn" href="#" download="pdf-magician-merged.pdf" class="mt-6 inline-block w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200">
+                            ดาวน์โหลดไฟล์
+                        </a>
+                        <button id="merge-reset-btn" class="mt-3 w-full text-sm text-gray-600 hover:text-indigo-600 font-medium">
+                            เริ่มต้นใหม่
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ================================== -->
+            <!-- Panel 2: Delete Pages              -->
+            <!-- ================================== -->
+            <section id="tab-delete" class="tab-panel hidden">
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                    
+                    <!-- Step 1: Upload -->
+                    <div id="delete-upload-view">
+                        <h2 class="text-2xl font-semibold mb-4">2. ลบหน้า (Delete Pages)</h2>
+                        <p class="text-gray-600 mb-6">อัปโหลดไฟล์ PDF (ไฟล์เดียว) เพื่อเลือกหน้าที่คุณไม่ต้องการ</p>
+
+                        <div id="delete-drop-zone" class="drop-zone">
+                            <input type="file" id="delete-file-input" class="hidden" accept="application/pdf">
+                            <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-600">ลากไฟล์เดียวมาวางที่นี่ หรือ <span class="font-medium text-indigo-600 hover:text-indigo-500">คลิกเพื่ออัปโหลด</span></p>
+                            <p class="text-xs text-gray-500 mt-1">คำแนะนำ: ไฟล์ขนาดใหญ่อาจใช้เวลาแสดงตัวอย่างนาน</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Edit -->
+                    <div id="delete-edit-view" class="hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-semibold">เลือกหน้าที่ต้องการลบ</h2>
+                            <button id="delete-cancel-btn" class="text-sm text-gray-600 hover:text-red-600 font-medium transition-colors">
+                                ยกเลิกและเลือกไฟล์ใหม่ &rarr;
+                            </button>
+                        </div>
+                        <p class="text-gray-600 mb-4">คลิกเพื่อ <strong>เลือก (X)</strong> หรือ <strong>ยกเลิก</strong> หน้าที่คุณไม่ต้องการ</p>
+
+                        <!-- Thumbnail Action Bar -->
+                        <div class="flex flex-wrap gap-2 mb-4 p-2 border rounded-lg bg-gray-100">
+                            <button id="delete-select-all" class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200">เลือกทั้งหมด</button>
+                            <button id="delete-deselect-all" class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-300">ยกเลิกทั้งหมด</button>
+                            <button id="delete-invert-select" class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-300">สลับการเลือก</button>
+                        </div>
+
+                        <!-- Thumbnails -->
+                        <div id="delete-thumbnail-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 bg-gray-100 p-4 rounded-lg max-h-[500px] overflow-y-auto">
+                            <!-- Thumbnails injected here -->
+                        </div>
+
+                        <!-- Delete Button -->
+                        <button id="delete-button" class="mt-6 w-full bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
+                            กรุณาเลือกหน้าที่จะลบ
+                        </button>
+                    </div>
+                    
+                    <!-- UX-Refactor: Step 3: Success View (NEW) -->
+                    <div id="delete-success-view" class="hidden text-center p-8">
+                        <svg class="w-16 h-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h2 class="text-2xl font-semibold text-green-700 mt-4">ดำเนินการเสร็จสิ้น!</h2>
+                        <p class="text-gray-600 mt-2">ไฟล์ใหม่ของคุณพร้อมให้ดาวน์โหลด</p>
+                        <a id="delete-download-btn" href="#" download="pdf-magician-deleted.pdf" class="mt-6 inline-block w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200">
+                            ดาวน์โหลดไฟล์
+                        </a>
+                        <button id="delete-reset-btn" class="mt-3 w-full text-sm text-gray-600 hover:text-indigo-600 font-medium">
+                            เริ่มต้นใหม่
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ================================== -->
+            <!-- Panel 3: Rotate Pages              -->
+            <!-- ================================== -->
+            <section id="tab-rotate" class="tab-panel hidden">
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                    <!-- Step 1: Upload -->
+                    <div id="rotate-upload-view">
+                        <h2 class="text-2xl font-semibold mb-4">3. หมุนหน้า (Rotate Pages)</h2>
+                        <p class="text-gray-600 mb-6">อัปโหลดไฟล์ PDF (ไฟล์เดียว) เพื่อหมุนหน้าที่สแกนมาเอียง</p>
+
+                        <div id="rotate-drop-zone" class="drop-zone">
+                            <input type="file" id="rotate-file-input" class="hidden" accept="application/pdf">
+                            <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-600">ลากไฟล์เดียวมาวางที่นี่ หรือ <span class="font-medium text-indigo-600 hover:text-indigo-500">คลิกเพื่ออัปโหลด</span></p>
+                            <p class="text-xs text-gray-500 mt-1">คำแนะนำ: ไฟล์ขนาดใหญ่อาจใช้เวลาแสดงตัวอย่างนาน</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Edit -->
+                    <div id="rotate-edit-view" class="hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-semibold">เลือกหน้าที่ต้องการหมุน</h2>
+                            <button id="rotate-cancel-btn" class="text-sm text-gray-600 hover:text-red-600 font-medium transition-colors">
+                                ยกเลิกและเลือกไฟล์ใหม่ &rarr;
+                            </button>
+                        </div>
+                        <p class="text-gray-600 mb-4">คลิกปุ่ม "↻" บนหน้าที่คุณต้องการหมุน (ทีละ 90 องศา)</p>
+
+                        <!-- Rotate All Bar -->
+                        <div class="flex flex-wrap gap-2 mb-4 p-2 border rounded-lg bg-gray-100">
+                            <button id="rotate-all-left" class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200">
+                                ↺ หมุนซ้ายทั้งหมด
+                            </button>
+                            <button id="rotate-all-right" class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200">
+                                ↻ หมุนขวาทั้งหมด
+                            </button>
+                        </div>
+
+                        <!-- Thumbnails -->
+                        <div id="rotate-thumbnail-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 bg-gray-100 p-4 rounded-lg max-h-[500px] overflow-y-auto">
+                            <!-- Thumbnails injected here -->
+                        </div>
+
+                        <!-- Rotate Button -->
+                        <button id="rotate-button" class="mt-6 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
+                            ใช้การเปลี่ยนแปลงและดาวน์โหลด
+                        </button>
+                    </div>
+
+                    <!-- UX-Refactor: Step 3: Success View (NEW) -->
+                    <div id="rotate-success-view" class="hidden text-center p-8">
+                        <svg class="w-16 h-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h2 class="text-2xl font-semibold text-green-700 mt-4">ดำเนินการเสร็จสิ้น!</h2>
+                        <p class="text-gray-600 mt-2">ไฟล์ที่หมุนแล้วของคุณพร้อมให้ดาวน์โหลด</p>
+                        <a id="rotate-download-btn" href="#" download="pdf-magician-rotated.pdf" class="mt-6 inline-block w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200">
+                            ดาวน์โหลดไฟล์
+                        </a>
+                        <button id="rotate-reset-btn" class="mt-3 w-full text-sm text-gray-600 hover:text-indigo-600 font-medium">
+                            เริ่มต้นใหม่
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================== -->
+            <!-- Panel 4: Image to PDF              -->
+            <!-- ================================== -->
+            <section id="tab-image" class="tab-panel hidden">
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                    <!-- Step 1: Upload -->
+                    <div id="image-upload-view">
+                        <h2 class="text-2xl font-semibold mb-4">4. แปลงรูปภาพเป็น PDF (Image to PDF)</h2>
+                        <p class="text-gray-600 mb-6">ลากรูปภาพ (.jpg, .png) มาวาง หรือคลิกเพื่อเลือก (รองรับหลายไฟล์)</p>
+
+                        <!-- Image Drop Zone -->
+                        <div id="image-drop-zone" class="drop-zone">
+                            <input type="file" id="image-file-input" class="hidden" accept="image/jpeg, image/png" multiple>
+                            <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 14m6-6l.01.01"></path>
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-600">ลากไฟล์รูปภาพมาวางที่นี่ หรือ <span class="font-medium text-indigo-600 hover:text-indigo-500">คลิกเพื่ออัปโหลด</span></p>
+                            <p class="text-xs text-gray-500 mt-1">รองรับ: .jpg, .jpeg, .png</p>
+                        </div>
+
+                        <!-- Image File List -->
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium mb-2">รายการรูปภาพ (ลากเพื่อจัดลำดับ):</h3>
+                            <div id="image-file-list" class="space-y-3">
+                                <p id="image-empty-state" class="text-gray-500 text-sm">ยังไม่มีรูปภาพในรายการ</p>
+                            </div>
+                        </div>
+
+                        <!-- Convert Button -->
+                        <button id="image-convert-button" class="mt-6 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                            กรุณาเลือกรูปภาพ
+                        </button>
+                    </div>
+
+                    <!-- UX-Refactor: Step 2: Success View (NEW) -->
+                    <div id="image-success-view" class="hidden text-center p-8">
+                        <svg class="w-16 h-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h2 class="text-2xl font-semibold text-green-700 mt-4">ดำเนินการเสร็จสิ้น!</h2>
+                        <p class="text-gray-600 mt-2">ไฟล์ PDF จากรูปภาพของคุณพร้อมแล้ว</p>
+                        <a id="image-download-btn" href="#" download="pdf-magician-converted.pdf" class="mt-6 inline-block w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200">
+                            ดาวน์โหลดไฟล์
+                        </a>
+                        <button id="image-reset-btn" class="mt-3 w-full text-sm text-gray-600 hover:text-indigo-600 font-medium">
+                            เริ่มต้นใหม่
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+
+        <!-- C&R Fix: Add Compliance Footer for Transparency & Licensing -->
+        <footer class="text-center text-xs text-gray-500 mt-10 border-t pt-6">
+            <p class="font-semibold">🔒 ความเป็นส่วนตัวคือสิทธิ์ของคุณ</p>
+            <p class="mb-3">แอปนี้ทำงาน 100% ในเบราว์เซอร์ของคุณ ข้อมูลไฟล์ PDF หรือรูปภาพของคุณจะไม่ถูกส่งออกจากคอมพิวเตอร์ของคุณเลย</p>
+            <p>ขับเคลื่อนโดยไลบรารี Open Source:
+                <a href="https://github.com/Hopding/pdf-lib" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">pdf-lib</a> (MIT),
+                <a href="https://mozilla.github.io/pdf.js/" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">pdf.js</a> (Apache 2.0),
+                และ <a href="https://github.com/SortableJS/Sortable" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">SortableJS</a> (MIT).
+            </p>
+            <!-- User Requested Footer -->
+            <p class="mt-4 text-gray-600">© developed by Tle Narongphisit | CTTC Suratthani @ CPD</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // TR-FIX: P1 (Scope) - Encapsulate all code in an IIFE
+        (function() {
+            'useS strict';
+
+            // PDF library instances
+            const {
+                PDFDocument,
+                degrees
+            } = PDFLib;
+
+            // Global App State
+            let activeTab = 'tab-merge';
+            // TR-P1: mergeFiles now stores { id, file, buffer }
+            let mergeFiles = []; // For Tool 1
+            let imageFiles = []; // For Tool 4
+            let activeFile = null; // For Tool 2 & 3 { buffer, name }
+            let deletePages = new Set(); // For Tool 2
+            let rotateDegrees = new Map(); // For Tool 3 (pageIndex -> degrees)
+            let sortableMerge = null;
+            let sortableImage = null;
+
+            // Utility Functions
+            const showLoader = () => document.getElementById('loader').classList.remove('hidden');
+            const hideLoader = () => document.getElementById('loader').classList.add('hidden');
+
+            const showError = (message) => {
+                const errorBox = document.getElementById('error-box');
+                document.getElementById('error-message').textContent = message;
+                errorBox.classList.remove('hidden');
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    errorBox.classList.add('hidden');
+                }, 5000);
+            };
+
+            /**
+             * TR-FIX (Robustness): Create a single, robust function to read files.
+             */
+            const readFileAsArrayBuffer = (file) => {
+                return new Promise((resolve, reject) => {
+                    // Check if file is valid *before* reading
+                    if (!file || typeof file.size === 'undefined' || typeof file.type === 'undefined') {
+                        reject(new Error('Invalid file object. It does not appear to be a file/blob.'));
+                        return;
+                    }
+
+                    const fileReader = new FileReader();
+                    fileReader.onload = () => resolve(fileReader.result);
+                    fileReader.onerror = () => reject(fileReader.error);
+                    fileReader.readAsArrayBuffer(file);
+                });
+            };
+
+            /**
+             * TR-FIX (Robustness): Create a function to read image files as Data URL
+             */
+            const readFileAsDataURL = (file) => {
+                return new Promise((resolve, reject) => {
+                    if (!file || typeof file.size === 'undefined' || typeof file.type === 'undefined') {
+                        reject(new Error('Invalid image file object.'));
+                        return;
+                    }
+                    const fileReader = new FileReader();
+                    fileReader.onload = () => resolve(fileReader.result);
+                    fileReader.onerror = () => reject(fileReader.error);
+                    fileReader.readAsDataURL(file);
+                });
+            };
+
+            /**
+             * TR-FIX: P3 (DRY Principle) - Create a wrapper for loading & error handling
+             */
+            const withLoader = async (asyncFunction, toolToReset) => {
+                showLoader();
+                try {
+                    await asyncFunction();
+                } catch (err) {
+                    console.error(err);
+                    let specificMessage = 'เกิดข้อผิดพลาดไม่ทราบสาเหตุ';
+
+                    // REFACTOR-BUG-FIX: Use optional chaining (?.
+                    if (err.name === 'PasswordException' || (err?.message?.includes('Password'))) {
+                        specificMessage = 'ไม่สามารถประมวลผลไฟล์ได้ เนื่องจากมีการป้องกันด้วยรหัสผ่าน';
+                    } else if (err?.message && !err.message.includes('pdfjsLib.getDocument')) {
+                        specificMessage = err.message;
+                    } else if (err?.message?.includes('pdfjsLib.getDocument')) {
+                        specificMessage = 'ไม่สามารถเปิดไฟล์ PDF นี้ได้ อาจเสียหายหรือมีรูปแบบที่ไม่รองรับ';
+                    }
+
+                    showError(specificMessage);
+
+                    // Reset the specific tool on failure
+                    if (toolToReset === 'merge') resetMergeTool();
+                    if (toolToReset === 'delete') resetDeleteTool();
+                    if (toolToReset === 'rotate') resetRotateTool();
+                    if (toolToReset === 'image') resetImageTool();
+                } finally {
+                    hideLoader();
+                }
+            };
+
+            /**
+             * UX-Refactor: New function to show a success screen instead of auto-downloading.
+             * @param {string} toolPrefix - 'merge', 'delete', 'rotate', 'image'
+             * @param {Blob} blob - The resulting file blob
+             * @param {string} filename - The desired download filename
+             */
+            const showSuccessView = (toolPrefix, blob, filename) => {
+                const downloadBtn = document.getElementById(`${toolPrefix}-download-btn`);
+                const resetBtn = document.getElementById(`${toolPrefix}-reset-btn`);
+                
+                resetToolUI(toolPrefix, 'success'); // Show success view
+
+                const url = URL.createObjectURL(blob);
+                downloadBtn.href = url;
+                downloadBtn.download = filename;
+
+                // Clean up previous listeners
+                const newResetBtn = resetBtn.cloneNode(true);
+                resetBtn.parentNode.replaceChild(newResetBtn, resetBtn);
+
+                newResetBtn.addEventListener('click', () => {
+                    if (toolPrefix === 'merge') resetMergeTool();
+                    if (toolPrefix === 'delete') resetDeleteTool();
+                    if (toolPrefix === 'rotate') resetRotateTool();
+                    if (toolPrefix === 'image') resetImageTool();
+                    URL.revokeObjectURL(url); // Clean up blob URL
+                });
+            };
+            
+            /**
+             * Refactor: New function to reset the UI views for a tool.
+             * @param {string} toolPrefix - 'merge', 'delete', 'rotate', 'image'
+             * @param {string} viewToShow - 'upload', 'edit', or 'success'
+             */
+            const resetToolUI = (toolPrefix, viewToShow = 'upload') => {
+                const uploadView = document.getElementById(`${toolPrefix}-upload-view`);
+                const editView = document.getElementById(`${toolPrefix}-edit-view`);
+                const successView = document.getElementById(`${toolPrefix}-success-view`);
+
+                if (uploadView) uploadView.classList.toggle('hidden', viewToShow !== 'upload');
+                if (editView) editView.classList.toggle('hidden', viewToShow !== 'edit'); // C&R Fix: ensure edit view is hidden
+                if (successView) successView.classList.toggle('hidden', viewToShow !== 'success');
+            };
+
+            /**
+             * Renders PDF thumbnails for Delete and Rotate tools.
+             * @param {ArrayBuffer} pdfBuffer The raw PDF data.
+             * @param {string} mode 'delete' or 'rotate'.
+             */
+            const renderPdfThumbnails = async (pdfBuffer, mode) => {
+                const grid = document.getElementById(mode === 'delete' ? 'delete-thumbnail-grid' : 'rotate-thumbnail-grid');
+                grid.innerHTML = ''; // Clear previous thumbnails
+
+                // Use slice(0) to create a copy for pdf.js, protecting the original buffer
+                const pdf = await pdfjsLib.getDocument({
+                    data: pdfBuffer.slice(0)
+                }).promise;
+                const totalPages = pdf.numPages;
+
+                if (mode === 'delete') {
+                    grid.dataset.totalPages = totalPages;
+                }
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({
+                        scale: 0.5
+                    });
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    canvas.className = "w-full h-auto object-cover rounded-md shadow-sm transition-transform duration-200"; // Added transition
+
+                    await page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    }).promise;
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = "thumbnail-item cursor-pointer";
+                    wrapper.dataset.pageIndex = i - 1;
+
+                    const pageNumber = document.createElement('span');
+                    pageNumber.className = "block text-center text-xs font-medium text-gray-700 mt-1";
+                    pageNumber.textContent = `หน้า ${i}`;
+
+                    if (mode === 'delete') {
+                        // C&R Fix: Add role, tabindex, and aria-label for accessibility
+                        wrapper.setAttribute('role', 'button');
+                        wrapper.setAttribute('tabindex', '0');
+                        wrapper.setAttribute('aria-label', `หน้า ${i}, คลิกเพื่อเลือก`);
+                        
+                        wrapper.appendChild(canvas);
+                        wrapper.appendChild(pageNumber);
+
+                        const overlay = document.createElement('div');
+                        overlay.className = "thumbnail-overlay";
+                        overlay.innerHTML = `<svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
+                        wrapper.appendChild(overlay);
+
+                        wrapper.addEventListener('click', () => {
+                            const pageIndex = parseInt(wrapper.dataset.pageIndex);
+                            const total = parseInt(grid.dataset.totalPages);
+
+                            if (!deletePages.has(pageIndex) && deletePages.size + 1 >= total) {
+                                showError('ไม่สามารถลบทุกหน้าได้ อย่างน้อยต้องเหลือ 1 หน้า');
+                                return;
+                            }
+
+                            wrapper.classList.toggle('selected');
+                            if (wrapper.classList.contains('selected')) {
+                                deletePages.add(pageIndex);
+                            } else {
+                                deletePages.delete(pageIndex);
+                            }
+                            updateDeleteButton();
+                        });
+                        
+                        // C&R Fix: Add keyup listener for Enter/Space
+                        wrapper.addEventListener('keyup', (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                wrapper.click(); // Trigger existing click handler
+                            }
+                        });
+
+                    } else {
+                        const canvasWrapper = document.createElement('div');
+                        canvasWrapper.className = "relative";
+
+                        const rotateButton = document.createElement('button');
+                        rotateButton.innerHTML = '↻';
+                        rotateButton.setAttribute('aria-label', `หมุนหน้า ${i}`);
+                        rotateButton.className = "absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full w-6 h-6 text-lg font-bold flex items-center justify-center hover:bg-opacity-80 transition-transform active:scale-90";
+
+                        rotateButton.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const pageIndex = parseInt(wrapper.dataset.pageIndex);
+                            const currentRotation = rotateDegrees.get(pageIndex) || 0;
+                            const newRotation = (currentRotation + 90) % 360;
+                            rotateDegrees.set(pageIndex, newRotation);
+
+                            canvas.style.transform = `rotate(${newRotation}deg)`;
+                            updateRotateButton();
+                        });
+
+                        canvasWrapper.appendChild(canvas);
+                        canvasWrapper.appendChild(rotateButton);
+                        wrapper.appendChild(canvasWrapper);
+                        wrapper.appendChild(pageNumber);
+                    }
+
+                    grid.appendChild(wrapper);
+                }
+            };
+
+
+            // ===============================================
+            // Tool 1: Merge Logic
+            // ===============================================
+
+            const resetMergeTool = () => {
+                resetToolUI('merge'); // Refactored
+                mergeFiles = [];
+                document.getElementById('merge-file-list').innerHTML = '<p id="merge-empty-state" class="text-gray-500 text-sm">ยังไม่มีไฟล์ในรายการ</p>';
+                document.getElementById('merge-file-input').value = '';
+                updateMergeButton();
+            };
+
+            // TR-P1: Refactored to use pre-loaded buffers
+            const loadMergeThumbnails = async () => {
+                const canvases = document.querySelectorAll('#merge-file-list canvas[data-file-id]');
+                for (const canvas of canvases) {
+                    const fileId = canvas.dataset.fileId;
+                    const fileWithId = mergeFiles.find(f => f.id === fileId);
+                    // Check if file and buffer exist
+                    if (!fileWithId || !fileWithId.buffer) continue; 
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = "gray";
+                    ctx.textAlign = "center";
+                    ctx.font = "8px sans-serif";
+                    
+                    try {
+                        // Use the pre-loaded buffer (slice to create a copy for pdf.js)
+                        const pdf = await pdfjsLib.getDocument({ data: fileWithId.buffer.slice(0) }).promise; 
+                        const page = await pdf.getPage(1); // Get first page
+                        
+                        const viewport = page.getViewport({ scale: 0.2 }); 
+                        
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+                    } catch (err) {
+                        console.error(`Failed to render thumb for ${fileWithId.file.name}:`, err);
+                        // Visually mark the canvas if rendering fails
+                        canvas.width = 40; // Set default size for error text
+                        canvas.height = 40;
+                        if (err.name === 'PasswordException') {
+                            ctx.fillText("Locked", canvas.width / 2, canvas.height / 2);
+                        } else {
+                            ctx.fillText("Error", canvas.width / 2, canvas.height / 2);
+                        }
+                    }
+                }
+            };
+
+            const renderMergeList = () => {
+                const list = document.getElementById('merge-file-list');
+                const emptyState = document.getElementById('merge-empty-state');
+                list.innerHTML = '';
+
+                if (mergeFiles.length === 0) {
+                    list.appendChild(emptyState);
+                } else {
+                    mergeFiles.forEach(file => {
+                        const item = document.createElement('div');
+                        item.className = "file-item";
+                        item.dataset.id = file.id;
+
+                        // UX-P1: Add canvas thumbnail and adjust layout
+                        // C&R Fix: Added aria-label to reorder handle
+                        item.innerHTML = `
+                            <div class="flex items-center overflow-hidden">
+                                <canvas data-file-id="${file.id}" class="merge-thumbnail" aria-hidden="true"></canvas>
+                                <div class="overflow-hidden">
+                                    <span class="font-medium text-sm truncate" title="${file.file.name}">${file.file.name}</span>
+                                    <span class="block text-xs text-gray-500">(${(file.file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <button data-id="${file.id}" class="remove-file-btn text-red-500 hover:text-red-700 p-1" aria-label="ลบไฟล์ ${file.file.name}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                                <svg class="w-5 h-5 text-gray-400 cursor-move ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="จัดลำดับใหม่"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                            </div>
+                        `;
+                        list.appendChild(item);
+                    });
+                    
+                    // UX-P1: Load thumbnails asynchronously
+                    loadMergeThumbnails();
+                }
+                updateMergeButton();
+            };
+
+            const updateMergeButton = () => {
+                const btn = document.getElementById('merge-button');
+                const count = mergeFiles.length;
+                if (count < 2) {
+                    btn.disabled = true;
+                    btn.textContent = 'กรุณาเลือก 2 ไฟล์ขึ้นไป';
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = `รวม ${count} ไฟล์`;
+                }
+            };
+
+            // TR-P1: handleMergeFiles now receives an array of {id, file, buffer}
+            const handleMergeFiles = (newFileObjects) => {
+                mergeFiles.push(...newFileObjects);
+                renderMergeList();
+            };
+
+            const doMerge = async () => {
+                const mergedPdf = await PDFDocument.create();
+                
+                const fileIdsOrder = Array.from(document.querySelectorAll('#merge-file-list .file-item')).map(item => item.dataset.id);
+                const sortedFiles = fileIdsOrder.map(id => mergeFiles.find(f => f.id === id));
+
+                for (const fileWithId of sortedFiles) {
+                    // TR-P1: Use the pre-loaded buffer (slice to create a copy for pdf-lib)
+                    const pdf = await PDFDocument.load(fileWithId.buffer.slice(0), {
+                        ignoreEncryption: true
+                    });
+                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    copiedPages.forEach((page) => mergedPdf.addPage(page));
+                }
+
+                const mergedPdfBytes = await mergedPdf.save();
+                
+                // UX-P2: Use smart file name
+                const baseName = sortedFiles[0].file.name.replace(/\.pdf$/i, '');
+                const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+                showSuccessView('merge', blob, `${baseName}-merged.pdf`);
+            };
+
+
+            // ===============================================
+            // Tool 2: Delete Logic
+            // ===============================================
+
+            const resetDeleteTool = () => {
+                resetToolUI('delete'); // Refactored
+                activeFile = null; // UX-P2: Reset activeFile object
+                deletePages.clear();
+                document.getElementById('delete-file-input').value = '';
+                document.getElementById('delete-thumbnail-grid').innerHTML = '';
+                updateDeleteButton();
+            };
+
+            const updateDeleteButton = () => {
+                const btn = document.getElementById('delete-button');
+                const count = deletePages.size;
+                if (count === 0) {
+                    btn.disabled = true;
+                    btn.textContent = 'กรุณาเลือกหน้าที่จะลบ';
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = `ลบ ${count} หน้าที่เลือก`;
+                }
+            };
+
+            // TR-P2: This function is now the *target* of processFiles
+            const handleDeleteFileBuffer = (buffer, name) => {
+                // The loader is already handled by processFiles, just call withLoader
+                // to handle the *rendering* and error part.
+                withLoader(async () => {
+                    activeFile = { buffer: buffer, name: name };
+                    await renderPdfThumbnails(buffer, 'delete');
+                    resetToolUI('delete', 'edit'); // Show edit view
+                }, 'delete');
+            };
+
+            const doDelete = async () => {
+                // UX-P2: Check activeFile object
+                if (!activeFile || deletePages.size === 0) {
+                    showError('ไม่มีไฟล์หรือไม่ได้เลือกหน้าที่จะลบ');
+                    return;
+                }
+
+                const pdf = await PDFDocument.load(activeFile.buffer.slice(0), { ignoreEncryption: true });
+                const totalPages = pdf.getPageCount();
+                
+                if (deletePages.size >= totalPages) {
+                    showError('ไม่สามารถลบทุกหน้าได้ อย่างน้อยต้องเหลือ 1 หน้า');
+                    return;
+                }
+
+                const keptIndices = [];
+                for (let i = 0; i < totalPages; i++) {
+                    if (!deletePages.has(i)) {
+                        keptIndices.push(i);
+                    }
+                }
+                
+                const newPdf = await PDFDocument.create();
+                const copiedPages = await newPdf.copyPages(pdf, keptIndices);
+                copiedPages.forEach(page => newPdf.addPage(page));
+
+                const newPdfBytes = await newPdf.save();
+                
+                // UX-P2: Use smart file name
+                const baseName = activeFile.name.replace(/\.pdf$/i, '');
+                const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+                showSuccessView('delete', blob, `${baseName}-deleted.pdf`);
+            };
+
+
+            // ===============================================
+            // Tool 3: Rotate Logic
+            // ===============================================
+
+            const resetRotateTool = () => {
+                resetToolUI('rotate'); // Refactored
+                activeFile = null; // UX-P2: Reset activeFile object
+                rotateDegrees.clear();
+                document.getElementById('rotate-file-input').value = '';
+                document.getElementById('rotate-thumbnail-grid').innerHTML = '';
+                updateRotateButton();
+            };
+
+            const updateRotateButton = () => {
+                const btn = document.getElementById('rotate-button');
+                const count = rotateDegrees.size;
+                btn.textContent = (count === 0) ? 'ใช้การเปลี่ยนแปลงและดาวน์โหลด' : `หมุน ${count} หน้า & ดาวน์โหลด`;
+            };
+
+            // TR-P2: This function is now the *target* of processFiles
+            const handleRotateFileBuffer = (buffer, name) => {
+                withLoader(async () => {
+                    activeFile = { buffer: buffer, name: name };
+                    await renderPdfThumbnails(buffer, 'rotate');
+                    resetToolUI('rotate', 'edit'); // Show edit view
+                    document.getElementById('rotate-button').disabled = false;
+                }, 'rotate');
+            };
+
+            const doRotate = async () => {
+                // UX-P2: Check activeFile object
+                if (!activeFile) {
+                    showError('ไม่มีไฟล์ที่จะหมุน');
+                    return;
+                }
+
+                const pdf = await PDFDocument.load(activeFile.buffer.slice(0), { ignoreEncryption: true });
+
+                rotateDegrees.forEach((deg, index) => {
+                    if (deg > 0) {
+                        const page = pdf.getPage(index);
+                        const currentRotation = page.getRotation().angle;
+                        page.setRotation(degrees(currentRotation + deg)); // Fix: Add to existing rotation
+                    }
+                });
+
+                const newPdfBytes = await pdf.save();
+                
+                // UX-P2: Use smart file name
+                const baseName = activeFile.name.replace(/\.pdf$/i, '');
+                const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+                showSuccessView('rotate', blob, `${baseName}-rotated.pdf`);
+            };
+
+
+            // ===============================================
+            // Tool 4: Image to PDF Logic
+            // ===============================================
+
+            const resetImageTool = () => {
+                resetToolUI('image'); // Refactored
+                imageFiles = [];
+                document.getElementById('image-file-list').innerHTML = '<p id="image-empty-state" class="text-gray-500 text-sm">ยังไม่มีรูปภาพในรายการ</p>';
+                document.getElementById('image-file-input').value = '';
+                updateImageConvertButton();
+            };
+
+            const renderImageList = () => {
+                const list = document.getElementById('image-file-list');
+                const emptyState = document.getElementById('image-empty-state');
+                list.innerHTML = '';
+
+                if (imageFiles.length === 0) {
+                    list.appendChild(emptyState);
+                } else {
+                    imageFiles.forEach(file => {
+                        const item = document.createElement('div');
+                        item.className = "file-item";
+                        item.dataset.id = file.id;
+
+                        const preview = document.createElement('img');
+                        preview.src = URL.createObjectURL(file.file);
+                        preview.className = "w-10 h-10 object-cover rounded-sm mr-3 flex-shrink-0";
+                        preview.onload = () => URL.revokeObjectURL(preview.src);
+                        preview.setAttribute('aria-hidden', 'true'); // Decorative preview
+
+                        const info = document.createElement('div');
+                        info.className = "flex items-center overflow-hidden";
+                        info.appendChild(preview);
+
+                        const text = document.createElement('span');
+                        text.className = "font-medium text-sm truncate";
+                        text.title = file.file.name;
+                        text.textContent = file.file.name;
+                        info.appendChild(text);
+
+                        const controls = document.createElement('div');
+                        controls.className = "flex items-center";
+                        // C&R Fix: Added aria-label to reorder handle
+                        controls.innerHTML = `
+                            <button data-id="${file.id}" class="remove-image-btn text-red-500 hover:text-red-700 p-1" aria-label="ลบรูปภาพ ${file.file.name}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                            <svg class="w-5 h-5 text-gray-400 cursor-move ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="จัดลำดับใหม่"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        `;
+
+                        item.appendChild(info);
+                        item.appendChild(controls);
+                        list.appendChild(item);
+                    });
+                }
+                updateImageConvertButton();
+            };
+
+            const updateImageConvertButton = () => {
+                const btn = document.getElementById('image-convert-button');
+                const count = imageFiles.length;
+                if (count === 0) {
+                    btn.disabled = true;
+                    btn.textContent = 'กรุณาเลือกรูปภาพ';
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = `แปลง ${count} รูปภาพเป็น PDF`;
+                }
+            };
+
+            const handleImageFiles = (files) => {
+                for (const file of files) {
+                    if (file.type === 'image/jpeg' || file.type === 'image/png') {
+                        const fileWithId = {
+                            id: `image_${Date.now()}_${Math.random()}`,
+                            file: file
+                        };
+                        imageFiles.push(fileWithId);
+                    }
+                }
+                renderImageList();
+            };
+
+            // Production Readiness Fix: Make image conversion more robust
+            const doImageConvert = async () => {
+                const newPdf = await PDFDocument.create();
+
+                const imageIdsOrder = Array.from(document.querySelectorAll('#image-file-list .file-item')).map(item => item.dataset.id);
+                const sortedFiles = imageIdsOrder.map(id => imageFiles.find(f => f.id === id));
+
+                let errorCount = 0;
+                for (const fileWithId of sortedFiles) {
+                    try {
+                        const data = await readFileAsDataURL(fileWithId.file);
+                        let image;
+                        if (fileWithId.file.type === 'image/png') {
+                            image = await newPdf.embedPng(data);
+                        } else {
+                            image = await newPdf.embedJpg(data);
+                        }
+
+                        const page = newPdf.addPage([image.width, image.height]);
+                        page.drawImage(image, {
+                            x: 0,
+                            y: 0,
+                            width: image.width,
+                            height: image.height,
+                        });
+                    } catch (err) {
+                        console.error(`Failed to embed image ${fileWithId.file.name}:`, err);
+                        errorCount++;
+                    }
+                }
+
+                // Show a non-blocking error if some images failed
+                if (errorCount > 0) {
+                    showError(`ไม่สามารถแปลงรูปภาพได้ ${errorCount} รูป (อาจเสียหายหรือมีรูปแบบที่ไม่รองรับ)`);
+                }
+                
+                // If *all* images failed, stop here.
+                if (newPdf.getPageCount() === 0) {
+                    showError('ไม่สามารถสร้าง PDF ได้ เนื่องจากไม่สามารถประมวลผลรูปภาพได้เลย');
+                    return; // Stop, don't save an empty PDF
+                }
+
+                const newPdfBytes = await newPdf.save();
+                
+                // UX-P2: Use smart file name
+                const baseName = sortedFiles[0].file.name.replace(/\.(jpg|jpeg|png)$/i, '');
+                const blob = new Blob([newPdfBytes], { type: 'application/pdf' });
+                showSuccessView('image', blob, `${baseName}-converted.pdf`);
+            };
+
+
+            // ===============================================
+            // Event Listeners
+            // ===============================================
+            document.addEventListener('DOMContentLoaded', () => {
+                // --- Tab Navigation ---
+                const tabButtons = document.querySelectorAll('.tab-btn');
+                const tabPanels = document.querySelectorAll('.tab-panel');
+
+                tabButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        activeTab = btn.dataset.tab;
+
+                        tabButtons.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+
+                        // TR-P1: Fix tab switching logic
+                        tabPanels.forEach(p => {
+                            if (p.id === activeTab) {
+                                p.classList.remove('hidden'); // Show selected
+                            } else {
+                                p.classList.add('hidden'); // Hide others
+                            }
+                        });
+                    });
+                });
+
+                // --- Global Error Box ---
+                document.getElementById('error-close-btn').addEventListener('click', () => {
+                    document.getElementById('error-box').classList.add('hidden');
+                });
+
+                // --- Drop Zone & File Input Setup ---
+                const dropZones = [{
+                    id: 'merge-drop-zone',
+                    input: 'merge-file-input',
+                    handler: handleMergeFiles,
+                    type: 'pdf'
+                }, {
+                    id: 'delete-drop-zone',
+                    input: 'delete-file-input',
+                    handler: handleDeleteFileBuffer,
+                    type: 'pdf-single'
+                }, {
+                    id: 'rotate-drop-zone',
+                    input: 'rotate-file-input',
+                    handler: handleRotateFileBuffer,
+                    type: 'pdf-single'
+                }, {
+                    id: 'image-drop-zone',
+                    input: 'image-file-input',
+                    handler: handleImageFiles,
+                    type: 'image'
+                }, {
+                    id: 'merge-file-list',
+                    handler: handleMergeFiles,
+                    type: 'pdf'
+                }, {
+                    id: 'image-file-list',
+                    handler: handleImageFiles,
+                    type: 'image'
+                }];
+
+                dropZones.forEach(config => {
+                    setupDropZone(config.id, config.input, config.handler, config.type);
+                });
+
+                // --- Tool 1: Merge ---
+                document.getElementById('merge-button').addEventListener('click', () => {
+                    withLoader(doMerge, 'merge');
+                });
+
+                document.getElementById('merge-file-list').addEventListener('click', (e) => {
+                    const removeBtn = e.target.closest('.remove-file-btn');
+                    if (removeBtn) {
+                        const idToRemove = removeBtn.dataset.id;
+                        mergeFiles = mergeFiles.filter(f => f.id !== idToRemove);
+                        renderMergeList();
+                    }
+                });
+
+                sortableMerge = new Sortable(document.getElementById('merge-file-list'), {
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    handle: '.cursor-move' // C&R Fix: Specify handle for a11y
+                });
+
+                // --- Tool 2: Delete ---
+                document.getElementById('delete-cancel-btn').addEventListener('click', resetDeleteTool);
+                document.getElementById('delete-button').addEventListener('click', () => {
+                    withLoader(doDelete, 'delete');
+                });
+
+                document.getElementById('delete-select-all').addEventListener('click', () => {
+                    const grid = document.getElementById('delete-thumbnail-grid');
+                    const total = parseInt(grid.dataset.totalPages);
+                    
+                    if (deletePages.size + 1 >= total) {
+                         showError('ไม่สามารถลบทุกหน้าได้ อย่างน้อยต้องเหลือ 1 หน้า');
+                         return;
+                    }
+                    
+                    grid.querySelectorAll('.thumbnail-item').forEach(item => {
+                        if (deletePages.size + 1 < total) {
+                            item.classList.add('selected');
+                            deletePages.add(parseInt(item.dataset.pageIndex));
+                        }
+                    });
+                    updateDeleteButton();
+                });
+
+                document.getElementById('delete-deselect-all').addEventListener('click', () => {
+                    document.querySelectorAll('#delete-thumbnail-grid .thumbnail-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    deletePages.clear();
+                    updateDeleteButton();
+                });
+
+                document.getElementById('delete-invert-select').addEventListener('click', () => {
+                    const grid = document.getElementById('delete-thumbnail-grid');
+                    const total = parseInt(grid.dataset.totalPages);
+                    const items = grid.querySelectorAll('.thumbnail-item');
+                    const newDeletePages = new Set();
+
+                    items.forEach(item => {
+                        if (!item.classList.contains('selected')) {
+                            newDeletePages.add(parseInt(item.dataset.pageIndex));
+                        }
+                    });
+
+                    if (newDeletePages.size >= total) {
+                        showError('ไม่สามารถลบทุกหน้าได้ (การสลับจะทำให้เลือกทุกหน้า)');
+                        return;
+                    }
+                    
+                    deletePages = newDeletePages;
+                    items.forEach(item => {
+                        const pageIndex = parseInt(item.dataset.pageIndex);
+                        item.classList.toggle('selected', deletePages.has(pageIndex));
+                    });
+                    
+                    updateDeleteButton();
+                });
+
+                // --- Tool 3: Rotate ---
+                document.getElementById('rotate-cancel-btn').addEventListener('click', resetRotateTool);
+                document.getElementById('rotate-button').addEventListener('click', () => {
+                    withLoader(doRotate, 'rotate');
+                });
+
+                const rotateAll = (deg) => {
+                    const grid = document.getElementById('rotate-thumbnail-grid');
+                    grid.querySelectorAll('.thumbnail-item').forEach(item => {
+                        const pageIndex = parseInt(item.dataset.pageIndex);
+                        const currentRotation = rotateDegrees.get(pageIndex) || 0;
+                        const newRotation = (currentRotation + deg + 360) % 360;
+                        rotateDegrees.set(pageIndex, newRotation);
+
+                        const canvas = item.querySelector('canvas');
+                        canvas.style.transform = `rotate(${newRotation}deg)`;
+                    });
+                    updateRotateButton();
+                };
+
+                document.getElementById('rotate-all-left').addEventListener('click', () => rotateAll(-90));
+                document.getElementById('rotate-all-right').addEventListener('click', () => rotateAll(90));
+
+                // --- Tool 4: Image ---
+                document.getElementById('image-convert-button').addEventListener('click', () => {
+                    withLoader(doImageConvert, 'image');
+                });
+
+                document.getElementById('image-file-list').addEventListener('click', (e) => {
+                    const removeBtn = e.target.closest('.remove-image-btn');
+                    if (removeBtn) {
+                        const idToRemove = removeBtn.dataset.id;
+                        imageFiles = imageFiles.filter(f => f.id !== idToRemove);
+                        renderImageList();
+                    }
+                });
+
+                sortableImage = new Sortable(document.getElementById('image-file-list'), {
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    handle: '.cursor-move' // C&R Fix: Specify handle for a11y
+                });
+
+            }); // End DOMContentLoaded
+
+            /**
+             * TR-FIX (Robustness): Centralized Drop Zone Setup
+             */
+            const setupDropZone = (zoneId, inputId, fileHandler, type) => {
+                const dropZone = document.getElementById(zoneId);
+                const fileInput = document.getElementById(inputId);
+
+                if (fileInput) {
+                    // C&R Fix: Make dropzone keyboard accessible
+                    dropZone.setAttribute('tabindex', '0');
+                    dropZone.setAttribute('role', 'button');
+                    dropZone.setAttribute('aria-label', 'คลิกหรือลากไฟล์มาวางที่นี่เพื่ออัปโหลด');
+
+                    dropZone.addEventListener('click', (e) => {
+                        if (e.target.closest('button') || e.target.closest('svg.cursor-move')) return;
+                        fileInput.click();
+                    });
+                    
+                    dropZone.addEventListener('keyup', (e) => {
+                         if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            if (e.target.closest('button') || e.target.closest('svg.cursor-move')) return;
+                            fileInput.click();
+                         }
+                    });
+
+                    fileInput.addEventListener('change', (e) => {
+                        const files = e.target.files;
+                        processFiles(files, fileHandler, type);
+                    });
+                }
+                
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-over');
+                });
+
+                dropZone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+                });
+
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+                    const files = e.dataTransfer.files;
+                    processFiles(files, fileHandler, type);
+                });
+            };
+            
+            /**
+             * TR-P1 & TR-P2 Refactor: Centralized file processing
+             * Now reads PDF files into buffers immediately.
+             */
+            const processFiles = async (files, fileHandler, type) => {
+                // TR-P1: Refactored 'pdf' type to read buffers immediately
+                if (type === 'pdf') {
+                    const pdfFiles = Array.from(files).filter(f => f.type === 'application/pdf');
+                    if (pdfFiles.length === 0) {
+                        showError('กรุณาเลือกไฟล์ PDF เท่านั้น');
+                        return;
+                    }
+                    
+                    showLoader();
+                    try {
+                        const fileObjects = await Promise.all(pdfFiles.map(async (file) => {
+                            const buffer = await readFileAsArrayBuffer(file);
+                            return {
+                                id: `file_${Date.now()}_${Math.random()}`,
+                                file: file, // Keep original file for size/name
+                                buffer: buffer // Store the buffer
+                            };
+                        }));
+                        fileHandler(fileObjects);
+                    } catch (err) {
+                        console.error(err);
+                        showError(`ไม่สามารถอ่านไฟล์ได้: ${err.message}`);
+                    } finally {
+                        hideLoader();
+                    }
+                } 
+                else if (type === 'image') {
+                    const imgFiles = Array.from(files).filter(f => f.type === 'image/jpeg' || f.type === 'image/png');
+                    if (imgFiles.length > 0) {
+                        fileHandler(imgFiles); // Image handler doesn't need pre-read
+                    } else {
+                        showError('กรุณาเลือกไฟล์ .jpg หรือ .png เท่านั้น');
+                    }
+                }
+                // TR-P2: Refactored 'pdf-single'
+                else if (type === 'pdf-single') {
+                    if (files.length !== 1) {
+                        showError('กรุณาเลือกไฟล์ PDF เพียงไฟล์เดียว');
+                        return;
+                    }
+                    const file = files[0];
+                    if (file.type !== 'application/pdf') {
+                        showError('กรุณาเลือกไฟล์ PDF เท่านั้น');
+                        return;
+                    }
+                    
+                    // TR-P2: Read file first, THEN pass to handler
+                    showLoader();
+                    try {
+                        const buffer = await readFileAsArrayBuffer(file);
+                        // Pass buffer and name to the handler, which will call its own withLoader
+                        fileHandler(buffer, file.name); 
+                    } catch (err) {
+                        console.error(err);
+                        showError(`ไม่สามารถอ่านไฟล์ได้: ${err.message}`);
+                    } finally {
+                        hideLoader();
+                    }
+                }
+            };
+
+        })(); // End IIFE
+    </script>
+</body>
+</html>
