@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Lucky Claw - เกมตู้คีบสุ่มรางวัล</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Bungee Font (Pixel/Arcade Font) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+    
+    <!-- Tone.js (For SFX/BGM) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    
+    <style>
+        /* ใช้ฟอนต์ Bungee เป็นหลัก */
+        body, html {
+            font-family: 'Bungee', cursive;
+            overscroll-behavior: none;
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* ป้องกันการเลื่อนหน้าจอ */
+            
+            /* --- พื้นหลังอวกาศ (Arcade Space BG) --- */
+            background-color: #0c0a1a; /* Dark space purple */
+            background-image: radial-gradient(circle at 10% 20%, #fff 1px, transparent 2px),
+                              radial-gradient(circle at 50% 70%, #fff 1px, transparent 2px),
+                              radial-gradient(circle at 80% 30%, #fff 1px, transparent 2px);
+            background-size: 100vw 100vh;
+            animation: space-scroll 60s linear infinite;
+            touch-action: none; /* ป้องกันการซูมและเลื่อนในมือถือ */
+        }
+
+        /* --- Animation สำหรับ BG --- */
+        @keyframes space-scroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100vh; }
+        }
+
+        /* ซ่อน scrollbar */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* เอฟเฟกต์ไฟกระพริบที่หัวตู้ */
+        @keyframes flicker {
+            0%, 100% { text-shadow: 0 0 5px #ff00de, 0 0 10px #ff00de, 0 0 20px #ff00de; color: #fff; }
+            50% { text-shadow: 0 0 5px #ff00de, 0 0 10px #ff00de; color: #f0f0f0; }
+        }
+        .arcade-flicker {
+            animation: flicker 1.5s infinite;
+        }
+
+        /* ปุ่มกดสไตล์อาเขต */
+        .arcade-button {
+            border-bottom-width: 8px;
+            transition: all 0.1s ease;
+            /* --- เพิ่มเงาข้อความและ transition สำหรับ hover --- */
+            text-shadow: 0 0 3px rgba(255,255,255,0.5);
+            transition: all 0.1s ease, box-shadow 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .arcade-button:active {
+            transform: translateY(4px);
+            border-bottom-width: 4px;
+        }
+        /* --- เพิ่มเอฟเฟกต์ hover --- */
+        .arcade-button:hover:not(:active) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        
+        /* ปรับปุ่มสำหรับหน้าจอมือถือ */
+        @media (max-width: 640px) {
+            .arcade-button {
+                border-bottom-width: 4px;
+            }
+            .arcade-button:active {
+                transform: translateY(2px);
+                border-bottom-width: 2px;
+            }
+        }
+
+        /* --- เพิ่ม Neon Glows สำหรับปุ่มหลัก --- */
+        #start-button:hover:not(:active), #start-button {
+            box-shadow: 0 0 10px #f59e0b, 0 0 20px #f59e0b;
+        }
+        #grab-button:hover:not(:active), #grab-button {
+            box-shadow: 0 0 10px #ef4444, 0 0 20px #ef4444;
+        }
+        #shuffle-button:hover:not(:active), #shuffle-button {
+            box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6;
+        }
+
+
+        /* ตู้คีบ */
+        #claw {
+            position: absolute;
+            top: 0;
+            left: 50%; /* จะถูกควบคุมโดย JS */
+            width: 40px;
+            transform: translateX(-50%);
+            transition: transform 0.2s linear;
+            z-index: 20;
+        }
+        #claw-arm {
+            width: 8px;
+            height: 80px; /* ความสูงของสายเริ่มต้น */
+            /* --- Metallic Gradient --- */
+            background: linear-gradient(to right, #9ca3af 0%, #e5e7eb 50%, #9ca3af 100%);
+            margin: 0 auto;
+            position: relative;
+            transition: height 1s ease-in-out;
+        }
+        #claw-hand {
+            width: 40px;
+            height: 20px;
+            /* --- Metallic Gradient --- */
+            background: linear-gradient(to top, #9ca3af 0%, #d1d5db 100%);
+            border-radius: 5px 5px 10px 10px; /* --- Tweak shape --- */
+            position: absolute;
+            bottom: 0;
+            left: -16px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 5px;
+            box-sizing: border-box;
+            /* --- visible เพื่อให้เห็นลูกบอลตอน Reparent --- */
+            overflow: visible;
+        }
+        /* แขนคีบ (ซ้าย/ขวา) */
+        /* --- ปรับปรุงกรงเล็บให้โค้งและเป็นโลหะ --- */
+        #claw-hand::before, #claw-hand::after {
+            content: '';
+            width: 8px; /* Thicker */
+            height: 35px; /* --- ยาวขึ้นเพื่อให้ครอบลูกบอลได้ลึกขึ้น --- */
+            background: linear-gradient(to bottom, #9ca3af 0%, #d1d5db 100%);
+            border-radius: 5px 5px 10px 10px; /* Rounded tip */
+            transform: rotate(30deg);
+            transition: transform 0.3s ease-in-out;
+            position: absolute;
+            bottom: -15px; /* --- ยื่นลงไปข้างล่างมากขึ้น --- */
+            transform-origin: top center;
+            z-index: 10; /* บังลูกบอลเล็กน้อยเพื่อให้ดูเหมือนจับอยู่ */
+        }
+        #claw-hand::before {
+            left: 5px;
+        }
+        #claw-hand::after {
+            right: 5px;
+            transform: rotate(-30deg);
+        }
+        /* แอนิเมชันตอนคีบ */
+        #claw.grabbing #claw-hand::before {
+            transform: rotate(10deg); /* --- Tighter grab --- */
+        }
+        #claw.grabbing #claw-hand::after {
+            transform: rotate(-10deg); /* --- Tighter grab --- */
+        }
+
+        /* ลูกบอลรางวัล */
+        .prize-ball {
+            width: 45px; /* เล็กลงเล็กน้อยเพื่อให้พอดีมือถือ */
+            height: 45px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin: 0 4px;
+            /* --- ปรับปรุง gradient ให้แวววาว --- */
+            background-image: radial-gradient(circle at 30% 25%, 
+                                  rgba(255,255,255,0.9) 0%, 
+                                  rgba(255,255,255,0.4) 10%, 
+                                  transparent 40%),
+                              radial-gradient(circle at 70% 80%, 
+                                  rgba(0,0,0,0.3) 0%, 
+                                  transparent 30%);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, opacity 0.5s ease;
+        }
+        @media (min-width: 768px) {
+            .prize-ball { width: 50px; height: 50px; margin: 0 5px; }
+        }
+
+        /* ช่องรับรางวัล */
+        #drop-zone {
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            width: 60px;
+            height: 60px;
+            background: rgba(0,0,0,0.5);
+            border: 4px dashed #4b5563;
+            border-radius: 10px;
+            z-index: 10;
+        }
+        @media (min-width: 768px) {
+            #drop-zone { width: 80px; height: 80px; }
+        }
+        
+        /* --- เพิ่มคลาสสำหรับแผงควบคุม --- */
+        .control-deck {
+            background: linear-gradient(to bottom, #6b7280 0%, #4b5563 20%, #374151 100%);
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.3); /* Inner shadow for depth */
+        }
+
+        /* พลุ Confetti */
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f00; /* สีจะถูกสุ่มโดย JS */
+            top: 0;
+            left: 50%;
+            opacity: 0;
+            animation: fall 3s linear forwards;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        /* --- ปรับแต่งสำหรับหน้าจอแนวนอนบนมือถือ (Landscape) --- */
+        @media (max-height: 500px) and (orientation: landscape) {
+            header { padding: 2px !important; border-bottom-width: 2px !important; }
+            header h1 { font-size: 1.2rem !important; }
+            .prize-ball { width: 35px; height: 35px; }
+            #prize-area { height: 80px !important; }
+            #claw-arm { height: 40px; } /* เริ่มต้นสั้นลง */
+            #drop-zone { width: 50px; height: 50px; }
+            .control-deck { height: auto !important; padding: 0.5rem !important; min-height: auto !important; }
+            .control-deck .arcade-button { width: 3rem !important; height: 3rem !important; font-size: 1rem !important; border-bottom-width: 3px !important; }
+            .control-deck .arcade-button:active { border-bottom-width: 1px !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white h-screen flex items-center justify-center overflow-hidden relative">
+
+    <!-- 
+      =================================
+      หน้าจอตั้งค่า (Setup Screen)
+      =================================
+    -->
+    <div id="setup-screen" class="w-11/12 max-w-lg p-6 md:p-8 bg-gray-800 bg-opacity-90 border-4 border-pink-500 rounded-lg shadow-lg backdrop-blur-sm z-30 flex flex-col" style="box-shadow: 0 0 20px #ff00de; border-color: #ff00de;">
+        <h1 class="text-3xl md:text-5xl text-center arcade-flicker mb-4 md:mb-6">THE LUCKY CLAW</h1>
+        <p class="text-center text-gray-300 mb-2 md:mb-4 text-xs md:text-base">ใส่รายการที่จะสุ่ม (1 รายการต่อบรรทัด หรือคั่นด้วยลูกน้ำ ,)</p>
+        
+        <textarea id="item-input" class="w-full h-32 md:h-40 bg-gray-900 border-2 border-purple-500 rounded-lg p-3 text-white font-mono text-base md:text-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500 shadow-inner resize-none" placeholder="ไอเทม 1&#10;ไอเทม 2&#10;ไอเทม 3, ไอเทม 4"></textarea>
+        
+        <button id="start-button" class="arcade-button w-full mt-4 md:mt-6 bg-yellow-500 border-yellow-700 text-gray-900 text-xl md:text-2xl py-2 md:py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-transform transform hover:scale-105">
+            🪙 หยอดเหรียญ!
+        </button>
+        <p id="setup-error" class="text-red-500 text-center mt-3 hidden font-bold animate-bounce text-sm">ต้องมีอย่างน้อย 1 รายการ!</p>
+    </div>
+
+    <!-- 
+      =================================
+      Footer Credit (Visible Always)
+      =================================
+    -->
+    <div class="fixed bottom-1 left-0 w-full text-center z-50 pointer-events-none opacity-60" style="text-shadow: 1px 1px 2px #000;">
+        <p class="text-[10px] md:text-xs text-gray-400 font-sans tracking-wider">
+            &copy; developed by Tle Narongphisit | CTTC Suratthani @ CPD
+        </p>
+    </div>
+
+    <!-- 
+      =================================
+      หน้าจอเกม (Game Screen)
+      =================================
+    -->
+    <div id="game-screen" class="w-full h-full flex flex-col hidden bg-gray-900" style="background-color: #1a1a2e;">
+        
+        <!-- ส่วนหัวตู้ (Header) -->
+        <header class="text-center py-2 bg-gray-800 border-b-4 border-gray-700 relative shadow-lg z-10 shrink-0">
+            <h1 class="text-2xl md:text-3xl arcade-flicker">THE LUCKY CLAW</h1>
+            <!-- ไฟประดับ -->
+            <div class="absolute top-2 left-2 w-2 h-2 md:w-3 md:h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_#ef4444]"></div>
+            <div class="absolute top-2 left-6 md:left-8 w-2 h-2 md:w-3 md:h-3 bg-yellow-500 rounded-full animate-pulse [animation-delay:0.2s] shadow-[0_0_10px_#eab308]"></div>
+            <div class="absolute top-2 right-2 w-2 h-2 md:w-3 md:h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_#ef4444]"></div>
+            <div class="absolute top-2 right-6 md:right-8 w-2 h-2 md:w-3 md:h-3 bg-yellow-500 rounded-full animate-pulse [animation-delay:0.2s] shadow-[0_0_10px_#eab308]"></div>
+        </header>
+
+        <!-- แผงควบคุมด้านบน (Top Controls) -->
+        <div class="bg-gray-800 p-1 md:p-2 flex justify-between items-center text-sm border-b-2 border-gray-700 z-10 shrink-0">
+            <div class="flex gap-1 md:gap-2">
+                <button id="history-button" class="p-2 hover:bg-gray-700 rounded-lg text-blue-300 hover:text-white transition-colors" title="ประวัติ (History)">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002-2h2a2 2 0 002 2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                </button>
+                <button id="remaining-button" class="p-2 hover:bg-gray-700 rounded-lg text-green-300 hover:text-white transition-colors" title="รายการคงเหลือ (Remaining)">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                </button>
+            </div>
+            <div class="flex gap-1 md:gap-2">
+                <button id="settings-button" class="p-2 hover:bg-gray-700 rounded-lg text-gray-300 hover:text-white transition-colors" title="ตั้งค่า (Settings)">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+                <button id="mute-button" class="p-2 hover:bg-gray-700 rounded-lg text-gray-300 hover:text-white transition-colors" title="ปิดเสียง (Mute)">
+                    <!-- ไอคอนจะถูกสลับโดย JS -->
+                </button>
+            </div>
+        </div>
+
+        <!-- 
+          ส่วนตู้เกม (Game Area)
+        -->
+        <!-- --- เปลี่ยน BG และลบ border-b (ย้ายไป CSS) --- -->
+        <div id="game-viewport" class="flex-1 bg-blue-900 bg-opacity-30 relative overflow-hidden" style="background: linear-gradient(to bottom, #1e3a8a 0%, #111827 100%); box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
+            
+            <!-- ตัวคีบ -->
+            <div id="claw">
+                <div id="claw-arm">
+                    <div id="claw-hand"></div>
+                </div>
+            </div>
+
+            <!-- Tooltip แสดงชื่อไอเทม -->
+            <div id="claw-tooltip" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-70 text-white px-3 py-1 rounded-md text-xs md:text-sm whitespace-nowrap z-30 transition-all duration-100 opacity-0 border border-white/20 backdrop-blur-sm pointer-events-none">
+                เล็ง: ...
+            </div>
+
+            <!-- พื้นที่วางรางวัล -->
+            <div id="prize-area" class="absolute bottom-0 left-0 right-0 h-24 md:h-32 flex items-center p-2 md:p-4 overflow-x-auto">
+                <!-- บอลรางวัลจะถูกสร้างโดย JS -->
+            </div>
+            
+            <!-- ช่องรับรางวัล -->
+            <div id="drop-zone" class="flex items-center justify-center">
+                <span class="text-gray-400 text-[10px] md:text-sm rotate-[-15deg] opacity-70">ช่องรับรางวัล</span>
+            </div>
+
+            <!-- เอฟเฟกต์สั่น (สำหรับ Shuffle) -->
+            <div id="shake-overlay" class="absolute inset-0 z-50 pointer-events-none"></div>
+            
+            <!-- Confetti container -->
+            <div id="confetti-container" class="absolute inset-0 z-50 pointer-events-none overflow-hidden"></div>
+        </div>
+
+        <!-- 
+          แผงควบคุม (Control Deck)
+        -->
+        <!-- --- ปรับ responsive layout --- -->
+        <div class="control-deck p-2 md:p-4 h-auto min-h-[130px] md:min-h-[160px] shadow-inner z-20 flex flex-col justify-center shrink-0 pb-6">
+            <div class="flex justify-between items-center w-full max-w-lg mx-auto gap-2">
+                <!-- ปุ่มบังคับทิศทาง -->
+                <div class="flex gap-2 md:gap-4">
+                    <button id="move-left" class="arcade-button w-16 h-16 md:w-24 md:h-24 bg-gray-800 border-gray-900 rounded-full text-2xl md:text-4xl text-white flex items-center justify-center active:scale-95">
+                        ◀️
+                    </button>
+                    <button id="move-right" class="arcade-button w-16 h-16 md:w-24 md:h-24 bg-gray-800 border-gray-900 rounded-full text-2xl md:text-4xl text-white flex items-center justify-center active:scale-95">
+                        ▶️
+                    </button>
+                </div>
+                
+                <!-- ปุ่ม 'กวน' และ 'คีบ' -->
+                <div class="flex gap-2 md:gap-4">
+                    <button id="shuffle-button" class="arcade-button w-14 h-14 md:w-24 md:h-24 bg-blue-500 border-blue-700 rounded-full text-sm md:text-xl text-white flex flex-col items-center justify-center leading-tight active:scale-95">
+                        <span class="text-lg md:text-2xl">🌀</span>
+                        <span class="text-[10px] md:text-base">กวน</span>
+                    </button>
+                    <button id="grab-button" class="arcade-button w-16 h-16 md:w-24 md:h-24 bg-red-500 border-red-700 rounded-full text-lg md:text-2xl text-white flex flex-col items-center justify-center leading-tight active:scale-95">
+                        <span class="text-xl md:text-3xl">👇</span>
+                        <span class="text-xs md:text-base">คีบ!</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 
+      =================================
+      Modals
+      =================================
+    -->
+
+    <!-- Modal พื้นหลัง (Overlay) -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-40 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+
+        <!-- Jackpot Modal -->
+        <div id="jackpot-modal" class_template="bg-gray-800 border-4 border-yellow-400 rounded-lg p-6 max-w-sm w-full text-center shadow-[0_0_30px_rgba(234,179,8,0.3)] relative" class="hidden">
+            <h2 class="text-3xl md:text-4xl text-yellow-300 mb-4 arcade-flicker">🏆 JACKPOT! 🏆</h2>
+            <p class="text-base md:text-lg mb-2 text-gray-300">คุณคีบได้:</p>
+            <p id="won-item-display" class="text-xl md:text-3xl text-white bg-gray-900 border border-gray-600 p-3 md:p-4 rounded-lg mb-6 truncate shadow-inner"></p>
+            
+            <div class="flex flex-col gap-2 md:gap-3">
+                <button id="claim-button" class="arcade-button bg-green-500 border-green-700 text-white py-2 md:py-3 rounded-lg text-base md:text-lg font-bold hover:brightness-110">รับรางวัล (นำออก)</button>
+                <button id="cancel-button" class="arcade-button bg-gray-600 border-gray-800 text-gray-200 py-2 md:py-3 rounded-lg text-base md:text-lg hover:brightness-110">ยกเลิก (เก็บไว้)</button>
+                <button id="reset-button" class="arcade-button bg-red-500 border-red-700 text-white py-2 rounded-lg text-xs md:text-sm mt-2 hover:brightness-110">เริ่มใหม่ทั้งหมด</button>
+            </div>
+        </div>
+
+        <!-- History Modal -->
+        <div id="history-modal" class_template="bg-gray-800 border-4 border-blue-400 rounded-lg p-6 max-w-sm w-full shadow-lg relative flex flex-col max-h-[80vh]" class="hidden">
+            <h2 class="text-2xl md:text-3xl text-blue-300 mb-4 text-center">📋 ประวัติ</h2>
+            <div id="history-list" class="flex-1 overflow-y-auto bg-gray-900 rounded-lg p-3 text-base md:text-lg font-mono border border-gray-700">
+                <!-- รายการจะถูกเพิ่มโดย JS -->
+            </div>
+            <button class="modal-close-button arcade-button bg-gray-600 border-gray-800 text-white py-2 px-4 rounded-lg text-lg mt-4 w-full hover:bg-gray-500">ปิด</button>
+        </div>
+
+        <!-- Remaining Modal -->
+        <div id="remaining-modal" class_template="bg-gray-800 border-4 border-green-400 rounded-lg p-6 max-w-sm w-full shadow-lg relative flex flex-col max-h-[80vh]" class="hidden">
+            <h2 class="text-2xl md:text-3xl text-green-300 mb-4 text-center">📝 รายการคงเหลือ</h2>
+            <div id="remaining-list" class="flex-1 overflow-y-auto bg-gray-900 rounded-lg p-3 text-base md:text-lg font-mono border border-gray-700">
+                <!-- รายการจะถูกเพิ่มโดย JS -->
+            </div>
+            <button class="modal-close-button arcade-button bg-gray-600 border-gray-800 text-white py-2 px-4 rounded-lg text-lg mt-4 w-full hover:bg-gray-500">ปิด</button>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class_template="bg-gray-800 border-4 border-gray-400 rounded-lg p-6 max-w-sm w-full shadow-lg relative" class="hidden">
+            <h2 class="text-2xl md:text-3xl text-gray-300 mb-6 text-center">⚙️ ตั้งค่า</h2>
+            <div class="space-y-4 text-base md:text-lg">
+                <label class="flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer">
+                    <span>ลดการเคลื่อนไหว</span>
+                    <input id="reduce-motion-toggle" type="checkbox" class="form-checkbox h-5 w-5 md:h-6 md:w-6 text-pink-500 bg-gray-900 border-gray-600 rounded focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-gray-800">
+                </label>
+                <label class="flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer">
+                    <span>เพลงพื้นหลัง (BGM)</span>
+                    <input id="bgm-toggle" type="checkbox" class="form-checkbox h-5 w-5 md:h-6 md:w-6 text-pink-500 bg-gray-900 border-gray-600 rounded focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-gray-800">
+                </label>
+                <label class="flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer">
+                    <span>เสียงเอฟเฟกต์ (SFX)</span>
+                    <input id="sfx-toggle" type="checkbox" class="form-checkbox h-5 w-5 md:h-6 md:w-6 text-pink-500 bg-gray-900 border-gray-600 rounded focus:ring-pink-500 focus:ring-offset-0 focus:ring-offset-gray-800">
+                </label>
+            </div>
+            <button class="modal-close-button arcade-button bg-gray-600 border-gray-800 text-white py-2 px-4 rounded-lg text-lg mt-6 w-full hover:bg-gray-500">ปิด</button>
+        </div>
+
+        <!-- Message Modal (สำหรับ "Missed!", etc.) -->
+        <div id="message-modal" class_template="bg-red-800 border-4 border-red-400 rounded-lg p-6 md:p-8 max-w-sm w-full text-center shadow-lg backdrop-blur-md bg-opacity-90" class="hidden">
+            <h2 id="message-text" class="text-3xl md:text-4xl drop-shadow-md">...</h2>
+        </div>
+
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- DOM Elements ---
+            const setupScreen = document.getElementById('setup-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const itemInput = document.getElementById('item-input');
+            const startButton = document.getElementById('start-button');
+            const setupError = document.getElementById('setup-error');
+            
+            const claw = document.getElementById('claw');
+            const clawArm = document.getElementById('claw-arm');
+            const clawHand = document.getElementById('claw-hand');
+            const clawTooltip = document.getElementById('claw-tooltip');
+            const prizeArea = document.getElementById('prize-area');
+            const dropZone = document.getElementById('drop-zone');
+            const gameViewport = document.getElementById('game-viewport');
+            
+            const moveLeftButton = document.getElementById('move-left');
+            const moveRightButton = document.getElementById('move-right');
+            const grabButton = document.getElementById('grab-button');
+            const shuffleButton = document.getElementById('shuffle-button');
+
+            const historyButton = document.getElementById('history-button');
+            const remainingButton = document.getElementById('remaining-button');
+            const settingsButton = document.getElementById('settings-button');
+            const muteButton = document.getElementById('mute-button');
+
+            const modalOverlay = document.getElementById('modal-overlay');
+            const allModals = modalOverlay.querySelectorAll('[id$="-modal"]');
+            const jackpotModal = document.getElementById('jackpot-modal');
+            const historyModal = document.getElementById('history-modal');
+            const remainingModal = document.getElementById('remaining-modal');
+            const settingsModal = document.getElementById('settings-modal');
+            const messageModal = document.getElementById('message-modal');
+            const messageText = document.getElementById('message-text');
+
+            const wonItemDisplay = document.getElementById('won-item-display');
+            const claimButton = document.getElementById('claim-button');
+            const cancelButton = document.getElementById('cancel-button');
+            const resetButton = document.getElementById('reset-button');
+            const modalCloseButtons = document.querySelectorAll('.modal-close-button');
+
+            const historyList = document.getElementById('history-list');
+            const remainingList = document.getElementById('remaining-list');
+            
+            const reduceMotionToggle = document.getElementById('reduce-motion-toggle');
+            const bgmToggle = document.getElementById('bgm-toggle');
+            const sfxToggle = document.getElementById('sfx-toggle');
+            const confettiContainer = document.getElementById('confetti-container');
+
+            // --- Game State ---
+            let gameState = 'setup'; // 'setup', 'playing', 'grabbing', 'modal'
+            let allItems = [];
+            let remainingItems = []; // { id, name, color, element }
+            let claimedItems = [];
+            let currentItemWon = null;
+            let clawPosition = 0; // 0 (left) to 100 (right) in %
+            let targetBall = null; // The DOM element of the ball being targeted
+
+            // --- Settings ---
+            let settings = {
+                reduceMotion: false,
+                bgm: true,
+                sfx: true,
+                muteAll: false
+            };
+
+            // --- Audio (Tone.js) ---
+            let audioReady = false;
+            let bgmLoop, sfxMove, sfxGrabDown, sfxGrabUp, sfxWin, sfxMiss, sfxShuffle, sfxClick, sfxConfetti;
+            let bgmSynth; // <--- เพิ่มตัวแปรสำหรับ BGM synth
+
+            const speakerIcon = `<svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 11.586l-4.243 4.243M12 11.586l4.243 4.243M12 11.586l-4.243-4.243M12 11.586l4.243-4.243m-2.264 2.264a1 1 0 11-1.414-1.414 1 1 0 011.414 1.414z"></path></svg>`;
+            const muteIcon = `<svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.707 0v16.414a1 1 0 01-1.707 0L5.586 15z"></path></svg>`;
+            muteButton.innerHTML = speakerIcon; // Start with sound on
+
+            async function setupAudio() {
+                if (audioReady) return;
+                try {
+                    await Tone.start();
+                    
+                    const gain = new Tone.Gain(0.5).toDestination();
+                    
+                    bgmSynth = new Tone.PolySynth(Tone.Synth).connect(gain); // <--- เปลี่ยนเป็น PolySynth เพื่อแก้ปัญหา timing
+                    
+                    bgmLoop = new Tone.Loop(time => {
+                        // const synth = new Tone.Synth().connect(gain); // <--- ลบการสร้าง synth ใหม่
+                        bgmSynth.triggerAttackRelease("C3", "8n", time); // <--- ใช้ bgmSynth ที่มีอยู่
+                        bgmSynth.triggerAttackRelease("E3", "8n", time + "+4n"); // <--- ใช้ bgmSynth ที่มีอยู่
+                        bgmSynth.triggerAttackRelease("G3", "8n", time + "+2n"); // <--- ใช้ bgmSynth ที่มีอยู่
+                        bgmSynth.triggerAttackRelease("E3", "8n", time + "+2n+4n"); // <--- ใช้ bgmSynth ที่มีอยู่
+                    }, "1n");
+                    
+                    sfxMove = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.01, decay: 0.05, sustain: 0, release: 0.1 } }).connect(gain);
+                    sfxGrabDown = new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.01, decay: 0.5, sustain: 0.1, release: 0.1 } }).connect(gain);
+                    sfxGrabUp = new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.1, decay: 0.5, sustain: 0.1, release: 0.01 } }).connect(gain);
+                    sfxWin = new Tone.Synth().connect(gain);
+                    sfxMiss = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.1 } }).connect(gain);
+                    sfxShuffle = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.01, decay: 0.3, sustain: 0, release: 0.1 } }).connect(gain);
+                    sfxClick = new Tone.MembraneSynth({ envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 } }).connect(gain);
+                    sfxConfetti = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.1 } }).connect(gain);
+
+                    Tone.Transport.start();
+                    audioReady = true;
+                    console.log("Audio ready.");
+                } catch (e) {
+                    console.error("Audio failed to start:", e);
+                }
+            }
+            
+            // --- Audio Playback ---
+            function playBGM(play) {
+                if (!audioReady) return;
+                if (play && settings.bgm && !settings.muteAll) {
+                    if (bgmLoop.state !== 'started') {
+                        bgmLoop.start(0);
+                    }
+                } else {
+                    if (bgmLoop.state === 'started') {
+                        bgmLoop.stop();
+                    }
+                }
+            }
+
+            function playSFX(sfx, note, time) {
+                if (!audioReady || !settings.sfx || settings.muteAll) return;
+                try {
+                    switch(sfx) {
+                        case 'move': sfxMove.triggerAttackRelease('C5', '16n'); break;
+                        case 'grabDown': sfxGrabDown.triggerAttackRelease('C3', '1s'); break;
+                        case 'grabUp': sfxGrabUp.triggerAttackRelease('C4', '1s'); break;
+                        case 'win':
+                            const now = Tone.now(); // <--- เก็บเวลาปัจจุบัน
+                            sfxWin.triggerAttackRelease("C5", "8n", now);
+                            sfxWin.triggerAttackRelease("E5", "8n", now + 0.2); // <--- บวกเวลาจากตัวแปร
+                            sfxWin.triggerAttackRelease("G5", "8n", now + 0.4); // <--- บวกเวลาจากตัวแปร
+                            sfxWin.triggerAttackRelease("C6", "4n", now + 0.6); // <--- บวกเวลาจากตัวแปร
+                            break;
+                        case 'miss':
+                            const missTime = Tone.now(); // <--- เก็บเวลาปัจจุบัน
+                            sfxMiss.triggerAttackRelease("G3", "4n", missTime);
+                            sfxMiss.triggerAttackRelease("C3", "4n", missTime + 0.2); // <--- บวกเวลาจากตัวแปร
+                            break;
+                        case 'shuffle': sfxShuffle.triggerAttackRelease("2n"); break;
+                        case 'click': sfxClick.triggerAttackRelease('C2', '8n'); break;
+                        case 'confetti': sfxConfetti.triggerAttackRelease('C6', '16n'); break;
+                    }
+                } catch (e) {
+                    console.error("SFX Error:", e);
+                }
+            }
+
+            // --- Game Flow ---
+            function startGame() {
+                playSFX('click');
+                const input = itemInput.value;
+                const items = input.split(/[\n,]/)
+                                  .map(item => item.trim())
+                                  .filter(item => item.length > 0);
+                
+                if (items.length === 0) {
+                    setupError.classList.remove('hidden');
+                    return;
+                }
+                
+                setupError.classList.add('hidden');
+                allItems = [...items];
+                claimedItems = [];
+                remainingItems = allItems.map((name, index) => ({
+                    id: index,
+                    name: name,
+                    color: getRandomColor(),
+                    element: null // Will be set in renderBalls
+                }));
+                
+                setupScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+                gameState = 'playing';
+                clawPosition = 50; // Start at 50%
+                updateClawPosition(true); // Force instant update
+                
+                shuffleItems(true); // Initial shuffle without sound
+                updateTooltip();
+                playBGM(true);
+            }
+
+            function resetGame() {
+                playSFX('click');
+                playBGM(false);
+                gameScreen.classList.add('hidden');
+                setupScreen.classList.remove('hidden');
+                
+                itemInput.value = '';
+                prizeArea.innerHTML = '';
+                
+                allItems = [];
+                remainingItems = [];
+                claimedItems = [];
+                gameState = 'setup';
+                hideModal();
+            }
+
+            // --- Claw and Ball Rendering ---
+            function renderBalls() {
+                prizeArea.innerHTML = '';
+                const prizeAreaWidth = prizeArea.clientWidth;
+                // ให้ลูกบอลชิดซ้ายก่อน
+                prizeArea.style.justifyContent = 'flex-start';
+                
+                remainingItems.forEach(item => {
+                    const ball = document.createElement('div');
+                    ball.className = 'prize-ball';
+                    ball.style.backgroundColor = item.color;
+                    ball.dataset.itemId = item.id;
+                    ball.dataset.itemName = item.name;
+                    item.element = ball; // Link DOM element to state
+                    prizeArea.appendChild(ball);
+                });
+
+                // ตรวจสอบว่าลูกบอลล้นจอหรือไม่
+                // ถ้าไม่ล้น ให้จัดกลาง
+                if (prizeArea.scrollWidth <= prizeAreaWidth) {
+                    prizeArea.style.justifyContent = 'center';
+                }
+            }
+            
+            function shuffleItems(initial = false) {
+                if (gameState !== 'playing') return;
+                
+                if (!initial) playSFX('shuffle');
+                
+                // Fisher-Yates Shuffle
+                for (let i = remainingItems.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [remainingItems[i], remainingItems[j]] = [remainingItems[j], remainingItems[i]];
+                }
+                
+                renderBalls();
+                updateTooltip();
+                
+                // Shake effect
+                if (!initial && !settings.reduceMotion) {
+                    const balls = document.querySelectorAll('.prize-ball');
+                    balls.forEach(ball => {
+                        ball.style.transform = `translateX(${Math.random() * 20 - 10}px)`;
+                    });
+                    setTimeout(() => {
+                        balls.forEach(ball => ball.style.transform = 'translateX(0)');
+                    }, 300);
+                }
+            }
+
+            function getRandomColor() {
+                const colors = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#a78bfa', '#f472b6'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            // --- Controls ---
+            function moveClaw(direction) {
+                if (gameState !== 'playing') return;
+                playSFX('move');
+                
+                const step = 2; // Move 2% per step
+                clawPosition = Math.max(0, Math.min(100, clawPosition + direction * step));
+                
+                updateClawPosition();
+                updateTooltip();
+            }
+            
+            function updateClawPosition(instant = false) {
+                claw.style.transition = instant ? 'none' : 'transform 0.2s linear';
+                claw.style.left = `${clawPosition}%`;
+
+                // อัปเดต Tooltip ตามตำแหน่งใหม่
+                const tooltipRect = clawTooltip.getBoundingClientRect();
+                const gameRect = gameViewport.getBoundingClientRect();
+                // พยายามจัดกลาง tooltip กับตัวคีบ
+                const clawScreenX = gameRect.left + (gameRect.width * clawPosition / 100);
+                clawTooltip.style.left = `${clawScreenX}px`;
+                clawTooltip.style.top = `${claw.getBoundingClientRect().bottom + 10}px`;
+                
+                // ทำให้ tooltip ไม่ตกขอบ
+                if (clawScreenX - (tooltipRect.width / 2) < gameRect.left) {
+                    clawTooltip.style.transform = `translateY(-50%)`;
+                } else if (clawScreenX + (tooltipRect.width / 2) > gameRect.right) {
+                    clawTooltip.style.transform = `translateX(-100%) translateY(-50%)`;
+                } else {
+                    clawTooltip.style.transform = `translateX(-50%) translateY(-50%)`;
+                }
+            }
+
+            function updateTooltip() {
+                if (gameState !== 'playing') {
+                    clawTooltip.classList.add('opacity-0');
+                    return;
+                }
+
+                clawTooltip.classList.remove('opacity-0');
+
+                const clawRect = clawHand.getBoundingClientRect();
+                const clawCenterX = clawRect.left + (clawRect.width / 2);
+
+                let closestBall = null;
+                let minDistance = Infinity;
+
+                remainingItems.forEach(item => {
+                    if (item.element) {
+                        const ballRect = item.element.getBoundingClientRect();
+                        const ballCenterX = ballRect.left + (ballRect.width / 2);
+                        const distance = Math.abs(clawCenterX - ballCenterX);
+
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            closestBall = item.element;
+                        }
+                    }
+                });
+
+                // Check if the claw is "over" the ball (within 50% of the ball's width)
+                if (closestBall && minDistance < (closestBall.getBoundingClientRect().width / 2)) {
+                    targetBall = closestBall; // Set the target
+                    
+                    // --- START EDIT ---
+                    // ค้นหาลำดับของลูกบอลที่เล็ง (จากซ้ายไปขวา)
+                    const ballsInArea = Array.from(prizeArea.children);
+                    const ballIndex = ballsInArea.indexOf(closestBall);
+                    
+                    clawTooltip.textContent = `เล็ง: บอลลูกที่ ${ballIndex + 1}`; // เปลี่ยนจาก targetBall.dataset.itemName
+                    // --- END EDIT ---
+
+                    clawTooltip.style.top = `${targetBall.getBoundingClientRect().top - clawTooltip.offsetHeight - 5}px`;
+                } else {
+                    targetBall = null; // Missed
+                    clawTooltip.textContent = `เล็ง: -- ว่างเปล่า --`;
+                    clawTooltip.style.top = `${claw.getBoundingClientRect().bottom + 10}px`;
+                }
+                
+                // อัปเดตตำแหน่งแนวนอนของ Tooltip
+                const clawScreenX = claw.getBoundingClientRect().left + (claw.getBoundingClientRect().width / 2);
+                clawTooltip.style.left = `${clawScreenX}px`;
+            }
+
+            async function grab() {
+                if (gameState !== 'playing') return;
+                
+                gameState = 'grabbing';
+                clawTooltip.classList.add('opacity-0');
+                playBGM(false);
+                
+                // 1. ตรวจสอบเป้าหมายครั้งสุดท้าย
+                updateTooltip();
+                const currentTarget = targetBall; // ล็อกเป้าหมาย
+                
+                // 2. คีบเลื่อนลง
+                // --- EDIT: คำนวณความลึกใหม่ตามตำแหน่งจริงของลูกบอล ---
+                const gameRect = gameViewport.getBoundingClientRect();
+                const ballRect = currentTarget ? currentTarget.getBoundingClientRect() : null;
+                
+                // ค่าเริ่มต้นถ้าคีบไม่โดนอะไร (ลงไปเกือบล่างสุด)
+                let dropHeight = gameRect.height - 150;
+
+                if (ballRect) {
+                    // ให้กรงเล็บลงไปถึงจุดกึ่งกลางของลูกบอลพอดี
+                    // ballRect.top คือขอบบนของลูกบอล
+                    // gameRect.top คือขอบบนของจอเกม
+                    // ลบออกเล็กน้อยเพื่อให้มือ (clawHand) อยู่เหนือลูกบอล และก้าม (pincers) ครอบลงมา
+                    dropHeight = (ballRect.top - gameRect.top) - 15;
+                }
+                
+                playSFX('grabDown');
+                clawArm.style.height = `${dropHeight}px`;
+                claw.classList.add('grabbing'); // แอนิเมชันมือคีบ
+                
+                await sleep(1000); // เวลารอคีบลง
+
+                // 3. ตรวจสอบผลลัพธ์
+                if (currentTarget === null) {
+                    // --- พลาด! ---
+                    playSFX('miss');
+                    await sleep(500);
+                    clawArm.style.height = `80px`; // กลับขึ้น (ความสูงเริ่มต้น)
+                    claw.classList.remove('grabbing');
+                    await sleep(1000); // เวลารอกลับ
+                    
+                    showTempMessage("คีบพลาด!", 1500);
+                    gameState = 'playing';
+                    playBGM(true);
+                    return;
+                }
+
+                // --- สำเร็จ! ---
+                playSFX('grabUp');
+
+                // --- EDIT: Reparenting Magic (ย้ายลูกบอลเข้ากรงเล็บ) ---
+                // 4. ย้ายลูกบอลจาก prize-area ไปใส่ใน claw-hand
+                // เพื่อแก้ปัญหา clipping และทำให้ลูกบอลขยับตามกรงเล็บเป๊ะๆ
+                
+                // ตั้งค่า Style ให้ลูกบอลอยู่กลางกรงเล็บ
+                currentTarget.style.position = 'absolute';
+                currentTarget.style.margin = '0'; // ลบ margin ของ flex item
+                currentTarget.style.top = '10px'; // ดันขึ้นไปให้อยู่ในอุ้งมือ
+                currentTarget.style.left = '50%';
+                currentTarget.style.transform = 'translateX(-50%)';
+                currentTarget.style.zIndex = '1'; // อยู่หลังกรงเล็บหน้าเล็กน้อย
+                
+                // ย้าย DOM
+                clawHand.appendChild(currentTarget);
+                
+                // 5. คีบขึ้น (ลูกบอลจะติดขึ้นไปด้วยเพราะเป็น child แล้ว)
+                clawArm.style.height = `80px`; // กลับขึ้น
+                
+                await sleep(1000); // เวลารอขึ้น
+
+                // 6. เลื่อนไปที่ช่องรับรางวัล
+                const dropZoneRect = dropZone.getBoundingClientRect();
+                const targetX = (dropZoneRect.left + dropZoneRect.width / 2) - gameRect.left;
+                
+                claw.style.transition = 'transform 1s ease-in-out';
+                claw.style.left = `${(targetX / gameRect.width) * 100}%`;
+                // ไม่ต้องขยับลูกบอลแยกแล้ว เพราะมันอยู่ใน claw
+                
+                await sleep(1000);
+
+                // 7. ปล่อยรางวัล
+                playSFX('click');
+                claw.classList.remove('grabbing');
+                
+                // แอนิเมชันลูกบอลตกลงจากมือ
+                currentTarget.style.transition = 'top 0.5s ease-in, opacity 0.5s ease-out';
+                currentTarget.style.top = '200px'; // ตกลงไปข้างล่าง
+                currentTarget.style.opacity = '0'; // จางหายไป
+                
+                await sleep(500);
+                
+                // ลบ element ออกจาก DOM ชั่วคราว (เดี๋ยว renderBalls จะสร้างใหม่ถ้ากด cancel)
+                if(currentTarget.parentNode) currentTarget.parentNode.removeChild(currentTarget);
+
+                // 8. กลับไปที่เดิม และแสดง Modal
+                claw.style.transition = 'transform 1s ease-in-out';
+                claw.style.left = `${clawPosition}%`;
+                
+                // หาไอเทมที่ได้
+                const wonItemId = currentTarget.dataset.itemId;
+                currentItemWon = remainingItems.find(item => item.id == wonItemId);
+                
+                showJackpotModal();
+            }
+
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            // --- Modal Handling ---
+            
+            function showModal(modalElement) {
+                // ซ่อน modal อื่นๆ ทั้งหมดก่อน
+                allModals.forEach(m => m.classList.add('hidden'));
+                
+                // แสดง modal ที่ต้องการ
+                modalElement.classList.remove('hidden', 'opacity-0');
+                
+                // แสดง overlay
+                modalOverlay.classList.remove('hidden');
+                modalOverlay.classList.add('flex');
+                gameState = 'modal';
+            }
+            
+            function hideModal() {
+                modalOverlay.classList.add('hidden');
+                modalOverlay.classList.remove('flex');
+                allModals.forEach(m => m.classList.add('hidden'));
+                
+                // ถ้าเกมยังไม่จบ ให้กลับไป 'playing'
+                if (remainingItems.length > 0 && gameState === 'modal') {
+                    gameState = 'playing';
+                    playBGM(true);
+                } else if (remainingItems.length === 0 && gameState !== 'setup') {
+                    // ถ้าของหมด
+                    showTempMessage("ของหมดแล้ว! เริ่มใหม่นะ", 3000, 'bg-green-800');
+                    setTimeout(resetGame, 3000);
+                }
+            }
+
+            function showTempMessage(message, duration = 2000, bgColor = 'bg-red-800') {
+                messageText.textContent = message;
+                messageModal.className = messageModal.attributes.class_template.value; // Reset class
+                messageModal.classList.add(bgColor);
+                showModal(messageModal);
+                
+                setTimeout(() => {
+                    // ซ่อนเฉพาะ message modal
+                    messageModal.classList.add('hidden');
+                    // ถ้าไม่มี modal อื่นเปิดอยู่ ให้ซ่อน overlay
+                    if (Array.from(allModals).every(m => m.classList.contains('hidden'))) {
+                        hideModal();
+                    }
+                }, duration);
+            }
+
+            function showJackpotModal() {
+                playSFX('win');
+                wonItemDisplay.textContent = currentItemWon.name;
+                showModal(jackpotModal);
+                if (!settings.reduceMotion) {
+                    launchConfetti();
+                }
+            }
+
+            function claimPrize() {
+                playSFX('click');
+                claimedItems.push(currentItemWon.name);
+                remainingItems = remainingItems.filter(item => item.id !== currentItemWon.id);
+                currentItemWon = null;
+                renderBalls();
+                hideModal();
+            }
+
+            function cancelPrize() {
+                playSFX('click');
+                // ไม่ต้องทำอะไร ไอเทมจะยังอยู่ใน remainingItems
+                currentItemWon = null;
+                renderBalls(); // เรนเดอร์ใหม่เพื่อให้ลูกบอลกลับมา
+                hideModal();
+            }
+            
+            function showHistory() {
+                playSFX('click');
+                if (claimedItems.length === 0) {
+                    historyList.innerHTML = '<p class="text-gray-400 text-center">ยังไม่มีประวัติ</p>';
+                } else {
+                    historyList.innerHTML = claimedItems.map(item => `<div class="p-2 border-b border-gray-700">${item}</div>`).join('');
+                }
+                showModal(historyModal);
+            }
+
+            function showRemaining() {
+                playSFX('click');
+                if (remainingItems.length === 0) {
+                    remainingList.innerHTML = '<p class="text-gray-400 text-center">ไม่เหลือไอเทม</p>';
+                } else {
+                    remainingList.innerHTML = remainingItems.map(item => `<div class="p-2 border-b border-gray-700">${item.name}</div>`).join('');
+                }
+                showModal(remainingModal);
+            }
+
+            function showSettings() {
+                playSFX('click');
+                reduceMotionToggle.checked = settings.reduceMotion;
+                bgmToggle.checked = settings.bgm;
+                sfxToggle.checked = settings.sfx;
+                showModal(settingsModal);
+            }
+            
+            // --- Settings Toggles ---
+            function toggleMute() {
+                settings.muteAll = !settings.muteAll;
+                playSFX('click');
+                
+                muteButton.innerHTML = settings.muteAll ? muteIcon : speakerIcon;
+                Tone.Destination.mute = settings.muteAll;
+                
+                // ถ้ากด mute, BGM ต้องหยุด
+                // ถ้ากด unmute, BGM ต้องเล่น (ถ้า BGM setting เปิดอยู่)
+                if (settings.muteAll) {
+                    playBGM(false); 
+                } else {
+                    playBGM(true); // ฟังก์ชันนี้จะเช็ค settings.bgm ภายในอยู่แล้ว
+                }
+            }
+            
+            reduceMotionToggle.addEventListener('change', (e) => {
+                settings.reduceMotion = e.target.checked;
+                playSFX('click');
+            });
+            bgmToggle.addEventListener('change', (e) => {
+                settings.bgm = e.target.checked;
+                playSFX('click');
+                playBGM(settings.bgm); // เปิด/ปิด BGM ทันที
+            });
+            sfxToggle.addEventListener('change', (e) => {
+                settings.sfx = e.target.checked;
+                playSFX('click');
+            });
+            
+            // --- Confetti ---
+            function launchConfetti() {
+                for (let i = 0; i < 50; i++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'confetti-piece';
+                    piece.style.background = getRandomColor();
+                    piece.style.left = `${Math.random() * 100}vw`;
+                    piece.style.animationDelay = `${Math.random() * 2}s`;
+                    piece.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
+                    piece.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                    confettiContainer.appendChild(piece);
+                    
+                    // playSFX('confetti'); // <-- OLD CODE: Causes error by calling 50x at once
+
+                    // NEW CODE: Stagger SFX calls using setTimeout to avoid Tone.js error
+                    setTimeout(() => {
+                        playSFX('confetti');
+                    }, i * 20); // Stagger each sound by 20ms
+
+                    setTimeout(() => {
+                        piece.remove();
+                    }, 5000);
+                }
+            }
+            
+            // --- Event Listeners ---
+            function init() {
+                // ต้องเริ่ม audio context จาก user action
+                document.body.addEventListener('click', () => setupAudio(), { once: true });
+                document.body.addEventListener('keydown', () => setupAudio(), { once: true });
+
+                startButton.addEventListener('click', startGame);
+                
+                // Game Controls
+                moveLeftButton.addEventListener('click', () => moveClaw(-1));
+                moveRightButton.addEventListener('click', () => moveClaw(1));
+                grabButton.addEventListener('click', grab);
+                shuffleButton.addEventListener('click', () => shuffleItems(false));
+
+                // Top Bar
+                historyButton.addEventListener('click', showHistory);
+                remainingButton.addEventListener('click', showRemaining);
+                settingsButton.addEventListener('click', showSettings);
+                muteButton.addEventListener('click', toggleMute);
+
+                // Modal Buttons
+                claimButton.addEventListener('click', claimPrize);
+                cancelButton.addEventListener('click', cancelPrize);
+                resetButton.addEventListener('click', resetGame);
+                modalCloseButtons.forEach(btn => btn.addEventListener('click', hideModal));
+                
+                // Keyboard Controls
+                document.addEventListener('keydown', (e) => {
+                    if (gameState !== 'playing') return;
+                    
+                    e.preventDefault(); // ป้องกันการเลื่อนหน้าจอด้วยลูกศร
+                    
+                    if (e.key === 'ArrowLeft') {
+                        moveClaw(-1);
+                    } else if (e.key === 'ArrowRight') {
+                        moveClaw(1);
+                    } else if (e.key === ' ') { // Spacebar
+                        grab();
+                    } else if (e.key.toLowerCase() === 's') {
+                        shuffleItems(false);
+                    }
+                });
+                
+                // ป้องกันการลากและซูมบนมือถือ
+                document.addEventListener('touchstart', (e) => {
+                    if (gameState === 'playing') e.preventDefault();
+                }, { passive: false });
+                document.addEventListener('touchmove', (e) => {
+                    if (gameState === 'playing') e.preventDefault();
+                }, { passive: false });
+                
+                // อัปเดตขนาด viewport
+                window.addEventListener('resize', () => {
+                    if (gameState === 'playing') {
+                        renderBalls();
+                        updateTooltip();
+                    }
+                });
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>
