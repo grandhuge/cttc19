@@ -62,6 +62,9 @@
             /* --- เพิ่มเงาข้อความและ transition สำหรับ hover --- */
             text-shadow: 0 0 3px rgba(255,255,255,0.5);
             transition: all 0.1s ease, box-shadow 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease;
+            /* ป้องกันการเลือกข้อความ (Text Selection) บนปุ่ม */
+            user-select: none;
+            -webkit-user-select: none;
         }
         .arcade-button:active {
             transform: translateY(4px);
@@ -335,6 +338,31 @@
             
             <!-- Confetti container -->
             <div id="confetti-container" class="absolute inset-0 z-50 pointer-events-none overflow-hidden"></div>
+
+            <!-- --- NEW: Game Instructions Overlay --- -->
+            <div id="game-instructions" class="absolute inset-0 z-40 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm hidden">
+                <div class="bg-gray-800 border-4 border-blue-500 rounded-xl p-6 max-w-md text-center shadow-2xl relative">
+                    <h2 class="text-2xl md:text-3xl text-yellow-400 mb-4 arcade-flicker">วิธีการเล่น</h2>
+                    <div class="text-left space-y-4 text-gray-200 text-base md:text-lg font-sans py-2">
+                        <p class="flex items-center gap-3">
+                            <span class="text-3xl">◀️ ▶️</span>
+                            <span>กดปุ่มซ้าย/ขวา เพื่อเล็ง</span>
+                        </p>
+                        <p class="flex items-center gap-3">
+                            <span class="text-3xl">👇</span>
+                            <span>กดปุ่มคีบ เมื่อพร้อม</span>
+                        </p>
+                        <p class="flex items-center gap-3">
+                            <span class="text-3xl">🌀</span>
+                            <span>กดกวน ถ้าอยากสุ่มใหม่</span>
+                        </p>
+                    </div>
+                    <!-- ลบคำเตือนออกแล้ว -->
+                    <button id="ready-button" class="arcade-button w-full mt-6 bg-green-500 border-green-700 text-white py-3 rounded-lg text-xl font-bold hover:brightness-110 hover:scale-105 transition-transform">
+                        เข้าใจแล้ว! (เริ่มเกม)
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- 
@@ -472,6 +500,9 @@
             const settingsModal = document.getElementById('settings-modal');
             const messageModal = document.getElementById('message-modal');
             const messageText = document.getElementById('message-text');
+            
+            const gameInstructions = document.getElementById('game-instructions');
+            const readyButton = document.getElementById('ready-button');
 
             const wonItemDisplay = document.getElementById('won-item-display');
             const claimButton = document.getElementById('claim-button');
@@ -488,7 +519,7 @@
             const confettiContainer = document.getElementById('confetti-container');
 
             // --- Game State ---
-            let gameState = 'setup'; // 'setup', 'playing', 'grabbing', 'modal'
+            let gameState = 'setup'; // 'setup', 'playing', 'grabbing', 'modal', 'instructions'
             let allItems = [];
             let remainingItems = []; // { id, name, color, element }
             let claimedItems = [];
@@ -614,12 +645,34 @@
                 
                 setupScreen.classList.add('hidden');
                 gameScreen.classList.remove('hidden');
-                gameState = 'playing';
-                clawPosition = 50; // Start at 50%
-                updateClawPosition(true); // Force instant update
                 
-                shuffleItems(true); // Initial shuffle without sound
-                updateTooltip();
+                // --- FIX BUG 1: รอให้หน้าจอพร้อมก่อนสุ่มบอล และตั้งค่า State ให้ถูกต้อง ---
+                setTimeout(() => {
+                    // 1. เปิดหน้าต่าง Instructions ก่อน (ตั้ง state เป็น 'instructions')
+                    showInstructions(); 
+                    
+                    // 2. ตั้งค่าตำแหน่งเริ่มต้น
+                    clawPosition = 50; 
+                    updateClawPosition(true); 
+                    
+                    // 3. สุ่มบอล (ตอนนี้ state เป็น instructions แล้ว ฟังก์ชัน shuffleItems จะยอมทำงาน)
+                    shuffleItems(true);
+                }, 100); // เพิ่มเวลาเล็กน้อยเพื่อให้มั่นใจใน Mobile
+            }
+            
+            function showInstructions() {
+                gameState = 'instructions';
+                gameInstructions.classList.remove('hidden');
+            }
+            
+            function dismissInstructions() {
+                playSFX('click');
+                gameInstructions.classList.add('hidden');
+                gameState = 'playing';
+                
+                // บังคับคำนวณตำแหน่ง Tooltip อีกครั้งเพื่อความชัวร์ว่าเล็งอะไรอยู่
+                updateTooltip(); 
+                
                 playBGM(true);
             }
 
@@ -635,6 +688,7 @@
                 allItems = [];
                 remainingItems = [];
                 claimedItems = [];
+                targetBall = null; // FIX BUG 2: ล้างค่าเป้าหมาย
                 gameState = 'setup';
                 hideModal();
             }
@@ -642,6 +696,8 @@
             // --- Claw and Ball Rendering ---
             function renderBalls() {
                 prizeArea.innerHTML = '';
+                targetBall = null; // FIX BUG 2: ล้างค่าเป้าหมายเก่าทุกครั้งที่สร้างบอลใหม่
+                
                 const prizeAreaWidth = prizeArea.clientWidth;
                 // ให้ลูกบอลชิดซ้ายก่อน
                 prizeArea.style.justifyContent = 'flex-start';
@@ -664,7 +720,8 @@
             }
             
             function shuffleItems(initial = false) {
-                if (gameState !== 'playing') return;
+                // อนุญาตให้ shuffle ได้ตอน instructions (เพื่อให้ DOM ถูกสร้างและบอลปรากฏ)
+                if (gameState !== 'playing' && gameState !== 'instructions') return;
                 
                 if (!initial) playSFX('shuffle');
                 
@@ -729,12 +786,18 @@
             }
 
             function updateTooltip() {
-                if (gameState !== 'playing') {
+                // ยอมให้คำนวณตอน instruction state ได้ เพื่อให้พร้อมเล่น
+                if (gameState !== 'playing' && gameState !== 'instructions') {
                     clawTooltip.classList.add('opacity-0');
                     return;
                 }
 
-                clawTooltip.classList.remove('opacity-0');
+                // แต่ซ่อน tooltip ไว้ถ้าอยู่ในหน้า instruction
+                if (gameState === 'instructions') {
+                    clawTooltip.classList.add('opacity-0');
+                } else {
+                    clawTooltip.classList.remove('opacity-0');
+                }
 
                 const clawRect = clawHand.getBoundingClientRect();
                 const clawCenterX = clawRect.left + (clawRect.width / 2);
@@ -759,13 +822,11 @@
                 if (closestBall && minDistance < (closestBall.getBoundingClientRect().width / 2)) {
                     targetBall = closestBall; // Set the target
                     
-                    // --- START EDIT ---
                     // ค้นหาลำดับของลูกบอลที่เล็ง (จากซ้ายไปขวา)
                     const ballsInArea = Array.from(prizeArea.children);
                     const ballIndex = ballsInArea.indexOf(closestBall);
                     
-                    clawTooltip.textContent = `เล็ง: บอลลูกที่ ${ballIndex + 1}`; // เปลี่ยนจาก targetBall.dataset.itemName
-                    // --- END EDIT ---
+                    clawTooltip.textContent = `เล็ง: บอลลูกที่ ${ballIndex + 1}`; 
 
                     clawTooltip.style.top = `${targetBall.getBoundingClientRect().top - clawTooltip.offsetHeight - 5}px`;
                 } else {
@@ -786,12 +847,11 @@
                 clawTooltip.classList.add('opacity-0');
                 playBGM(false);
                 
-                // 1. ตรวจสอบเป้าหมายครั้งสุดท้าย
+                // 1. ตรวจสอบเป้าหมายครั้งสุดท้าย (เรียกซ้ำเพื่อความชัวร์)
                 updateTooltip();
-                const currentTarget = targetBall; // ล็อกเป้าหมาย
+                const currentTarget = targetBall; // ล็อกเป้าหมาย ณ วินาทีที่กด
                 
                 // 2. คีบเลื่อนลง
-                // --- EDIT: คำนวณความลึกใหม่ตามตำแหน่งจริงของลูกบอล ---
                 const gameRect = gameViewport.getBoundingClientRect();
                 const ballRect = currentTarget ? currentTarget.getBoundingClientRect() : null;
                 
@@ -799,10 +859,6 @@
                 let dropHeight = gameRect.height - 150;
 
                 if (ballRect) {
-                    // ให้กรงเล็บลงไปถึงจุดกึ่งกลางของลูกบอลพอดี
-                    // ballRect.top คือขอบบนของลูกบอล
-                    // gameRect.top คือขอบบนของจอเกม
-                    // ลบออกเล็กน้อยเพื่อให้มือ (clawHand) อยู่เหนือลูกบอล และก้าม (pincers) ครอบลงมา
                     dropHeight = (ballRect.top - gameRect.top) - 15;
                 }
                 
@@ -830,17 +886,13 @@
                 // --- สำเร็จ! ---
                 playSFX('grabUp');
 
-                // --- EDIT: Reparenting Magic (ย้ายลูกบอลเข้ากรงเล็บ) ---
-                // 4. ย้ายลูกบอลจาก prize-area ไปใส่ใน claw-hand
-                // เพื่อแก้ปัญหา clipping และทำให้ลูกบอลขยับตามกรงเล็บเป๊ะๆ
-                
-                // ตั้งค่า Style ให้ลูกบอลอยู่กลางกรงเล็บ
+                // Reparenting Magic (ย้ายลูกบอลเข้ากรงเล็บ)
                 currentTarget.style.position = 'absolute';
-                currentTarget.style.margin = '0'; // ลบ margin ของ flex item
-                currentTarget.style.top = '10px'; // ดันขึ้นไปให้อยู่ในอุ้งมือ
+                currentTarget.style.margin = '0'; 
+                currentTarget.style.top = '10px'; 
                 currentTarget.style.left = '50%';
                 currentTarget.style.transform = 'translateX(-50%)';
-                currentTarget.style.zIndex = '1'; // อยู่หลังกรงเล็บหน้าเล็กน้อย
+                currentTarget.style.zIndex = '1'; 
                 
                 // ย้าย DOM
                 clawHand.appendChild(currentTarget);
@@ -856,7 +908,6 @@
                 
                 claw.style.transition = 'transform 1s ease-in-out';
                 claw.style.left = `${(targetX / gameRect.width) * 100}%`;
-                // ไม่ต้องขยับลูกบอลแยกแล้ว เพราะมันอยู่ใน claw
                 
                 await sleep(1000);
 
@@ -864,14 +915,14 @@
                 playSFX('click');
                 claw.classList.remove('grabbing');
                 
-                // แอนิเมชันลูกบอลตกลงจากมือ
-                currentTarget.style.transition = 'top 0.5s ease-in, opacity 0.5s ease-out';
+                // แอนิเมชันลูกบอลตกลงจากมือ (Physics: Gravity)
+                currentTarget.style.transition = 'top 0.5s cubic-bezier(0.6, 0.04, 0.98, 0.335), opacity 0.5s ease-out'; // Cubic bezier for gravity feel
                 currentTarget.style.top = '200px'; // ตกลงไปข้างล่าง
                 currentTarget.style.opacity = '0'; // จางหายไป
                 
                 await sleep(500);
                 
-                // ลบ element ออกจาก DOM ชั่วคราว (เดี๋ยว renderBalls จะสร้างใหม่ถ้ากด cancel)
+                // ลบ element ออกจาก DOM ชั่วคราว
                 if(currentTarget.parentNode) currentTarget.parentNode.removeChild(currentTarget);
 
                 // 8. กลับไปที่เดิม และแสดง Modal
@@ -879,8 +930,17 @@
                 claw.style.left = `${clawPosition}%`;
                 
                 // หาไอเทมที่ได้
+                // --- FIX: ดึงข้อมูลจาก Dataset โดยตรง เพื่อป้องกัน undefined ---
+                const wonItemName = currentTarget.dataset.itemName;
                 const wonItemId = currentTarget.dataset.itemId;
+                
+                // ค้นหา object จริงใน array (เอาไว้สำหรับ remove ตอน claim)
                 currentItemWon = remainingItems.find(item => item.id == wonItemId);
+                
+                // ถ้าไม่เจอใน array (กรณีบัค หรือหาไม่เจอ) ให้สร้าง object ชั่วคราว
+                if (!currentItemWon) {
+                     currentItemWon = { id: wonItemId, name: wonItemName };
+                }
                 
                 showJackpotModal();
             }
@@ -892,13 +952,8 @@
             // --- Modal Handling ---
             
             function showModal(modalElement) {
-                // ซ่อน modal อื่นๆ ทั้งหมดก่อน
                 allModals.forEach(m => m.classList.add('hidden'));
-                
-                // แสดง modal ที่ต้องการ
                 modalElement.classList.remove('hidden', 'opacity-0');
-                
-                // แสดง overlay
                 modalOverlay.classList.remove('hidden');
                 modalOverlay.classList.add('flex');
                 gameState = 'modal';
@@ -914,7 +969,6 @@
                     gameState = 'playing';
                     playBGM(true);
                 } else if (remainingItems.length === 0 && gameState !== 'setup') {
-                    // ถ้าของหมด
                     showTempMessage("ของหมดแล้ว! เริ่มใหม่นะ", 3000, 'bg-green-800');
                     setTimeout(resetGame, 3000);
                 }
@@ -927,9 +981,7 @@
                 showModal(messageModal);
                 
                 setTimeout(() => {
-                    // ซ่อนเฉพาะ message modal
                     messageModal.classList.add('hidden');
-                    // ถ้าไม่มี modal อื่นเปิดอยู่ ให้ซ่อน overlay
                     if (Array.from(allModals).every(m => m.classList.contains('hidden'))) {
                         hideModal();
                     }
@@ -950,17 +1002,19 @@
                 claimedItems.push(currentItemWon.name);
                 remainingItems = remainingItems.filter(item => item.id !== currentItemWon.id);
                 currentItemWon = null;
+                targetBall = null; // FIX BUG 2: ล้างค่าเป้าหมายทันทีที่รับรางวัล
                 renderBalls();
                 hideModal();
             }
 
             function cancelPrize() {
                 playSFX('click');
-                // ไม่ต้องทำอะไร ไอเทมจะยังอยู่ใน remainingItems
                 currentItemWon = null;
-                renderBalls(); // เรนเดอร์ใหม่เพื่อให้ลูกบอลกลับมา
+                renderBalls(); 
                 hideModal();
             }
+            
+            // ... (ฟังก์ชันช่วยเหลืออื่นๆ: showHistory, showRemaining, showSettings, toggleMute, listeners) ...
             
             function showHistory() {
                 playSFX('click');
@@ -990,20 +1044,16 @@
                 showModal(settingsModal);
             }
             
-            // --- Settings Toggles ---
             function toggleMute() {
                 settings.muteAll = !settings.muteAll;
                 playSFX('click');
                 
                 muteButton.innerHTML = settings.muteAll ? muteIcon : speakerIcon;
                 Tone.Destination.mute = settings.muteAll;
-                
-                // ถ้ากด mute, BGM ต้องหยุด
-                // ถ้ากด unmute, BGM ต้องเล่น (ถ้า BGM setting เปิดอยู่)
                 if (settings.muteAll) {
                     playBGM(false); 
                 } else {
-                    playBGM(true); // ฟังก์ชันนี้จะเช็ค settings.bgm ภายในอยู่แล้ว
+                    playBGM(true); 
                 }
             }
             
@@ -1014,14 +1064,13 @@
             bgmToggle.addEventListener('change', (e) => {
                 settings.bgm = e.target.checked;
                 playSFX('click');
-                playBGM(settings.bgm); // เปิด/ปิด BGM ทันที
+                playBGM(settings.bgm);
             });
             sfxToggle.addEventListener('change', (e) => {
                 settings.sfx = e.target.checked;
                 playSFX('click');
             });
             
-            // --- Confetti ---
             function launchConfetti() {
                 for (let i = 0; i < 50; i++) {
                     const piece = document.createElement('div');
@@ -1033,12 +1082,9 @@
                     piece.style.animationDuration = `${Math.random() * 3 + 2}s`;
                     confettiContainer.appendChild(piece);
                     
-                    // playSFX('confetti'); // <-- OLD CODE: Causes error by calling 50x at once
-
-                    // NEW CODE: Stagger SFX calls using setTimeout to avoid Tone.js error
                     setTimeout(() => {
                         playSFX('confetti');
-                    }, i * 20); // Stagger each sound by 20ms
+                    }, i * 20); 
 
                     setTimeout(() => {
                         piece.remove();
@@ -1046,58 +1092,37 @@
                 }
             }
             
-            // --- Event Listeners ---
             function init() {
-                // ต้องเริ่ม audio context จาก user action
                 document.body.addEventListener('click', () => setupAudio(), { once: true });
                 document.body.addEventListener('keydown', () => setupAudio(), { once: true });
 
                 startButton.addEventListener('click', startGame);
+                readyButton.addEventListener('click', dismissInstructions);
                 
-                // Game Controls
                 moveLeftButton.addEventListener('click', () => moveClaw(-1));
                 moveRightButton.addEventListener('click', () => moveClaw(1));
                 grabButton.addEventListener('click', grab);
                 shuffleButton.addEventListener('click', () => shuffleItems(false));
 
-                // Top Bar
                 historyButton.addEventListener('click', showHistory);
                 remainingButton.addEventListener('click', showRemaining);
                 settingsButton.addEventListener('click', showSettings);
                 muteButton.addEventListener('click', toggleMute);
 
-                // Modal Buttons
                 claimButton.addEventListener('click', claimPrize);
                 cancelButton.addEventListener('click', cancelPrize);
                 resetButton.addEventListener('click', resetGame);
                 modalCloseButtons.forEach(btn => btn.addEventListener('click', hideModal));
                 
-                // Keyboard Controls
                 document.addEventListener('keydown', (e) => {
                     if (gameState !== 'playing') return;
-                    
-                    e.preventDefault(); // ป้องกันการเลื่อนหน้าจอด้วยลูกศร
-                    
-                    if (e.key === 'ArrowLeft') {
-                        moveClaw(-1);
-                    } else if (e.key === 'ArrowRight') {
-                        moveClaw(1);
-                    } else if (e.key === ' ') { // Spacebar
-                        grab();
-                    } else if (e.key.toLowerCase() === 's') {
-                        shuffleItems(false);
-                    }
+                    e.preventDefault(); 
+                    if (e.key === 'ArrowLeft') moveClaw(-1);
+                    else if (e.key === 'ArrowRight') moveClaw(1);
+                    else if (e.key === ' ') grab();
+                    else if (e.key.toLowerCase() === 's') shuffleItems(false);
                 });
                 
-                // ป้องกันการลากและซูมบนมือถือ
-                document.addEventListener('touchstart', (e) => {
-                    if (gameState === 'playing') e.preventDefault();
-                }, { passive: false });
-                document.addEventListener('touchmove', (e) => {
-                    if (gameState === 'playing') e.preventDefault();
-                }, { passive: false });
-                
-                // อัปเดตขนาด viewport
                 window.addEventListener('resize', () => {
                     if (gameState === 'playing') {
                         renderBalls();
