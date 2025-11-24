@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>สหกรณ์นักเรียนจำลอง</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body, html {
+      height: 100%;
+      font-family: "Prompt", "Sarabun", sans-serif;
+      overflow: hidden;
+    }
+    
+    .container {
+      width: 100vw;
+      height: 100vh;
+      background: url('https://img5.pic.in.th/file/secure-sv1/bg9dfff736bd58ff4b.jpg') no-repeat center center;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30px 20px;
+    }
+    
+    .logo-area {
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .logo-area img {
+      width: 180px;
+      height: auto;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+      animation: float 4s ease-in-out infinite;
+    }
+    
+    .title {
+      margin-top: 20px;
+      color: white;
+      text-align: center;
+      text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
+    }
+    
+    .title h1 {
+      font-size: 48px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    
+    .title p {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .button-area {
+      margin-bottom: 60px;
+    }
+    
+    .play-button {
+      display: block;
+      width: 300px;
+      height: 110px;
+      background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+      border-radius: 55px;
+      box-shadow: 0 12px 25px rgba(255, 107, 107, 0.5);
+      text-decoration: none;
+      color: white;
+      font-size: 40px;
+      font-weight: 900;
+      text-align: center;
+      line-height: 110px;
+      animation: pulse 2s infinite;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .play-button:before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 70px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>') no-repeat center;
+      background-size: 70px;
+    }
+    
+    .play-button:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(255, 107, 107, 0.6);
+    }
+    
+    .play-button:active {
+      transform: translateY(3px);
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 12px 25px rgba(255, 107, 107, 0.5); }
+      50% { box-shadow: 0 12px 50px rgba(255, 107, 107, 0.8); }
+      100% { box-shadow: 0 12px 25px rgba(255, 107, 107, 0.5); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    .footer {
+      color: white;
+      font-size: 18px;
+      text-align: center;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+      line-height: 1.5;
+      padding: 0 20px;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@700;900&family=Sarabun:wght@600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- โลโก้ -->
+    <div class="logo-area">
+      <img src="https://img2.pic.in.th/pic/cpdlogo3D.png" alt="โลโก้ ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19">
+    </div>
+    
+    <!-- ชื่อเกม -->
+    <div class="title">
+      <h1>สหกรณ์นักเรียน</h1>
+      <p>เกมจำลองสนุกๆ สำหรับน้องประถม</p>
+    </div>
+    
+    <!-- ปุ่มเข้าเล่น -->
+    <div class="button-area">
+      <a href="https://cttc19-simstucoop.onrender.com/" class="play-button">
+        เข้าเล่นเลย!
+      </a>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      © 2025 ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 จังหวัดสุราษฎร์ธานี<br>
+      มาเรียนรู้การออมเงินและบริหารสหกรณ์ไปด้วยกันนะครับ ♡
+    </div>
+  </div>
+</body>
+</html>
