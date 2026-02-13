@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตรวจสอบผลการทดสอบ - ศส.20</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        softblue: '#a6d8f5',
+                        softmint: '#c3f0d4',
+                        softpink: '#ffd6e0',
+                        softpurple: '#e5d4f0',
+                    },
+                    fontFamily: { prompt: ['Prompt', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f8f9fa; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 1000; display: none; justify-content: center; align-items: center; flex-direction: column;}
+        .spinner { width: 50px; height: 50px; border: 5px solid #a6d8f5; border-top: 5px solid #ffd6e0; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .score-card { transition: transform 0.2s; }
+        .score-card:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+    <div id="loading" class="loading-overlay">
+        <div class="spinner mb-3"></div>
+        <div class="text-gray-500 font-medium">กำลังตรวจสอบข้อมูล...</div>
+    </div>
+
+    <div class="bg-white shadow-sm p-4 text-center sticky top-0 z-10">
+        <h1 class="text-xl font-bold text-gray-800">ตรวจสอบผลการทดสอบ</h1>
+        <p class="text-xs text-gray-500">โครงการพัฒนาศักยภาพบุคลากรด้านสินเชื่อและการบริหารความเสี่ยงของสหกรณ์</p>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 flex-grow max-w-lg">
+        
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <label class="block text-gray-700 font-semibold mb-2">ระบุเลขบัตรประชาชน</label>
+            <div class="relative">
+                <input type="text" id="idCard" maxlength="13" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-softblue bg-gray-50 text-center text-lg tracking-widest" placeholder="XXXXXXXXXXXXX" inputmode="numeric">
+                <i class="fas fa-id-card absolute right-4 top-4 text-gray-400"></i>
+            </div>
+            <button onclick="checkScore()" class="w-full bg-softblue hover:bg-blue-300 text-gray-800 font-bold py-3 px-6 rounded-xl mt-4 transition shadow-sm">
+                <i class="fas fa-search mr-2"></i> ตรวจสอบผล
+            </button>
+        </div>
+
+        <div id="resultSection" class="hidden fade-in">
+            
+            <div class="text-center mb-6">
+                <h2 id="userName" class="text-xl font-bold text-gray-800"></h2>
+                <p id="userCoop" class="text-gray-500 text-sm"></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="score-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-400 text-center">
+                    <p class="text-gray-500 text-xs font-bold uppercase mb-1">Pre-test</p>
+                    <div id="preScoreDisplay" class="text-3xl font-bold text-gray-700">-</div>
+                    <div id="preStatus" class="text-xs mt-1 text-gray-400">ยังไม่สอบ</div>
+                </div>
+
+                <div class="score-card bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-400 text-center">
+                    <p class="text-gray-500 text-xs font-bold uppercase mb-1">Post-test</p>
+                    <div id="postScoreDisplay" class="text-3xl font-bold text-gray-700">-</div>
+                    <div id="postStatus" class="text-xs mt-1 text-gray-400">ยังไม่สอบ</div>
+                </div>
+            </div>
+
+            <div id="evaluationCard" class="bg-gray-100 rounded-xl p-6 text-center border-2 border-dashed border-gray-300">
+                <div class="mb-2">
+                    <i id="evalIcon" class="fas fa-hourglass-half text-4xl text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-700 mb-1">ผลการประเมิน</h3>
+                <div id="evalText" class="text-gray-600 font-medium">รอผลการทดสอบ</div>
+                
+                <div id="successMessage" class="hidden mt-4 bg-green-50 text-green-800 text-sm p-4 rounded-lg border border-green-200 text-left">
+                    <i class="fas fa-info-circle mr-1"></i> 
+                    ท่านทำแบบทดสอบผ่านเกณฑ์แล้ว โปรดรอเจ้าหน้าที่ศูนย์ฯในพื้นที่ดำเนินการตรวจสอบยืนยันคุณสมบัติและจำนวนชั่วโมงที่เข้าอบรม
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <a href="index.html" class="text-gray-500 hover:text-gray-700 text-sm underline">กลับหน้าหลัก</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ***********************************************
+        // ใส่ URL Apps Script ล่าสุดของคุณที่นี่
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxX7VkxfTL2ggkmqpZBYjsllx6vgLJp79OPCPVeRIYvYfHn3ymStlPrn7MtURrfNH2d/exec"; 
+        // ***********************************************
+
+        function jsonp(url, params, callbackName) {
+            return new Promise((resolve, reject) => {
+                const unique = callbackName + '_' + Math.round(Math.random() * 100000);
+                const script = document.createElement('script');
+                const query = Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&');
+                script.src = `${url}?${query}&callback=${unique}`;
+                window[unique] = (data) => { delete window[unique]; document.body.removeChild(script); resolve(data); };
+                script.onerror = () => { document.body.removeChild(script); reject('Connection failed'); };
+                document.body.appendChild(script);
+            });
+        }
+
+        async function checkScore() {
+            const idCard = document.getElementById('idCard').value;
+            
+            // Validate ID Card length
+            if(idCard.length !== 13 || !/^\d+$/.test(idCard)) {
+                alert("กรุณาระบุเลขบัตรประชาชน 13 หลักให้ถูกต้อง");
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('resultSection').classList.add('hidden');
+
+            try {
+                // เรียกใช้ฟังก์ชันใหม่ getStudentScore
+                const res = await jsonp(SCRIPT_URL, { action: 'getStudentScore', idCard: idCard }, 'cb_score');
+                
+                document.getElementById('loading').style.display = 'none';
+
+                if (res.status === 'success') {
+                    displayResult(res.student, res.scores);
+                } else {
+                    alert("ไม่พบข้อมูลลงทะเบียนของท่านในระบบ");
+                }
+
+            } catch(e) {
+                document.getElementById('loading').style.display = 'none';
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ: " + e);
+            }
+        }
+
+        function displayResult(student, scores) {
+            // แสดงข้อมูลส่วนตัว
+            document.getElementById('userName').innerText = student.name;
+            document.getElementById('userCoop').innerText = student.coop;
+
+            // ตัวแปรคะแนน
+            let pre = scores.pre === "" || scores.pre === null ? null : parseInt(scores.pre);
+            let post = scores.post === "" || scores.post === null ? null : parseInt(scores.post);
+
+            // แสดงผล Pre-test
+            const preDisplay = document.getElementById('preScoreDisplay');
+            const preStatus = document.getElementById('preStatus');
+            if (pre !== null) {
+                preDisplay.innerText = pre;
+                preDisplay.classList.remove('text-gray-700'); preDisplay.classList.add('text-blue-600');
+                preStatus.innerHTML = '<span class="text-green-600"><i class="fas fa-check"></i> ส่งแล้ว</span>';
+            } else {
+                preDisplay.innerText = "-";
+                preDisplay.className = "text-3xl font-bold text-gray-400";
+                preStatus.innerText = "ยังไม่สอบ";
+            }
+
+            // แสดงผล Post-test
+            const postDisplay = document.getElementById('postScoreDisplay');
+            const postStatus = document.getElementById('postStatus');
+            if (post !== null) {
+                postDisplay.innerText = post;
+                if(post >= 12) {
+                    postDisplay.className = "text-3xl font-bold text-green-600";
+                    postStatus.innerHTML = '<span class="text-green-600 font-bold">ผ่านเกณฑ์คะแนน</span>';
+                } else {
+                    postDisplay.className = "text-3xl font-bold text-red-500";
+                    postStatus.innerHTML = '<span class="text-red-500">ไม่ถึงเกณฑ์</span>';
+                }
+            } else {
+                postDisplay.innerText = "-";
+                postDisplay.className = "text-3xl font-bold text-gray-400";
+                postStatus.innerText = "ยังไม่สอบ";
+            }
+
+            // ประเมินผลรวม
+            const evalCard = document.getElementById('evaluationCard');
+            const evalIcon = document.getElementById('evalIcon');
+            const evalText = document.getElementById('evalText');
+            const successMsg = document.getElementById('successMessage');
+
+            // Reset Styles
+            evalCard.className = "bg-gray-100 rounded-xl p-6 text-center border-2 border-dashed border-gray-300";
+            successMsg.classList.add('hidden');
+
+            if (pre !== null && post !== null) {
+                const passScore = post >= 12;
+                const passProgress = post >= pre;
+
+                if (passScore && passProgress) {
+                    // --- ผ่าน ---
+                    evalCard.className = "bg-green-50 rounded-xl p-6 text-center border-2 border-green-400 shadow-md";
+                    evalIcon.className = "fas fa-check-circle text-5xl text-green-500 mb-2";
+                    evalText.innerHTML = "<span class='text-green-700 text-xl font-bold'>ผ่านการประเมิน</span>";
+                    successMsg.classList.remove('hidden'); // แสดงข้อความพิเศษ
+                } else {
+                    // --- ไม่ผ่าน ---
+                    evalCard.className = "bg-red-50 rounded-xl p-6 text-center border-2 border-red-300";
+                    evalIcon.className = "fas fa-times-circle text-5xl text-red-400 mb-2";
+                    
+                    let reason = "";
+                    if (!passScore) reason = "คะแนนหลังอบรมไม่ถึงเกณฑ์ (12 คะแนน)";
+                    else if (!passProgress) reason = "คะแนนหลังอบรมน้อยกว่าก่อนอบรม";
+                    
+                    evalText.innerHTML = `<span class='text-red-600 font-bold'>ไม่ผ่านการประเมิน</span><div class='text-xs text-red-500 mt-1'>(${reason})</div>`;
+                }
+            } else {
+                // --- ยังสอบไม่ครบ ---
+                evalIcon.className = "fas fa-exclamation-circle text-4xl text-yellow-500 mb-2";
+                evalText.innerHTML = "<span class='text-gray-600'>กรุณาทำแบบทดสอบให้ครบถ้วน</span>";
+            }
+
+            // แสดงผลลัพธ์
+            document.getElementById('resultSection').classList.remove('hidden');
+        }
+    </script>
+
+</body>
+</html>

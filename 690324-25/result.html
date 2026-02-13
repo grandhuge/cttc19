@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายงานผลคะแนน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { softblue: '#a6d8f5', softmint: '#c3f0d4', softpink: '#ffd6e0', softpurple: '#e5d4f0', softgray: '#f0f0f0' },
+                    fontFamily: { prompt: ['Prompt', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f8f9fa; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #a6d8f5; border-top: 5px solid #ffd6e0; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        th { cursor: pointer; user-select: none; }
+        th:hover { background-color: #f3f4f6; }
+        th .sort-icon { display: inline-block; margin-left: 3px; font-size: 0.8em; color: #9ca3af; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div id="loading" class="loading-overlay"><div class="spinner"></div></div>
+
+    <div class="bg-white shadow p-4 md:p-6 mb-4 md:mb-8 sticky top-0 z-10">
+        <div class="container mx-auto flex flex-col lg:flex-row justify-between items-center gap-3">
+            <div class="text-center lg:text-left">
+                <h1 class="text-lg md:text-2xl font-bold text-gray-800">รายงานผลคะแนน</h1>
+                <p class="text-gray-500 text-xs md:text-sm">โครงการพัฒนาศักยภาพบุคลากรด้านสินเชื่อและการบริหารความเสี่ยงของสหกรณ์</p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto items-center">
+                <div class="relative w-full sm:w-48">
+                    <select id="provinceFilter" class="appearance-none border rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-softblue bg-white text-gray-700 cursor-pointer text-sm">
+                        <option value="">ทั้งหมด (ทุกจังหวัด)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"><i class="fas fa-chevron-down text-xs"></i></div>
+                </div>
+
+                <div class="relative w-full sm:w-64">
+                    <input type="text" id="searchInput" placeholder="ค้นหาชื่อ, สังกัด..." class="border rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-softblue pl-10 text-sm">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                </div>
+                
+                <button onclick="forceReload()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-lg transition text-sm flex items-center justify-center w-full sm:w-auto">
+                    <i class="fas fa-sync-alt mr-2 sm:mr-0"></i> <span class="sm:hidden">อัปเดตข้อมูล</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-2 md:px-4 pb-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6 text-center">
+            <div class="bg-white p-3 md:p-5 rounded-xl shadow-sm border-b-4 border-blue-400">
+                <p class="text-gray-500 text-xs mb-1">ผู้ลงทะเบียน</p>
+                <h3 id="statTotal" class="text-xl md:text-3xl font-bold text-gray-800">0</h3>
+            </div>
+            <div class="bg-white p-3 md:p-5 rounded-xl shadow-sm border-b-4 border-yellow-400">
+                <p class="text-gray-500 text-xs mb-1">เข้าสอบแล้ว</p>
+                <h3 id="statTested" class="text-xl md:text-3xl font-bold text-gray-800">0</h3>
+            </div>
+            <div class="bg-white p-3 md:p-5 rounded-xl shadow-sm border-b-4 border-green-400">
+                <p class="text-gray-500 text-xs mb-1">ผ่านเกณฑ์</p>
+                <h3 id="statPassed" class="text-xl md:text-3xl font-bold text-green-600">0</h3>
+            </div>
+            <div class="bg-white p-3 md:p-5 rounded-xl shadow-sm border-b-4 border-red-400">
+                <p class="text-gray-500 text-xs mb-1">ไม่ผ่าน</p>
+                <h3 id="statFailed" class="text-xl md:text-3xl font-bold text-red-600">0</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[140px]" onclick="sortData('name')">ชื่อ-นามสกุล <span id="sort-name" class="sort-icon">↕</span></th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[110px]" onclick="sortData('coop')">สังกัด <span id="sort-coop" class="sort-icon">↕</span></th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[90px]" onclick="sortData('province')">จังหวัด <span id="sort-province" class="sort-icon">↕</span></th>
+                            
+                            <th class="px-2 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[60px]" onclick="sortData('pre')">Pre <span id="sort-pre" class="sort-icon">↕</span></th>
+                            <th class="px-2 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[60px]" onclick="sortData('post')">Post <span id="sort-post" class="sort-icon">↕</span></th>
+                            
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[100px]" onclick="sortData('status')">ผลประเมิน <span id="sort-status" class="sort-icon">↕</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultTable" class="divide-y divide-gray-100 bg-white"></tbody>
+                </table>
+            </div>
+            
+            <div id="noDataMessage" class="hidden p-8 text-center text-gray-500">
+                <i class="fas fa-search mb-2 text-2xl text-gray-300"></i><br>
+                ไม่พบข้อมูลที่ค้นหา
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ***********************************************
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxX7VkxfTL2ggkmqpZBYjsllx6vgLJp79OPCPVeRIYvYfHn3ymStlPrn7MtURrfNH2d/exec"; 
+        // ***********************************************
+
+        const CACHE_KEY_RESULT = 'DASHBOARD_DATA_V1';
+        let allData = [];
+        let filteredData = [];
+        let sortState = { key: 'name', dir: 1 };
+
+        function loadDashboard() {
+            const cachedData = sessionStorage.getItem(CACHE_KEY_RESULT);
+            if (cachedData) {
+                processData(JSON.parse(cachedData));
+                hideLoading();
+            } else {
+                fetchDataFromServer();
+            }
+        }
+
+        function fetchDataFromServer() {
+            showLoading();
+            const callback = 'cb_' + Math.round(Math.random() * 100000);
+            const script = document.createElement('script');
+            script.src = `${SCRIPT_URL}?action=getDashboardData&callback=${callback}`;
+            
+            window[callback] = (data) => { 
+                delete window[callback]; 
+                document.body.removeChild(script); 
+                if(data.status === 'success') {
+                    sessionStorage.setItem(CACHE_KEY_RESULT, JSON.stringify(data));
+                }
+                processData(data); 
+            };
+            script.onerror = () => {
+                alert("โหลดข้อมูลไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต");
+                hideLoading();
+            };
+            document.body.appendChild(script);
+        }
+
+        function forceReload() {
+            sessionStorage.removeItem(CACHE_KEY_RESULT);
+            fetchDataFromServer();
+        }
+
+        function hideLoading() { document.getElementById('loading').classList.add('hidden'); }
+        function showLoading() { document.getElementById('loading').classList.remove('hidden'); }
+
+        function processData(data) {
+            const people = data.people;
+            const scores = data.scores;
+            const scoreMap = {};
+            
+            // Map คะแนน
+            scores.forEach(s => {
+                scoreMap[s.id] = { pre: s.pre, post: s.post };
+            });
+
+            // รวมข้อมูล
+            allData = Object.keys(people).map(id => {
+                const person = people[id];
+                const score = scoreMap[id] || { pre: "", post: "" };
+
+                let status = "ยังไม่สอบ";
+                let pre = score.pre === "" ? null : parseInt(score.pre);
+                let post = score.post === "" ? null : parseInt(score.post);
+
+                // Logic การประเมิน (เหมือนเดิม)
+                if (pre !== null && post !== null) {
+                    const passScore = post >= 12;
+                    const passProgress = post >= pre;
+                    
+                    if (passScore && passProgress) status = "ผ่าน";
+                    else if (!passScore) status = "ไม่ผ่าน (คะแนนหลังอบรม < 12)";
+                    else if (!passProgress) status = "ไม่ผ่าน (คะแนนหลังอบรมน้อยกว่าก่อน)";
+                    
+                } else if (pre !== null || post !== null) {
+                    status = "สอบไม่ครบ";
+                }
+
+                return {
+                    id: id,
+                    name: `${person.prefix}${person.fname} ${person.lname}`,
+                    coop: person.coop || "-",
+                    province: person.province || "-",
+                    pre: pre,
+                    post: post,
+                    status: status
+                };
+            });
+            
+            initProvinceFilter(allData);
+            sortData('name'); 
+            hideLoading();
+        }
+
+        function initProvinceFilter(data) {
+            const provinces = [...new Set(data.map(item => item.province).filter(p => p && p !== '-'))].sort((a, b) => a.localeCompare(b, 'th'));
+            const select = document.getElementById('provinceFilter');
+            select.innerHTML = '<option value="">ทั้งหมด (ทุกจังหวัด)</option>';
+            provinces.forEach(prov => {
+                const option = document.createElement('option');
+                option.value = prov;
+                option.textContent = prov;
+                select.appendChild(option);
+            });
+        }
+
+        function applyFilter() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const provinceVal = document.getElementById('provinceFilter').value;
+
+            filteredData = allData.filter(x => {
+                const matchSearch = x.name.toLowerCase().includes(term) || x.coop.toLowerCase().includes(term);
+                const matchProvince = provinceVal === "" || x.province === provinceVal;
+                return matchSearch && matchProvince;
+            });
+
+            sortData(sortState.key, false);
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').innerText = filteredData.length;
+            document.getElementById('statTested').innerText = filteredData.filter(x => x.pre !== null || x.post !== null).length;
+            document.getElementById('statPassed').innerText = filteredData.filter(x => x.status === 'ผ่าน').length;
+            document.getElementById('statFailed').innerText = filteredData.filter(x => x.status.startsWith('ไม่ผ่าน') || x.status === 'สอบไม่ครบ').length;
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('resultTable');
+            tbody.innerHTML = '';
+            
+            if(data.length === 0) {
+                document.getElementById('noDataMessage').classList.remove('hidden');
+                updateStats();
+                return;
+            } else {
+                document.getElementById('noDataMessage').classList.add('hidden');
+            }
+
+            updateStats();
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-blue-50 transition duration-150";
+                
+                // 1. Badge ผลประเมิน
+                let statusBadge = "";
+                if(row.status === 'ผ่าน') {
+                    statusBadge = `<span class="bg-green-100 text-green-800 py-1 px-3 rounded-full text-xs font-bold inline-block border border-green-200">ผ่าน</span>`;
+                } else if (row.status.startsWith('ไม่ผ่าน')) {
+                    statusBadge = `<span class="bg-red-100 text-red-800 py-1 px-3 rounded-full text-xs font-bold inline-block border border-red-200 cursor-help" title="${row.status}">ไม่ผ่าน</span>`;
+                } else if (row.status === 'สอบไม่ครบ') {
+                    statusBadge = `<span class="bg-yellow-100 text-yellow-800 py-1 px-3 rounded-full text-xs font-bold inline-block border border-yellow-200">สอบไม่ครบ</span>`;
+                } else {
+                    // ปรับข้อความเป็น "ยังไม่สอบ"
+                    statusBadge = `<span class="bg-gray-100 text-gray-500 py-1 px-3 rounded-full text-xs inline-block">ยังไม่สอบ</span>`;
+                }
+
+                // 2. แสดงผล Pre-test (ไอคอนอย่างเดียว ไม่มีข้อความ)
+                let preDisplay = "";
+                if (row.pre !== null) {
+                    preDisplay = `<i class="fas fa-check text-blue-500 text-lg" title="ทำแล้ว"></i>`;
+                } else {
+                    preDisplay = `<span class="text-gray-300">-</span>`;
+                }
+
+                // 3. แสดงผล Post-test (ไอคอนอย่างเดียว ไม่มีข้อความ)
+                let postDisplay = "";
+                if (row.post !== null) {
+                    if (row.post >= 12) {
+                        // ผ่านเกณฑ์ -> ติ๊กถูกสีเขียว
+                        postDisplay = `<i class="fas fa-check text-green-500 text-lg" title="ผ่านเกณฑ์คะแนน"></i>`;
+                    } else {
+                        // ไม่ผ่านเกณฑ์ -> ตกใจสีแดง
+                        postDisplay = `<i class="fas fa-exclamation text-red-500 text-lg" title="คะแนนไม่ถึงเกณฑ์"></i>`;
+                    }
+                } else {
+                    postDisplay = `<span class="text-gray-300">-</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="px-4 py-4 whitespace-nowrap font-medium text-gray-800 text-sm">${row.name}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">${row.coop}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${row.province}</td>
+                    <td class="px-2 py-4 whitespace-nowrap text-center">${preDisplay}</td>
+                    <td class="px-2 py-4 whitespace-nowrap text-center">${postDisplay}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-center">${statusBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('input', applyFilter);
+        document.getElementById('provinceFilter').addEventListener('change', applyFilter);
+
+        function sortData(key, toggle = true) {
+            if (toggle) {
+                if (sortState.key === key) sortState.dir = sortState.dir * -1;
+                else { sortState.key = key; sortState.dir = 1; }
+            }
+
+            document.querySelectorAll('.sort-icon').forEach(icon => icon.innerText = '↕');
+            const currentIcon = document.getElementById(`sort-${key}`);
+            if(currentIcon) currentIcon.innerText = sortState.dir === 1 ? '↑' : '↓';
+
+            if (filteredData.length === 0 && document.getElementById('searchInput').value === "" && document.getElementById('provinceFilter').value === "") {
+                filteredData = [...allData];
+            }
+
+            filteredData.sort((a, b) => {
+                let valA = a[key];
+                let valB = b[key];
+
+                if (key === 'pre' || key === 'post') {
+                    let numA = (valA === null || valA === "") ? -Infinity : valA;
+                    let numB = (valB === null || valB === "") ? -Infinity : valB;
+                    return (numA - numB) * sortState.dir;
+                }
+
+                valA = (valA || "").toString();
+                valB = (valB || "").toString();
+                return valA.localeCompare(valB, 'th') * sortState.dir;
+            });
+
+            renderTable(filteredData);
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

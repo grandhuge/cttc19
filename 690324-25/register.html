@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบฟอร์มลงทะเบียนอบรมบุคคลภายนอก ศส.20</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --bg-color: #f3f4f6;
+            --input-bg: #f9fafb;
+        }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: var(--bg-color);
+            background-image: radial-gradient(circle at 10% 20%, rgb(242, 246, 252) 0%, rgb(235, 235, 235) 90%);
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; color: #333;
+        }
+        .container {
+            background: #ffffff; width: 100%; max-width: 480px; border-radius: 24px; padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1); position: relative; overflow: hidden; transition: all 0.3s ease;
+        }
+        .container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: var(--primary-gradient); }
+        
+        @media (max-width: 480px) {
+            body { padding: 15px; align-items: flex-start; padding-top: 30px; }
+            .container { padding: 25px 20px; border-radius: 16px; }
+            h2 { font-size: 1.5rem !important; }
+            h3 { font-size: 1.1rem !important; }
+            h4 { font-size: 0.9rem !important; }
+            .subtitle { font-size: 0.8rem !important; }
+            button { padding: 14px !important; font-size: 1rem !important; }
+        }
+
+        h2 { text-align: center; font-weight: 600; color: #2d3748; margin-bottom: 10px; font-size: 1.8rem; }
+        h3 { text-align: center; font-weight: 500; color: #4a5568; margin-bottom: 5px; font-size: 1.2rem; }
+        h4 { text-align: center; font-weight: 400; color: #718096; margin-bottom: 5px; font-size: 1rem; }
+        .subtitle { text-align: center; color: #718096; font-size: 0.9rem; margin-bottom: 20px; }
+        hr { border: 0; height: 1px; background: #e2e8f0; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; position: relative; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; color: #4a5568; }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #a0aec0; transition: color 0.3s; }
+        input {
+            width: 100%; padding: 14px 14px 14px 45px; border: 2px solid transparent; background-color: var(--input-bg);
+            border-radius: 12px; font-size: 1rem; font-family: 'Sarabun', sans-serif; transition: all 0.3s ease;
+            box-sizing: border-box; color: #2d3748; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        input:focus { outline: none; background-color: #fff; border-color: #764ba2; box-shadow: 0 0 0 4px rgba(118, 75, 162, 0.1); }
+        input:focus + i, .input-wrapper:focus-within i { color: #764ba2; }
+        .id-input-valid { border-color: var(--success-color) !important; background-color: #f0fff4 !important; }
+        .id-input-error { border-color: var(--error-color) !important; background-color: #fff5f5 !important; animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        .error-msg { color: var(--error-color); font-size: 0.85rem; margin-top: 6px; display: flex; align-items: center; gap: 5px; }
+        button {
+            width: 100%; padding: 16px; background: var(--primary-gradient); color: white; border: none; border-radius: 12px;
+            font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 20px; transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(118, 75, 162, 0.5); }
+        button:disabled { background: #cbd5e0; cursor: not-allowed; box-shadow: none; transform: none; }
+        #overlay-loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; flex-direction: column;
+            z-index: 1000; opacity: 0; transition: opacity 0.3s ease;
+        }
+        #overlay-loading.active { display: flex; opacity: 1; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(118, 75, 162, 0.2); border-left-color: #764ba2; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        #messageArea { margin-top: 20px; text-align: center; border-radius: 8px; padding: 10px; display: none; }
+        .success-box { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error-box { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        .fade-in { animation: fadeIn 0.5s ease forwards; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+<div id="overlay-loading"><div class="spinner"></div><div id="overlay-text">กำลังตรวจสอบข้อมูล...</div></div>
+<div class="container fade-in">
+    <center><img src="https://img2.pic.in.th/logocttc20crop.png" style="max-width: 25%; height: auto;"></center>
+    <h2>ลงทะเบียนอบรม</h2>
+    <h3>โครงการ "พัฒนาศักยภาพบุคลากรด้านสินเชื่อและการบริหารความเสี่ยงของสหกรณ์"</h3>
+    <h4>วันที่ 24 - 25 มีนาคม 2569 ผ่าน Zoom Meeting</h4>
+    <div class="subtitle">โดย ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 ร่วมกับ ศูนย์ฯ 15-20</div>
+    <hr>
+    <div id="loading-form" style="text-align: center; color: #718096; padding: 20px;"><i class="fas fa-circle-notch fa-spin"></i> กำลังโหลดแบบฟอร์ม...</div>
+    <form id="dynamicForm"></form>
+    <div id="messageArea"></div>
+</div>
+<script>
+    // ***********************************************
+    // แก้ไข URL ให้เป็นของคุณเอง
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxX7VkxfTL2ggkmqpZBYjsllx6vgLJp79OPCPVeRIYvYfHn3ymStlPrn7MtURrfNH2d/exec"; 
+    // ***********************************************
+
+    const showOverlay = (msg) => { document.getElementById('overlay-text').innerText = msg; document.getElementById('overlay-loading').classList.add('active'); };
+    const hideOverlay = () => { document.getElementById('overlay-loading').classList.remove('active'); };
+    const showMessage = (msg, type) => {
+        const area = document.getElementById('messageArea'); area.style.display = 'block';
+        area.className = type === 'success' ? 'success-box' : 'error-box'; area.innerHTML = msg;
+    };
+    function jsonp(url, params, callbackName) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            const unique = callbackName + '_' + Math.round(Math.random() * 100000);
+            const query = Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&');
+            script.src = `${url}?${query}&callback=${unique}`;
+            window[unique] = (data) => { delete window[unique]; document.body.removeChild(script); resolve(data); };
+            script.onerror = () => { delete window[unique]; document.body.removeChild(script); reject('Connection failed'); };
+            document.body.appendChild(script);
+        });
+    }
+    function validateThaiID(id) {
+        if(id.length !== 13 || !/^[0-9]+$/.test(id)) return false;
+        let sum = 0; for(let i=0; i<12; i++) sum += parseFloat(id.charAt(i)) * (13-i);
+        const check = (11 - sum % 11) % 10; return check === parseFloat(id.charAt(12));
+    }
+    async function loadForm() {
+        try {
+            const res = await jsonp(SCRIPT_URL, { action: 'getHeaders' }, 'cb_head');
+            if(res.status === 'success') { document.getElementById('loading-form').style.display = 'none'; generateForm(res.headers); }
+        } catch(e) { document.getElementById('loading-form').innerHTML = '<span style="color:var(--error-color)">ไม่สามารถโหลดฟอร์มได้</span>'; }
+    }
+    function generateForm(headers) {
+        const form = document.getElementById('dynamicForm'); form.innerHTML = ''; form.classList.add('fade-in');
+        headers.forEach((header, index) => {
+            if(header.toLowerCase() === 'timestamp' || header === 'วันเวลา') return;
+            const div = document.createElement('div'); div.className = 'form-group';
+            const label = document.createElement('label'); label.innerText = header + (index === 0 ? " (เลขบัตรประชาชน)" : "");
+            const wrapper = document.createElement('div'); wrapper.className = 'input-wrapper';
+            const icon = document.createElement('i');
+            const input = document.createElement('input'); input.name = header; input.id = header; input.required = true;
+            if(index === 0) {
+                input.type = "text"; input.maxLength = 13; input.placeholder = "ระบุเลข 13 หลัก"; input.inputMode = "numeric"; icon.className = "fas fa-id-card";
+                input.addEventListener('change', function() { handleIDCheck(this); });
+                input.addEventListener('input', function() { this.value = this.value.replace(/[^0-9]/g, ''); if(this.classList.contains('id-input-error')) { this.classList.remove('id-input-error'); document.getElementById('id-error-msg').style.display = 'none'; } });
+            } else if(index === 1) { input.type = "date"; icon.className = "fas fa-calendar-alt";
+            } else { input.type = "text"; icon.className = "fas fa-user"; if(header.includes('โทร')) icon.className = "fas fa-phone"; if(header.includes('เมล')) icon.className = "fas fa-envelope"; }
+            wrapper.appendChild(input); wrapper.appendChild(icon); div.appendChild(label); div.appendChild(wrapper);
+            if(index === 0) { const errMsg = document.createElement('div'); errMsg.className = 'error-msg'; errMsg.id = 'id-error-msg'; errMsg.style.display = 'none'; errMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง'; div.appendChild(errMsg); }
+            form.appendChild(div);
+        });
+        const btn = document.createElement('button'); btn.innerHTML = 'บันทึกข้อมูล <i class="fas fa-paper-plane" style="margin-left:5px;"></i>'; btn.type = 'submit'; form.appendChild(btn);
+    }
+    async function handleIDCheck(input) {
+        const val = input.value;
+        if (!validateThaiID(val)) { input.classList.add('id-input-error'); input.classList.remove('id-input-valid'); document.getElementById('id-error-msg').style.display = 'flex'; document.querySelector('button[type="submit"]').disabled = true; return; }
+        else { input.classList.remove('id-input-error'); input.classList.add('id-input-valid'); document.getElementById('id-error-msg').style.display = 'none'; document.querySelector('button[type="submit"]').disabled = false; }
+        showOverlay("กำลังตรวจสอบฐานข้อมูล...");
+        try {
+            const res = await jsonp(SCRIPT_URL, { action: 'checkKey', key: val }, 'cb_check');
+            hideOverlay();
+            if (res.status === 'found') { setTimeout(() => { alert("⚠️ พบข้อมูลเดิมในระบบ\n\nโปรดตรวจสอบความถูกต้อง หากมีการเปลี่ยนแปลงให้กดบันทึก"); populateForm(res.data); }, 200); }
+            else { const inputs = document.querySelectorAll('form input'); inputs.forEach((inp, i) => { if(i !== 0) inp.value = ''; }); }
+        } catch(e) { hideOverlay(); showMessage("ไม่สามารถเชื่อมต่อฐานข้อมูลได้", "error"); }
+    }
+    function populateForm(data) {
+        for (const [key, value] of Object.entries(data)) {
+            const input = document.getElementById(key);
+            if (input) {
+                if(input.type === 'date' && value) { const dateObj = new Date(value); if(!isNaN(dateObj)) { const yyyy = dateObj.getFullYear(); const mm = String(dateObj.getMonth() + 1).padStart(2, '0'); const dd = String(dateObj.getDate()).padStart(2, '0'); input.value = `${yyyy}-${mm}-${dd}`; } }
+                else { input.value = value; }
+            }
+        }
+    }
+    document.getElementById('dynamicForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const idInput = document.getElementById(document.querySelector('.id-input-valid')?.id || document.querySelector('input').id);
+        if(!validateThaiID(idInput.value)) { idInput.classList.add('id-input-error'); return; }
+        showOverlay("กำลังบันทึกข้อมูล..."); document.getElementById('messageArea').style.display = 'none';
+        const formData = new FormData(this); const data = { action: 'submit' }; formData.forEach((v, k) => data[k] = v);
+        try {
+            const res = await jsonp(SCRIPT_URL, data, 'cb_submit');
+            hideOverlay();
+            if(res.status === 'success') { showMessage(`<i class="fas fa-check-circle"></i> ${res.message}`, "success"); if(res.message.includes('ใหม่')) this.reset(); const inputs = document.querySelectorAll('input'); inputs.forEach(i => i.classList.remove('id-input-valid')); }
+            else { showMessage(`<i class="fas fa-times-circle"></i> ${res.message}`, "error"); }
+        } catch(err) { hideOverlay(); showMessage("เกิดข้อผิดพลาดในการส่งข้อมูล", "error"); }
+    });
+    loadForm();
+</script>
+</body>
+</html>
+

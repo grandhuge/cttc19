@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบออนไลน์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = { theme: { extend: { colors: { softblue: '#a6d8f5', softmint: '#c3f0d4', softpink: '#ffd6e0', softpurple: '#e5d4f0' }, fontFamily: { prompt: ['Prompt', 'sans-serif'] } } } }
+    </script>
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #a6d8f5; border-top: 5px solid #ffd6e0; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .unanswered-warning { border: 2px solid #ef4444; background-color: #fef2f2; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <div id="loading" class="loading-overlay"><div class="spinner mb-4"></div><div class="text-gray-600 font-medium animate-pulse">กำลังโหลดข้อมูล...</div></div>
+    <div class="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 py-6 px-4 shadow-md">
+        <div class="container mx-auto text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">แบบทดสอบออนไลน์</h1>
+            <p class="text-gray-700 font-medium">โครงการพัฒนาศักยภาพบุคลากรด้านสินเชื่อและการบริหารความเสี่ยงของสหกรณ์</p>
+        </div>
+    </div>
+    <div class="container mx-auto px-4 py-8 flex-grow max-w-3xl">
+        <div id="introSection" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-6 border-t-4 border-softblue fade-in">
+            <div class="flex items-center mb-6"><div class="bg-blue-100 p-3 rounded-full mr-4 text-blue-600"><i class="fas fa-user-edit text-xl"></i></div><div><h2 class="text-xl font-bold text-gray-800">ข้อมูลผู้เข้าสอบ</h2><p class="text-gray-500 text-sm">กรุณาระบุตัวตนก่อนเริ่มทำแบบทดสอบ</p></div></div>
+            <div class="mb-5">
+                <label class="block text-gray-700 font-semibold mb-2">ชื่อ-นามสกุล (ค้นหาจากฐานข้อมูล)</label>
+                <div class="relative">
+                    <input list="nameList" id="fullName" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-softblue bg-gray-50 transition" placeholder="พิมพ์ชื่อเพื่อค้นหา..." autocomplete="off">
+                    <datalist id="nameList"></datalist>
+                    <i class="fas fa-search absolute right-4 top-4 text-gray-400"></i>
+                </div>
+                <button onclick="clearCacheAndReload()" class="text-xs text-blue-500 hover:underline mt-1 cursor-pointer">(คลิกที่นี่หากต้องการอัปเดตรายชื่อล่าสุด)</button>
+            </div>
+            <div class="mb-8">
+                <label class="block text-gray-700 font-semibold mb-2">ประเภทการสอบ</label>
+                <div class="relative">
+                    <select id="examType" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-softblue bg-gray-50 appearance-none cursor-pointer">
+                        <option value="" disabled selected>-- กรุณาเลือก --</option>
+                        <option value="Pre-test">แบบทดสอบก่อนอบรม (Pre-test)</option>
+<!--                         <option value="Post-test">แบบทดสอบหลังอบรม (Post-test)</option>  -->
+</select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500"><i class="fas fa-chevron-down"></i></div>
+                </div>
+            </div>
+            <button onclick="startQuiz()" class="w-full bg-softblue hover:bg-blue-300 text-gray-800 font-bold py-4 px-6 rounded-xl transition duration-300 shadow-md transform hover:-translate-y-1 flex justify-center items-center"><span>เริ่มทำแบบทดสอบ</span><i class="fas fa-arrow-right ml-2"></i></button>
+        </div>
+        <div id="quizSection" class="hidden fade-in">
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-start"><i class="fas fa-exclamation-circle text-blue-500 mt-1 mr-3"></i><div><h3 class="font-bold text-blue-800">คำชี้แจง</h3><p class="text-sm text-blue-700">กรุณาทำข้อสอบให้ครบทุกข้อ เมื่อมั่นใจแล้วให้กดปุ่ม "ส่งคำตอบ" ด้านล่างสุด</p></div></div>
+            <form id="quizForm"><div id="questionsContainer" class="space-y-6"></div><div class="mt-8"><button type="submit" class="w-full bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 shadow-lg transform hover:-translate-y-1 flex justify-center items-center"><span>ส่งคำตอบ</span><i class="fas fa-paper-plane ml-2"></i></button></div></form>
+        </div>
+        <div id="scoreSection" class="hidden bg-white rounded-2xl shadow-lg p-8 text-center border-t-4 border-softpink fade-in">
+            <div class="mb-6"><div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto animate-bounce"><i class="fas fa-check text-4xl text-green-500"></i></div></div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">บันทึกผลเรียบร้อย</h2><p class="text-gray-600 mb-6">ระบบได้บันทึกคะแนนของคุณแล้ว</p>
+            <div class="bg-gray-50 rounded-xl p-6 mb-6 inline-block w-full md:w-2/3 border border-gray-100"><p class="text-sm text-gray-500 uppercase tracking-wide mb-1">คะแนนที่ได้</p><div class="text-5xl font-bold text-softblue mb-2"><span id="userScore">0</span><span class="text-2xl text-gray-400 mx-1">/</span><span id="fullScore" class="text-2xl text-gray-400">0</span></div><div id="scoreMessage" class="text-sm font-medium text-blue-600 bg-blue-50 py-1 px-3 rounded-full inline-block"></div></div>
+            <div><button onclick="location.reload()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-8 rounded-xl transition duration-300"><i class="fas fa-home mr-2"></i>กลับหน้าแรก</button></div>
+        </div>
+    </div>
+    <footer class="bg-white border-t border-gray-200 py-6 mt-auto"><div class="container mx-auto px-4 text-center"><p class="text-gray-500 text-sm">© developed by Tle Narongphisit | CTTC20 @ CPD</p></div></footer>
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxX7VkxfTL2ggkmqpZBYjsllx6vgLJp79OPCPVeRIYvYfHn3ymStlPrn7MtURrfNH2d/exec"; 
+        let userMap = {}; let quizData = [];
+        function jsonp(url, params, callbackName) {
+            return new Promise((resolve, reject) => {
+                const unique = callbackName + '_' + Math.round(Math.random() * 100000);
+                const script = document.createElement('script');
+                const query = Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&');
+                window[unique] = (data) => { delete window[unique]; document.body.removeChild(script); resolve(data); };
+                script.src = `${url}?${query}&callback=${unique}`;
+                script.onerror = () => { document.body.removeChild(script); reject('Connection Failed'); };
+                document.body.appendChild(script);
+            });
+        }
+        async function init() {
+            try {
+                const localData = sessionStorage.getItem('QUIZ_DATA_CACHE_V2');
+                if (localData) { const res = JSON.parse(localData); setupQuizForm(res); } 
+                else {
+                    const res = await jsonp(SCRIPT_URL, { action: 'getQuizData' }, 'cb_init');
+                    if(res.status === 'success') { try { sessionStorage.setItem('QUIZ_DATA_CACHE_V2', JSON.stringify(res)); } catch (e) {} setupQuizForm(res); } 
+                    else { throw new Error(res.message); }
+                }
+            } catch(e) { alert("ไม่สามารถโหลดข้อมูลได้"); document.getElementById('loading').innerHTML = '<div class="text-red-500">โหลดข้อมูลล้มเหลว กรุณารีเฟรชหน้าจอ</div>'; }
+        }
+        function clearCacheAndReload() { sessionStorage.removeItem('QUIZ_DATA_CACHE_V2'); location.reload(); }
+        function setupQuizForm(res) {
+            const dl = document.getElementById('nameList'); dl.innerHTML = ''; userMap = {};
+            res.users.forEach(u => { const opt = document.createElement('option'); opt.value = u.name; dl.appendChild(opt); userMap[u.name] = u.id; });
+            quizData = res.questions; renderQuestions(res.questions); document.getElementById('loading').classList.add('hidden');
+        }
+        function renderQuestions(qs) {
+            const container = document.getElementById('questionsContainer'); container.innerHTML = '';
+            qs.forEach((q, idx) => {
+                let choicesHtml = '';
+                q.choices.forEach((c, i) => { if(c) { choicesHtml += `<label class="flex items-center p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition border border-transparent hover:border-gray-200 mb-2"><div class="relative flex items-center"><input type="radio" name="q_${q.id}" value="${i+1}" class="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-gray-300 checked:border-softblue checked:bg-softblue transition-all" required><div class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg></div></div><span class="ml-3 text-gray-700 select-none">${c}</span></label>`; } });
+                container.innerHTML += `<div id="q-block-${idx+1}" class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 transition duration-300 hover:shadow-md"><h3 class="font-bold text-lg text-gray-800 mb-4 flex items-start"><span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm mr-3 mt-0.5 whitespace-nowrap shadow-sm">ข้อ ${idx+1}</span><span class="leading-relaxed">${q.question}</span></h3><div class="space-y-1 pl-1 md:pl-4 border-l-2 border-gray-100 ml-2">${choicesHtml}</div></div>`;
+            });
+        }
+        function startQuiz() {
+            const name = document.getElementById('fullName').value; const type = document.getElementById('examType').value;
+            if(!name) return alert('กรุณาระบุชื่อ-นามสกุล'); if(!userMap[name]) return alert('ไม่พบรายชื่อในระบบ โปรดตรวจสอบการลงทะเบียนหรือติดต่อเจ้าหน้าที่'); if(!type) return alert('กรุณาเลือกประเภทการสอบ');
+            document.getElementById('introSection').classList.add('hidden'); document.getElementById('quizSection').classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        document.getElementById('quizForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this); let unanswered = [];
+            document.querySelectorAll('[id^="q-block-"]').forEach(el => el.classList.remove('unanswered-warning'));
+            quizData.forEach((q, index) => { if(!formData.get(`q_${q.id}`)) { unanswered.push(index + 1); document.getElementById(`q-block-${index+1}`).classList.add('unanswered-warning'); } });
+            if(unanswered.length > 0) { alert(`⚠️ คุณยังตอบไม่ครบจำนวน ${unanswered.length} ข้อ`); document.getElementById(`q-block-${unanswered[0]}`).scrollIntoView({behavior: 'smooth', block: 'center'}); return; }
+            if(!confirm('ยืนยันการส่งคำตอบ?')) return;
+            document.getElementById('loading').classList.remove('hidden');
+            const name = document.getElementById('fullName').value; const idCard = userMap[name]; let score = 0;
+            quizData.forEach(q => { if(parseInt(formData.get(`q_${q.id}`)) === parseInt(q.correct)) score++; });
+            try {
+                const res = await jsonp(SCRIPT_URL, { action: 'submitScore', idCard: idCard, type: document.getElementById('examType').value, score: score, fullScore: quizData.length }, 'cb_submit');
+                document.getElementById('loading').classList.add('hidden'); document.getElementById('quizSection').classList.add('hidden'); document.getElementById('scoreSection').classList.remove('hidden');
+                document.getElementById('userScore').innerText = score; document.getElementById('fullScore').innerText = quizData.length; document.getElementById('scoreMessage').innerHTML = `<i class="fas fa-info-circle mr-1"></i> ${res.message}`; window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch(err) { alert("เกิดข้อผิดพลาดในการส่งข้อมูล"); document.getElementById('loading').classList.add('hidden'); }
+        });
+        init();
+    </script>
+</body>
+
+</html>
+

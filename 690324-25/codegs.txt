@@ -1,0 +1,280 @@
+// *****************************************************************
+// ตั้งค่า ID ของ Google Sheet ของคุณที่นี่
+//var SHEET_ID = "XXXXX";
+// *****************************************************************
+
+function doGet(e) {
+  var callback = e.parameter.callback || 'callback';
+  var action = e.parameter.action;
+  var result = {};
+
+  // กำหนดชื่อ Key สำหรับเก็บ Cache
+  var CACHE_KEYS = {
+    HEADERS: "CACHE_HEADERS_V1",
+    QUIZ_DATA: "CACHE_QUIZ_DATA_V1",
+    DASHBOARD: "CACHE_DASHBOARD_DATA_V1"
+  };
+
+  try {
+    //var ss = SpreadsheetApp.openById(SHEET_ID);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var cache = CacheService.getScriptCache();
+
+    // ==========================================
+    // 1. ลงทะเบียน (register)
+    // ==========================================
+    if (action === "getHeaders") {
+      var cached = cache.get(CACHE_KEYS.HEADERS);
+      if (cached) {
+        result = JSON.parse(cached);
+      } else {
+        var sheet = ss.getSheetByName("register");
+        var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+        result = { status: "success", headers: headers };
+        cache.put(CACHE_KEYS.HEADERS, JSON.stringify(result), 21600); // 6 ชม.
+      }
+    } 
+    else if (action === "checkKey") {
+      var sheet = ss.getSheetByName("register");
+      var key = e.parameter.key;
+      var data = sheet.getDataRange().getValues();
+      var foundData = null;
+      var headers = data[0];
+      
+      for (var i = 1; i < data.length; i++) {
+        if (String(data[i][0]) === String(key)) {
+          foundData = {};
+          for (var j = 0; j < headers.length; j++) {
+             foundData[headers[j]] = data[i][j];
+          }
+          break;
+        }
+      }
+      result = foundData ? { status: "found", data: foundData } : { status: "not_found" };
+    }
+    else if (action === "submit") {
+      var lock = LockService.getScriptLock();
+      lock.waitLock(10000);
+
+      try {
+        var sheet = ss.getSheetByName("register");
+        var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+        var keyVal = e.parameter[headers[0]];
+        var allData = sheet.getDataRange().getValues();
+        var rowIndex = -1;
+
+        for (var i = 1; i < allData.length; i++) {
+          if (String(allData[i][0]) === String(keyVal)) { rowIndex = i + 1; break; }
+        }
+
+        var rowData = [];
+        for (var i = 0; i < headers.length; i++) {
+          var h = headers[i];
+          if (h.toLowerCase().includes('timestamp') || h.includes('วันเวลา')) rowData.push(new Date());
+          else rowData.push(e.parameter[h] || "");
+        }
+
+        if (rowIndex > 0) {
+          sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+          result = { status: "success", message: "อัปเดตข้อมูลเรียบร้อย" };
+        } else {
+          sheet.appendRow(rowData);
+          result = { status: "success", message: "ลงทะเบียนเรียบร้อย" };
+        }
+
+        // ล้าง Cache เพื่อให้ข้อมูลอัปเดตทันที
+        cache.remove(CACHE_KEYS.QUIZ_DATA);
+        cache.remove(CACHE_KEYS.DASHBOARD);
+
+      } finally {
+        lock.releaseLock();
+      }
+    }
+
+    // ==========================================
+    // 2. ทำข้อสอบ (Quiz)
+    // ==========================================
+    else if (action === "getQuizData") {
+      var cached = cache.get(CACHE_KEYS.QUIZ_DATA);
+      if (cached) {
+        result = JSON.parse(cached);
+      } else {
+        var regSheet = ss.getSheetByName("register");
+        var regData = regSheet.getDataRange().getValues();
+        var userList = [];
+        
+        for(var i=1; i<regData.length; i++) {
+          var r = regData[i];
+          if(r[0]) {
+              var displayName = (r[2] || "") + "" + (r[3] || "") + " " + (r[4] || "");
+              userList.push({ id: String(r[0]), name: displayName.trim() });
+          }
+        }
+        userList.sort(function(a, b) { return a.name.localeCompare(b.name, 'th'); });
+
+        var qSheet = ss.getSheetByName("question");
+        var qData = qSheet.getDataRange().getValues();
+        var questions = [];
+        for(var i=1; i<qData.length; i++) {
+          if(qData[i][1] != "") {
+             questions.push({
+               id: i,
+               question: qData[i][1],
+               choices: [qData[i][2], qData[i][3], qData[i][4], qData[i][5]],
+               correct: qData[i][6] 
+             });
+          }
+        }
+        result = { status: "success", users: userList, questions: questions };
+        try { cache.put(CACHE_KEYS.QUIZ_DATA, JSON.stringify(result), 1800); } catch(e) {}
+      }
+    }
+
+    else if (action === "submitScore") {
+      var scoreSheet = ss.getSheetByName("testscore");
+      if (!scoreSheet) {
+         scoreSheet = ss.insertSheet("testscore");
+         scoreSheet.appendRow(["Timestamp", "ID_Card", "Pre-test", "Post-test"]);
+      }
+
+      var idCard = e.parameter.idCard;
+      var type = e.parameter.type;
+      var newScore = parseInt(e.parameter.score);
+      
+      var lock = LockService.getScriptLock();
+      lock.waitLock(10000); 
+
+      try {
+        var data = scoreSheet.getDataRange().getValues();
+        var rowIndex = -1;
+
+        for (var i = 1; i < data.length; i++) {
+          if (String(data[i][1]) === String(idCard)) { rowIndex = i + 1; break; }
+        }
+
+        var targetCol = (type === "Pre-test") ? 3 : 4; 
+
+        if (rowIndex > 0) {
+          var currentScore = data[rowIndex-1][targetCol-1];
+          if (currentScore === "" || newScore > parseInt(currentScore)) {
+              scoreSheet.getRange(rowIndex, 1).setValue(new Date());
+              scoreSheet.getRange(rowIndex, targetCol).setValue(newScore);
+              result = { status: "success", message: "บันทึกคะแนนสูงสุดใหม่ (" + type + ": " + newScore + ")" };
+          } else {
+              result = { status: "success", message: "คะแนนไม่สูงกว่าเดิม (" + currentScore + ") ระบบคงคะแนนเดิมไว้" };
+          }
+        } else {
+          var newRow = [new Date(), "'" + idCard, "", ""];
+          if (type === "Pre-test") newRow[2] = newScore; else newRow[3] = newScore;
+          scoreSheet.appendRow(newRow);
+          result = { status: "success", message: "บันทึกคะแนนเรียบร้อยแล้ว" };
+        }
+
+        cache.remove(CACHE_KEYS.DASHBOARD); // ล้าง Cache ผลคะแนน
+
+      } finally {
+        lock.releaseLock();
+      }
+    }
+
+    // ==========================================
+    // 3. รายงานผล (Result)
+    // ==========================================
+    else if (action === "getDashboardData") {
+      var cached = cache.get(CACHE_KEYS.DASHBOARD);
+      if (cached) {
+        result = JSON.parse(cached);
+      } else {
+        var regSheet = ss.getSheetByName("register");
+        var regRaw = regSheet.getDataRange().getValues();
+        var personMap = {};
+        for(var i=1; i<regRaw.length; i++) {
+          var r = regRaw[i];
+          if(r[0]) {
+              personMap[String(r[0])] = {
+                  prefix: r[2], fname: r[3], lname: r[4], coop: r[6], province: r[10]
+              };
+          }
+        }
+
+        var scoreSheet = ss.getSheetByName("testscore");
+        var testScores = [];
+        if(scoreSheet) {
+            var scoreRaw = scoreSheet.getDataRange().getValues();
+            for(var i=1; i<scoreRaw.length; i++) {
+                testScores.push({
+                    id: String(scoreRaw[i][1]),
+                    pre: scoreRaw[i][2],
+                    post: scoreRaw[i][3]
+                });
+            }
+        }
+
+        result = { status: "success", people: personMap, scores: testScores };
+        try { cache.put(CACHE_KEYS.DASHBOARD, JSON.stringify(result), 600); } catch(e) {}
+      }
+    }
+
+    // ==========================================
+    // 4. ตรวจสอบผลคะแนนรายบุคคล (check_score.html)
+    // ==========================================
+    else if (action === "getStudentScore") {
+      var idCard = e.parameter.idCard;
+      var regSheet = ss.getSheetByName("register");
+      var regData = regSheet.getDataRange().getValues();
+      var student = null;
+
+      // 1. ค้นหาข้อมูลส่วนตัวจาก Register
+      // A=0(ID), C=2(Prefix), D=3(Name), E=4(Surname), G=6(Coop)
+      for (var i = 1; i < regData.length; i++) {
+        if (String(regData[i][0]) === String(idCard)) {
+          student = {
+            name: (regData[i][2] || "") + "" + (regData[i][3] || "") + " " + (regData[i][4] || ""),
+            coop: regData[i][6] || "-"
+          };
+          break;
+        }
+      }
+
+      if (!student) {
+        result = { status: "not_found", message: "ไม่พบข้อมูลลงทะเบียน" };
+      } else {
+        // 2. ค้นหาคะแนนจาก TestScore
+        var scoreSheet = ss.getSheetByName("testscore");
+        var scores = { pre: null, post: null };
+        
+        if (scoreSheet) {
+          var scoreData = scoreSheet.getDataRange().getValues();
+          // Structure: A=Time, B=ID, C=Pre, D=Post
+          for (var i = 1; i < scoreData.length; i++) {
+            if (String(scoreData[i][1]) === String(idCard)) {
+              scores.pre = scoreData[i][2];
+              scores.post = scoreData[i][3];
+              break;
+            }
+          }
+        }
+        result = { status: "success", student: student, scores: scores };
+      }
+    }
+    
+    else {
+      result = { status: "error", message: "Invalid Action" };
+    }
+
+  } catch (error) {
+    result = { status: "error", message: error.toString() };
+  }
+
+  return ContentService.createTextOutput(callback + "(" + JSON.stringify(result) + ")")
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
+function clearAllCache() {
+  var cache = CacheService.getScriptCache();
+  cache.removeAll([
+    "CACHE_HEADERS_V1",
+    "CACHE_QUIZ_DATA_V1",
+    "CACHE_DASHBOARD_DATA_V1"
+  ]);
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน้าหลัก - โครงการพัฒนาศักยภาพบุคลากรด้านสินเชื่อและการบริหารความเสี่ยงของสหกรณ์</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        softblue: '#a6d8f5',
+                        softmint: '#c3f0d4',
+                        softpink: '#ffd6e0',
+                        softpurple: '#e5d4f0',
+                    },
+                    fontFamily: { prompt: ['Prompt', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+        .menu-card { transition: all 0.3s ease; }
+        .menu-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .qr-card { transition: transform 0.2s; }
+        .qr-card:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+    <div class="flex-grow flex flex-col justify-center py-6 md:py-10 px-4">
+        <div class="container mx-auto max-w-4xl">
+            
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-6 md:mb-8 text-center border-t-4 border-blue-400 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300"></div>
+                
+                <img src="https://img2.pic.in.th/logocttc20crop.png" alt="Logo CTTC20" class="h-20 md:h-32 mx-auto mb-4 md:mb-6 object-contain">
+                
+                <h1 class="text-xl md:text-3xl font-bold text-gray-800 mb-2">
+                    โครงการพัฒนาศักยภาพบุคลากรด้านสินเชื่อและการบริหารความเสี่ยงของสหกรณ์ (ออนไลน์)
+                </h1>
+                <p class="text-gray-600 font-medium mb-1 text-sm md:text-base">
+                    <i class="far fa-calendar-alt mr-2 text-blue-500"></i>วันที่ 24 - 25 มีนาคม 2569
+                </p>
+                <p class="text-gray-600 text-sm mb-4">
+                    <i class="fas fa-video mr-2 text-red-500"></i>ผ่านระบบ Zoom Meeting
+                </p>
+                <div class="inline-block bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-xs md:text-sm">
+                    โดย ศูนย์ถ่ายทอดเทคโนโลยีการสหกรณ์ที่ 19 ร่วมกับ ศูนย์ฯ 15-20
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8 md:mb-10">
+                <a href="register.html" target="_blank" class="menu-card bg-white p-5 md:p-6 rounded-xl shadow-md border-l-8 border-blue-400 flex items-center group cursor-pointer">
+                    <div class="bg-blue-100 p-4 rounded-full mr-5 group-hover:bg-blue-200 transition"><i class="fas fa-user-plus text-2xl text-blue-600"></i></div>
+                    <div><h3 class="text-lg md:text-xl font-bold text-gray-800 group-hover:text-blue-600 transition">ลงทะเบียน</h3><p class="text-gray-500 text-sm">ลงทะเบียนเข้าร่วมโครงการ</p></div>
+                </a>
+<!--                <a href="edit.html" target="_blank" class="menu-card bg-white p-5 md:p-6 rounded-xl shadow-md border-l-8 border-blue-400 flex items-center group cursor-pointer">
+                    <div class="bg-blue-100 p-4 rounded-full mr-5 group-hover:bg-blue-200 transition"><i class="fas fa-user-edit text-2xl text-blue-600"></i></div>
+                    <div><h3 class="text-lg md:text-xl font-bold text-gray-800 group-hover:text-blue-600 transition">แก้ไขข้อมูล</h3><p class="text-gray-500 text-sm">แก้ไขข้อมูลการลงทะเบียน</p></div>
+                </a>
+                -->
+                <a href="result.html" target="_blank" class="menu-card bg-white p-5 md:p-6 rounded-xl shadow-md border-l-8 border-green-400 flex items-center group cursor-pointer">
+                    <div class="bg-green-100 p-4 rounded-full mr-5 group-hover:bg-green-200 transition"><i class="fas fa-list-alt text-2xl text-green-600"></i></div>
+                    <div><h3 class="text-lg md:text-xl font-bold text-gray-800 group-hover:text-green-600 transition">ตรวจสอบรายชื่อ</h3><p class="text-gray-500 text-sm">สถานะและผลการทดสอบ</p></div>
+                </a>
+                <a href="comingsoon.html" target="_blank" class="menu-card bg-white p-5 md:p-6 rounded-xl shadow-md border-l-8 border-purple-400 flex items-center group cursor-pointer">
+                    <div class="bg-purple-100 p-4 rounded-full mr-5 group-hover:bg-purple-200 transition"><i class="fas fa-pen-nib text-2xl text-purple-600"></i></div>
+                    <div><h3 class="text-lg md:text-xl font-bold text-gray-800 group-hover:text-purple-600 transition">ทำแบบทดสอบ</h3><p class="text-gray-500 text-sm">ทดสอบก่อน/หลังอบรม</p></div>
+                </a>
+                <a href="comingsoon.html" target="_blank" class="menu-card bg-white p-5 md:p-6 rounded-xl shadow-md border-l-8 border-yellow-400 flex items-center group cursor-pointer">
+                    <div class="bg-yellow-100 p-4 rounded-full mr-5 group-hover:bg-yellow-200 transition"><i class="fas fa-star text-2xl text-yellow-600"></i></div>
+                    <div><h3 class="text-lg md:text-xl font-bold text-gray-800 group-hover:text-yellow-600 transition">ประเมินผลโครงการ</h3><p class="text-gray-500 text-sm">แบบประเมินความพึงพอใจ</p></div>
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                <div class="text-center mb-6 relative">
+                    <h2 class="text-lg font-bold text-gray-700 inline-block bg-white px-4 relative z-10">
+                        <i class="fas fa-qrcode mr-2 text-gray-500"></i>ข้อมูลเพิ่มเติมและเอกสาร
+                    </h2>
+                    <div class="absolute top-1/2 left-0 w-full h-px bg-gray-200 -z-0"></div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                    <a href="https://drive.google.com/drive/folders/1Uo0FvqLsJbfqjgheOrh42bN9P_92F_o6" target="_blank" class="qr-card flex flex-col items-center group">
+                        <div class="bg-gray-50 p-2 rounded-lg border border-gray-200 mb-3 shadow-sm group-hover:shadow-md w-full flex justify-center"><img src="https://i.ibb.co/bMHnX2Gg/24-25project.png" alt="รายละเอียด" class="w-full h-auto object-contain rounded max-h-32"></div>
+                        <span class="text-sm font-medium text-gray-700 text-center">รายละเอียดโครงการ</span><span class="text-xs text-gray-400 mt-1">คลิกเพื่อดู</span>
+                    </a>
+                    <a href="https://line.me/R/ti/g/Wj5s56drBY" target="_blank" class="qr-card flex flex-col items-center group">
+                        <div class="bg-green-50 p-2 rounded-lg border border-green-200 mb-3 shadow-sm group-hover:shadow-md w-full flex justify-center"><img src="https://i.ibb.co/bgwBLQcD/24-25line.jpg" alt="Line Group" class="w-full h-auto object-contain rounded max-h-32"></div>
+                        <span class="text-sm font-medium text-gray-700 text-center">Line Group Chat</span><span class="text-xs text-green-500 mt-1 font-medium">เข้าร่วมกลุ่ม</span>
+                    </a>
+                    <a href="https://zoom.us/j/5667757303?pwd=Y3JZaXkREh199J2xtHlcYWpIdBVdFc.1&omn=95004332789" target="_blank" class="qr-card flex flex-col items-center group">
+                        <div class="bg-blue-50 p-2 rounded-lg border border-blue-200 mb-3 shadow-sm group-hover:shadow-md w-full flex justify-center"><img src="https://i.ibb.co/dshTkD5k/24-25zoom.png" alt="Zoom Meeting" class="w-full h-auto object-contain rounded max-h-32"></div>
+                        <span class="text-sm font-medium text-gray-700 text-center">Zoom Meeting</span><span class="text-xs text-blue-500 mt-1 font-medium">สแกน/คลิกเพื่อเข้า</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/18AGL2xETA_DMN1VeuJIsOrbw-0XyFNmE" target="_blank" class="qr-card flex flex-col items-center group">
+                        <div class="bg-yellow-50 p-2 rounded-lg border border-yellow-200 mb-3 shadow-sm group-hover:shadow-md w-full flex justify-center"><img src="https://i.ibb.co/whcpmRsv/24-25doc.png" alt="เอกสาร" class="w-full h-auto object-contain rounded max-h-32"></div>
+                        <span class="text-sm font-medium text-gray-700 text-center">เอกสารประกอบ</span><span class="text-xs text-gray-400 mt-1">ดาวน์โหลด</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-600 font-medium text-sm">© developed by Tle Narongphisit | CTTC20 @ CPD</p>
+        </div>
+    </footer>
+</body>
+
+</html>
+
+
+
+
+
+
