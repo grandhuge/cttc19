@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ยังไม่เปิดให้บริการ - Coming Soon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ตั้งค่าพื้นฐาน */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(135deg, #a6d8f5 0%, #e5d4f0 100%); /* ปรับสีให้เข้ากับธีมหลัก */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            padding: 20px;
+        }
+
+        /* กล่องเนื้อหาหลัก */
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            border-top: 8px solid #a6d8f5;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* ไอคอน */
+        .icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* หัวข้อหลัก */
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        /* คำอธิบาย */
+        p {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .highlight-text {
+            color: #5a67d8;
+            font-weight: 500;
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* ปุ่มกลับหน้าหลัก */
+        .btn {
+            display: inline-block;
+            padding: 14px 35px;
+            background-color: #a6d8f5;
+            color: #2d3748;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(166, 216, 245, 0.5);
+        }
+
+        .btn:hover {
+            background-color: #90cdf4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(166, 216, 245, 0.6);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            p {
+                font-size: 1rem;
+            }
+            .icon {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="icon">⏳</div>
+        
+        <h1>ระบบยังไม่เปิดให้บริการ</h1>
+        
+        <p>
+            ขณะนี้เมนูนี้ยังไม่ถึงกำหนดเวลาเปิดให้ใช้งาน
+            <br>กรุณากลับมาใหม่อีกครั้งเมื่อถึงกำหนด
+            <span class="highlight-text">(Will be available soon)</span>
+        </p>
+
+        <a href="index.html" class="btn">
+            <i class="fas fa-home" style="margin-right: 5px;"></i> กลับหน้าหลัก
+        </a>
+    </div>
+
+</body>
+</html>
