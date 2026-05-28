@@ -104,6 +104,16 @@
             </div>
         </div>
 
+        <!-- Control Buttons -->
+        <div class="text-center mt-8 space-x-4">
+            <button id="start-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105">
+                🚀 เริ่มเกม
+            </button>
+            <button id="reset-btn" class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105" disabled="">
+                🔄 เริ่มใหม่
+            </button>
+        </div>
+        
         <!-- Game Area -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Items Pool -->
@@ -137,7 +147,7 @@
                 </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="rights" data-index="5">
                     <div class="flex items-center space-x-2">
                         <span class="text-xl">🔍</span>
-                        <span class="font-medium text-gray-800">ตรวจสอบการดำเนินงาน</span>
+                        <span class="font-medium text-gray-800">ขอตรวจสอบการดำเนินงาน</span>
                     </div>
                 </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="duties" data-index="6">
                     <div class="flex items-center space-x-2">
@@ -162,7 +172,7 @@
                 </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="rights" data-index="10">
                     <div class="flex items-center space-x-2">
                         <span class="text-xl">🗳️</span>
-                        <span class="font-medium text-gray-800">เข้าร่วมประชุมใหญ่</span>
+                        <span class="font-medium text-gray-800">แสดงความคิดเห็นในที่ประชุมใหญ่</span>
                     </div>
                 </div><div class="drag-item bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md cursor-grab" draggable="true" data-group="duties" data-index="11">
                     <div class="flex items-center space-x-2">
@@ -222,15 +232,7 @@
             </div>
         </div>
 
-        <!-- Control Buttons -->
-        <div class="text-center mt-8 space-x-4">
-            <button id="start-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105">
-                🚀 เริ่มเกม
-            </button>
-            <button id="reset-btn" class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105" disabled="">
-                🔄 เริ่มใหม่
-            </button>
-        </div>
+
     </div>
 
     <!-- Game Over Modal -->
@@ -264,11 +266,11 @@
         const gameItems = [
             // Rights (สิทธิ)
             { text: "ได้รับเงินปันผล", group: "rights", icon: "💰" },
-            { text: "เข้าร่วมประชุมใหญ่", group: "rights", icon: "🗳️" },
+            { text: "แสดงความคิดเห็นในที่ประชุมใหญ่", group: "rights", icon: "🗳️" },
             { text: "ออกเสียงลงคะแนน", group: "rights", icon: "✋" },
             { text: "ได้รับบริการจากสหกรณ์", group: "rights", icon: "🏪" },
             { text: "เสนอความคิดเห็น", group: "rights", icon: "💭" },
-            { text: "ตรวจสอบการดำเนินงาน", group: "rights", icon: "🔍" },
+            { text: "ขอตรวจสอบการดำเนินงาน", group: "rights", icon: "🔍" },
             { text: "ได้รับข้อมูลข่าวสาร", group: "rights", icon: "📰" },
             { text: "ขอกู้เงินจากสหกรณ์", group: "rights", icon: "🏦" },
             
